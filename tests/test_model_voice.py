@@ -79,18 +79,40 @@ def test_default_plans_make_no_model_call():
     assert w.decisions.tail(1)[0].source == "fallback"
 
 
-def test_the_model_can_choose_another_allowed_action():
-    def stubborn(call_type, pack):
-        data = FakeModel.good(call_type, pack)
-        if call_type == "decide" and pack["you"] == "Kael":
-            data["action"] = "wait"
-        return data
+def test_drives_decide_what_the_model_may_choose():
+    """A clear pull is acted on; only actions about as strong as the best are left to the model."""
+    def wants(action):
+        def reply(call_type, pack):
+            data = FakeModel.good(call_type, pack)
+            if call_type == "decide" and pack["you"] == "Kael":
+                data["action"] = action
+            return data
+        return reply
+
+    # Tick 0 after the humiliation: walking on (6) beats waiting (0) by far, so waiting is never offered.
     w = new_world(1)
     for verb in ("insult", "challenge", "humiliate"):
-        rules.act(w, verb, "kael", gateway=FakeModel(stubborn))
+        rules.act(w, verb, "kael", gateway=FakeModel(wants("wait")))
     d = next(d for d in w.decisions if d.npc == "kael" and d.kind == "decide")
-    assert (d.chosen, d.source) == ("wait", "llm")
-    assert w.npcs["kael"].loc == "tavern"  # he stayed, because the model said so
+    assert (d.chosen, d.source) == ("go_to", "fallback") and "action 'wait' is not allowed" in d.reason
+
+    # Tick 0 after sparing him: a drink (respect 4 + 3 = 7) against walking on (6) is a real choice, left to him.
+    w = new_world(1)
+    for verb in ("insult", "challenge", "spare"):
+        rules.act(w, verb, "kael", gateway=FakeModel(wants("go_to")))
+    d = next(d for d in w.decisions if d.npc == "kael" and d.kind == "decide")
+    assert (d.chosen, d.source) == ("go_to", "llm") and d.allowed == ["go_to", "wait", "share_drink"]
+    assert w.npcs["kael"].loc == "market"  # he left instead of staying for the drink, because the model chose to
+
+
+def test_a_clear_grudge_is_always_acted_on():
+    model = FakeModel()
+    play_demo(model)
+    accuse = next(p for c, p in model.calls if c == "decide" and p["ALLOWED"][0]["id"] == "accuse:player")
+    assert accuse["ALLOWED"] == [{"id": "accuse:player", "pull": 9,
+                                  "does": "tell the Captain what the player did to you; she trusts you and will "
+                                          "stop them at the gate"}]
+    assert accuse["situation"] == "You are at the guard post. Decide what to do now."
 
 
 @pytest.mark.parametrize("bad,why", [
@@ -139,7 +161,7 @@ def test_state_pack_holds_what_the_npc_knows_and_never_truth():
     assert "truth" not in json.dumps(detain)  # the model never learns which beliefs are false
     assert any(b["claim"] == "Kael robbed Odo" for b in detain["beliefs"])  # the lie, held as a belief
     assert len(detain["beliefs"]) <= 5 and len(detain["events"]) <= 5
-    assert [a["id"] for a in detain["ALLOWED"]] == ["detain:kael", "wait"]  # ordered by what her duty favours
+    assert [a["id"] for a in detain["ALLOWED"]] == ["detain:kael"]  # her duty (10) far outweighs waiting (1)
     assert detain["you"] == "Captain Brenna" and "bridge" in detain["setting"]
     talk = next(p for c, p in model.calls if c == "react" and "What did you see?" in p["situation"])
     assert talk["you"] == "Mags" and talk["situation"] == 'The player says to you: "What did you see?"'

@@ -25,6 +25,7 @@ from thespis.ledger import Claim, Event
 from thespis.world import LOST, PLAYING, WON, World
 
 TALK_MAX = 200
+DRIVE_MARGIN = 2  # the model may choose only among actions within this many utility points of the best one
 EPILOGUE_PHASES = 2
 DUEL_WON = "duel_won"
 
@@ -330,7 +331,7 @@ def end_phase(w: World, action: str, brain: Brain | None = None, mind: Mind | No
         ask = voice.crossed_threshold(w, C.RIVAL) or len(options) > 2
         chosen = _decide(w, mind, brain, C.RIVAL, "tick", options, None,
                          lambda ch: voice.decision_line(w, C.RIVAL, ch, grievance, view),
-                         f"You are at {C.STOP_NAMES[kael.loc]}. Decide your next move in the race for the relic.", ask,
+                         f"You are at {C.STOP_NAMES[kael.loc]}. Decide what to do now.", ask,
                          view)
         if chosen == "take_relic":
             if w.status == PLAYING:
@@ -396,11 +397,21 @@ def _decide(w: World, mind: Mind, brain: Brain, npc: str, trigger: str, options:
     choice = brain.choose(npc, options)
     said = line_for(choice)
     fallback = Utterance(choice, *(said or (None, [])), "fallback")
-    u = mind.decide(voice.pack_for(w, npc, situation, options, view), fallback) if ask and mind.active else fallback
+    # Drives decide what is on the table: the model only chooses between actions they rate about as highly as the
+    # best, so a clear grudge always acts on it. It still words every line and settles near-ties.
+    offered = _offered(options)
+    u = mind.decide(voice.pack_for(w, npc, situation, offered, view), fallback) if ask and mind.active else fallback
     base = reason or f"{u.action} scores {options[u.action]}"  # without a reason given, the utility explains it
+    if u.source == "llm" and len(offered) < len(options):
+        base += f"; drives offered {', '.join(offered)}"
     w.decisions.record(DECIDE, npc, w.phase, trigger, allowed=list(options), chosen=u.action, line=u.line,
                        cites=u.cites, reason=f"{base}; {u.note}" if u.note else base, source=u.source)
     return u.action
+
+
+def _offered(options: dict[str, float]) -> dict[str, float]:
+    best = max(options.values())
+    return {a: u for a, u in options.items() if u >= best - DRIVE_MARGIN}
 
 
 def run_epilogue(w: World, brain: Brain | None = None, mind: Mind | None = None) -> list[Tick]:
