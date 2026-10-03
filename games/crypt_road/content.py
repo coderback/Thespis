@@ -5,6 +5,7 @@ The rules that act on it (verbs, the tick, gossip, testimony) live in rules.py (
 
 from __future__ import annotations
 
+import hashlib
 import tomllib
 from functools import cache
 from pathlib import Path
@@ -13,12 +14,41 @@ from thespis.minds import NPC
 from thespis.world import World
 
 STOPS = ["tavern", "market", "guard_post", "bridge", "crypt"]
+STOP_NAMES = {"tavern": "the tavern", "market": "the market", "guard_post": "the guard post",
+              "bridge": "the bridge", "crypt": "the crypt"}
 PHASES = ["morning", "noon", "evening", "night"]
 GATE = ("guard_post", "bridge")  # the crossing Brenna controls
 PREDS = ["robbed", "beat", "insulted", "spared", "lied"]
 GOSSIP_PRIORITY = {"robbed": 3, "beat": 2, "insulted": 1}  # worst news travels first
 DEMO_SEED = 1
 PLAYER_START = {"loc": "tavern", "coins": 10}
+
+RIVAL = "kael"  # races you to the relic and remembers what you did
+GUARD = "brenna"  # holds the gate; believes people she trusts
+GOSSIPS = ("odo", "mags")  # pass on what they know, in this order
+WITNESSES = ("odo", "mags")  # the guard can question them
+FINE = 20  # the bribe, in coins
+DUEL_WIN_CHANCE = 0.6
+CRIME_CONF = 0.5  # beliefs below this are stored and shown but never acted on
+
+
+def dice(seed: int, key: str) -> float:
+    """Deterministic uniform [0, 1) from (seed, key). Duels use key "challenge:<n>", never an event id."""
+    h = hashlib.sha256(f"{seed}:{key}".encode()).hexdigest()
+    return int(h[:8], 16) / 0x100000000
+
+
+def conf_from_trust(trust: int) -> float:
+    """How strongly a listener believes a claim, from its trust in the speaker."""
+    if trust >= 2:
+        return 0.9
+    if trust >= 0:
+        return 0.4
+    return 0.2
+
+
+def short_name(npc: str) -> str:
+    return npc.capitalize()
 
 CAST_FILE = Path(__file__).with_name("cast.toml")
 

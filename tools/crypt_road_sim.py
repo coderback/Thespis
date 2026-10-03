@@ -21,7 +21,7 @@ PHASES = ["morning", "noon", "evening", "night"]
 ODO_WALK = [0, 1, 2, 1]                     # Odo's stop by phase % 4
 GOSSIP_PRIORITY = {"robbed": 3, "beat": 2, "insulted": 1}
 NPCS = ["kael", "brenna", "mags", "odo"]
-DEMO_SEED = 1   # first duel (event e0002) wins on this seed; re-check once the real engine's event ids exist
+DEMO_SEED = 1   # the first duel wins on this seed. Duel dice are keyed on "challenge:<n>", never an event id
 
 
 def dice(seed, event_id):
@@ -54,6 +54,7 @@ class World:
         self.decisions = []
         self.log = []
         self.pending_duel = False
+        self.challenges = 0
 
     # ---------- helpers ----------
     def loc_of(self, n):
@@ -66,11 +67,11 @@ class World:
     def at(self, loc):
         return [n for n in NPCS if self.loc_of(n) == loc]
 
-    def event(self, verb, actor, target, claim=None, truth=True):
+    def event(self, verb, actor, target, claim=None, truth=True, loc=None):
         eid = f"e{len(self.ledger) + 1:04d}"
         self.ledger.append({"id": eid, "phase": self.phase, "verb": verb, "actor": actor,
                             "target": target, "claim": claim, "truth": truth,
-                            "loc": STOPS[self.player["loc"]]})
+                            "loc": loc or STOPS[self.player["loc"]]})  # where it happened
         return eid
 
     def conf(self, npc, claim):
@@ -112,8 +113,9 @@ class World:
     def challenge(self):
         """Ends the phase unless won, in which case humiliate/spare must follow."""
         assert self.kael["loc"] == self.player["loc"]
-        eid = self.event("challenge", "player", "kael")
-        win = dice(self.seed, eid) < 0.6
+        self.challenges += 1
+        self.event("challenge", "player", "kael")
+        win = dice(self.seed, f"challenge:{self.challenges}") < 0.6
         if win:
             self.kael["fear"] += 2
             self.kael["grudge"] += 2
@@ -212,7 +214,7 @@ class World:
                     for src in {e["source"] for e in bel["evidence"]}:
                         if src in b["trust"]:
                             b["trust"][src] -= 3
-                    self.event("testify", w, "brenna", claim, True)
+                    self.event("testify", w, "brenna", claim, self.happened(claim), loc="guard_post")
                     self.log.append(f"p{p}: {w} testifies; Brenna RETRACTS {claim}; trust = {b['trust']}")
                     if k["frozen_until"] >= p:
                         k["frozen_until"] = p - 1
@@ -236,7 +238,7 @@ class World:
                 k["accused"] = True
                 claim = ("robbed", "player", "kael") if self.conf("kael", ("robbed", "player", "kael")) \
                     else ("beat", "player", "kael")
-                eid = self.event("accuse", "kael", "brenna", claim, True)
+                eid = self.event("accuse", "kael", "brenna", claim, True, loc=STOPS[k["loc"]])
                 self.log.append(f"p{p}: Kael ACCUSES the player to Brenna (grudge {k['grudge']})")
                 self.add_evidence("brenna", claim, conf_from_trust(b["trust"]["kael"]), "kael", eid)
             elif chosen == "share_drink":
@@ -257,7 +259,8 @@ class World:
                     continue
                 for _, c_conf, claim in mine:
                     if claim not in self.beliefs[listener]:
-                        eid = self.event("gossip", g, listener, claim, self.happened(claim))
+                        eid = self.event("gossip", g, listener, claim, self.happened(claim),
+                                         loc=STOPS[self.loc_of(g)])
                         self.add_evidence(listener, claim, round(c_conf * 0.8, 2), g, eid)
                         self.log.append(f"p{p}: {g} gossips {claim} to {listener}")
                         break
@@ -339,7 +342,7 @@ def route_spare(seed):
 def route_duel_lost(seed):
     # find a seed where the first duel loses
     s = seed
-    while dice(s, "e0002") < 0.6:
+    while dice(s, "challenge:1") < 0.6:
         s += 1
     w = World(s); w.insult(); w.challenge(); advance(w, []); return w
 
@@ -404,7 +407,7 @@ if __name__ == "__main__":
         ("Provoke, then wait", route_provoke(seed, pay=True, wait_after=True)),
         ("Provoke, wait, frame", route_provoke(seed, frame=True, wait_after=True)),
     ]
-    print(f"seed {seed}; first duel {'WINS' if dice(seed, 'e0002') < 0.6 else 'loses'}\n")
+    print(f"seed {seed}; first duel {'WINS' if dice(seed, 'challenge:1') < 0.6 else 'loses'}\n")
     print(f"{'route':24} {'result':10} coins  kael_grudge")
     for name, w in rows:
         print(f"{name:24} {w.status:10} {w.player['coins']:5}  {w.kael['grudge']}")
