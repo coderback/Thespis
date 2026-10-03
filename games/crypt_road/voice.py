@@ -31,6 +31,19 @@ KNOWN_EVENTS = 5
 THRESHOLDS = {"grudge": (4, 5), "respect": (4,), "fear": (4,)}  # crossing one makes the rival stop and think
 
 
+@dataclass(frozen=True)
+class View:
+    """What NPCs perceive of the player while a phase plays out: where the player started it. A player who is
+    moving is on the road until the next phase, so that move isn't visible yet (`hidden`)."""
+
+    player_at: str
+    hidden: frozenset[str] = frozenset()
+
+
+def _view(w: World, view: View | None) -> View:
+    return view or View(w.player["loc"])
+
+
 @dataclass
 class Speech:
     npc: str
@@ -101,14 +114,16 @@ def describe(option: str, w: World, npc: str) -> str:
     }.get(kind, option.replace("_", " "))
 
 
-def pack_for(w: World, npc_id: str, situation: str, options: dict[str, float] | None = None) -> StatePack:
+def pack_for(w: World, npc_id: str, situation: str, options: dict[str, float] | None = None,
+             view: View | None = None) -> StatePack:
     """Everything the model may know when it speaks for this NPC, and nothing more. Never whether a belief is true."""
-    npc, cast = w.npcs[npc_id], C.load_cast()["npc"][npc_id]
+    npc, cast, view = w.npcs[npc_id], C.load_cast()["npc"][npc_id], _view(w, view)
     others = [n.id for n in w.npcs_at(npc.loc) if n.id != npc_id]
-    if w.player["loc"] == npc.loc:
+    if view.player_at == npc.loc:
         others.append("player")
     beliefs = RETRIEVER.beliefs(w.beliefs, npc_id)  # active only: a retracted belief is never offered as fact
-    known = [e for e in reversed(list(w.ledger)) if knows(w, npc_id, e.id)][:KNOWN_EVENTS][::-1]
+    known = [e for e in reversed(list(w.ledger))
+             if e.id not in view.hidden and knows(w, npc_id, e.id)][:KNOWN_EVENTS][::-1]
     names = {npc_id, *others, *C.STOPS}  # everyone knows the road
     for b in beliefs:
         names |= {b.claim.a, b.claim.b}
@@ -218,14 +233,15 @@ def _told(w: World, listener: str, claim: Claim, events: list[Event]) -> list[Sp
 
 
 # ---------------------------------------------------------------- decisions inside the tick
-def decision_line(w: World, npc: str, chosen: str, claim: Claim | None = None) -> tuple[str, list[str]] | None:
+def decision_line(w: World, npc: str, chosen: str, claim: Claim | None = None,
+                  view: View | None = None) -> tuple[str, list[str]] | None:
     """The template line that goes with an NPC's decision, if it says anything."""
     if npc == C.RIVAL:
         if chosen == "accuse:player" and claim is not None:
             return line(C.RIVAL, f"accuse_{claim.pred}", belief_cites(w.beliefs.get(C.RIVAL, claim)))
         if chosen == "share_drink":
             return line(C.RIVAL, "share_drink", belief_cites(w.beliefs.get(C.RIVAL, Claim("spared", "player", C.RIVAL))))
-        if chosen == "go_to" and w.npcs[C.RIVAL].loc == w.player["loc"]:
+        if chosen == "go_to" and w.npcs[C.RIVAL].loc == _view(w, view).player_at:  # said to the player's face
             return line(C.RIVAL, "leaving", belief_cites(_top(w, C.RIVAL, ("player",))))
     if npc == C.GUARD and claim is not None:
         b = belief_cites(w.beliefs.get(C.GUARD, claim))

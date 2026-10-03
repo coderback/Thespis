@@ -155,3 +155,18 @@ def test_api_uses_the_apps_gateway(tmp_path, monkeypatch):
         session = client.post("/session", json={}).json()["session"]
         r = client.post("/act", json={"verb": "insult", "target": "kael"}, headers={"X-Session": session}).json()
         assert r["replies"][0]["source"] == "llm" and r["replies"][0]["line"] == "So be it."
+
+
+def test_a_moving_player_is_on_the_road_during_the_tick():
+    """NPCs decide on start-of-phase positions: a player who moves this phase isn't with them yet."""
+    model = FakeModel()
+    w, _ = play_demo(model)
+    decides = [p for c, p in model.calls if c == "decide"]
+    accuse = next(p for p in decides if p["ALLOWED"][0]["id"] == "accuse:player")  # tick 2: you are still on the road
+    assert accuse["here"] == ["Brenna", "Odo"]
+    assert not any("The player walked" in e["what"] for e in accuse["events"])
+    detain = next(p for p in decides if p["ALLOWED"][0]["id"] == "detain:kael")  # tick 3: you started it at her gate
+    assert "the player" in detain["here"]
+    assert not any("to the bridge" in e["what"] for e in detain["events"])  # but she can't see you leave yet
+    move_ids = {e.id for e in w.ledger if e.verb == "move" and e.actor == "player"}
+    assert not any(set(d.cites) & move_ids for d in w.decisions if d.kind == "decide")

@@ -63,3 +63,13 @@ def test_lie_is_called_out_and_exposed():
     said = {d.line for t in end.epilogue for d in t.decisions if d.line}
     assert "Robbed? Me? By Kael? Captain, I've never been robbed in my life." in said
     check_cites(w)
+
+
+def test_rival_only_speaks_to_a_player_who_is_there():
+    """Tick 0: Kael leaves the tavern in front of you. Tick 1: you are still at the tavern, so he says nothing."""
+    w = new_world(1)
+    for verb, target in [("insult", "kael"), ("challenge", "kael"), ("humiliate", "kael"), ("move", None)]:
+        rules.act(w, verb, target)
+    tick0, tick1 = [d for d in w.decisions if d.npc == "kael" and d.kind == "decide"]
+    assert (tick0.phase, tick0.line) == (0, "Out of my way.")
+    assert (tick1.phase, tick1.chosen, tick1.line) == (1, "go_to", None)
