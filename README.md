@@ -9,6 +9,8 @@ evidence (source, confidence, can be wrong, can be retracted), and numeric drive
 it will do. The language model only picks from actions the code has validated and voices them, citing
 the ledger events behind each line.
 
+**Live:** <https://thespis-production.up.railway.app> (the engine is in progress; `/health` answers today).
+
 **Demo game:** *The Crypt Road*, a race to a relic where a humiliated rival reports you to the guard out
 of sight, a lie can frame him, and a passing witness can expose you.
 
@@ -55,7 +57,9 @@ Railway, which rebuilds and redeploys every merge to `main`, so the hosted URL a
 - **Settings:** `railway.toml` sets the Dockerfile build, a `/health` check and one replica.
 - **Volume:** mounted at `/data`. The SQLite database is `DB_PATH=/data/thespis.sqlite`.
 - **Model keys:** set as Railway variables, never in the repo.
-- **Check the volume persists:** restart the service, and the log line `boot #N` should go up by one.
+- **URL:** <https://thespis-production.up.railway.app>
+- **Check the volume persists:** *redeploy* the service (a fresh container, unlike a restart), and the log line
+  `boot #N` should go up by one. Checked on 3 Oct: a redeploy logged `boot #2`.
 - **Freeze:** turn off auto-deploy at Sunday 12:00.
 
 Test the image locally:
