@@ -50,8 +50,15 @@ if ($LASTEXITCODE -ne 0) {
 }
 $login = (gh api user --jq .login).Trim()
 if ($login -ne $Owner) { Fail "gh is logged in as '$login', but the repo belongs to '$Owner'. Run: gh auth login (as $Owner) and re-run." }
+$status = (gh auth status 2>&1 | Out-String)
+if ($status -notmatch "workflow") {
+  Warn "Your GitHub CLI login lacks the 'workflow' permission, which GitHub requires to push the CI file."
+  Warn "A browser window will open to add it; approve it there."
+  gh auth refresh --hostname github.com --scopes workflow
+  if ($LASTEXITCODE -ne 0) { Fail "Could not add the workflow permission. Run: gh auth refresh -h github.com -s workflow" }
+}
 gh auth setup-git *> $null
-Ok "Logged in to GitHub as $login"
+Ok "Logged in to GitHub as $login (with workflow permission)"
 
 # ---------------------------------------------------------------- 2. first commit, as you
 Step "Preparing the first commit with your git identity"
@@ -103,16 +110,20 @@ if ($LASTEXITCODE -ne 0) {
 Step "Creating $Full ($Visibility) and pushing main"
 gh repo view $Full --json name *> $null
 if ($LASTEXITCODE -ne 0) {
-  gh repo create $Full "--$Visibility" --source . --remote origin --push `
-    --description "Thespis: an AI/ML toolkit for game developers. First module: Thespis Cast, NPC minds that remember, believe and act offscreen." *> $null
-  if ($LASTEXITCODE -ne 0) { Fail "Could not create $Full." }
+  gh repo create $Full "--$Visibility" --source . --remote origin `
+    --description "Thespis: an AI/ML toolkit for game developers. First module: Thespis Cast, NPC minds that remember, believe and act offscreen."
+  if ($LASTEXITCODE -ne 0) { Fail "Could not create $Full (see the message above)." }
   Ok "Created https://github.com/$Full"
 } else {
   Ok "Repo already exists"
-  git remote get-url origin *> $null
-  if ($LASTEXITCODE -ne 0) { git remote add origin "https://github.com/$Full.git" }
-  git push -u origin main *> $null
 }
+git remote get-url origin *> $null
+if ($LASTEXITCODE -ne 0) { git remote add origin "https://github.com/$Full.git" }
+git push -u origin main
+if ($LASTEXITCODE -ne 0) {
+  Fail "Push failed (see the message above). If it mentions 'workflow', run: gh auth refresh -h github.com -s workflow  then re-run this script."
+}
+Ok "Pushed main"
 gh repo edit $Full --add-topic game-ai --add-topic npc --add-topic llm --add-topic game-development *> $null
 
 # ---------------------------------------------------------------- 4. merge settings
