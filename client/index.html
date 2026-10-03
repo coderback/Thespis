@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Crypt Road · Thespis</title>
+  <meta name="description" content="NPCs that remember, believe, and act when you're not looking." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%231b1420'/%3E%3Cpath d='M5 13V7a3 3 0 0 1 6 0v6z' fill='%23f6c25a'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./src/style.css" />
+</head>
+<body>
+  <div id="viewport">
+    <div id="stage">
+      <main id="left">
+        <div id="mapwrap">
+          <canvas id="map" width="864" height="576" aria-label="The road from the tavern to the crypt"></canvas>
+          <div id="caption" hidden></div>
+          <div id="hint" hidden></div>
+        </div>
+        <div id="bar">
+          <div id="log" aria-live="polite"></div>
+          <div id="actions"></div>
+        </div>
+      </main>
+      <aside id="side">
+        <header id="top">
+          <div id="clock" class="pixel">Day 1 · Morning</div>
+          <div id="coins" title="Coins"></div>
+          <div id="brain" class="badge"></div>
+          <button id="reset" class="ghost" title="Start the race again">Reset</button>
+        </header>
+        <section id="narrator">
+          <h2>The Dungeon Master</h2>
+          <div id="feed"></div>
+        </section>
+        <nav id="tabs" role="tablist">
+          <button role="tab" data-tab="minds">Minds</button>
+          <button role="tab" data-tab="beliefs">Beliefs</button>
+          <button role="tab" data-tab="ledger">Ledger</button>
+          <button role="tab" data-tab="why">Why</button>
+        </nav>
+        <div id="panel" role="tabpanel"></div>
+      </aside>
+
+      <div id="landing" class="overlay">
+        <div class="title-card">
+          <p class="kicker">Thespis Cast presents</p>
+          <h1 class="pixel">The Crypt Road</h1>
+          <p class="tagline">NPCs that remember, believe, and act when you're not looking.</p>
+          <p class="premise">Race Kael to the relic. Everything you do is remembered, passed on, and acted on out of sight.</p>
+          <div class="cta">
+            <button id="watch" class="primary">▶ Watch the 60-second story</button>
+            <button id="play" class="secondary">Play it yourself</button>
+          </div>
+          <button id="credits-link" class="link">Credits</button>
+        </div>
+      </div>
+
+      <div id="endcard" class="overlay" hidden>
+        <div class="card">
+          <h1 id="end-title" class="pixel"></h1>
+          <p id="end-sub"></p>
+          <div id="epilogue" class="epilogue"></div>
+          <h3>What the world remembers</h3>
+          <ul id="memory"></ul>
+          <div class="cta">
+            <button id="again" class="primary">Play again</button>
+            <button id="inspect" class="secondary">Inspect the world</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="credits" class="overlay" hidden>
+        <div class="card">
+          <h1 class="pixel">Credits</h1>
+          <p><b>Thespis</b>, an AI/ML toolkit for game developers. This is its first module, <b>Thespis Cast</b> (NPC minds).</p>
+          <p>Built by Tobi (<a href="https://github.com/coderback" target="_blank" rel="noopener">@coderback</a>): engine, model layer, harness.
+            Ahmed (<a href="https://github.com/AhmedBokaniUsman" target="_blank" rel="noopener">@AhmedBokaniUsman</a>): client, inspector, autoplay, video.</p>
+          <p>Pixel art: characters and map drawn in code for this game. Fonts: Press Start 2P, VT323 and Inter (SIL Open Font License).</p>
+          <p>NPC voices: the language model providers configured on the host, with code fallbacks.</p>
+          <p>Prior art we build on: Talk of the Town, Versu, Viv and Generative Agents.</p>
+          <p><a href="https://github.com/coderback/Thespis" target="_blank" rel="noopener">Source on GitHub</a></p>
+          <div class="cta"><button id="credits-close" class="primary">Close</button></div>
+        </div>
+      </div>
+
+      <div id="dev" hidden>
+        <h3>Dev panel <span class="muted">(` to toggle)</span></h3>
+        <div class="row"><span>Backend</span><b id="dev-backend"></b></div>
+        <div class="row"><span>Session</span><code id="dev-session"></code></div>
+        <div class="row"><button id="dev-reload">Reload from disk</button></div>
+        <div class="row"><span>Brain</span>
+          <button id="dev-model">Model</button><button id="dev-fallback">Fallback (brain off)</button></div>
+        <div class="row"><span>Replay</span><b id="dev-replay">no cache hits yet</b></div>
+        <div class="row"><span>Seed</span><input id="dev-seed" type="number" value="1" /><button id="dev-new">New session</button></div>
+      </div>
+
+      <div id="pop" hidden></div>
+      <div id="toast" hidden></div>
+    </div>
+  </div>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
