@@ -19,13 +19,14 @@ from dataclasses import dataclass, field
 
 from thespis.gateway import ModelGateway
 
-PROMPT_VERSION = 1  # part of #18's cache key: bump it whenever the prompts below change
+PROMPT_VERSION = 2  # part of #18's cache key: bump it whenever the prompts below change
 LINE_MAX = 160
 
 _RULES = ("You know only what is listed below. Never state a fact that is not listed.\n"
           "In \"cites\", list the ids of the beliefs or events your line relies on.\n")
 DECIDE_PROMPT = ("You are {name}. {persona}\n" + _RULES +
-                 "Pick exactly one action id from ALLOWED. They are listed from what your drives favour most to least.\n"
+                 "Pick exactly one action id from ALLOWED. Each action's \"pull\" is how strongly your drives push you "
+                 "towards it: follow the strongest pull unless your persona clearly says otherwise.\n"
                  "Write one line of dialogue, at most 25 words, in character.\n"
                  'Reply with JSON only: {{"action": "...", "line": "...", "cites": ["..."]}}')
 REACT_PROMPT = ("You are {name}. {persona}\n" + _RULES +
@@ -45,7 +46,7 @@ class StatePack:
     trust_in: dict
     beliefs: list[dict]  # {"id", "claim", "conf", "from"}
     events: list[dict]  # {"id", "what"}
-    allowed: list[dict] = field(default_factory=list)  # {"id", "does"}; empty for a reply with no action
+    allowed: list[dict] = field(default_factory=list)  # {"id", "does", "pull"}; empty for a reply with no action
     names: set[str] = field(default_factory=set)  # every character and place the pack mentions, as game ids
     setting: str = ""  # where the NPC is and the lie of the land, as the game describes it
 

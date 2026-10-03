@@ -2,7 +2,8 @@
 
 The player's verbs go through act(), which validates against allowed() first. Phase-ending verbs run the tick:
   1. the player's phase action (the gate refuses a distrusted player);
-  2. decisions on start-of-phase positions: the guard (detain, question) first, then the rival;
+  2. decisions on start-of-phase positions: the guard (detain, question) first, then the rival. A player who
+     moves is on the road until the next phase, so NPCs still see them where they started, and don't see the move;
   3. gossip between NPCs on the same stop, before anyone moves;
   4. moves, including the scheduled walkers;
   5. drive upkeep: fear eases by 1 towards 1;
@@ -24,6 +25,7 @@ from thespis.ledger import Claim, Event
 from thespis.world import LOST, PLAYING, WON, World
 
 TALK_MAX = 200
+DRIVE_MARGIN = 2  # the model may choose only among actions within this many utility points of the best one
 EPILOGUE_PHASES = 2
 DUEL_WON = "duel_won"
 
@@ -258,6 +260,7 @@ def end_phase(w: World, action: str, brain: Brain | None = None, mind: Mind | No
     kael, guard = w.npcs[C.RIVAL], w.npcs[C.GUARD]
     start_events, start_decisions = len(w.ledger), len(w.decisions)
     tick = Tick()
+    view = voice.View(pl["loc"])  # what NPCs see of the player this phase: where they started it
 
     # 1. The player's phase action.
     if action == "move" and C.next_stop(pl["loc"]):
@@ -265,8 +268,9 @@ def end_phase(w: World, action: str, brain: Brain | None = None, mind: Mind | No
             _event(w, "block", "player", C.GUARD, pl["loc"])
         else:
             frm, pl["loc"] = pl["loc"], C.next_stop(pl["loc"])
-            _event(w, "move", "player", pl["loc"], frm)
+            move = _event(w, "move", "player", pl["loc"], frm)
             tick.moves.append({"who": "player", "from": frm, "to": pl["loc"]})
+            view = voice.View(frm, frozenset({move.id}))  # still on the road until the phase ends
 
     # 2a. The guard decides: detain anyone she believes robbed someone, then question witnesses.
     if kael.loc == guard.loc and not kael.frozen(p):
@@ -276,8 +280,8 @@ def end_phase(w: World, action: str, brain: Brain | None = None, mind: Mind | No
             if c.a == C.RIVAL and w.beliefs.conf(C.GUARD, c) >= C.CRIME_CONF and cj not in detained:
                 options = {f"detain:{C.RIVAL}": 10, "wait": 1}
                 chosen = _decide(w, mind, brain, C.GUARD, "crime_belief", options, "believes a robbery at 0.5 or more",
-                                 lambda ch, c=c: voice.decision_line(w, C.GUARD, ch, c),
-                                 f"You believe {voice._about(c)}. {C.short_name(c.a)} is here at your post.")
+                                 lambda ch, c=c: voice.decision_line(w, C.GUARD, ch, c, view),
+                                 f"You believe {voice._about(c)}. {C.short_name(c.a)} is here at your post.", view=view)
                 if chosen.startswith("detain"):
                     detained.append(cj)
                     kael.frozen_until = p + 1
@@ -294,9 +298,9 @@ def end_phase(w: World, action: str, brain: Brain | None = None, mind: Mind | No
                 continue
             options = {f"question:{wit}": 8, "wait": 1}
             chosen = _decide(w, mind, brain, C.GUARD, "witness_present", options, f"{wit} can speak to a claim about them",
-                             lambda ch, c=belief.claim: voice.decision_line(w, C.GUARD, ch, c),
+                             lambda ch, c=belief.claim: voice.decision_line(w, C.GUARD, ch, c, view),
                              f"{C.short_name(wit)} is here. You were told that {voice._about(belief.claim)}; "
-                             f"{C.short_name(wit)} would know whether it happened.")
+                             f"{C.short_name(wit)} would know whether it happened.", view=view)
             if not chosen.startswith("question"):
                 continue
             w.beliefs.retract(belief)  # the witness knows it never happened
@@ -320,14 +324,15 @@ def end_phase(w: World, action: str, brain: Brain | None = None, mind: Mind | No
         if (kael.loc == guard.loc and d["grudge"] >= 4 and not kael.flags.get("accused")
                 and (w.beliefs.conf(C.RIVAL, robbed) or w.beliefs.conf(C.RIVAL, beaten))):
             options["accuse:player"] = d["grudge"] + 3
-        if d["respect"] >= 4 and kael.loc == pl["loc"] and not kael.flags.get("drink"):
+        if d["respect"] >= 4 and kael.loc == view.player_at and not kael.flags.get("drink"):
             options["share_drink"] = d["respect"] + 3
         grievance = robbed if w.beliefs.conf(C.RIVAL, robbed) else beaten
         # Ask the model only for a real choice: an option beyond the default walk, or a drive past a threshold.
         ask = voice.crossed_threshold(w, C.RIVAL) or len(options) > 2
         chosen = _decide(w, mind, brain, C.RIVAL, "tick", options, None,
-                         lambda ch: voice.decision_line(w, C.RIVAL, ch, grievance),
-                         f"You are at {C.STOP_NAMES[kael.loc]}. Decide your next move in the race for the relic.", ask)
+                         lambda ch: voice.decision_line(w, C.RIVAL, ch, grievance, view),
+                         f"You are at {C.STOP_NAMES[kael.loc]}. Decide what to do now.", ask,
+                         view)
         if chosen == "take_relic":
             if w.status == PLAYING:
                 w.status, w.ended_at = LOST, p
@@ -384,7 +389,7 @@ def end_phase(w: World, action: str, brain: Brain | None = None, mind: Mind | No
 
 
 def _decide(w: World, mind: Mind, brain: Brain, npc: str, trigger: str, options: dict[str, float],
-            reason: str | None, line_for, situation: str, ask: bool = True) -> str:
+            reason: str | None, line_for, situation: str, ask: bool = True, view: voice.View | None = None) -> str:
     """Choose an action and its line: the model's if it is asked and its reply passes, else the utility brain's.
 
     Returns the chosen action id, which is always one of `options`.
@@ -392,11 +397,21 @@ def _decide(w: World, mind: Mind, brain: Brain, npc: str, trigger: str, options:
     choice = brain.choose(npc, options)
     said = line_for(choice)
     fallback = Utterance(choice, *(said or (None, [])), "fallback")
-    u = mind.decide(voice.pack_for(w, npc, situation, options), fallback) if ask and mind.active else fallback
+    # Drives decide what is on the table: the model only chooses between actions they rate about as highly as the
+    # best, so a clear grudge always acts on it. It still words every line and settles near-ties.
+    offered = _offered(options)
+    u = mind.decide(voice.pack_for(w, npc, situation, offered, view), fallback) if ask and mind.active else fallback
     base = reason or f"{u.action} scores {options[u.action]}"  # without a reason given, the utility explains it
+    if u.source == "llm" and len(offered) < len(options):
+        base += f"; drives offered {', '.join(offered)}"
     w.decisions.record(DECIDE, npc, w.phase, trigger, allowed=list(options), chosen=u.action, line=u.line,
                        cites=u.cites, reason=f"{base}; {u.note}" if u.note else base, source=u.source)
     return u.action
+
+
+def _offered(options: dict[str, float]) -> dict[str, float]:
+    best = max(options.values())
+    return {a: u for a, u in options.items() if u >= best - DRIVE_MARGIN}
 
 
 def run_epilogue(w: World, brain: Brain | None = None, mind: Mind | None = None) -> list[Tick]:

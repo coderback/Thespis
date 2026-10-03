@@ -754,11 +754,8 @@
           "wait"
         ],
         "chosen": "go_to",
-        "line": "Out of my way.",
-        "cites": [
-          "b0009",
-          "e0004"
-        ],
+        "line": null,
+        "cites": [],
         "reason": "go_to scores 6",
         "source": "fallback"
       },
