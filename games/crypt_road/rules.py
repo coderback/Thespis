@@ -18,6 +18,8 @@ from games.crypt_road import content as C
 from games.crypt_road import voice
 from thespis.brain import Brain, UtilityBrain
 from thespis.decisions import DECIDE, Decision
+from thespis.expression import Mind, Utterance
+from thespis.gateway import ModelGateway
 from thespis.ledger import Claim, Event
 from thespis.world import LOST, PLAYING, WON, World
 
@@ -144,10 +146,16 @@ def _check(w: World, verb: str, target: str | None) -> dict:
 
 # ---------------------------------------------------------------- acting
 def act(w: World, verb: str, target: str | None = None, claim: dict | Claim | None = None,
-        amount: int | None = None, text: str | None = None, brain: Brain | None = None) -> ActResult:
-    """Apply one player verb, the tick it triggers, and the epilogue if the race ends."""
+        amount: int | None = None, text: str | None = None, brain: Brain | None = None,
+        gateway: ModelGateway | None = None) -> ActResult:
+    """Apply one player verb, the tick it triggers, and the epilogue if the race ends.
+
+    With a gateway and the brain switched on, NPCs speak and make their real choices through the model; anything
+    the model gets wrong, or can't answer, falls back to the utility brain and template lines.
+    """
     _check(w, verb, target)
     brain = brain or UtilityBrain()
+    mind = Mind(gateway if w.brain_mode == "model" else None, voice.VALIDATOR)
     start = len(w.ledger)
     ends_phase = None  # the tick this verb triggers, if any: "move" or "wait"
     told = None
@@ -181,12 +189,12 @@ def act(w: World, verb: str, target: str | None = None, claim: dict | Claim | No
         w.status, w.ended_at = WON, w.phase
         _event(w, "take_relic", "player", None, w.player["loc"])
 
-    replies = voice.react(w, verb, target, list(w.ledger)[start:], told)
-    tick = end_phase(w, ends_phase, brain) if ends_phase else None
+    replies = voice.react(w, mind, verb, target, list(w.ledger)[start:], told, text)
+    tick = end_phase(w, ends_phase, brain, mind) if ends_phase else None
     if tick is not None and w.status == PLAYING:
-        replies += voice.phase_start(w, tick.moves)
+        replies += voice.phase_start(w, mind, tick.moves)
     events = list(w.ledger)[start:]
-    epilogue = run_epilogue(w, brain) if w.status != PLAYING and w.ended_at is not None and not \
+    epilogue = run_epilogue(w, brain, mind) if w.status != PLAYING and w.ended_at is not None and not \
         w.counters.get("epilogue_done") else None
     return ActResult(events=events, tick=tick, epilogue=epilogue, replies=replies)
 
@@ -243,8 +251,9 @@ def _tell(w: World, listener: str, c: Claim) -> None:
 
 
 # ---------------------------------------------------------------- the tick
-def end_phase(w: World, action: str, brain: Brain | None = None) -> Tick:
+def end_phase(w: World, action: str, brain: Brain | None = None, mind: Mind | None = None) -> Tick:
     brain = brain or UtilityBrain()
+    mind = mind or Mind(None, voice.VALIDATOR)
     p, pl = w.phase, w.player
     kael, guard = w.npcs[C.RIVAL], w.npcs[C.GUARD]
     start_events, start_decisions = len(w.ledger), len(w.decisions)
@@ -266,9 +275,9 @@ def end_phase(w: World, action: str, brain: Brain | None = None) -> Tick:
             detained = guard.flags.setdefault("detained_for", [])
             if c.a == C.RIVAL and w.beliefs.conf(C.GUARD, c) >= C.CRIME_CONF and cj not in detained:
                 options = {f"detain:{C.RIVAL}": 10, "wait": 1}
-                chosen = brain.choose(C.GUARD, options)
-                _decide(w, C.GUARD, "crime_belief", options, chosen, "believes a robbery at 0.5 or more",
-                        voice.decision_line(w, C.GUARD, chosen, c))
+                chosen = _decide(w, mind, brain, C.GUARD, "crime_belief", options, "believes a robbery at 0.5 or more",
+                                 lambda ch, c=c: voice.decision_line(w, C.GUARD, ch, c),
+                                 f"You believe {voice._about(c)}. {C.short_name(c.a)} is here at your post.")
                 if chosen.startswith("detain"):
                     detained.append(cj)
                     kael.frozen_until = p + 1
@@ -284,9 +293,10 @@ def end_phase(w: World, action: str, brain: Brain | None = None) -> Tick:
             if w.ledger.happened(belief.claim):
                 continue
             options = {f"question:{wit}": 8, "wait": 1}
-            chosen = brain.choose(C.GUARD, options)
-            _decide(w, C.GUARD, "witness_present", options, chosen, f"{wit} can speak to a claim about them",
-                    voice.decision_line(w, C.GUARD, chosen, belief.claim))
+            chosen = _decide(w, mind, brain, C.GUARD, "witness_present", options, f"{wit} can speak to a claim about them",
+                             lambda ch, c=belief.claim: voice.decision_line(w, C.GUARD, ch, c),
+                             f"{C.short_name(wit)} is here. You were told that {voice._about(belief.claim)}; "
+                             f"{C.short_name(wit)} would know whether it happened.")
             if not chosen.startswith("question"):
                 continue
             w.beliefs.retract(belief)  # the witness knows it never happened
@@ -294,7 +304,7 @@ def end_phase(w: World, action: str, brain: Brain | None = None) -> Tick:
                 if src in guard.trust_in:
                     guard.trust_in[src] -= 3
             e = _event(w, "testify", wit, C.GUARD, guard.loc, belief.claim, w.ledger.happened(belief.claim))
-            voice.testimony(w, wit, belief.claim, e)
+            voice.testimony(w, mind, wit, belief.claim, e)
             if kael.frozen(p):
                 kael.frozen_until = None
                 _event(w, "release", C.GUARD, C.RIVAL, guard.loc)
@@ -312,10 +322,12 @@ def end_phase(w: World, action: str, brain: Brain | None = None) -> Tick:
             options["accuse:player"] = d["grudge"] + 3
         if d["respect"] >= 4 and kael.loc == pl["loc"] and not kael.flags.get("drink"):
             options["share_drink"] = d["respect"] + 3
-        chosen = brain.choose(C.RIVAL, options)
         grievance = robbed if w.beliefs.conf(C.RIVAL, robbed) else beaten
-        _decide(w, C.RIVAL, "tick", options, chosen, f"{chosen} scores {options[chosen]}",
-                voice.decision_line(w, C.RIVAL, chosen, grievance))
+        # Ask the model only for a real choice: an option beyond the default walk, or a drive past a threshold.
+        ask = voice.crossed_threshold(w, C.RIVAL) or len(options) > 2
+        chosen = _decide(w, mind, brain, C.RIVAL, "tick", options, None,
+                         lambda ch: voice.decision_line(w, C.RIVAL, ch, grievance),
+                         f"You are at {C.STOP_NAMES[kael.loc]}. Decide your next move in the race for the relic.", ask)
         if chosen == "take_relic":
             if w.status == PLAYING:
                 w.status, w.ended_at = LOST, p
@@ -371,14 +383,23 @@ def end_phase(w: World, action: str, brain: Brain | None = None) -> Tick:
     return tick
 
 
-def _decide(w: World, npc: str, trigger: str, options: dict, chosen: str, reason: str,
-            said: tuple[str, list[str]] | None = None) -> Decision:
-    text, cites = said if said else (None, [])
-    return w.decisions.record(DECIDE, npc, w.phase, trigger, allowed=list(options), chosen=chosen,
-                              line=text, cites=cites, reason=reason, source="fallback")
+def _decide(w: World, mind: Mind, brain: Brain, npc: str, trigger: str, options: dict[str, float],
+            reason: str | None, line_for, situation: str, ask: bool = True) -> str:
+    """Choose an action and its line: the model's if it is asked and its reply passes, else the utility brain's.
+
+    Returns the chosen action id, which is always one of `options`.
+    """
+    choice = brain.choose(npc, options)
+    said = line_for(choice)
+    fallback = Utterance(choice, *(said or (None, [])), "fallback")
+    u = mind.decide(voice.pack_for(w, npc, situation, options), fallback) if ask and mind.active else fallback
+    base = reason or f"{u.action} scores {options[u.action]}"  # without a reason given, the utility explains it
+    w.decisions.record(DECIDE, npc, w.phase, trigger, allowed=list(options), chosen=u.action, line=u.line,
+                       cites=u.cites, reason=f"{base}; {u.note}" if u.note else base, source=u.source)
+    return u.action
 
 
-def run_epilogue(w: World, brain: Brain | None = None) -> list[Tick]:
+def run_epilogue(w: World, brain: Brain | None = None, mind: Mind | None = None) -> list[Tick]:
     """After the race, the world runs on for two phases with the player idle."""
     w.counters["epilogue_done"] = 1
-    return [end_phase(w, "wait", brain) for _ in range(EPILOGUE_PHASES)]
+    return [end_phase(w, "wait", brain, mind) for _ in range(EPILOGUE_PHASES)]

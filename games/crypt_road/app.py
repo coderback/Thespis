@@ -41,11 +41,11 @@ async def lifespan(app: FastAPI):
     app.state.store = Store(path)
     # On the host, a count that keeps rising across redeploys proves the volume persists.
     log.warning("boot #%d, database at %s", app.state.store.record_boot(), path.resolve())
-    app.state.gateway = gateway_from_env()
-    names = [p.name for p in app.state.gateway.providers]
+    gateway = app.state.gateway = gateway_from_env()
+    names = [p.name for p in gateway.providers]
     log.warning("models: %s", " then ".join(names) + " then fallback" if names else "none configured, fallback only")
     yield
-    app.state.gateway.close()
+    gateway.close()  # the one this app opened, even if a test swapped app.state.gateway
 
 
 app = FastAPI(title="Thespis: The Crypt Road", lifespan=lifespan)
@@ -142,7 +142,7 @@ def post_act(body: ActBody, request: Request, x_session: str | None = Header(def
         world = _load(store, session)
         try:
             result = rules.act(world, body.verb, body.target, body.claim.model_dump() if body.claim else None,
-                               body.amount, body.text)
+                               body.amount, body.text, gateway=request.app.state.gateway)
         except rules.NotAllowed as e:
             raise ApiError(409, "not_allowed", e.reason) from None
         store.save(session, world)

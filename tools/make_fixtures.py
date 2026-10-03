@@ -24,6 +24,14 @@ LIE = {"pred": "robbed", "a": "kael", "b": "odo"}
 def generate() -> dict[str, dict]:
     """Play the demo route on the default seed and return {file name: response}."""
     sys.path.insert(0, str(ROOT))
+    saved = {k: os.environ.pop(k) for k in list(os.environ) if k.startswith("LLM_")}  # fixtures never use a model
+    try:
+        return _play()
+    finally:
+        os.environ.update(saved)
+
+
+def _play() -> dict[str, dict]:
     from fastapi.testclient import TestClient
 
     with tempfile.TemporaryDirectory() as tmp:

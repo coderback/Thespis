@@ -1,16 +1,42 @@
-"""The fallback voice: template lines from cast.toml, each citing the ids it rests on.
+"""NPC voices: the model's lines when there is one, template lines from cast.toml when not.
 
-Every line cites at least one belief or ledger event its speaker knows, so the inspector's why-chain can trace it.
-The model voice (#17) replaces the words; the cites rule stays.
+Every line, whoever writes it, cites at least one belief or ledger event its speaker knows, so the inspector's
+why-chain can trace it. Each line starts as a Speech carrying its template fallback. deliver() asks the model for
+all of a moment's lines at once, keeps only the replies that pass the validator, and records the result.
 """
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 from games.crypt_road import content as C
+from games.crypt_road import words
 from thespis.beliefs import Belief
 from thespis.decisions import REACT
+from thespis.expression import Mind, StatePack, Utterance, Validator
 from thespis.ledger import Claim, Event
+from thespis.retriever import TopKRetriever
 from thespis.world import World
+
+# Every way a line can name a character or a place, mapped to its game id, for the validator.
+VOCABULARY = {
+    "kael": "kael", "brenna": "brenna", "captain": "brenna", "odo": "odo", "peddler": "odo",
+    "mags": "mags", "innkeeper": "mags",
+    "tavern": "tavern", "lantern": "tavern", "market": "market", "guard post": "guard_post", "gate": "guard_post",
+    "bridge": "bridge", "crypt": "crypt",
+}
+VALIDATOR = Validator(VOCABULARY)
+RETRIEVER = TopKRetriever(5)
+KNOWN_EVENTS = 5
+THRESHOLDS = {"grudge": (4, 5), "respect": (4,), "fear": (4,)}  # crossing one makes the rival stop and think
+
+
+@dataclass
+class Speech:
+    npc: str
+    trigger: str
+    said: tuple[str, list[str]] | None  # the fallback line and its cites; None means the NPC stays silent
+    situation: str  # what just happened, from the NPC's point of view, for the model
 
 
 def template(npc: str, key: str) -> str | None:
@@ -43,15 +69,6 @@ def line(npc: str, key: str, cites: list[str], **fmt) -> tuple[str, list[str]] |
     return text.format(**fmt), list(dict.fromkeys(cites))
 
 
-def say(w: World, npc: str, trigger: str, said: tuple[str, list[str]] | None) -> dict | None:
-    """Record a spoken line as a react decision and return it as a reply."""
-    if said is None:
-        return None
-    text, cites = said
-    d = w.decisions.record(REACT, npc, w.phase, trigger, line=text, cites=cites, reason=trigger, source="fallback")
-    return {"decision": d.id, "npc": npc, "line": text, "cites": cites, "source": d.source}
-
-
 def _top(w: World, npc: str, about: tuple[str, ...]) -> Belief | None:
     held = [b for b in w.beliefs.for_npc(npc) if b.active and b.conf >= C.CRIME_CONF
             and any(b.claim.mentions(x) for x in about)]
@@ -59,27 +76,106 @@ def _top(w: World, npc: str, about: tuple[str, ...]) -> Belief | None:
     return held[0] if held else None
 
 
+def _about(c: Claim, speaker: str | None = None) -> str:
+    return words.claim_text(c, speaker, player=words.ABOUT_PLAYER)
+
+
+def _name(who: str) -> str:
+    return {"odo": "the peddler", "mags": "the innkeeper", "brenna": "the Captain", "player": "you"}.get(
+        who, C.short_name(who))
+
+
+# ---------------------------------------------------------------- the state pack
+def describe(option: str, w: World, npc: str) -> str:
+    """One line on what an allowed action does, for the model."""
+    kind, _, who = option.partition(":")
+    nxt = C.next_stop(w.npcs[npc].loc)
+    return {
+        "go_to": f"walk on to {C.STOP_NAMES[nxt]}" if nxt else "walk on",
+        "wait": "stay where you are",
+        "take_relic": "take the relic and win the race",
+        "accuse": "tell the Captain what the player did to you",
+        "share_drink": "stay to share a drink with the player and give them a tip",
+        "detain": f"have the sergeant hold {C.short_name(who)} for two phases",
+        "question": f"ask {C.short_name(who)} whether the claim about them is true",
+    }.get(kind, option.replace("_", " "))
+
+
+def pack_for(w: World, npc_id: str, situation: str, options: dict[str, float] | None = None) -> StatePack:
+    """Everything the model may know when it speaks for this NPC, and nothing more. Never whether a belief is true."""
+    npc, cast = w.npcs[npc_id], C.load_cast()["npc"][npc_id]
+    others = [n.id for n in w.npcs_at(npc.loc) if n.id != npc_id]
+    if w.player["loc"] == npc.loc:
+        others.append("player")
+    beliefs = RETRIEVER.beliefs(w.beliefs, npc_id)  # active only: a retracted belief is never offered as fact
+    known = [e for e in reversed(list(w.ledger)) if knows(w, npc_id, e.id)][:KNOWN_EVENTS][::-1]
+    names = {npc_id, *others, *C.STOPS}  # everyone knows the road
+    for b in beliefs:
+        names |= {b.claim.a, b.claim.b}
+    for e in known:
+        names |= {e.actor, e.target}
+        if e.claim:
+            names |= {e.claim.a, e.claim.b}
+    ordered = sorted(options or {}, key=lambda o: -(options or {})[o])  # stable: ties keep their order
+    for option in ordered:
+        names.add(option.partition(":")[2])
+    return StatePack(
+        npc=npc_id, name=cast["name"], persona=cast["persona"], goal=cast["goal"], situation=situation,
+        here=[words.who(x, player=words.ABOUT_PLAYER) for x in others],
+        drives=dict(npc.drives), trust_in=dict(npc.trust_in),
+        beliefs=[{"id": b.id, "claim": _about(b.claim), "conf": b.conf,
+                  "from": sorted({e.source for e in b.evidence})} for b in beliefs],
+        events=[{"id": e.id, "what": words.sentence(e, words.ABOUT_PLAYER)} for e in known],
+        allowed=[{"id": o, "does": describe(o, w, npc_id)} for o in ordered],
+        names={x for x in names if x and x != "player"},
+        setting=f"You are at {C.STOP_NAMES[npc.loc]}. The road runs east: "
+                + ", ".join(C.STOP_NAMES[s] for s in C.STOPS) + ". The relic lies in the crypt.",
+    )
+
+
+def deliver(w: World, mind: Mind, speeches: list[Speech]) -> list[dict]:
+    """Voice a moment's lines, all model calls in parallel, and record each as a react decision."""
+    speeches = [s for s in speeches if s.said]
+    fallbacks = [Utterance(None, s.said[0], s.said[1], "fallback") for s in speeches]
+    if mind.active:
+        spoken = mind.react_many([(pack_for(w, s.npc, s.situation), f) for s, f in zip(speeches, fallbacks)])
+    else:
+        spoken = fallbacks
+    replies = []
+    for s, u in zip(speeches, spoken):
+        reason = f"{s.trigger}; {u.note}" if u.note else s.trigger
+        d = w.decisions.record(REACT, s.npc, w.phase, s.trigger, line=u.line, cites=u.cites, reason=reason,
+                               source=u.source)
+        replies.append({"decision": d.id, "npc": s.npc, "line": u.line, "cites": u.cites, "source": u.source})
+    return replies
+
+
 # ---------------------------------------------------------------- reactions to the player's verb
-def react(w: World, verb: str, target: str | None, events: list[Event], claim: Claim | None = None) -> list[dict]:
+def react(w: World, mind: Mind, verb: str, target: str | None, events: list[Event], claim: Claim | None = None,
+          text: str | None = None) -> list[dict]:
     """Lines spoken straight after a player verb, before any tick."""
     last = events[-1].id if events else None
-    out: list[dict | None] = []
+    speeches: list[Speech] = []
     if verb == "insult":
-        out.append(say(w, target, "insulted", line(target, "insulted", [last])))
+        speeches.append(Speech(target, "insulted", line(target, "insulted", [last]), "The player just insulted you."))
     elif verb == "challenge":
         won = w.pending == "duel_won"
-        out.append(say(w, C.RIVAL, "beaten" if won else "victor",
-                       line(C.RIVAL, "beaten" if won else "victor", [last])))
+        key = "beaten" if won else "victor"
+        what = "The player just beat you in a duel." if won else "You just beat the player in a duel."
+        speeches.append(Speech(C.RIVAL, key, line(C.RIVAL, key, [last]), what))
     elif verb in ("humiliate", "spare"):
         key = "robbed" if verb == "humiliate" else "spared"
-        out.append(say(w, C.RIVAL, key, line(C.RIVAL, key, [last])))
+        what = ("The player beat you, then humiliated you and took your purse." if verb == "humiliate"
+                else "The player beat you in a duel, then spared you.")
+        speeches.append(Speech(C.RIVAL, key, line(C.RIVAL, key, [last]), what))
     elif verb == "bribe":
-        out.append(say(w, C.GUARD, "bribe", line(C.GUARD, "bribe", [last])))
+        speeches.append(Speech(C.GUARD, "bribe", line(C.GUARD, "bribe", [last]),
+                               f"The player just paid you a {C.FINE}-coin fine."))
     elif verb == "talk":
-        out.append(say(w, target, "talk", _talk(w, target)))
+        speeches.append(Speech(target, "talk", _talk(w, target), f'The player says to you: "{text or ""}"'))
     elif verb == "tell_claim":
-        out.extend(_told(w, target, claim, events))
-    return [r for r in out if r]
+        speeches.extend(_told(w, target, claim, events))
+    return deliver(w, mind, speeches)
 
 
 def _talk(w: World, npc: str) -> tuple[str, list[str]] | None:
@@ -101,32 +197,29 @@ def _talk(w: World, npc: str) -> tuple[str, list[str]] | None:
     return line(npc, "talk", seen)
 
 
-def _told(w: World, listener: str, claim: Claim, events: list[Event]) -> list[dict | None]:
+def _told(w: World, listener: str, claim: Claim, events: list[Event]) -> list[Speech]:
     told = events[0]
-    out = []
+    what = f"The player just told you that {_about(claim)}."
     if listener == C.GUARD:
         key = "told_believed" if w.beliefs.conf(C.GUARD, claim) >= C.CRIME_CONF else "told_doubted"
-        out.append(say(w, C.GUARD, "told", line(C.GUARD, key, [told.id])))
+        out = [Speech(C.GUARD, "told", line(C.GUARD, key, [told.id]), what)]
     else:
-        out.append(say(w, listener, "told", line(listener, "told", [told.id])))
+        out = [Speech(listener, "told", line(listener, "told", [told.id]), what)]
     if not told.truth:  # a lie, overheard by the NPC it names
         lied = Claim("lied", "player", C.RIVAL)
         b = w.beliefs.get(C.RIVAL, lied)
         if b is not None and listener != C.RIVAL and any(e.event == told.id for e in b.evidence):
             victim = claim.b if claim.a == C.RIVAL else claim.a
-            out.append(say(w, C.RIVAL, "lied_about",
-                           line(C.RIVAL, "lied_about", [told.id, b.id], victim=_name(victim))))
+            out.append(Speech(C.RIVAL, "lied_about",
+                              line(C.RIVAL, "lied_about", [told.id, b.id], victim=_name(victim)),
+                              f"You just heard the player tell {C.short_name(listener)} that {_about(claim)}. "
+                              "You know it never happened."))
     return out
 
 
-def _name(who: str) -> str:
-    return {"odo": "the peddler", "mags": "the innkeeper", "brenna": "the Captain", "player": "you"}.get(
-        who, C.short_name(who))
-
-
-# ---------------------------------------------------------------- lines inside the tick
+# ---------------------------------------------------------------- decisions inside the tick
 def decision_line(w: World, npc: str, chosen: str, claim: Claim | None = None) -> tuple[str, list[str]] | None:
-    """The line that goes with an NPC's decision, if it says anything."""
+    """The template line that goes with an NPC's decision, if it says anything."""
     if npc == C.RIVAL:
         if chosen == "accuse:player" and claim is not None:
             return line(C.RIVAL, f"accuse_{claim.pred}", belief_cites(w.beliefs.get(C.RIVAL, claim)))
@@ -143,15 +236,26 @@ def decision_line(w: World, npc: str, chosen: str, claim: Claim | None = None) -
     return None
 
 
-def testimony(w: World, witness: str, claim: Claim, event: Event) -> None:
+def crossed_threshold(w: World, npc_id: str) -> bool:
+    """Has a drive crossed one of its thresholds since this NPC last decided? Remembers the drives either way."""
+    npc = w.npcs[npc_id]
+    before = npc.flags.get("drives_seen") or C.load_cast()["npc"][npc_id]["drives"]
+    npc.flags["drives_seen"] = dict(npc.drives)
+    return any(min(before.get(k, 0), npc.drives.get(k, 0)) < t <= max(before.get(k, 0), npc.drives.get(k, 0))
+               for k, ts in THRESHOLDS.items() for t in ts)
+
+
+def testimony(w: World, mind: Mind, witness: str, claim: Claim, event: Event) -> None:
     """The witness's own words when the guard questions them; recorded inside the tick."""
-    say(w, witness, "testify", line(witness, "testify", [event.id], culprit=C.short_name(claim.a)))
+    deliver(w, mind, [Speech(witness, "testify",
+                             line(witness, "testify", [event.id], culprit=C.short_name(claim.a)),
+                             f"The Captain asks whether {_about(claim)}. You know it never happened.")])
 
 
 # ---------------------------------------------------------------- lines when a new phase starts
-def phase_start(w: World, moves: list[dict]) -> list[dict]:
+def phase_start(w: World, mind: Mind, moves: list[dict]) -> list[dict]:
     """Greetings when the player and an NPC newly share a stop: the guard at the gate, the rival on the road."""
-    out: list[dict | None] = []
+    speeches: list[Speech] = []
     here = {n.id for n in w.npcs_at(w.player["loc"])}
     arrived = {m["who"] for m in moves}
     met = here if "player" in arrived else here & arrived
@@ -161,16 +265,21 @@ def phase_start(w: World, moves: list[dict]) -> list[dict]:
         if guard.trust_in.get("player", 0) < 0 and b is not None and b.claim.a == "player":
             src = max(b.evidence, key=lambda e: e.conf).source
             said = line(C.GUARD, f"arrival_{b.claim.pred}", belief_cites(b), source=C.short_name(src))
-            out.append(say(w, C.GUARD, "arrival", said or line(C.GUARD, "arrival", belief_cites(b))))
+            speeches.append(Speech(C.GUARD, "arrival", said or line(C.GUARD, "arrival", belief_cites(b)),
+                                   "The player has just arrived at your gate. You do not trust them."))
         else:
             arrival = next((e.id for e in reversed(list(w.ledger)) if e.verb == "move" and e.actor == "player"), None)
-            out.append(say(w, C.GUARD, "arrival", line(C.GUARD, "arrival", [arrival] if arrival else [])))
+            speeches.append(Speech(C.GUARD, "arrival", line(C.GUARD, "arrival", [arrival] if arrival else []),
+                                   "The player has just arrived at your gate."))
     if C.RIVAL in met and not w.npcs[C.RIVAL].frozen(w.phase):
         kael = w.npcs[C.RIVAL]
         accused = next((e for e in reversed(list(w.ledger)) if e.verb == "accuse" and e.actor == C.RIVAL), None)
+        where = C.STOP_NAMES[kael.loc]
         if kael.flags.get("accused") and accused is not None:
-            out.append(say(w, C.RIVAL, "shares_stop", line(C.RIVAL, "reported", [accused.id])))
+            speeches.append(Speech(C.RIVAL, "shares_stop", line(C.RIVAL, "reported", [accused.id]),
+                                   f"You meet the player again at {where}, after reporting them to the Captain."))
         elif kael.drives["grudge"] >= 5:
-            out.append(say(w, C.RIVAL, "shares_stop",
-                           line(C.RIVAL, "grudge_meet", belief_cites(_top(w, C.RIVAL, ("player",))))))
-    return [r for r in out if r]
+            speeches.append(Speech(C.RIVAL, "shares_stop",
+                                   line(C.RIVAL, "grudge_meet", belief_cites(_top(w, C.RIVAL, ("player",)))),
+                                   f"You meet the player again at {where}."))
+    return deliver(w, mind, speeches)
