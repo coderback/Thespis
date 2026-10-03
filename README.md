@@ -42,9 +42,28 @@ python -m venv .venv
 pip install -r requirements-dev.txt
 pytest                          # rules model + architecture checks
 python tools/crypt_road_sim.py  # route outcomes and the demo-route acceptance test
+uvicorn games.crypt_road.app:app --reload   # the app on http://localhost:8000
 ```
 
 Copy `.env.example` to `.env` for model keys. Never commit `.env`.
+
+## Deploy
+
+One Docker image serves the engine API and the built client from the same URL (`Dockerfile`). It is hosted on
+Railway, which rebuilds and redeploys every merge to `main`, so the hosted URL always matches `main`.
+
+- **Settings:** `railway.toml` sets the Dockerfile build, a `/health` check and one replica.
+- **Volume:** mounted at `/data`. The SQLite database is `DB_PATH=/data/thespis.sqlite`.
+- **Model keys:** set as Railway variables, never in the repo.
+- **Check the volume persists:** restart the service, and the log line `boot #N` should go up by one.
+- **Freeze:** turn off auto-deploy at Sunday 12:00.
+
+Test the image locally:
+
+```bash
+docker build -t thespis:dev .
+docker run --rm -p 8000:8000 -v thespis-data:/data thespis:dev   # restart it: "boot #N" keeps counting
+```
 
 ## How we work
 
