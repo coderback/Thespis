@@ -1,0 +1,41 @@
+# The Crypt Road cast: starting state and personas, from the Cast section of docs/crypt-road-v2.md.
+# Persona lines go word for word into the model's state pack. Sample lines and fallback templates arrive in #10.
+# Drives run 0 to 10; trust runs -5 to 5.
+
+[npc.kael]
+name = "Kael"
+start = "tavern"
+goal = "Take the relic"
+persona = "A sellsword with a reputation to protect: proud, quick to anger and slow to forgive. He speaks in short, cutting sentences and never forgets a slight."
+drives = { grudge = 0, fear = 1, respect = 1, ambition = 6 }
+trust_in = {}
+
+[npc.brenna]
+name = "Captain Brenna"
+start = "guard_post"
+goal = "Keep the road orderly"
+persona = "Captain of the bridge watch: dutiful, tired and practical. She believes people she trusts, and a fine paid in coin smooths most trouble."
+drives = {}
+trust_in = { player = 0, kael = 2, odo = 2, mags = 1 }
+
+[npc.odo]
+name = "Odo"
+start = "tavern"
+goal = "Sell goods, avoid trouble"
+persona = "A travelling peddler who walks this road every day: nervous, honest to a fault and eager to avoid trouble. Ask and he'll tell you what he saw."
+drives = {}
+trust_in = { player = 0, kael = 0 }
+# His stop by time of day: morning, noon, evening, night. The only schedule in the game.
+walk = ["tavern", "market", "guard_post", "market"]
+
+[npc.mags]
+name = "Mags"
+start = "tavern"
+goal = "Keep the tavern calm"
+persona = "Innkeeper of the Lantern & Last Coin: warm, nosy, and misses nothing under her roof. She trades gossip like coin."
+drives = {}
+trust_in = { player = 0, kael = 0 }
+
+[narrator]
+name = "The Dungeon Master"
+persona = "A wry storyteller who recounts only what the ledger shows and ends every telling with a hook."
