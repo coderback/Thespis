@@ -32,5 +32,5 @@ def test_cast_has_a_persona_and_goal_for_everyone():
     for npc in content.npc_ids():
         assert cast["npc"][npc]["persona"] and cast["npc"][npc]["goal"]
     assert cast["narrator"]["persona"]
-    assert content.subjects() == ["player", "kael", "brenna", "odo", "mags"]
+    assert content.subjects() == ["player", "kael", "brenna", "mags", "odo"]
     assert content.next_stop("guard_post") == "bridge" and content.next_stop("crypt") is None

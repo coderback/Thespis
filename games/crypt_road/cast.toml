@@ -18,6 +18,14 @@ persona = "Captain of the bridge watch: dutiful, tired and practical. She believ
 drives = {}
 trust_in = { player = 0, kael = 2, odo = 2, mags = 1 }
 
+[npc.mags]
+name = "Mags"
+start = "tavern"
+goal = "Keep the tavern calm"
+persona = "Innkeeper of the Lantern & Last Coin: warm, nosy, and misses nothing under her roof. She trades gossip like coin."
+drives = {}
+trust_in = { player = 0, kael = 0 }
+
 [npc.odo]
 name = "Odo"
 start = "tavern"
@@ -27,14 +35,6 @@ drives = {}
 trust_in = { player = 0, kael = 0 }
 # His stop by time of day: morning, noon, evening, night. The only schedule in the game.
 walk = ["tavern", "market", "guard_post", "market"]
-
-[npc.mags]
-name = "Mags"
-start = "tavern"
-goal = "Keep the tavern calm"
-persona = "Innkeeper of the Lantern & Last Coin: warm, nosy, and misses nothing under her roof. She trades gossip like coin."
-drives = {}
-trust_in = { player = 0, kael = 0 }
 
 [narrator]
 name = "The Dungeon Master"
