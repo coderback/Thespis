@@ -1,9 +1,11 @@
 {
-  "text": "While you crossed the market, Kael reached the guard post and told Captain Brenna you robbed him in the tavern. Odo, passing through, added that you beat Kael in a duel.",
-  "hook": "Revenge is brewing: Kael has not forgotten the tavern.",
+  "text": "You walked from the market to the guard post. Kael told Brenna that you robbed him. Odo told Brenna that you beat Kael. Odo walked from the guard post to the market.",
+  "hook": null,
   "cites": [
+    "e0010",
     "e0011",
-    "e0012"
+    "e0012",
+    "e0013"
   ],
   "epilogue": null
 }

@@ -42,7 +42,7 @@
       "frozen_until": null
     },
     {
-      "id": "odo",
+      "id": "mags",
       "loc": "tavern",
       "last_seen": {
         "loc": "tavern",
@@ -56,7 +56,7 @@
       "frozen_until": null
     },
     {
-      "id": "mags",
+      "id": "odo",
       "loc": "tavern",
       "last_seen": {
         "loc": "tavern",

@@ -1,52 +1,11 @@
 {
   "events": [
     {
-      "id": "e0010",
-      "phase": 2,
-      "verb": "move",
+      "id": "e0015",
+      "phase": 3,
+      "verb": "bribe",
       "actor": "player",
-      "target": "guard_post",
-      "loc": "market",
-      "claim": null,
-      "truth": true,
-      "schema_version": 1
-    },
-    {
-      "id": "e0011",
-      "phase": 2,
-      "verb": "accuse",
-      "actor": "kael",
       "target": "brenna",
-      "loc": "guard_post",
-      "claim": {
-        "pred": "robbed",
-        "a": "player",
-        "b": "kael"
-      },
-      "truth": true,
-      "schema_version": 1
-    },
-    {
-      "id": "e0012",
-      "phase": 2,
-      "verb": "gossip",
-      "actor": "odo",
-      "target": "brenna",
-      "loc": "guard_post",
-      "claim": {
-        "pred": "beat",
-        "a": "player",
-        "b": "kael"
-      },
-      "truth": true,
-      "schema_version": 1
-    },
-    {
-      "id": "e0013",
-      "phase": 2,
-      "verb": "move",
-      "actor": "odo",
-      "target": "market",
       "loc": "guard_post",
       "claim": null,
       "truth": true,
@@ -54,93 +13,7 @@
     }
   ],
   "replies": [],
-  "tick": {
-    "moves": [
-      {
-        "who": "player",
-        "from": "market",
-        "to": "guard_post"
-      },
-      {
-        "who": "odo",
-        "from": "guard_post",
-        "to": "market"
-      }
-    ],
-    "decisions": [
-      {
-        "id": "d0003",
-        "kind": "decide",
-        "npc": "kael",
-        "phase": 2,
-        "trigger": "tick",
-        "allowed": [
-          "go_to",
-          "wait",
-          "accuse:player"
-        ],
-        "chosen": "accuse:player",
-        "line": null,
-        "cites": [],
-        "reason": "accuse:player scores 9",
-        "source": "fallback"
-      }
-    ],
-    "events": [
-      {
-        "id": "e0010",
-        "phase": 2,
-        "verb": "move",
-        "actor": "player",
-        "target": "guard_post",
-        "loc": "market",
-        "claim": null,
-        "truth": true,
-        "schema_version": 1
-      },
-      {
-        "id": "e0011",
-        "phase": 2,
-        "verb": "accuse",
-        "actor": "kael",
-        "target": "brenna",
-        "loc": "guard_post",
-        "claim": {
-          "pred": "robbed",
-          "a": "player",
-          "b": "kael"
-        },
-        "truth": true,
-        "schema_version": 1
-      },
-      {
-        "id": "e0012",
-        "phase": 2,
-        "verb": "gossip",
-        "actor": "odo",
-        "target": "brenna",
-        "loc": "guard_post",
-        "claim": {
-          "pred": "beat",
-          "a": "player",
-          "b": "kael"
-        },
-        "truth": true,
-        "schema_version": 1
-      },
-      {
-        "id": "e0013",
-        "phase": 2,
-        "verb": "move",
-        "actor": "odo",
-        "target": "market",
-        "loc": "guard_post",
-        "claim": null,
-        "truth": true,
-        "schema_version": 1
-      }
-    ]
-  },
+  "tick": null,
   "epilogue": null,
   "state": {
     "seed": 1,
@@ -153,7 +26,7 @@
     "ended_at": null,
     "player": {
       "loc": "guard_post",
-      "coins": 40
+      "coins": 0
     },
     "npcs": [
       {
@@ -181,7 +54,7 @@
         },
         "drives": {},
         "trust_in": {
-          "player": -2,
+          "player": 2,
           "kael": 2,
           "odo": 2,
           "mags": 1
@@ -598,6 +471,28 @@
         "verb": "move",
         "actor": "odo",
         "target": "market",
+        "loc": "guard_post",
+        "claim": null,
+        "truth": true,
+        "schema_version": 1
+      },
+      {
+        "id": "e0014",
+        "phase": 3,
+        "verb": "bribe",
+        "actor": "player",
+        "target": "brenna",
+        "loc": "guard_post",
+        "claim": null,
+        "truth": true,
+        "schema_version": 1
+      },
+      {
+        "id": "e0015",
+        "phase": 3,
+        "verb": "bribe",
+        "actor": "player",
+        "target": "brenna",
         "loc": "guard_post",
         "claim": null,
         "truth": true,

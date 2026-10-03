@@ -13,8 +13,8 @@
     },
     {
       "verb": "talk",
-      "target": "odo",
-      "label": "Talk to Odo",
+      "target": "mags",
+      "label": "Talk to Mags",
       "args": {
         "max_len": 200
       },
@@ -24,8 +24,8 @@
     },
     {
       "verb": "talk",
-      "target": "mags",
-      "label": "Talk to Mags",
+      "target": "odo",
+      "label": "Talk to Odo",
       "args": {
         "max_len": 200
       },
@@ -44,8 +44,8 @@
     },
     {
       "verb": "insult",
-      "target": "odo",
-      "label": "Insult Odo",
+      "target": "mags",
+      "label": "Insult Mags",
       "args": {},
       "ends_phase": false,
       "enabled": false,
@@ -53,8 +53,8 @@
     },
     {
       "verb": "insult",
-      "target": "mags",
-      "label": "Insult Mags",
+      "target": "odo",
+      "label": "Insult Odo",
       "args": {},
       "ends_phase": false,
       "enabled": false,
@@ -103,32 +103,8 @@
           "player",
           "kael",
           "brenna",
-          "odo",
-          "mags"
-        ]
-      },
-      "ends_phase": false,
-      "enabled": false,
-      "reason": "Choose: humiliate or spare"
-    },
-    {
-      "verb": "tell_claim",
-      "target": "odo",
-      "label": "Tell Odo...",
-      "args": {
-        "preds": [
-          "robbed",
-          "beat",
-          "insulted",
-          "spared",
-          "lied"
-        ],
-        "subjects": [
-          "player",
-          "kael",
-          "brenna",
-          "odo",
-          "mags"
+          "mags",
+          "odo"
         ]
       },
       "ends_phase": false,
@@ -151,8 +127,32 @@
           "player",
           "kael",
           "brenna",
-          "odo",
-          "mags"
+          "mags",
+          "odo"
+        ]
+      },
+      "ends_phase": false,
+      "enabled": false,
+      "reason": "Choose: humiliate or spare"
+    },
+    {
+      "verb": "tell_claim",
+      "target": "odo",
+      "label": "Tell Odo...",
+      "args": {
+        "preds": [
+          "robbed",
+          "beat",
+          "insulted",
+          "spared",
+          "lied"
+        ],
+        "subjects": [
+          "player",
+          "kael",
+          "brenna",
+          "mags",
+          "odo"
         ]
       },
       "ends_phase": false,
