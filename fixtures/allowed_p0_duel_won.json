@@ -1,0 +1,192 @@
+{
+  "verbs": [
+    {
+      "verb": "talk",
+      "target": "kael",
+      "label": "Talk to Kael",
+      "args": {
+        "max_len": 200
+      },
+      "ends_phase": false,
+      "enabled": false,
+      "reason": "Choose: humiliate or spare"
+    },
+    {
+      "verb": "talk",
+      "target": "odo",
+      "label": "Talk to Odo",
+      "args": {
+        "max_len": 200
+      },
+      "ends_phase": false,
+      "enabled": false,
+      "reason": "Choose: humiliate or spare"
+    },
+    {
+      "verb": "talk",
+      "target": "mags",
+      "label": "Talk to Mags",
+      "args": {
+        "max_len": 200
+      },
+      "ends_phase": false,
+      "enabled": false,
+      "reason": "Choose: humiliate or spare"
+    },
+    {
+      "verb": "insult",
+      "target": "kael",
+      "label": "Insult Kael",
+      "args": {},
+      "ends_phase": false,
+      "enabled": false,
+      "reason": "Choose: humiliate or spare"
+    },
+    {
+      "verb": "insult",
+      "target": "odo",
+      "label": "Insult Odo",
+      "args": {},
+      "ends_phase": false,
+      "enabled": false,
+      "reason": "Choose: humiliate or spare"
+    },
+    {
+      "verb": "insult",
+      "target": "mags",
+      "label": "Insult Mags",
+      "args": {},
+      "ends_phase": false,
+      "enabled": false,
+      "reason": "Choose: humiliate or spare"
+    },
+    {
+      "verb": "challenge",
+      "target": "kael",
+      "label": "Challenge Kael",
+      "args": {},
+      "ends_phase": true,
+      "enabled": false,
+      "reason": "Choose: humiliate or spare"
+    },
+    {
+      "verb": "humiliate",
+      "target": "kael",
+      "label": "Humiliate Kael",
+      "args": {},
+      "ends_phase": true,
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "verb": "spare",
+      "target": "kael",
+      "label": "Spare Kael",
+      "args": {},
+      "ends_phase": true,
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "verb": "tell_claim",
+      "target": "kael",
+      "label": "Tell Kael...",
+      "args": {
+        "preds": [
+          "robbed",
+          "beat",
+          "insulted",
+          "spared",
+          "lied"
+        ],
+        "subjects": [
+          "player",
+          "kael",
+          "brenna",
+          "odo",
+          "mags"
+        ]
+      },
+      "ends_phase": false,
+      "enabled": false,
+      "reason": "Choose: humiliate or spare"
+    },
+    {
+      "verb": "tell_claim",
+      "target": "odo",
+      "label": "Tell Odo...",
+      "args": {
+        "preds": [
+          "robbed",
+          "beat",
+          "insulted",
+          "spared",
+          "lied"
+        ],
+        "subjects": [
+          "player",
+          "kael",
+          "brenna",
+          "odo",
+          "mags"
+        ]
+      },
+      "ends_phase": false,
+      "enabled": false,
+      "reason": "Choose: humiliate or spare"
+    },
+    {
+      "verb": "tell_claim",
+      "target": "mags",
+      "label": "Tell Mags...",
+      "args": {
+        "preds": [
+          "robbed",
+          "beat",
+          "insulted",
+          "spared",
+          "lied"
+        ],
+        "subjects": [
+          "player",
+          "kael",
+          "brenna",
+          "odo",
+          "mags"
+        ]
+      },
+      "ends_phase": false,
+      "enabled": false,
+      "reason": "Choose: humiliate or spare"
+    },
+    {
+      "verb": "move",
+      "target": null,
+      "label": "Move to the market",
+      "args": {
+        "to": "market"
+      },
+      "ends_phase": true,
+      "enabled": false,
+      "reason": "Choose: humiliate or spare"
+    },
+    {
+      "verb": "wait",
+      "target": null,
+      "label": "Wait",
+      "args": {},
+      "ends_phase": true,
+      "enabled": false,
+      "reason": "Choose: humiliate or spare"
+    },
+    {
+      "verb": "take_relic",
+      "target": null,
+      "label": "Take the relic",
+      "args": {},
+      "ends_phase": false,
+      "enabled": false,
+      "reason": "Choose: humiliate or spare"
+    }
+  ]
+}

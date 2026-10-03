@@ -1,0 +1,76 @@
+{
+  "seed": 1,
+  "phase": 0,
+  "day": 1,
+  "phase_name": "morning",
+  "status": "playing",
+  "brain": "model",
+  "pending": null,
+  "ended_at": null,
+  "player": {
+    "loc": "tavern",
+    "coins": 10
+  },
+  "npcs": [
+    {
+      "id": "kael",
+      "loc": "tavern",
+      "last_seen": {
+        "loc": "tavern",
+        "phase": 0
+      },
+      "drives": {
+        "grudge": 0,
+        "fear": 1,
+        "respect": 1,
+        "ambition": 6
+      },
+      "trust_in": {},
+      "frozen_until": null
+    },
+    {
+      "id": "brenna",
+      "loc": "guard_post",
+      "last_seen": null,
+      "drives": {},
+      "trust_in": {
+        "player": 0,
+        "kael": 2,
+        "odo": 2,
+        "mags": 1
+      },
+      "frozen_until": null
+    },
+    {
+      "id": "odo",
+      "loc": "tavern",
+      "last_seen": {
+        "loc": "tavern",
+        "phase": 0
+      },
+      "drives": {},
+      "trust_in": {
+        "player": 0,
+        "kael": 0
+      },
+      "frozen_until": null
+    },
+    {
+      "id": "mags",
+      "loc": "tavern",
+      "last_seen": {
+        "loc": "tavern",
+        "phase": 0
+      },
+      "drives": {},
+      "trust_in": {
+        "player": 0,
+        "kael": 0
+      },
+      "frozen_until": null
+    }
+  ],
+  "beliefs": [],
+  "ledger_tail": [],
+  "decisions_tail": []
+}
