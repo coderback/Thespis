@@ -1,53 +1,38 @@
 {
   "events": [
     {
-      "id": "e0010",
-      "phase": 2,
+      "id": "e0017",
+      "phase": 3,
       "verb": "move",
       "actor": "player",
-      "target": "guard_post",
-      "loc": "market",
+      "target": "bridge",
+      "loc": "guard_post",
       "claim": null,
       "truth": true,
       "schema_version": 1
     },
     {
-      "id": "e0011",
-      "phase": 2,
-      "verb": "accuse",
-      "actor": "kael",
-      "target": "brenna",
+      "id": "e0018",
+      "phase": 3,
+      "verb": "detain",
+      "actor": "brenna",
+      "target": "kael",
       "loc": "guard_post",
       "claim": {
         "pred": "robbed",
-        "a": "player",
-        "b": "kael"
+        "a": "kael",
+        "b": "odo"
       },
-      "truth": true,
+      "truth": false,
       "schema_version": 1
     },
     {
-      "id": "e0012",
-      "phase": 2,
-      "verb": "gossip",
-      "actor": "odo",
-      "target": "brenna",
-      "loc": "guard_post",
-      "claim": {
-        "pred": "beat",
-        "a": "player",
-        "b": "kael"
-      },
-      "truth": true,
-      "schema_version": 1
-    },
-    {
-      "id": "e0013",
-      "phase": 2,
+      "id": "e0019",
+      "phase": 3,
       "verb": "move",
       "actor": "odo",
-      "target": "market",
-      "loc": "guard_post",
+      "target": "tavern",
+      "loc": "market",
       "claim": null,
       "truth": true,
       "schema_version": 1
@@ -58,83 +43,67 @@
     "moves": [
       {
         "who": "player",
-        "from": "market",
-        "to": "guard_post"
+        "from": "guard_post",
+        "to": "bridge"
       },
       {
         "who": "odo",
-        "from": "guard_post",
-        "to": "market"
+        "from": "market",
+        "to": "tavern"
       }
     ],
     "decisions": [
       {
-        "id": "d0003",
+        "id": "d0004",
         "kind": "decide",
-        "npc": "kael",
-        "phase": 2,
-        "trigger": "tick",
+        "npc": "brenna",
+        "phase": 3,
+        "trigger": "crime_belief",
         "allowed": [
-          "go_to",
-          "wait",
-          "accuse:player"
+          "detain:kael",
+          "wait"
         ],
-        "chosen": "accuse:player",
+        "chosen": "detain:kael",
         "line": null,
         "cites": [],
-        "reason": "accuse:player scores 9",
+        "reason": "believes a robbery at 0.5 or more",
         "source": "fallback"
       }
     ],
     "events": [
       {
-        "id": "e0010",
-        "phase": 2,
+        "id": "e0017",
+        "phase": 3,
         "verb": "move",
         "actor": "player",
-        "target": "guard_post",
-        "loc": "market",
+        "target": "bridge",
+        "loc": "guard_post",
         "claim": null,
         "truth": true,
         "schema_version": 1
       },
       {
-        "id": "e0011",
-        "phase": 2,
-        "verb": "accuse",
-        "actor": "kael",
-        "target": "brenna",
+        "id": "e0018",
+        "phase": 3,
+        "verb": "detain",
+        "actor": "brenna",
+        "target": "kael",
         "loc": "guard_post",
         "claim": {
           "pred": "robbed",
-          "a": "player",
-          "b": "kael"
+          "a": "kael",
+          "b": "odo"
         },
-        "truth": true,
+        "truth": false,
         "schema_version": 1
       },
       {
-        "id": "e0012",
-        "phase": 2,
-        "verb": "gossip",
-        "actor": "odo",
-        "target": "brenna",
-        "loc": "guard_post",
-        "claim": {
-          "pred": "beat",
-          "a": "player",
-          "b": "kael"
-        },
-        "truth": true,
-        "schema_version": 1
-      },
-      {
-        "id": "e0013",
-        "phase": 2,
+        "id": "e0019",
+        "phase": 3,
         "verb": "move",
         "actor": "odo",
-        "target": "market",
-        "loc": "guard_post",
+        "target": "tavern",
+        "loc": "market",
         "claim": null,
         "truth": true,
         "schema_version": 1
@@ -144,16 +113,16 @@
   "epilogue": null,
   "state": {
     "seed": 1,
-    "phase": 3,
-    "day": 1,
-    "phase_name": "night",
+    "phase": 4,
+    "day": 2,
+    "phase_name": "morning",
     "status": "playing",
     "brain": "model",
     "pending": null,
     "ended_at": null,
     "player": {
-      "loc": "guard_post",
-      "coins": 40
+      "loc": "bridge",
+      "coins": 0
     },
     "npcs": [
       {
@@ -164,13 +133,13 @@
           "phase": 3
         },
         "drives": {
-          "grudge": 6,
+          "grudge": 8,
           "fear": 1,
           "respect": 0,
           "ambition": 6
         },
         "trust_in": {},
-        "frozen_until": null
+        "frozen_until": 4
       },
       {
         "id": "brenna",
@@ -181,8 +150,8 @@
         },
         "drives": {},
         "trust_in": {
-          "player": -2,
-          "kael": 2,
+          "player": 2,
+          "kael": 0,
           "odo": 2,
           "mags": 1
         },
@@ -204,7 +173,7 @@
       },
       {
         "id": "odo",
-        "loc": "market",
+        "loc": "tavern",
         "last_seen": {
           "loc": "tavern",
           "phase": 0
@@ -437,6 +406,46 @@
         ],
         "conf": 0.8,
         "truth": true
+      },
+      {
+        "id": "b0012",
+        "npc": "brenna",
+        "claim": {
+          "pred": "robbed",
+          "a": "kael",
+          "b": "odo"
+        },
+        "status": "active",
+        "evidence": [
+          {
+            "source": "player",
+            "event": "e0016",
+            "phase": 3,
+            "conf": 0.9
+          }
+        ],
+        "conf": 0.9,
+        "truth": false
+      },
+      {
+        "id": "b0013",
+        "npc": "kael",
+        "claim": {
+          "pred": "lied",
+          "a": "player",
+          "b": "kael"
+        },
+        "status": "active",
+        "evidence": [
+          {
+            "source": "self",
+            "event": "e0016",
+            "phase": 3,
+            "conf": 1.0
+          }
+        ],
+        "conf": 1.0,
+        "truth": false
       }
     ],
     "ledger_tail": [
@@ -602,6 +611,80 @@
         "claim": null,
         "truth": true,
         "schema_version": 1
+      },
+      {
+        "id": "e0014",
+        "phase": 3,
+        "verb": "bribe",
+        "actor": "player",
+        "target": "brenna",
+        "loc": "guard_post",
+        "claim": null,
+        "truth": true,
+        "schema_version": 1
+      },
+      {
+        "id": "e0015",
+        "phase": 3,
+        "verb": "bribe",
+        "actor": "player",
+        "target": "brenna",
+        "loc": "guard_post",
+        "claim": null,
+        "truth": true,
+        "schema_version": 1
+      },
+      {
+        "id": "e0016",
+        "phase": 3,
+        "verb": "tell_claim",
+        "actor": "player",
+        "target": "brenna",
+        "loc": "guard_post",
+        "claim": {
+          "pred": "robbed",
+          "a": "kael",
+          "b": "odo"
+        },
+        "truth": false,
+        "schema_version": 1
+      },
+      {
+        "id": "e0017",
+        "phase": 3,
+        "verb": "move",
+        "actor": "player",
+        "target": "bridge",
+        "loc": "guard_post",
+        "claim": null,
+        "truth": true,
+        "schema_version": 1
+      },
+      {
+        "id": "e0018",
+        "phase": 3,
+        "verb": "detain",
+        "actor": "brenna",
+        "target": "kael",
+        "loc": "guard_post",
+        "claim": {
+          "pred": "robbed",
+          "a": "kael",
+          "b": "odo"
+        },
+        "truth": false,
+        "schema_version": 1
+      },
+      {
+        "id": "e0019",
+        "phase": 3,
+        "verb": "move",
+        "actor": "odo",
+        "target": "tavern",
+        "loc": "market",
+        "claim": null,
+        "truth": true,
+        "schema_version": 1
       }
     ],
     "decisions_tail": [
@@ -652,6 +735,22 @@
         "line": null,
         "cites": [],
         "reason": "accuse:player scores 9",
+        "source": "fallback"
+      },
+      {
+        "id": "d0004",
+        "kind": "decide",
+        "npc": "brenna",
+        "phase": 3,
+        "trigger": "crime_belief",
+        "allowed": [
+          "detain:kael",
+          "wait"
+        ],
+        "chosen": "detain:kael",
+        "line": null,
+        "cites": [],
+        "reason": "believes a robbery at 0.5 or more",
         "source": "fallback"
       }
     ]

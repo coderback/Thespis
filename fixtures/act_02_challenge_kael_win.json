@@ -27,17 +27,7 @@
       "schema_version": 1
     }
   ],
-  "replies": [
-    {
-      "decision": "d0002",
-      "npc": "kael",
-      "line": "Lucky blade. It won't happen twice.",
-      "cites": [
-        "b0006"
-      ],
-      "source": "llm"
-    }
-  ],
+  "replies": [],
   "tick": null,
   "epilogue": null,
   "state": {
@@ -84,7 +74,7 @@
         "frozen_until": null
       },
       {
-        "id": "odo",
+        "id": "mags",
         "loc": "tavern",
         "last_seen": {
           "loc": "tavern",
@@ -98,7 +88,7 @@
         "frozen_until": null
       },
       {
-        "id": "mags",
+        "id": "odo",
         "loc": "tavern",
         "last_seen": {
           "loc": "tavern",
@@ -121,9 +111,7 @@
           "a": "player",
           "b": "kael"
         },
-        "conf": 1.0,
         "status": "active",
-        "truth": true,
         "evidence": [
           {
             "source": "witnessed",
@@ -131,7 +119,9 @@
             "phase": 0,
             "conf": 1.0
           }
-        ]
+        ],
+        "conf": 1.0,
+        "truth": true
       },
       {
         "id": "b0002",
@@ -141,9 +131,7 @@
           "a": "player",
           "b": "kael"
         },
-        "conf": 1.0,
         "status": "active",
-        "truth": true,
         "evidence": [
           {
             "source": "witnessed",
@@ -151,7 +139,9 @@
             "phase": 0,
             "conf": 1.0
           }
-        ]
+        ],
+        "conf": 1.0,
+        "truth": true
       },
       {
         "id": "b0003",
@@ -161,9 +151,7 @@
           "a": "player",
           "b": "kael"
         },
-        "conf": 1.0,
         "status": "active",
-        "truth": true,
         "evidence": [
           {
             "source": "self",
@@ -171,7 +159,9 @@
             "phase": 0,
             "conf": 1.0
           }
-        ]
+        ],
+        "conf": 1.0,
+        "truth": true
       },
       {
         "id": "b0004",
@@ -181,9 +171,7 @@
           "a": "player",
           "b": "kael"
         },
-        "conf": 1.0,
         "status": "active",
-        "truth": true,
         "evidence": [
           {
             "source": "witnessed",
@@ -191,7 +179,9 @@
             "phase": 0,
             "conf": 1.0
           }
-        ]
+        ],
+        "conf": 1.0,
+        "truth": true
       },
       {
         "id": "b0005",
@@ -201,9 +191,7 @@
           "a": "player",
           "b": "kael"
         },
-        "conf": 1.0,
         "status": "active",
-        "truth": true,
         "evidence": [
           {
             "source": "witnessed",
@@ -211,7 +199,9 @@
             "phase": 0,
             "conf": 1.0
           }
-        ]
+        ],
+        "conf": 1.0,
+        "truth": true
       },
       {
         "id": "b0006",
@@ -221,9 +211,7 @@
           "a": "player",
           "b": "kael"
         },
-        "conf": 1.0,
         "status": "active",
-        "truth": true,
         "evidence": [
           {
             "source": "self",
@@ -231,7 +219,9 @@
             "phase": 0,
             "conf": 1.0
           }
-        ]
+        ],
+        "conf": 1.0,
+        "truth": true
       }
     ],
     "ledger_tail": [
@@ -277,38 +267,6 @@
         "schema_version": 1
       }
     ],
-    "decisions_tail": [
-      {
-        "id": "d0001",
-        "kind": "react",
-        "npc": "kael",
-        "phase": 0,
-        "trigger": "insulted",
-        "allowed": [],
-        "chosen": null,
-        "line": "Say that again, stranger. I dare you.",
-        "cites": [
-          "e0001",
-          "b0003"
-        ],
-        "reason": "grudge 0 -> 1",
-        "source": "llm"
-      },
-      {
-        "id": "d0002",
-        "kind": "react",
-        "npc": "kael",
-        "phase": 0,
-        "trigger": "beaten",
-        "allowed": [],
-        "chosen": null,
-        "line": "Lucky blade. It won't happen twice.",
-        "cites": [
-          "b0006"
-        ],
-        "reason": "fear 1 -> 3, grudge 1 -> 3",
-        "source": "llm"
-      }
-    ]
+    "decisions_tail": []
   }
 }
