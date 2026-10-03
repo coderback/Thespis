@@ -104,11 +104,11 @@ def describe(option: str, w: World, npc: str) -> str:
     kind, _, who = option.partition(":")
     nxt = C.next_stop(w.npcs[npc].loc)
     return {
-        "go_to": f"walk on to {C.STOP_NAMES[nxt]}" if nxt else "walk on",
-        "wait": "stay where you are",
+        "go_to": f"walk on towards the relic, to {C.STOP_NAMES[nxt]}" if nxt else "walk on",
+        "wait": "stay where you are and do nothing this phase",
         "take_relic": "take the relic and win the race",
-        "accuse": "tell the Captain what the player did to you",
-        "share_drink": "stay to share a drink with the player and give them a tip",
+        "accuse": "tell the Captain what the player did to you; she trusts you and will stop them at the gate",
+        "share_drink": "stay this phase to share a drink with the player and tell them something useful",
         "detain": f"have the sergeant hold {C.short_name(who)} for two phases",
         "question": f"ask {C.short_name(who)} whether the claim about them is true",
     }.get(kind, option.replace("_", " "))
@@ -141,7 +141,7 @@ def pack_for(w: World, npc_id: str, situation: str, options: dict[str, float] | 
         beliefs=[{"id": b.id, "claim": _about(b.claim), "conf": b.conf,
                   "from": sorted({e.source for e in b.evidence})} for b in beliefs],
         events=[{"id": e.id, "what": words.sentence(e, words.ABOUT_PLAYER)} for e in known],
-        allowed=[{"id": o, "does": describe(o, w, npc_id)} for o in ordered],
+        allowed=[{"id": o, "does": describe(o, w, npc_id), "pull": (options or {})[o]} for o in ordered],
         names={x for x in names if x and x != "player"},
         setting=f"You are at {C.STOP_NAMES[npc.loc]}. The road runs east: "
                 + ", ".join(C.STOP_NAMES[s] for s in C.STOPS) + ". The relic lies in the crypt.",
