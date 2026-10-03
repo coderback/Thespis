@@ -12,7 +12,17 @@
       "schema_version": 1
     }
   ],
-  "replies": [],
+  "replies": [
+    {
+      "decision": "d0011",
+      "npc": "brenna",
+      "line": "Twenty coins says I was looking the other way.",
+      "cites": [
+        "e0015"
+      ],
+      "source": "fallback"
+    }
+  ],
   "tick": null,
   "epilogue": null,
   "state": {
@@ -502,6 +512,51 @@
     "decisions_tail": [
       {
         "id": "d0001",
+        "kind": "react",
+        "npc": "kael",
+        "phase": 0,
+        "trigger": "insulted",
+        "allowed": [],
+        "chosen": null,
+        "line": "Say that again, stranger, and we settle it with steel.",
+        "cites": [
+          "e0001"
+        ],
+        "reason": "insulted",
+        "source": "fallback"
+      },
+      {
+        "id": "d0002",
+        "kind": "react",
+        "npc": "kael",
+        "phase": 0,
+        "trigger": "beaten",
+        "allowed": [],
+        "chosen": null,
+        "line": "Lucky blade. It won't happen twice.",
+        "cites": [
+          "e0003"
+        ],
+        "reason": "beaten",
+        "source": "fallback"
+      },
+      {
+        "id": "d0003",
+        "kind": "react",
+        "npc": "kael",
+        "phase": 0,
+        "trigger": "robbed",
+        "allowed": [],
+        "chosen": null,
+        "line": "Laugh now. The road is long.",
+        "cites": [
+          "e0004"
+        ],
+        "reason": "robbed",
+        "source": "fallback"
+      },
+      {
+        "id": "d0004",
         "kind": "decide",
         "npc": "kael",
         "phase": 0,
@@ -511,13 +566,32 @@
           "wait"
         ],
         "chosen": "go_to",
-        "line": null,
-        "cites": [],
+        "line": "Out of my way.",
+        "cites": [
+          "b0009",
+          "e0004"
+        ],
         "reason": "go_to scores 6",
         "source": "fallback"
       },
       {
-        "id": "d0002",
+        "id": "d0005",
+        "kind": "react",
+        "npc": "mags",
+        "phase": 1,
+        "trigger": "talk",
+        "allowed": [],
+        "chosen": null,
+        "line": "Odo saw the whole thing, and Odo talks.",
+        "cites": [
+          "b0007",
+          "e0004"
+        ],
+        "reason": "talk",
+        "source": "fallback"
+      },
+      {
+        "id": "d0006",
         "kind": "decide",
         "npc": "kael",
         "phase": 1,
@@ -527,13 +601,16 @@
           "wait"
         ],
         "chosen": "go_to",
-        "line": null,
-        "cites": [],
+        "line": "Out of my way.",
+        "cites": [
+          "b0009",
+          "e0004"
+        ],
         "reason": "go_to scores 6",
         "source": "fallback"
       },
       {
-        "id": "d0003",
+        "id": "d0007",
         "kind": "decide",
         "npc": "kael",
         "phase": 2,
@@ -544,9 +621,73 @@
           "accuse:player"
         ],
         "chosen": "accuse:player",
-        "line": null,
-        "cites": [],
+        "line": "Captain. The rogue in green robbed me at the Lantern.",
+        "cites": [
+          "b0009",
+          "e0004"
+        ],
         "reason": "accuse:player scores 9",
+        "source": "fallback"
+      },
+      {
+        "id": "d0008",
+        "kind": "react",
+        "npc": "brenna",
+        "phase": 3,
+        "trigger": "arrival",
+        "allowed": [],
+        "chosen": null,
+        "line": "Kael says you cut his purse in the tavern. You're not crossing.",
+        "cites": [
+          "b0010",
+          "e0011"
+        ],
+        "reason": "arrival",
+        "source": "fallback"
+      },
+      {
+        "id": "d0009",
+        "kind": "react",
+        "npc": "kael",
+        "phase": 3,
+        "trigger": "shares_stop",
+        "allowed": [],
+        "chosen": null,
+        "line": "Told the Captain what you did in the tavern. Enjoy the view.",
+        "cites": [
+          "e0011"
+        ],
+        "reason": "shares_stop",
+        "source": "fallback"
+      },
+      {
+        "id": "d0010",
+        "kind": "react",
+        "npc": "brenna",
+        "phase": 3,
+        "trigger": "bribe",
+        "allowed": [],
+        "chosen": null,
+        "line": "Twenty coins says I was looking the other way.",
+        "cites": [
+          "e0014"
+        ],
+        "reason": "bribe",
+        "source": "fallback"
+      },
+      {
+        "id": "d0011",
+        "kind": "react",
+        "npc": "brenna",
+        "phase": 3,
+        "trigger": "bribe",
+        "allowed": [],
+        "chosen": null,
+        "line": "Twenty coins says I was looking the other way.",
+        "cites": [
+          "e0015"
+        ],
+        "reason": "bribe",
         "source": "fallback"
       }
     ]

@@ -1,5 +1,6 @@
 # The Crypt Road cast: starting state and personas, from the Cast section of docs/crypt-road-v2.md.
-# Persona lines go word for word into the model's state pack. Sample lines and fallback templates arrive in #10.
+# Persona lines go word for word into the model's state pack. The [npc.*.lines] tables are the fallback brain's
+# lines, keyed by trigger; the quoted sample lines come from the design doc. {placeholders} are filled in code.
 # Drives run 0 to 10; trust runs -5 to 5.
 
 [npc.kael]
@@ -39,3 +40,47 @@ walk = ["tavern", "market", "guard_post", "market"]
 [narrator]
 name = "The Dungeon Master"
 persona = "A wry storyteller who recounts only what the ledger shows and ends every telling with a hook."
+
+# ---------------------------------------------------------------- fallback lines (#10)
+[npc.kael.lines]
+insulted = "Say that again, stranger, and we settle it with steel."
+beaten = "Lucky blade. It won't happen twice."
+victor = "Stay down. The relic is mine."
+robbed = "Laugh now. The road is long."
+spared = "A fair fight. I'll remember that."
+leaving = "Out of my way."
+accuse_robbed = "Captain. The rogue in green robbed me at the Lantern."
+accuse_beat = "Captain. The rogue in green set on me at the Lantern."
+reported = "Told the Captain what you did in the tavern. Enjoy the view."
+grudge_meet = "You'll answer for the tavern."
+share_drink = "Sit. One drink, for a fair fight. A tip: the Captain believes whoever she trusts."
+lied_about = "Liar! I never touched {victim}!"
+talk = "Speak quickly. I have a road to run."
+told = "Save your stories."
+
+[npc.brenna.lines]
+arrival_robbed = "{source} says you cut his purse in the tavern. You're not crossing."
+arrival_beat = "{source} says you beat him bloody. You're not crossing."
+arrival = "State your business, traveller."
+bribe = "Twenty coins says I was looking the other way."
+told_believed = "Is that so? I'll see to it."
+told_doubted = "I don't know you well enough to take your word."
+detain = "{culprit} robbed {victim}, did he? Sergeant, hold him."
+question = "{witness}. Is it true you were robbed?"
+talk_distrust = "No one crosses while I doubt them."
+talk = "Keep moving, and keep out of trouble."
+insulted = "Careful. I've locked up men for less."
+
+[npc.mags.lines]
+talk_robbed = "Odo saw the whole thing, and Odo talks."
+talk_grudge = "Kael won't forget that, love. That one keeps a list."
+talk = "What'll it be, love?"
+told = "Is that so? I'll keep it in mind, love."
+insulted = "Mind your manners under my roof."
+
+[npc.odo.lines]
+talk_saw = "I saw nothing! Well. I saw the purse."
+talk = "Fine wares, fair prices!"
+told = "Oh! Is that so? Dear me."
+testify = "Robbed? Me? By {culprit}? Captain, I've never been robbed in my life."
+insulted = "No need for that, friend. No need at all."

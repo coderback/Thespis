@@ -6,8 +6,8 @@ Real API responses in the `docs/api.md` shapes. They follow the demo route (the 
 **Generated, not written by hand.** `python tools/make_fixtures.py` plays the route through the engine's HTTP API and
 rewrites this folder. `tests/test_fixtures.py` fails if these files differ from what the engine produces, and checks
 their numbers against `tools/crypt_road_sim.py`. Every id is real but may change between engine versions, so never
-hard-code one. Until #10 lands, NPC lines are absent (`replies` is empty and decisions have `line: null`), and the
-digest is built from the ledger in code.
+hard-code one. Lines come from the fallback voice (`source: "fallback"`, templates in `games/crypt_road/cast.toml`)
+until the model voice lands (#17); every line cites the ids it rests on. The digest is built from the ledger in code.
 
 | File | Request | Demo beat |
 | --- | --- | --- |
@@ -19,9 +19,9 @@ digest is built from the ledger in code.
 | `allowed_p0_duel_won.json` | `GET /allowed` | Only `humiliate` and `spare` enabled |
 | `act_03_humiliate_kael.json` | `POST /act {verb: "humiliate", target: "kael"}` | Beat 1: +30 coins, the phase ends, and Kael and Odo leave the tavern |
 | `state_p1_after_humiliate.json` | `GET /state` | Phase 1: Kael is out of sight, with `last_seen` ghosts at the tavern |
-| `act_04_talk_mags.json` | `POST /act {verb: "talk", target: "mags", text: "..."}` | Beat 2 (her line arrives with #10) |
+| `act_04_talk_mags.json` | `POST /act {verb: "talk", target: "mags", text: "..."}` | Beat 2: "Odo saw the whole thing, and Odo talks." |
 | `act_05_move_to_market.json` | `POST /act {verb: "move"}` | Beat 2: to the market, while Kael and Odo reach the guard post |
-| `act_06_move_to_guard_post.json` | `POST /act {verb: "move"}` | Beat 3: Kael accuses you offscreen, and Odo gossips to Brenna |
+| `act_06_move_to_guard_post.json` | `POST /act {verb: "move"}` | Beat 3: Kael accuses you offscreen; Brenna and Kael greet you at the gate |
 | `digest_p2.json` | `GET /digest?since=2` | Beat 3: what happened out of sight |
 | `state_p3_gate.json` | `GET /state` | Phase 3: Brenna believes the robbery at 0.9 from Kael; her trust in you is -2 |
 | `allowed_p3_gate.json` | `GET /allowed` | `move` disabled: "Blocked: Brenna's trust in you is -2" |
@@ -33,5 +33,9 @@ digest is built from the ledger in code.
 | `state_p7_end.json` | `GET /state` | After the epilogue: the lie is retracted, and Brenna's trust in you is -1 |
 | `allowed_p7_end.json` | `GET /allowed` | Everything disabled: "The race is over" |
 | `digest_epilogue.json` | `GET /digest?since=5` | The epilogue text, for the win card |
+
+The why-chain to try first: in `act_06_move_to_guard_post.json`, Brenna's reply cites belief `b0010`, which
+rests on Kael's accusation `e0011`. The belief's claim, `robbed(player, kael)`, is `truth: true` because of the
+humiliation, `e0004`.
 
 Rule: whoever changes an API shape updates `docs/api.md` and regenerates these fixtures in the same PR.

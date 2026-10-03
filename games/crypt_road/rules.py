@@ -15,6 +15,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from games.crypt_road import content as C
+from games.crypt_road import voice
 from thespis.brain import Brain, UtilityBrain
 from thespis.decisions import DECIDE, Decision
 from thespis.ledger import Claim, Event
@@ -148,7 +149,8 @@ def act(w: World, verb: str, target: str | None = None, claim: dict | Claim | No
     _check(w, verb, target)
     brain = brain or UtilityBrain()
     start = len(w.ledger)
-    tick = None
+    ends_phase = None  # the tick this verb triggers, if any: "move" or "wait"
+    told = None
 
     if verb == "talk":
         if not text or len(text) > TALK_MAX:
@@ -159,12 +161,14 @@ def act(w: World, verb: str, target: str | None = None, claim: dict | Claim | No
         c = Claim("insulted", "player", target)
         witness(w, c, "player", target, _event(w, "insult", "player", target, w.player["loc"], c))
     elif verb == "challenge":
-        tick = _challenge(w, brain)
+        if not _challenge(w):
+            ends_phase = "wait"  # a lost duel ends the phase; a won one waits for humiliate or spare
     elif verb in ("humiliate", "spare"):
         _settle_duel(w, verb)
-        tick = end_phase(w, "wait", brain)
+        ends_phase = "wait"
     elif verb == "tell_claim":
-        _tell(w, target, _as_claim(claim))
+        told = _as_claim(claim)
+        _tell(w, target, told)
     elif verb == "bribe":
         if amount not in (None, C.FINE):
             raise NotAllowed(f"The fine is {C.FINE} coins")
@@ -172,15 +176,19 @@ def act(w: World, verb: str, target: str | None = None, claim: dict | Claim | No
         w.npcs[C.GUARD].trust_in["player"] += 2
         _event(w, "bribe", "player", C.GUARD, w.player["loc"])
     elif verb in ("move", "wait"):
-        tick = end_phase(w, verb, brain)
+        ends_phase = verb
     elif verb == "take_relic":
         w.status, w.ended_at = WON, w.phase
         _event(w, "take_relic", "player", None, w.player["loc"])
 
+    replies = voice.react(w, verb, target, list(w.ledger)[start:], told)
+    tick = end_phase(w, ends_phase, brain) if ends_phase else None
+    if tick is not None and w.status == PLAYING:
+        replies += voice.phase_start(w, tick.moves)
     events = list(w.ledger)[start:]
     epilogue = run_epilogue(w, brain) if w.status != PLAYING and w.ended_at is not None and not \
         w.counters.get("epilogue_done") else None
-    return ActResult(events=events, tick=tick, epilogue=epilogue)
+    return ActResult(events=events, tick=tick, epilogue=epilogue, replies=replies)
 
 
 def _as_claim(claim: dict | Claim | None) -> Claim:
@@ -190,7 +198,8 @@ def _as_claim(claim: dict | Claim | None) -> Claim:
     return c
 
 
-def _challenge(w: World, brain: Brain) -> Tick | None:
+def _challenge(w: World) -> bool:
+    """Roll the duel. Returns whether the player won."""
     kael = w.npcs[C.RIVAL].drives
     w.counters["challenges"] = n = w.counters.get("challenges", 0) + 1
     _event(w, "challenge", "player", C.RIVAL, w.player["loc"])
@@ -200,11 +209,11 @@ def _challenge(w: World, brain: Brain) -> Tick | None:
         c = Claim("beat", "player", C.RIVAL)
         witness(w, c, "player", C.RIVAL, _event(w, "beat", "player", C.RIVAL, w.player["loc"], c))
         w.pending = DUEL_WON  # the player must humiliate or spare, which ends the phase
-        return None
+        return True
     kael["grudge"] += 1
     c = Claim("beat", C.RIVAL, "player")
     witness(w, c, C.RIVAL, "player", _event(w, "beat", C.RIVAL, "player", w.player["loc"], c))
-    return end_phase(w, "wait", brain)
+    return False
 
 
 def _settle_duel(w: World, verb: str) -> None:
@@ -258,7 +267,8 @@ def end_phase(w: World, action: str, brain: Brain | None = None) -> Tick:
             if c.a == C.RIVAL and w.beliefs.conf(C.GUARD, c) >= C.CRIME_CONF and cj not in detained:
                 options = {f"detain:{C.RIVAL}": 10, "wait": 1}
                 chosen = brain.choose(C.GUARD, options)
-                _decide(w, C.GUARD, "crime_belief", options, chosen, "believes a robbery at 0.5 or more")
+                _decide(w, C.GUARD, "crime_belief", options, chosen, "believes a robbery at 0.5 or more",
+                        voice.decision_line(w, C.GUARD, chosen, c))
                 if chosen.startswith("detain"):
                     detained.append(cj)
                     kael.frozen_until = p + 1
@@ -275,14 +285,16 @@ def end_phase(w: World, action: str, brain: Brain | None = None) -> Tick:
                 continue
             options = {f"question:{wit}": 8, "wait": 1}
             chosen = brain.choose(C.GUARD, options)
-            _decide(w, C.GUARD, "witness_present", options, chosen, f"{wit} can speak to a claim about them")
+            _decide(w, C.GUARD, "witness_present", options, chosen, f"{wit} can speak to a claim about them",
+                    voice.decision_line(w, C.GUARD, chosen, belief.claim))
             if not chosen.startswith("question"):
                 continue
             w.beliefs.retract(belief)  # the witness knows it never happened
             for src in {e.source for e in belief.evidence}:
                 if src in guard.trust_in:
                     guard.trust_in[src] -= 3
-            _event(w, "testify", wit, C.GUARD, guard.loc, belief.claim, w.ledger.happened(belief.claim))
+            e = _event(w, "testify", wit, C.GUARD, guard.loc, belief.claim, w.ledger.happened(belief.claim))
+            voice.testimony(w, wit, belief.claim, e)
             if kael.frozen(p):
                 kael.frozen_until = None
                 _event(w, "release", C.GUARD, C.RIVAL, guard.loc)
@@ -301,14 +313,16 @@ def end_phase(w: World, action: str, brain: Brain | None = None) -> Tick:
         if d["respect"] >= 4 and kael.loc == pl["loc"] and not kael.flags.get("drink"):
             options["share_drink"] = d["respect"] + 3
         chosen = brain.choose(C.RIVAL, options)
-        _decide(w, C.RIVAL, "tick", options, chosen, f"{chosen} scores {options[chosen]}")
+        grievance = robbed if w.beliefs.conf(C.RIVAL, robbed) else beaten
+        _decide(w, C.RIVAL, "tick", options, chosen, f"{chosen} scores {options[chosen]}",
+                voice.decision_line(w, C.RIVAL, chosen, grievance))
         if chosen == "take_relic":
             if w.status == PLAYING:
                 w.status, w.ended_at = LOST, p
                 _event(w, "take_relic", C.RIVAL, None, kael.loc)
         elif chosen == "accuse:player":
             kael.flags["accused"] = True
-            c = robbed if w.beliefs.conf(C.RIVAL, robbed) else beaten
+            c = grievance
             e = _event(w, "accuse", C.RIVAL, C.GUARD, kael.loc, c, w.ledger.happened(c))
             give_evidence(w, C.GUARD, c, C.conf_from_trust(guard.trust_in.get(C.RIVAL, 0)), C.RIVAL, e)
         elif chosen == "share_drink":
@@ -357,9 +371,11 @@ def end_phase(w: World, action: str, brain: Brain | None = None) -> Tick:
     return tick
 
 
-def _decide(w: World, npc: str, trigger: str, options: dict, chosen: str, reason: str) -> Decision:
+def _decide(w: World, npc: str, trigger: str, options: dict, chosen: str, reason: str,
+            said: tuple[str, list[str]] | None = None) -> Decision:
+    text, cites = said if said else (None, [])
     return w.decisions.record(DECIDE, npc, w.phase, trigger, allowed=list(options), chosen=chosen,
-                              reason=reason, source="fallback")
+                              line=text, cites=cites, reason=reason, source="fallback")
 
 
 def run_epilogue(w: World, brain: Brain | None = None) -> list[Tick]:
