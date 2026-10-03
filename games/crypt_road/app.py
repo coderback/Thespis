@@ -21,6 +21,7 @@ from pydantic import BaseModel
 
 from games.crypt_road import rules, views
 from games.crypt_road.content import DEMO_SEED, new_world
+from thespis.gateway import gateway_from_env
 from thespis.store import SessionNotFound, Store
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -40,7 +41,11 @@ async def lifespan(app: FastAPI):
     app.state.store = Store(path)
     # On the host, a count that keeps rising across redeploys proves the volume persists.
     log.warning("boot #%d, database at %s", app.state.store.record_boot(), path.resolve())
+    app.state.gateway = gateway_from_env()
+    names = [p.name for p in app.state.gateway.providers]
+    log.warning("models: %s", " then ".join(names) + " then fallback" if names else "none configured, fallback only")
     yield
+    app.state.gateway.close()
 
 
 app = FastAPI(title="Thespis: The Crypt Road", lifespan=lifespan)
