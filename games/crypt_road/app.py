@@ -6,13 +6,13 @@ The session endpoints from docs/api.md arrive in #8; for now this serves /health
 
 import logging
 import os
-import sqlite3
-import time
 from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+
+from thespis.store import Store
 
 ROOT = Path(__file__).resolve().parents[2]
 CLIENT_DIST = ROOT / "client" / "dist"
@@ -24,23 +24,12 @@ def db_path() -> Path:
     return Path(os.environ.get("DB_PATH", "./data/thespis.sqlite"))
 
 
-def record_boot(path: Path) -> int:
-    """Log this start in the database and return how many starts it has seen.
-
-    On the host, a count that keeps rising across restarts proves the volume persists.
-    """
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with sqlite3.connect(path) as db:
-        db.execute("CREATE TABLE IF NOT EXISTS boots (id INTEGER PRIMARY KEY, at REAL NOT NULL)")
-        db.execute("INSERT INTO boots (at) VALUES (?)", (time.time(),))
-        return db.execute("SELECT COUNT(*) FROM boots").fetchone()[0]
-
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     path = db_path()
-    boots = record_boot(path)
-    log.warning("boot #%d, database at %s", boots, path.resolve())
+    app.state.store = Store(path)
+    # On the host, a count that keeps rising across redeploys proves the volume persists.
+    log.warning("boot #%d, database at %s", app.state.store.record_boot(), path.resolve())
     yield
 
 
