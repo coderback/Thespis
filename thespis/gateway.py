@@ -5,6 +5,10 @@ Each call uses JSON mode, max_tokens 150 and temperature 0.6, with thinking swit
 that fails it returns None so the caller uses its code fallback. It never raises, so a model problem never reaches
 the player.
 
+Azure OpenAI and Azure AI Foundry work too: their hosts get the `api-key` header, and `api_version` adds the
+`api-version` query older deployment URLs need. In `extra`, a null value removes that field from the request,
+e.g. {"max_tokens": null, "max_completion_tokens": 300} for a model that refuses max_tokens.
+
 A provider that answers 401, 402 or 403 (a dead key or no credit) is skipped for 10 minutes, and one that answers
 429 for 30 seconds, so later calls go straight to the backup. Every call is logged in `calls` for the harness.
 """
@@ -39,6 +43,25 @@ class Provider:
     api_key: str = field(repr=False)
     model: str
     extra: dict = field(default_factory=dict)  # merged into the request body, e.g. {"enable_thinking": false}
+    api_version: str = ""  # Azure's api-version query, for deployment-style URLs
+
+    @property
+    def azure(self) -> bool:
+        host = urlparse(self.base_url).hostname or ""
+        return host.endswith((".azure.com", ".azure-api.net"))
+
+    def headers(self) -> dict:
+        # Azure wants the key as api-key; as a Bearer token it would be read as an Entra login and refused.
+        return {"api-key": self.api_key} if self.azure else {"Authorization": f"Bearer {self.api_key}"}
+
+    def url(self) -> str:
+        url = f"{self.base_url.rstrip('/')}/chat/completions"
+        return f"{url}?api-version={self.api_version}" if self.api_version else url
+
+    def body(self, messages: list[dict]) -> dict:
+        body = {"model": self.model, "messages": messages, "max_tokens": MAX_TOKENS, "temperature": TEMPERATURE,
+                "response_format": {"type": "json_object"}, **self.extra}
+        return {k: v for k, v in body.items() if v is not None}  # null in extra removes a field
 
 
 @dataclass(frozen=True)
@@ -129,14 +152,11 @@ class OpenAICompatGateway:
         self._client.close()
 
     def _call(self, p: Provider, call_type: str, messages: list[dict]) -> ModelReply | None:
-        body = {"model": p.model, "messages": messages, "max_tokens": MAX_TOKENS, "temperature": TEMPERATURE,
-                "response_format": {"type": "json_object"}, **p.extra}
         started = time.perf_counter()
         reply, error = None, None
         try:
             with self._slots:
-                r = self._client.post(f"{p.base_url.rstrip('/')}/chat/completions", json=body,
-                                      headers={"Authorization": f"Bearer {p.api_key}"})
+                r = self._client.post(p.url(), json=p.body(messages), headers=p.headers())
             if r.status_code == 200:
                 data = parse_json(r.json()["choices"][0]["message"]["content"])
                 reply = ModelReply(data, p.name, p.model, time.perf_counter() - started)
@@ -159,7 +179,7 @@ def _provider(env: Mapping[str, str], prefix: str) -> Provider | None:
         return None
     extra = env.get(f"{prefix}EXTRA", "").strip()
     return Provider(name=f"{urlparse(base).hostname or base}/{model}", base_url=base, api_key=key, model=model,
-                    extra=json.loads(extra) if extra else {})
+                    extra=json.loads(extra) if extra else {}, api_version=env.get(f"{prefix}API_VERSION", "").strip())
 
 
 def gateway_from_env(env: Mapping[str, str] | None = None) -> OpenAICompatGateway | NoModel:
