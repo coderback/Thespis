@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 from games.crypt_road import content as C
+from games.crypt_road import words
 from games.crypt_road.rules import ActResult, Tick
-from thespis.ledger import Claim, Event
+from thespis.ledger import Event
 from thespis.world import World
 
 TAIL = 50  # covers a whole demo run
@@ -42,61 +43,8 @@ def act_view(result: ActResult, w: World) -> dict:
 
 
 # ---------------------------------------------------------------- the code-built digest (#19 adds the model's)
-def _who(name: str | None, start: bool = False) -> str:
-    if name == "player":
-        return "You" if start else "you"
-    return C.short_name(name) if name else ""
-
-
-PRONOUNS = {"kael": ("he", "him"), "brenna": ("she", "her"), "odo": ("he", "him"), "mags": ("she", "her")}
-VERBS = {"robbed": "robbed", "beat": "beat", "insulted": "insulted", "spared": "spared", "lied": "lied to"}
-
-
-def _claim(c: Claim, speaker: str | None = None, negate: bool = False) -> str:
-    """A claim as words. Whoever is telling it becomes he/him or she/her: "Kael told Brenna that you robbed him"."""
-    def name(who: str, subject: bool) -> str:
-        if who == speaker and who in PRONOUNS:
-            return PRONOUNS[who][0 if subject else 1]
-        return _who(who)
-    verb = VERBS.get(c.pred, c.pred)
-    return f"{name(c.a, True)} {'never ' if negate else ''}{verb} {name(c.b, False)}"
-
-
-def sentence(e: Event) -> str:
-    a, t = _who(e.actor, start=True), _who(e.target)
-    where = C.STOP_NAMES.get(e.loc, e.loc)
-    match e.verb:
-        case "insult":
-            return f"{a} insulted {t} at {where}."
-        case "challenge":
-            return f"{a} challenged {t} to a duel."
-        case "beat":
-            return f"{a} beat {t} in the duel."
-        case "humiliate":
-            return f"{a} humiliated {t} and took {'your' if e.target == 'player' else 'his'} purse."
-        case "spare":
-            return f"{a} spared {t}."
-        case "bribe":
-            return f"{a} paid {t} a fine."
-        case "move":
-            return f"{a} walked from {where} to {C.STOP_NAMES.get(e.target, e.target)}."
-        case "block":
-            return f"{_who(C.GUARD, start=True)} turned {_who(e.actor)} back at the gate."
-        case "detain":
-            return f"{a} detained {t}."
-        case "release":
-            return f"{a} released {t}."
-        case "testify":
-            return f"{a} told {t} that {_claim(e.claim, e.actor, negate=True)}."
-        case "take_relic":
-            return f"{a} took the relic."
-        case _ if e.claim is not None:  # tell_claim, accuse, gossip
-            return f"{a} told {t} that {_claim(e.claim, e.actor)}."
-    return f"{a} {e.verb.replace('_', ' ')} {t}.".replace("  ", " ")
-
-
 def _text(events: list[Event]) -> str:
-    return " ".join(sentence(e) for e in events)
+    return " ".join(words.sentence(e) for e in events)
 
 
 def digest_view(w: World, since: int) -> dict:
