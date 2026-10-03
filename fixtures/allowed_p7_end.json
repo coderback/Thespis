@@ -8,19 +8,8 @@
         "max_len": 200
       },
       "ends_phase": false,
-      "enabled": true,
-      "reason": null
-    },
-    {
-      "verb": "talk",
-      "target": "brenna",
-      "label": "Talk to Brenna",
-      "args": {
-        "max_len": 200
-      },
-      "ends_phase": false,
-      "enabled": true,
-      "reason": null
+      "enabled": false,
+      "reason": "The race is over"
     },
     {
       "verb": "insult",
@@ -28,17 +17,8 @@
       "label": "Insult Kael",
       "args": {},
       "ends_phase": false,
-      "enabled": true,
-      "reason": null
-    },
-    {
-      "verb": "insult",
-      "target": "brenna",
-      "label": "Insult Brenna",
-      "args": {},
-      "ends_phase": false,
-      "enabled": true,
-      "reason": null
+      "enabled": false,
+      "reason": "The race is over"
     },
     {
       "verb": "challenge",
@@ -46,8 +26,8 @@
       "label": "Challenge Kael",
       "args": {},
       "ends_phase": true,
-      "enabled": true,
-      "reason": null
+      "enabled": false,
+      "reason": "The race is over"
     },
     {
       "verb": "humiliate",
@@ -56,7 +36,7 @@
       "args": {},
       "ends_phase": true,
       "enabled": false,
-      "reason": "Win a duel first"
+      "reason": "The race is over"
     },
     {
       "verb": "spare",
@@ -65,7 +45,7 @@
       "args": {},
       "ends_phase": true,
       "enabled": false,
-      "reason": "Win a duel first"
+      "reason": "The race is over"
     },
     {
       "verb": "tell_claim",
@@ -88,54 +68,17 @@
         ]
       },
       "ends_phase": false,
-      "enabled": true,
-      "reason": null
-    },
-    {
-      "verb": "tell_claim",
-      "target": "brenna",
-      "label": "Tell Brenna...",
-      "args": {
-        "preds": [
-          "robbed",
-          "beat",
-          "insulted",
-          "spared",
-          "lied"
-        ],
-        "subjects": [
-          "player",
-          "kael",
-          "brenna",
-          "mags",
-          "odo"
-        ]
-      },
-      "ends_phase": false,
-      "enabled": true,
-      "reason": null
-    },
-    {
-      "verb": "bribe",
-      "target": "brenna",
-      "label": "Bribe Brenna (20)",
-      "args": {
-        "amount": 20
-      },
-      "ends_phase": false,
-      "enabled": true,
-      "reason": null
+      "enabled": false,
+      "reason": "The race is over"
     },
     {
       "verb": "move",
       "target": null,
-      "label": "Move to the bridge",
-      "args": {
-        "to": "bridge"
-      },
+      "label": "Move on",
+      "args": {},
       "ends_phase": true,
       "enabled": false,
-      "reason": "Blocked: Brenna's trust in you is -2"
+      "reason": "The race is over"
     },
     {
       "verb": "wait",
@@ -143,8 +86,8 @@
       "label": "Wait",
       "args": {},
       "ends_phase": true,
-      "enabled": true,
-      "reason": null
+      "enabled": false,
+      "reason": "The race is over"
     },
     {
       "verb": "take_relic",
@@ -153,7 +96,7 @@
       "args": {},
       "ends_phase": false,
       "enabled": false,
-      "reason": "The relic is in the crypt"
+      "reason": "The race is over"
     }
   ]
 }

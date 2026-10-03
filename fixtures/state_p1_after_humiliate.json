@@ -42,11 +42,11 @@
       "frozen_until": null
     },
     {
-      "id": "odo",
-      "loc": "market",
+      "id": "mags",
+      "loc": "tavern",
       "last_seen": {
         "loc": "tavern",
-        "phase": 0
+        "phase": 1
       },
       "drives": {},
       "trust_in": {
@@ -56,11 +56,11 @@
       "frozen_until": null
     },
     {
-      "id": "mags",
-      "loc": "tavern",
+      "id": "odo",
+      "loc": "market",
       "last_seen": {
         "loc": "tavern",
-        "phase": 1
+        "phase": 0
       },
       "drives": {},
       "trust_in": {
@@ -79,9 +79,7 @@
         "a": "player",
         "b": "kael"
       },
-      "conf": 1.0,
       "status": "active",
-      "truth": true,
       "evidence": [
         {
           "source": "witnessed",
@@ -89,7 +87,9 @@
           "phase": 0,
           "conf": 1.0
         }
-      ]
+      ],
+      "conf": 1.0,
+      "truth": true
     },
     {
       "id": "b0002",
@@ -99,9 +99,7 @@
         "a": "player",
         "b": "kael"
       },
-      "conf": 1.0,
       "status": "active",
-      "truth": true,
       "evidence": [
         {
           "source": "witnessed",
@@ -109,7 +107,9 @@
           "phase": 0,
           "conf": 1.0
         }
-      ]
+      ],
+      "conf": 1.0,
+      "truth": true
     },
     {
       "id": "b0003",
@@ -119,9 +119,7 @@
         "a": "player",
         "b": "kael"
       },
-      "conf": 1.0,
       "status": "active",
-      "truth": true,
       "evidence": [
         {
           "source": "self",
@@ -129,7 +127,9 @@
           "phase": 0,
           "conf": 1.0
         }
-      ]
+      ],
+      "conf": 1.0,
+      "truth": true
     },
     {
       "id": "b0004",
@@ -139,9 +139,7 @@
         "a": "player",
         "b": "kael"
       },
-      "conf": 1.0,
       "status": "active",
-      "truth": true,
       "evidence": [
         {
           "source": "witnessed",
@@ -149,7 +147,9 @@
           "phase": 0,
           "conf": 1.0
         }
-      ]
+      ],
+      "conf": 1.0,
+      "truth": true
     },
     {
       "id": "b0005",
@@ -159,9 +159,7 @@
         "a": "player",
         "b": "kael"
       },
-      "conf": 1.0,
       "status": "active",
-      "truth": true,
       "evidence": [
         {
           "source": "witnessed",
@@ -169,7 +167,9 @@
           "phase": 0,
           "conf": 1.0
         }
-      ]
+      ],
+      "conf": 1.0,
+      "truth": true
     },
     {
       "id": "b0006",
@@ -179,9 +179,7 @@
         "a": "player",
         "b": "kael"
       },
-      "conf": 1.0,
       "status": "active",
-      "truth": true,
       "evidence": [
         {
           "source": "self",
@@ -189,7 +187,9 @@
           "phase": 0,
           "conf": 1.0
         }
-      ]
+      ],
+      "conf": 1.0,
+      "truth": true
     },
     {
       "id": "b0007",
@@ -199,9 +199,7 @@
         "a": "player",
         "b": "kael"
       },
-      "conf": 1.0,
       "status": "active",
-      "truth": true,
       "evidence": [
         {
           "source": "witnessed",
@@ -209,7 +207,9 @@
           "phase": 0,
           "conf": 1.0
         }
-      ]
+      ],
+      "conf": 1.0,
+      "truth": true
     },
     {
       "id": "b0008",
@@ -219,9 +219,7 @@
         "a": "player",
         "b": "kael"
       },
-      "conf": 1.0,
       "status": "active",
-      "truth": true,
       "evidence": [
         {
           "source": "witnessed",
@@ -229,7 +227,9 @@
           "phase": 0,
           "conf": 1.0
         }
-      ]
+      ],
+      "conf": 1.0,
+      "truth": true
     },
     {
       "id": "b0009",
@@ -239,9 +239,7 @@
         "a": "player",
         "b": "kael"
       },
-      "conf": 1.0,
       "status": "active",
-      "truth": true,
       "evidence": [
         {
           "source": "self",
@@ -249,7 +247,9 @@
           "phase": 0,
           "conf": 1.0
         }
-      ]
+      ],
+      "conf": 1.0,
+      "truth": true
     }
   ],
   "ledger_tail": [
@@ -335,68 +335,19 @@
   "decisions_tail": [
     {
       "id": "d0001",
-      "kind": "react",
-      "npc": "kael",
-      "phase": 0,
-      "trigger": "insulted",
-      "allowed": [],
-      "chosen": null,
-      "line": "Say that again, stranger. I dare you.",
-      "cites": [
-        "e0001",
-        "b0003"
-      ],
-      "reason": "grudge 0 -> 1",
-      "source": "llm"
-    },
-    {
-      "id": "d0002",
-      "kind": "react",
-      "npc": "kael",
-      "phase": 0,
-      "trigger": "beaten",
-      "allowed": [],
-      "chosen": null,
-      "line": "Lucky blade. It won't happen twice.",
-      "cites": [
-        "b0006"
-      ],
-      "reason": "fear 1 -> 3, grudge 1 -> 3",
-      "source": "llm"
-    },
-    {
-      "id": "d0003",
-      "kind": "react",
-      "npc": "kael",
-      "phase": 0,
-      "trigger": "robbed",
-      "allowed": [],
-      "chosen": null,
-      "line": "Laugh now. The road is long.",
-      "cites": [
-        "b0009",
-        "e0004"
-      ],
-      "reason": "grudge 3 -> 6",
-      "source": "llm"
-    },
-    {
-      "id": "d0004",
       "kind": "decide",
       "npc": "kael",
       "phase": 0,
-      "trigger": "threshold",
+      "trigger": "tick",
       "allowed": [
         "go_to",
         "wait"
       ],
       "chosen": "go_to",
-      "line": "Spend it quick. I'll be at the crypt before you.",
-      "cites": [
-        "b0009"
-      ],
-      "reason": "grudge crossed 5; go_to 6 beats wait 0",
-      "source": "llm"
+      "line": null,
+      "cites": [],
+      "reason": "go_to scores 6",
+      "source": "fallback"
     }
   ]
 }
