@@ -1,0 +1,159 @@
+{
+  "verbs": [
+    {
+      "verb": "talk",
+      "target": "kael",
+      "label": "Talk to Kael",
+      "args": {
+        "max_len": 200
+      },
+      "ends_phase": false,
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "verb": "talk",
+      "target": "brenna",
+      "label": "Talk to Brenna",
+      "args": {
+        "max_len": 200
+      },
+      "ends_phase": false,
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "verb": "insult",
+      "target": "kael",
+      "label": "Insult Kael",
+      "args": {},
+      "ends_phase": false,
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "verb": "insult",
+      "target": "brenna",
+      "label": "Insult Brenna",
+      "args": {},
+      "ends_phase": false,
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "verb": "challenge",
+      "target": "kael",
+      "label": "Challenge Kael",
+      "args": {},
+      "ends_phase": true,
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "verb": "humiliate",
+      "target": "kael",
+      "label": "Humiliate Kael",
+      "args": {},
+      "ends_phase": true,
+      "enabled": false,
+      "reason": "Win a duel first"
+    },
+    {
+      "verb": "spare",
+      "target": "kael",
+      "label": "Spare Kael",
+      "args": {},
+      "ends_phase": true,
+      "enabled": false,
+      "reason": "Win a duel first"
+    },
+    {
+      "verb": "tell_claim",
+      "target": "kael",
+      "label": "Tell Kael...",
+      "args": {
+        "preds": [
+          "robbed",
+          "beat",
+          "insulted",
+          "spared",
+          "lied"
+        ],
+        "subjects": [
+          "player",
+          "kael",
+          "brenna",
+          "odo",
+          "mags"
+        ]
+      },
+      "ends_phase": false,
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "verb": "tell_claim",
+      "target": "brenna",
+      "label": "Tell Brenna...",
+      "args": {
+        "preds": [
+          "robbed",
+          "beat",
+          "insulted",
+          "spared",
+          "lied"
+        ],
+        "subjects": [
+          "player",
+          "kael",
+          "brenna",
+          "odo",
+          "mags"
+        ]
+      },
+      "ends_phase": false,
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "verb": "bribe",
+      "target": "brenna",
+      "label": "Bribe Brenna (20)",
+      "args": {
+        "amount": 20
+      },
+      "ends_phase": false,
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "verb": "move",
+      "target": null,
+      "label": "Move to the bridge",
+      "args": {
+        "to": "bridge"
+      },
+      "ends_phase": true,
+      "enabled": false,
+      "reason": "Blocked: Brenna's trust in you is -2"
+    },
+    {
+      "verb": "wait",
+      "target": null,
+      "label": "Wait",
+      "args": {},
+      "ends_phase": true,
+      "enabled": true,
+      "reason": null
+    },
+    {
+      "verb": "take_relic",
+      "target": null,
+      "label": "Take the relic",
+      "args": {},
+      "ends_phase": false,
+      "enabled": false,
+      "reason": "The relic is in the crypt"
+    }
+  ]
+}

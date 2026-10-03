@@ -1,0 +1,433 @@
+{
+  "events": [],
+  "replies": [
+    {
+      "decision": "d0005",
+      "npc": "mags",
+      "line": "Odo saw the whole thing, and Odo talks.",
+      "cites": [
+        "b0007"
+      ],
+      "source": "llm"
+    }
+  ],
+  "tick": null,
+  "epilogue": null,
+  "state": {
+    "seed": 1,
+    "phase": 1,
+    "day": 1,
+    "phase_name": "noon",
+    "status": "playing",
+    "brain": "model",
+    "pending": null,
+    "ended_at": null,
+    "player": {
+      "loc": "tavern",
+      "coins": 40
+    },
+    "npcs": [
+      {
+        "id": "kael",
+        "loc": "market",
+        "last_seen": {
+          "loc": "tavern",
+          "phase": 0
+        },
+        "drives": {
+          "grudge": 6,
+          "fear": 2,
+          "respect": 0,
+          "ambition": 6
+        },
+        "trust_in": {},
+        "frozen_until": null
+      },
+      {
+        "id": "brenna",
+        "loc": "guard_post",
+        "last_seen": null,
+        "drives": {},
+        "trust_in": {
+          "player": 0,
+          "kael": 2,
+          "odo": 2,
+          "mags": 1
+        },
+        "frozen_until": null
+      },
+      {
+        "id": "odo",
+        "loc": "market",
+        "last_seen": {
+          "loc": "tavern",
+          "phase": 0
+        },
+        "drives": {},
+        "trust_in": {
+          "player": 0,
+          "kael": 0
+        },
+        "frozen_until": null
+      },
+      {
+        "id": "mags",
+        "loc": "tavern",
+        "last_seen": {
+          "loc": "tavern",
+          "phase": 1
+        },
+        "drives": {},
+        "trust_in": {
+          "player": 0,
+          "kael": 0
+        },
+        "frozen_until": null
+      }
+    ],
+    "beliefs": [
+      {
+        "id": "b0001",
+        "npc": "mags",
+        "claim": {
+          "pred": "insulted",
+          "a": "player",
+          "b": "kael"
+        },
+        "conf": 1.0,
+        "status": "active",
+        "truth": true,
+        "evidence": [
+          {
+            "source": "witnessed",
+            "event": "e0001",
+            "phase": 0,
+            "conf": 1.0
+          }
+        ]
+      },
+      {
+        "id": "b0002",
+        "npc": "odo",
+        "claim": {
+          "pred": "insulted",
+          "a": "player",
+          "b": "kael"
+        },
+        "conf": 1.0,
+        "status": "active",
+        "truth": true,
+        "evidence": [
+          {
+            "source": "witnessed",
+            "event": "e0001",
+            "phase": 0,
+            "conf": 1.0
+          }
+        ]
+      },
+      {
+        "id": "b0003",
+        "npc": "kael",
+        "claim": {
+          "pred": "insulted",
+          "a": "player",
+          "b": "kael"
+        },
+        "conf": 1.0,
+        "status": "active",
+        "truth": true,
+        "evidence": [
+          {
+            "source": "self",
+            "event": "e0001",
+            "phase": 0,
+            "conf": 1.0
+          }
+        ]
+      },
+      {
+        "id": "b0004",
+        "npc": "mags",
+        "claim": {
+          "pred": "beat",
+          "a": "player",
+          "b": "kael"
+        },
+        "conf": 1.0,
+        "status": "active",
+        "truth": true,
+        "evidence": [
+          {
+            "source": "witnessed",
+            "event": "e0003",
+            "phase": 0,
+            "conf": 1.0
+          }
+        ]
+      },
+      {
+        "id": "b0005",
+        "npc": "odo",
+        "claim": {
+          "pred": "beat",
+          "a": "player",
+          "b": "kael"
+        },
+        "conf": 1.0,
+        "status": "active",
+        "truth": true,
+        "evidence": [
+          {
+            "source": "witnessed",
+            "event": "e0003",
+            "phase": 0,
+            "conf": 1.0
+          }
+        ]
+      },
+      {
+        "id": "b0006",
+        "npc": "kael",
+        "claim": {
+          "pred": "beat",
+          "a": "player",
+          "b": "kael"
+        },
+        "conf": 1.0,
+        "status": "active",
+        "truth": true,
+        "evidence": [
+          {
+            "source": "self",
+            "event": "e0003",
+            "phase": 0,
+            "conf": 1.0
+          }
+        ]
+      },
+      {
+        "id": "b0007",
+        "npc": "mags",
+        "claim": {
+          "pred": "robbed",
+          "a": "player",
+          "b": "kael"
+        },
+        "conf": 1.0,
+        "status": "active",
+        "truth": true,
+        "evidence": [
+          {
+            "source": "witnessed",
+            "event": "e0004",
+            "phase": 0,
+            "conf": 1.0
+          }
+        ]
+      },
+      {
+        "id": "b0008",
+        "npc": "odo",
+        "claim": {
+          "pred": "robbed",
+          "a": "player",
+          "b": "kael"
+        },
+        "conf": 1.0,
+        "status": "active",
+        "truth": true,
+        "evidence": [
+          {
+            "source": "witnessed",
+            "event": "e0004",
+            "phase": 0,
+            "conf": 1.0
+          }
+        ]
+      },
+      {
+        "id": "b0009",
+        "npc": "kael",
+        "claim": {
+          "pred": "robbed",
+          "a": "player",
+          "b": "kael"
+        },
+        "conf": 1.0,
+        "status": "active",
+        "truth": true,
+        "evidence": [
+          {
+            "source": "self",
+            "event": "e0004",
+            "phase": 0,
+            "conf": 1.0
+          }
+        ]
+      }
+    ],
+    "ledger_tail": [
+      {
+        "id": "e0001",
+        "phase": 0,
+        "verb": "insult",
+        "actor": "player",
+        "target": "kael",
+        "loc": "tavern",
+        "claim": {
+          "pred": "insulted",
+          "a": "player",
+          "b": "kael"
+        },
+        "truth": true,
+        "schema_version": 1
+      },
+      {
+        "id": "e0002",
+        "phase": 0,
+        "verb": "challenge",
+        "actor": "player",
+        "target": "kael",
+        "loc": "tavern",
+        "claim": null,
+        "truth": true,
+        "schema_version": 1
+      },
+      {
+        "id": "e0003",
+        "phase": 0,
+        "verb": "beat",
+        "actor": "player",
+        "target": "kael",
+        "loc": "tavern",
+        "claim": {
+          "pred": "beat",
+          "a": "player",
+          "b": "kael"
+        },
+        "truth": true,
+        "schema_version": 1
+      },
+      {
+        "id": "e0004",
+        "phase": 0,
+        "verb": "humiliate",
+        "actor": "player",
+        "target": "kael",
+        "loc": "tavern",
+        "claim": {
+          "pred": "robbed",
+          "a": "player",
+          "b": "kael"
+        },
+        "truth": true,
+        "schema_version": 1
+      },
+      {
+        "id": "e0005",
+        "phase": 0,
+        "verb": "move",
+        "actor": "kael",
+        "target": "market",
+        "loc": "tavern",
+        "claim": null,
+        "truth": true,
+        "schema_version": 1
+      },
+      {
+        "id": "e0006",
+        "phase": 0,
+        "verb": "move",
+        "actor": "odo",
+        "target": "market",
+        "loc": "tavern",
+        "claim": null,
+        "truth": true,
+        "schema_version": 1
+      }
+    ],
+    "decisions_tail": [
+      {
+        "id": "d0001",
+        "kind": "react",
+        "npc": "kael",
+        "phase": 0,
+        "trigger": "insulted",
+        "allowed": [],
+        "chosen": null,
+        "line": "Say that again, stranger. I dare you.",
+        "cites": [
+          "e0001",
+          "b0003"
+        ],
+        "reason": "grudge 0 -> 1",
+        "source": "llm"
+      },
+      {
+        "id": "d0002",
+        "kind": "react",
+        "npc": "kael",
+        "phase": 0,
+        "trigger": "beaten",
+        "allowed": [],
+        "chosen": null,
+        "line": "Lucky blade. It won't happen twice.",
+        "cites": [
+          "b0006"
+        ],
+        "reason": "fear 1 -> 3, grudge 1 -> 3",
+        "source": "llm"
+      },
+      {
+        "id": "d0003",
+        "kind": "react",
+        "npc": "kael",
+        "phase": 0,
+        "trigger": "robbed",
+        "allowed": [],
+        "chosen": null,
+        "line": "Laugh now. The road is long.",
+        "cites": [
+          "b0009",
+          "e0004"
+        ],
+        "reason": "grudge 3 -> 6",
+        "source": "llm"
+      },
+      {
+        "id": "d0004",
+        "kind": "decide",
+        "npc": "kael",
+        "phase": 0,
+        "trigger": "threshold",
+        "allowed": [
+          "go_to",
+          "wait"
+        ],
+        "chosen": "go_to",
+        "line": "Spend it quick. I'll be at the crypt before you.",
+        "cites": [
+          "b0009"
+        ],
+        "reason": "grudge crossed 5; go_to 6 beats wait 0",
+        "source": "llm"
+      },
+      {
+        "id": "d0005",
+        "kind": "react",
+        "npc": "mags",
+        "phase": 1,
+        "trigger": "talk",
+        "allowed": [],
+        "chosen": null,
+        "line": "Odo saw the whole thing, and Odo talks.",
+        "cites": [
+          "b0007"
+        ],
+        "reason": "strongest belief about the player",
+        "source": "llm"
+      }
+    ]
+  }
+}
