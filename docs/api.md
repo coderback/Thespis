@@ -54,8 +54,10 @@ disabled with the reason `"Choose: humiliate or spare"`. The pick ends the phase
 `POST /act` returns:
 
 - `events`: the ledger events this request wrote, in order (the free action's events, then the tick's).
-- `replies`: lines spoken in response, as `[{decision, npc, line, cites, source}]`. `decision` is the id of the
-  record that holds the line, so the client can open its why-chain.
+- `replies`: lines spoken to the player, as `[{decision, npc, line, cites, source}]`. This covers reactions to the
+  verb and lines that fire when the new phase starts (an NPC greeting the player on arrival). `decision` is the id of
+  the record that holds the line, so the client can open its why-chain. Lines from decisions made inside the tick are
+  in `tick.decisions` instead.
 - `tick`: `{moves, decisions, events}` for a phase-ending verb, or `null` for a free action. `moves` is
   `[{who, from, to}]` and includes the player. It has no digest: fetch `GET /digest` while the moves animate.
 - `epilogue`: `null`, except on the request that ends the race. See [The race end](#the-race-end).
@@ -103,7 +105,8 @@ A ledger event:
   "claim": { "pred": "robbed", "a": "player", "b": "kael" }, "truth": true, "schema_version": 1 }
 ```
 
-`loc` is the stop where the event happened. `claim` is `null` for events that carry none, such as `move`. For an event
+`loc` is the stop where the event happened; for a `move` it is the stop left, and `target` is the stop reached.
+`claim` is `null` for events that carry none, such as `move`. For an event
 that carries a claim, `truth` says whether that claim happened, so a lie told as `tell_claim` has `truth: false`.
 
 A decision record. Every spoken line has one: `kind` is `decide` when the NPC chose an action, or `react` for a line
