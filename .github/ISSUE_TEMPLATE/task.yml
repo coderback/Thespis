@@ -1,0 +1,31 @@
+name: Task
+description: A piece of work with a clear done-when check
+labels: ["type:task"]
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options: ["engine", "client", "shared contract", "devops", "content", "video and submission"]
+    validations:
+      required: true
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: What this achieves and why.
+    validations:
+      required: true
+  - type: textarea
+    id: tasks
+    attributes:
+      label: Tasks
+      value: |
+        - [ ] 
+  - type: textarea
+    id: done
+    attributes:
+      label: Done when
+      description: A check anyone can run to confirm it is finished.
+    validations:
+      required: true

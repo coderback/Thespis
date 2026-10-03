@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  engine:
+    name: engine
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install
+        run: pip install -r requirements-dev.txt
+      - name: Lint
+        run: ruff check .
+      - name: Test
+        run: pytest -q
+
+  client:
+    name: client
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Lint, test and build (if the client has a package.json)
+        shell: bash
+        run: |
+          if [ ! -f client/package.json ]; then
+            echo "No client/package.json yet; nothing to check."
+            exit 0
+          fi
+          cd client
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+          npm run lint --if-present
+          npm test --if-present
+          npm run build --if-present
+
+  # The single required check for main. Do not rename without updating the ruleset.
+  ci:
+    name: ci
+    if: always()
+    needs: [engine, client]
+    runs-on: ubuntu-latest
+    steps:
+      - name: All checks passed
+        shell: bash
+        run: |
+          if [ "${{ needs.engine.result }}" != "success" ] || [ "${{ needs.client.result }}" != "success" ]; then
+            echo "engine=${{ needs.engine.result }} client=${{ needs.client.result }}"
+            exit 1
+          fi

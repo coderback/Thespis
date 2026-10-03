@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDEs (each of us uses our own settings)
+.idea/
+.vscode/
+*.swp
+
+# Secrets and local config: never commit keys
+.env
+.env.*
+!.env.example
+
+# Local data
+*.sqlite
+*.sqlite3
+*.db
+data/
+recordings/
+
+# Client
+node_modules/
+client/dist/
+client/.vite/
+
+# OS
+.DS_Store
+Thumbs.db

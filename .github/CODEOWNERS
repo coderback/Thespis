@@ -1,0 +1,17 @@
+# Who reviews what. GitHub requests these reviewers automatically on PRs.
+# Default owner
+*                       @coderback
+
+# Engine, rules, tests, tooling: Tobi
+/thespis/               @coderback
+/games/                 @coderback
+/tests/                 @coderback
+/tools/                 @coderback
+/.github/               @coderback
+
+# Client: Ahmed
+/client/                @AhmedBokaniUsman
+
+# The contract between the two halves: both of us
+/docs/api.md            @coderback @AhmedBokaniUsman
+/fixtures/              @coderback @AhmedBokaniUsman

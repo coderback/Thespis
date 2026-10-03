@@ -1,0 +1,599 @@
+[
+  {
+    "number": 1,
+    "title": "Lock the v2 rules and the API contract",
+    "body": "## Goal\n\nAgree the rules and every request/response shape before splitting, so both halves can be built in parallel without waiting on each other.\n\n## Tasks\n\n- [ ] Read docs/api.md together and resolve any open question\n- [ ] Confirm stops, cast, verbs, claim types and tick order match the design doc\n- [ ] Agree field names the client needs that are missing (e.g. labels for buttons)\n\n## Done when\n\ndocs/api.md has no open questions and both of you have approved the PR that finalises it.\n\n## Owner\n\nTobi (@coderback) and Ahmed (@AhmedBokaniUsman)\n\n## Reference\n\nDesign doc: *The Crypt Road v2* (shared by Tobi), section “API contract for the client”. API shapes: `docs/api.md`.\n",
+    "labels": [
+      "area:shared",
+      "type:task",
+      "P0",
+      "owner:both"
+    ],
+    "milestone": "M0 Kickoff",
+    "assignees": [
+      "coderback",
+      "AhmedBokaniUsman"
+    ]
+  },
+  {
+    "number": 2,
+    "title": "Generate client fixtures from the rules model",
+    "body": "## Goal\n\nGive the client realistic canned responses for every demo beat, generated from the same model the acceptance test uses.\n\n## Tasks\n\n- [ ] Write tools/make_fixtures.py that plays the demo route in tools/crypt_road_sim.py\n- [ ] Dump state, allowed and act responses per beat into fixtures/ in the docs/api.md shapes\n- [ ] Add a test that fixtures are regenerated without diff (or document the command)\n\n## Done when\n\nfixtures/ holds one state/allowed/act set per demo beat and the client can load them.\n\n## Depends on\n\n#1\n\n## Owner\n\nTobi (@coderback)\n",
+    "labels": [
+      "area:shared",
+      "type:task",
+      "P0",
+      "owner:tobi"
+    ],
+    "milestone": "M0 Kickoff",
+    "assignees": [
+      "coderback"
+    ]
+  },
+  {
+    "number": 3,
+    "title": "Deploy a hello-world with a persistent volume",
+    "body": "## Goal\n\nFind hosting problems now, not at hour 20. SQLite must survive restarts on the host.\n\n## Tasks\n\n- [ ] Pick Fly.io or Railway, EU region, with a persistent volume\n- [ ] Deploy a FastAPI app with GET /health\n- [ ] Write a file to the volume, restart the machine, confirm it is still there\n- [ ] Note the public URL and deploy command in the README\n\n## Done when\n\nThe public URL returns {\"ok\": true} and a file written before a restart is still there after it.\n\n## Owner\n\nTobi (@coderback)\n",
+    "labels": [
+      "area:devops",
+      "type:task",
+      "P0",
+      "owner:tobi"
+    ],
+    "milestone": "M0 Kickoff",
+    "assignees": [
+      "coderback"
+    ]
+  },
+  {
+    "number": 4,
+    "title": "Claim credits and benchmark model providers",
+    "body": "## Goal\n\nChoose a primary and a backup model on measured speed and reliability from the host.\n\n## Tasks\n\n- [ ] Claim the hackathon credits and note balances and expiry\n- [ ] From the host, send 20 calls per candidate with a real state pack, JSON mode, max_tokens 150, thinking off\n- [ ] Record p50/p95 latency and % valid picks in docs/models.md\n- [ ] Primary: lowest p95 with >=95% valid and p95 < 3 s; backup from a different provider\n- [ ] Set LLM_* and LLM_BACKUP_* env vars on the host; if no credits by 12:00, use a cheap paid key\n\n## Done when\n\ndocs/models.md names the primary and backup with their numbers, and both keys work from the host.\n\n## Owner\n\nTobi (@coderback)\n\n## Reference\n\nDesign doc: *The Crypt Road v2* (shared by Tobi), section “Kickoff and submission”. API shapes: `docs/api.md`.\n",
+    "labels": [
+      "area:engine",
+      "type:task",
+      "P0",
+      "owner:tobi"
+    ],
+    "milestone": "M0 Kickoff",
+    "assignees": [
+      "coderback"
+    ]
+  },
+  {
+    "number": 5,
+    "title": "Client skeleton, assets and fixture loader",
+    "body": "## Goal\n\nGet the client running against fixtures within the first hour so art and engine never block it.\n\n## Tasks\n\n- [ ] Choose plain canvas or Phaser (your call) and scaffold client/ with a package.json (lint/test/build scripts)\n- [ ] Download Kenney Tiny Town and Tiny Dungeon (CC0); add client/CREDITS.md\n- [ ] Load fixtures/ through a small API module that can later point at the real engine\n- [ ] Agree with Tobi how the engine serves the built client as static files\n\n## Done when\n\nThe client starts locally, renders the stub state, and CI's client job runs your scripts.\n\n## Depends on\n\n#1\n\n## Owner\n\nAhmed (@AhmedBokaniUsman)\n",
+    "labels": [
+      "area:client",
+      "type:task",
+      "P0",
+      "owner:ahmed"
+    ],
+    "milestone": "M0 Kickoff",
+    "assignees": [
+      "AhmedBokaniUsman"
+    ]
+  },
+  {
+    "number": 6,
+    "title": "Ask the organisers the open questions",
+    "body": "## Goal\n\nRemove guesswork about rules, credits and judging.\n\n## Tasks\n\n- [ ] Was any code allowed before 11:00?\n- [ ] Do credit keys keep working during judging?\n- [ ] How long must the link stay live; video length limit and host; project link = site or repo?\n- [ ] Can submissions be edited; are CC0 and AI-generated assets allowed?\n- [ ] Record answers (or the defaults from the design doc) in docs/event.md\n\n## Done when\n\ndocs/event.md lists every question with an answer or the default being used.\n\n## Owner\n\nTobi (@coderback)\n\n## Reference\n\nDesign doc: *The Crypt Road v2* (shared by Tobi), section “Kickoff and submission”. API shapes: `docs/api.md`.\n",
+    "labels": [
+      "area:shared",
+      "type:task",
+      "P1",
+      "owner:tobi"
+    ],
+    "milestone": "M0 Kickoff",
+    "assignees": [
+      "coderback"
+    ]
+  },
+  {
+    "number": 7,
+    "title": "Core/adapter split and SQLite storage",
+    "body": "## Goal\n\nBuild the game-agnostic core and keep the Crypt Road rules in their own adapter, so Thespis stays a framework.\n\n## Tasks\n\n- [ ] thespis/: append-only ledger, sessions, evidence-based beliefs, NPC state, decisions, model cache, meta tables\n- [ ] games/crypt_road/: stops, cast YAML, claim types, verbs, rules\n- [ ] Event schema carries schema_version; beliefs store every piece of evidence (confidence = max for now)\n- [ ] Keep tests/test_architecture.py green: nothing in thespis/ imports games/\n\n## Done when\n\nWriting an event, killing the server and reloading gives an identical state, and the architecture test passes.\n\n## Depends on\n\n#1\n\n## Owner\n\nTobi (@coderback)\n\n## Reference\n\nDesign doc: *The Crypt Road v2* (shared by Tobi), section “Built to grow”. API shapes: `docs/api.md`.\n",
+    "labels": [
+      "area:engine",
+      "type:feature",
+      "P0",
+      "owner:tobi"
+    ],
+    "milestone": "M1 Fallback playable",
+    "assignees": [
+      "coderback"
+    ]
+  },
+  {
+    "number": 8,
+    "title": "Session endpoints from docs/api.md",
+    "body": "## Goal\n\nServe the contract the client is already built against.\n\n## Tasks\n\n- [ ] POST /session, GET /state, GET /allowed (with disabled reasons), POST /act, POST /reset, POST /reload, GET /health\n- [ ] Session id from the X-Session header; default seed is the demo seed\n- [ ] Serve client/dist as static files from the same app\n\n## Done when\n\nEvery endpoint returns the docs/api.md shape, checked by a test that compares against fixtures/.\n\n## Depends on\n\n#7, #2\n\n## Owner\n\nTobi (@coderback)\n\n## Reference\n\nDesign doc: *The Crypt Road v2* (shared by Tobi), section “API contract for the client”. API shapes: `docs/api.md`.\n",
+    "labels": [
+      "area:engine",
+      "type:feature",
+      "P0",
+      "owner:tobi"
+    ],
+    "milestone": "M1 Fallback playable",
+    "assignees": [
+      "coderback"
+    ]
+  },
+  {
+    "number": 9,
+    "title": "Crypt Road rules: verbs, tick, gate, beliefs, gossip, testimony",
+    "body": "## Goal\n\nImplement the v2 rules so the engine matches the reference model exactly.\n\n## Tasks\n\n- [ ] Verbs: talk, insult, challenge (+humiliate/spare), tell_claim, bribe, move, wait, take_relic\n- [ ] Tick order: player action, decisions (Brenna then Kael), gossip on pre-move positions, moves, fear decay\n- [ ] Trust-scaled claims (0.9 / 0.4 / 0.2), crime -> trust -2, detain once per claim for 2 phases\n- [ ] Odo's walk, gossip worst-news-first at x0.8, testimony retraction with trust -3\n- [ ] Seeded dice: hash(seed, event_id)\n\n## Done when\n\nEvery route in tools/crypt_road_sim.py gives the same result when played through the engine.\n\n## Depends on\n\n#7\n\n## Owner\n\nTobi (@coderback)\n\n## Reference\n\nDesign doc: *The Crypt Road v2* (shared by Tobi), section “Gameplay”. API shapes: `docs/api.md`.\n",
+    "labels": [
+      "area:engine",
+      "type:feature",
+      "P0",
+      "owner:tobi"
+    ],
+    "milestone": "M1 Fallback playable",
+    "assignees": [
+      "coderback"
+    ]
+  },
+  {
+    "number": 10,
+    "title": "Utility fallback brain and template lines",
+    "body": "## Goal\n\nThe demo must play with no model at all.\n\n## Tasks\n\n- [ ] Utility scores from the design doc (accuse = grudge + 3, go_to = ambition, ...)\n- [ ] Template lines per action, filled from the top cited belief\n- [ ] Decision records with source = fallback\n\n## Done when\n\nWith the model switched off, Kael accuses at tick 2 and every NPC line cites at least one id.\n\n## Depends on\n\n#9\n\n## Owner\n\nTobi (@coderback)\n\n## Reference\n\nDesign doc: *The Crypt Road v2* (shared by Tobi), section “Validator, fallback and model calls”. API shapes: `docs/api.md`.\n",
+    "labels": [
+      "area:engine",
+      "type:feature",
+      "P0",
+      "owner:tobi"
+    ],
+    "milestone": "M1 Fallback playable",
+    "assignees": [
+      "coderback"
+    ]
+  },
+  {
+    "number": 11,
+    "title": "demo_test.py: acceptance test against the engine",
+    "body": "## Goal\n\nMake the demo route the definition of done, run by CI on every PR.\n\n## Tasks\n\n- [ ] Port the assertions from tools/crypt_road_sim.py demo_acceptance() to run against the API\n- [ ] Run with the model off in CI; add a flag to run against a live host\n\n## Done when\n\npytest runs the full demo route against the engine and passes in CI.\n\n## Depends on\n\n#8, #10\n\n## Owner\n\nTobi (@coderback)\n\n## Reference\n\nDesign doc: *The Crypt Road v2* (shared by Tobi), section “Demo script and acceptance test”. API shapes: `docs/api.md`.\n",
+    "labels": [
+      "area:engine",
+      "type:test",
+      "P0",
+      "owner:tobi"
+    ],
+    "milestone": "M1 Fallback playable",
+    "assignees": [
+      "coderback"
+    ]
+  },
+  {
+    "number": 12,
+    "title": "Map: tiles, stops, sprites, tweens and phase lighting",
+    "body": "## Goal\n\nThe world the judges see first.\n\n## Tasks\n\n- [ ] 18 x 12 tiles of 16 px at 3x, pixelated; road left to right, river under the bridge\n- [ ] Stops at tile x 2, 5, 9, 12, 15; distinct sprites or tints and name labels for all five characters\n- [ ] Straight-line tweens between stops with bob, shadow and arrival squash\n- [ ] Phase tint (morning, noon, evening, night) with a 0.8 s fade\n\n## Done when\n\nLoading a fixture state draws every character at the right stop, and a move fixture animates.\n\n## Depends on\n\n#5\n\n## Owner\n\nAhmed (@AhmedBokaniUsman)\n\n## Reference\n\nDesign doc: *The Crypt Road v2* (shared by Tobi), section “Visual and UX design”. API shapes: `docs/api.md`.\n",
+    "labels": [
+      "area:client",
+      "type:feature",
+      "P0",
+      "owner:ahmed"
+    ],
+    "milestone": "M1 Fallback playable",
+    "assignees": [
+      "AhmedBokaniUsman"
+    ]
+  },
+  {
+    "number": 13,
+    "title": "Play UI: action bar, claim builder, dialogue, event log",
+    "body": "## Goal\n\nLet a judge play the whole route with a mouse.\n\n## Tasks\n\n- [ ] Buttons built from GET /allowed; free vs phase-ending styles; disabled reason on hover\n- [ ] Tell... opens a three-dropdown claim builder\n- [ ] Speech bubble over the speaker plus a log line with a model/cache/fallback badge\n- [ ] Session id in the URL (?s=) so reload resumes; Reset always visible\n\n## Done when\n\nBeats 1 to 3 of the demo route can be clicked through against fixtures.\n\n## Depends on\n\n#5\n\n## Owner\n\nAhmed (@AhmedBokaniUsman)\n\n## Reference\n\nDesign doc: *The Crypt Road v2* (shared by Tobi), section “Visual and UX design”. API shapes: `docs/api.md`.\n",
+    "labels": [
+      "area:client",
+      "type:feature",
+      "P0",
+      "owner:ahmed"
+    ],
+    "milestone": "M1 Fallback playable",
+    "assignees": [
+      "AhmedBokaniUsman"
+    ]
+  },
+  {
+    "number": 14,
+    "title": "Fog of war and last-seen ghosts",
+    "body": "## Goal\n\nMake 'offscreen' visible: you only see your own stop.\n\n## Tasks\n\n- [ ] Dim every stop except the player's to ~30% light\n- [ ] Hide NPCs away from the player's stop\n- [ ] Draw a dashed 'last seen' ghost from npcs[].last_seen\n\n## Done when\n\nDuring the walk to the market, Kael disappears from view and a ghost marks where he was seen.\n\n## Depends on\n\n#12\n\n## Owner\n\nAhmed (@AhmedBokaniUsman)\n\n## Reference\n\nDesign doc: *The Crypt Road v2* (shared by Tobi), section “Visual and UX design”. API shapes: `docs/api.md`.\n",
+    "labels": [
+      "area:client",
+      "type:feature",
+      "P1",
+      "owner:ahmed"
+    ],
+    "milestone": "M1 Fallback playable",
+    "assignees": [
+      "AhmedBokaniUsman"
+    ]
+  },
+  {
+    "number": 15,
+    "title": "Integration 1: demo route playable on the fallback brain (Sat 18:00)",
+    "body": "## Goal\n\nFirst gate: client against the real engine on the hosted URL.\n\n## Tasks\n\n- [ ] Point the client at the hosted engine\n- [ ] Play the full demo route with the model off\n- [ ] File bugs for anything that differs from the fixtures\n\n## Done when\n\nThe demo route plays end to end on the hosted URL with no model. If not, no new features until it does.\n\n## Depends on\n\n#11, #12, #13\n\n## Owner\n\nTobi (@coderback) and Ahmed (@AhmedBokaniUsman)\n\n## Reference\n\nDesign doc: *The Crypt Road v2* (shared by Tobi), section “Revised schedule”. API shapes: `docs/api.md`.\n",
+    "labels": [
+      "area:shared",
+      "type:task",
+      "P0",
+      "owner:both"
+    ],
+    "milestone": "M1 Fallback playable",
+    "assignees": [
+      "coderback",
+      "AhmedBokaniUsman"
+    ]
+  },
+  {
+    "number": 16,
+    "title": "Model gateway: provider adapter, backup, timeout",
+    "body": "## Goal\n\nCall the model safely and cheaply.\n\n## Tasks\n\n- [ ] OpenAI-compatible client for primary and backup\n- [ ] JSON mode, max_tokens 150, temperature 0.6, thinking off\n- [ ] 4 s timeout, no retries: backup provider, then fallback\n- [ ] Parallel calls for different NPCs in one tick\n\n## Done when\n\nKilling the primary key mid-run switches to the backup, then to fallback, with no error shown to the player.\n\n## Depends on\n\n#10, #4\n\n## Owner\n\nTobi (@coderback)\n\n## Reference\n\nDesign doc: *The Crypt Road v2* (shared by Tobi), section “Validator, fallback and model calls”. API shapes: `docs/api.md`.\n",
+    "labels": [
+      "area:engine",
+      "type:feature",
+      "P0",
+      "owner:tobi"
+    ],
+    "milestone": "M2 Live model on host",
+    "assignees": [
+      "coderback"
+    ]
+  },
+  {
+    "number": 17,
+    "title": "State pack, validator and react/decide calls",
+    "body": "## Goal\n\nThe model may only pick allowed actions and must cite what it knows.\n\n## Tasks\n\n- [ ] State pack: persona, drives, trust, top 5 beliefs with ids, last 5 known events, goal, allowed actions\n- [ ] react (line only) and decide (action + line) calls with the prompt skeleton from the doc\n- [ ] Reject when action not allowed, a cited id is not in the pack, line > 160 chars, or it names an absent character or stop\n\n## Done when\n\nWith the model on, the demo route uses no fallback on its beats and every line's cites are valid ids.\n\n## Depends on\n\n#16\n\n## Owner\n\nTobi (@coderback)\n\n## Reference\n\nDesign doc: *The Crypt Road v2* (shared by Tobi), section “Validator, fallback and model calls”. API shapes: `docs/api.md`.\n",
+    "labels": [
+      "area:engine",
+      "type:feature",
+      "P0",
+      "owner:tobi"
+    ],
+    "milestone": "M2 Live model on host",
+    "assignees": [
+      "coderback"
+    ]
+  },
+  {
+    "number": 18,
+    "title": "Model cache and REPLAY mode",
+    "body": "## Goal\n\nMake the demo reproducible and cheap.\n\n## Tasks\n\n- [ ] Key = sha256(model, prompt version, call type, canonical state pack)\n- [ ] REPLAY=1 serves only from cache and fallback, never the network\n\n## Done when\n\nPlaying the demo route twice makes zero model calls the second time, and REPLAY=1 passes offline.\n\n## Depends on\n\n#17\n\n## Owner\n\nTobi (@coderback)\n",
+    "labels": [
+      "area:engine",
+      "type:feature",
+      "P0",
+      "owner:tobi"
+    ],
+    "milestone": "M2 Live model on host",
+    "assignees": [
+      "coderback"
+    ]
+  },
+  {
+    "number": 19,
+    "title": "Narrator digest, epilogue and story hooks",
+    "body": "## Goal\n\nThe Dungeon Master tells you what happened out of sight.\n\n## Tasks\n\n- [ ] GET /digest?since=: 2-3 sentences from up to 12 ledger events, mentioning only those events\n- [ ] Hooks: revenge brewing, lie told, lie exposed\n- [ ] Epilogue: two extra simulated phases after a win\n- [ ] Code-built fallback digest\n\n## Done when\n\nAfter tick 2 the digest names Kael's accusation and Odo's gossip; after the win the epilogue reports the exposed lie.\n\n## Depends on\n\n#17\n\n## Owner\n\nTobi (@coderback)\n\n## Reference\n\nDesign doc: *The Crypt Road v2* (shared by Tobi), section “Cast”. API shapes: `docs/api.md`.\n",
+    "labels": [
+      "area:engine",
+      "type:feature",
+      "P1",
+      "owner:tobi"
+    ],
+    "milestone": "M2 Live model on host",
+    "assignees": [
+      "coderback"
+    ]
+  },
+  {
+    "number": 20,
+    "title": "Inspector: Minds, Beliefs, Ledger and Decisions tabs",
+    "body": "## Goal\n\nShow why NPCs do what they do. This is the project's key differentiator.\n\n## Tasks\n\n- [ ] Minds: drive bars and trust per NPC\n- [ ] Beliefs: confidence bar, source chips from evidence, tick/cross against truth\n- [ ] Ledger: event rows sliding in, highlighted\n- [ ] Decisions: allowed list, chosen action, cited ids, source badge\n\n## Done when\n\nAt phase 3 the inspector shows Brenna's robbery belief at 0.9 from Kael, marked true.\n\n## Depends on\n\n#13\n\n## Owner\n\nAhmed (@AhmedBokaniUsman)\n\n## Reference\n\nDesign doc: *The Crypt Road v2* (shared by Tobi), section “Visual and UX design”. API shapes: `docs/api.md`.\n",
+    "labels": [
+      "area:client",
+      "type:feature",
+      "P0",
+      "owner:ahmed"
+    ],
+    "milestone": "M2 Live model on host",
+    "assignees": [
+      "AhmedBokaniUsman"
+    ]
+  },
+  {
+    "number": 21,
+    "title": "Why-chain: line to decision to belief to ledger event",
+    "body": "## Goal\n\nThe hero visual: trace any spoken line back to the event it rests on.\n\n## Tasks\n\n- [ ] Click a line -> show its decision, the beliefs it cites, and the ledger event at the root\n- [ ] Mark the root event true or false\n\n## Done when\n\nClicking Brenna's 'Kael says you robbed him' line shows the chain down to the humiliate event, marked true.\n\n## Depends on\n\n#20\n\n## Owner\n\nAhmed (@AhmedBokaniUsman)\n\n## Reference\n\nDesign doc: *The Crypt Road v2* (shared by Tobi), section “Visual and UX design”. API shapes: `docs/api.md`.\n",
+    "labels": [
+      "area:client",
+      "type:feature",
+      "P0",
+      "owner:ahmed"
+    ],
+    "milestone": "M2 Live model on host",
+    "assignees": [
+      "AhmedBokaniUsman"
+    ]
+  },
+  {
+    "number": 22,
+    "title": "Narrator feed and digest fetching",
+    "body": "## Goal\n\nShow the digest after moves animate, without blocking the tick.\n\n## Tasks\n\n- [ ] Fetch GET /digest while moves animate\n- [ ] Narrator feed above the inspector tabs\n- [ ] Win/lose card shows the epilogue\n\n## Done when\n\nAfter every phase-ending action the digest appears once the moves finish.\n\n## Depends on\n\n#13\n\n## Owner\n\nAhmed (@AhmedBokaniUsman)\n",
+    "labels": [
+      "area:client",
+      "type:feature",
+      "P1",
+      "owner:ahmed"
+    ],
+    "milestone": "M2 Live model on host",
+    "assignees": [
+      "AhmedBokaniUsman"
+    ]
+  },
+  {
+    "number": 23,
+    "title": "Integration 2: live-model route and restart test on the host (Sat 22:00)",
+    "body": "## Goal\n\nSecond gate: the real thing works on the real host.\n\n## Tasks\n\n- [ ] Play the demo route with the live model on the hosted URL\n- [ ] Restart the host machine mid-route; reload; continue\n- [ ] Check every NPC line cites valid ids\n\n## Done when\n\nThe live route and the restart test both pass on the host.\n\n## Depends on\n\n#15, #17, #18, #20\n\n## Owner\n\nTobi (@coderback) and Ahmed (@AhmedBokaniUsman)\n\n## Reference\n\nDesign doc: *The Crypt Road v2* (shared by Tobi), section “Revised schedule”. API shapes: `docs/api.md`.\n",
+    "labels": [
+      "area:shared",
+      "type:task",
+      "P0",
+      "owner:both"
+    ],
+    "milestone": "M2 Live model on host",
+    "assignees": [
+      "coderback",
+      "AhmedBokaniUsman"
+    ]
+  },
+  {
+    "number": 24,
+    "title": "Caps, rate limits and graceful degradation",
+    "body": "## Goal\n\nJudges clicking everything must never break the site or the credits.\n\n## Tasks\n\n- [ ] Per-session cap (start at 60) and a global cap from the credit balance\n- [ ] At most 4 concurrent model calls; 5 new sessions per IP per hour\n- [ ] Cap hit, 401/402/429 or timeout -> fallback and state.brain = 'fallback' for the 'offline brain' badge\n- [ ] Limit free text to 200 characters\n\n## Done when\n\nHitting the cap mid-route keeps the game playable and the badge appears.\n\n## Depends on\n\n#16\n\n## Owner\n\nTobi (@coderback)\n\n## Reference\n\nDesign doc: *The Crypt Road v2* (shared by Tobi), section “Kickoff and submission”. API shapes: `docs/api.md`.\n",
+    "labels": [
+      "area:engine",
+      "type:feature",
+      "P0",
+      "owner:tobi"
+    ],
+    "milestone": "M3 Feature freeze",
+    "assignees": [
+      "coderback"
+    ]
+  },
+  {
+    "number": 25,
+    "title": "Harness: route outcomes and measured numbers",
+    "body": "## Goal\n\nTurn claims into numbers judges can trust (seed of Thespis Rehearsal).\n\n## Tasks\n\n- [ ] Play every route through the engine; compare with tools/crypt_road_sim.py\n- [ ] Report invalid actions blocked, % NPC ticks with no model call, p50/p95 latency, cost per run\n- [ ] Write results.md\n\n## Done when\n\nresults.md exists with real numbers from the hosted engine.\n\n## Depends on\n\n#23\n\n## Owner\n\nTobi (@coderback)\n",
+    "labels": [
+      "area:engine",
+      "type:test",
+      "P1",
+      "owner:tobi"
+    ],
+    "milestone": "M3 Feature freeze",
+    "assignees": [
+      "coderback"
+    ]
+  },
+  {
+    "number": 26,
+    "title": "Warm the cache on the demo seed and verify REPLAY on the host",
+    "body": "## Goal\n\nJudges following the video path get instant, consistent answers even if credits run out.\n\n## Tasks\n\n- [ ] Play the demo route twice on the host with the live model\n- [ ] Confirm REPLAY=1 reproduces it with no network\n- [ ] Re-check that the demo seed's first duel still wins in the real engine\n\n## Done when\n\nA third run on the host makes zero model calls and matches the video.\n\n## Depends on\n\n#18, #23\n\n## Owner\n\nTobi (@coderback)\n",
+    "labels": [
+      "area:engine",
+      "type:task",
+      "P0",
+      "owner:tobi"
+    ],
+    "milestone": "M3 Feature freeze",
+    "assignees": [
+      "coderback"
+    ]
+  },
+  {
+    "number": 27,
+    "title": "Autoplay: 'Watch the 60-second story'",
+    "body": "## Goal\n\nMost judges will watch, not play. Show them the payoff in one click.\n\n## Tasks\n\n- [ ] Landing screen with 'Watch the 60-second story' and 'Play it yourself'\n- [ ] Scripted demo route with captions per beat\n- [ ] First-time hint: 'Try insulting Kael'\n\n## Done when\n\nAutoplay finishes the demo route on the hosted URL in under 90 seconds.\n\n## Depends on\n\n#21, #22\n\n## Owner\n\nAhmed (@AhmedBokaniUsman)\n\n## Reference\n\nDesign doc: *The Crypt Road v2* (shared by Tobi), section “Visual and UX design”. API shapes: `docs/api.md`.\n",
+    "labels": [
+      "area:client",
+      "type:feature",
+      "P0",
+      "owner:ahmed"
+    ],
+    "milestone": "M3 Feature freeze",
+    "assignees": [
+      "AhmedBokaniUsman"
+    ]
+  },
+  {
+    "number": 28,
+    "title": "Juice: emotion icons, belief bursts, dice, chains",
+    "body": "## Goal\n\nMake the minds visible on the map.\n\n## Tasks\n\n- [ ] Icons from drives: angry (grudge >= 5), sweat (fear >= 4), star (respect >= 4)\n- [ ] '!' when a belief arrives; gossip line speaker -> listener\n- [ ] Dice roll on duels; chains while detained; '?!' when lied to\n- [ ] Typed-out speech bubbles\n\n## Done when\n\nEach icon appears at the right beat of the demo route.\n\n## Depends on\n\n#12\n\n## Owner\n\nAhmed (@AhmedBokaniUsman)\n\n## Reference\n\nDesign doc: *The Crypt Road v2* (shared by Tobi), section “Visual and UX design”. API shapes: `docs/api.md`.\n",
+    "labels": [
+      "area:client",
+      "type:feature",
+      "P1",
+      "owner:ahmed"
+    ],
+    "milestone": "M3 Feature freeze",
+    "assignees": [
+      "AhmedBokaniUsman"
+    ]
+  },
+  {
+    "number": 29,
+    "title": "Title card, win/lose cards, credits page, dev panel",
+    "body": "## Goal\n\nFinish the frame around the game.\n\n## Tasks\n\n- [ ] Title card that looks finished in the first 10 seconds\n- [ ] Win/lose cards with the narrator epilogue and 'what the world remembers'\n- [ ] Credits page (Kenney, model providers, any generated images)\n- [ ] Hidden dev panel: reload from disk, brain off, replay badge, seed\n\n## Done when\n\nAll four exist on the hosted build and the dev panel's buttons work.\n\n## Depends on\n\n#13\n\n## Owner\n\nAhmed (@AhmedBokaniUsman)\n",
+    "labels": [
+      "area:client",
+      "type:feature",
+      "P1",
+      "owner:ahmed"
+    ],
+    "milestone": "M3 Feature freeze",
+    "assignees": [
+      "AhmedBokaniUsman"
+    ]
+  },
+  {
+    "number": 30,
+    "title": "Sunday 07:00 smoke test and bug triage",
+    "body": "## Goal\n\nCatch what broke overnight before the freeze.\n\n## Tasks\n\n- [ ] Play the demo route in an incognito window and on a phone\n- [ ] File and label every bug; fix only P0 bugs before 09:30\n\n## Done when\n\nThree or fewer open P0 bugs by 08:00, all fixed by 09:30.\n\n## Depends on\n\n#23\n\n## Owner\n\nTobi (@coderback) and Ahmed (@AhmedBokaniUsman)\n",
+    "labels": [
+      "area:shared",
+      "type:task",
+      "P0",
+      "owner:both"
+    ],
+    "milestone": "M3 Feature freeze",
+    "assignees": [
+      "coderback",
+      "AhmedBokaniUsman"
+    ]
+  },
+  {
+    "number": 31,
+    "title": "README: what it is, how to run, architecture, claims, credits",
+    "body": "## Goal\n\nThe repo is part of the submission; judges may open it.\n\n## Tasks\n\n- [ ] Explain Thespis and Thespis Cast; link the hosted demo and video\n- [ ] Architecture diagram or summary; prior art and what is new (cite Talk of the Town, Viv, Versu, Generative Agents)\n- [ ] results.md numbers; credits; choose and add a licence\n\n## Done when\n\nA stranger can understand the project and run it locally from the README alone.\n\n## Depends on\n\n#25\n\n## Owner\n\nTobi (@coderback)\n",
+    "labels": [
+      "area:shared",
+      "type:docs",
+      "P1",
+      "owner:tobi"
+    ],
+    "milestone": "M3 Feature freeze",
+    "assignees": [
+      "coderback"
+    ]
+  },
+  {
+    "number": 32,
+    "title": "Record the demo: 3 autoplay takes, restart clip, close-ups",
+    "body": "## Goal\n\nCapture everything the edit needs in one window (09:30 to 11:00).\n\n## Tasks\n\n- [ ] 1280 x 720, browser zoomed so text is readable, debug UI hidden\n- [ ] Three autoplay takes; one restart clip (terminal + browser); inspector and why-chain close-ups\n\n## Done when\n\nOne clean take plus every insert shot from the demo script exists.\n\n## Depends on\n\n#27, #26\n\n## Owner\n\nTobi (@coderback) and Ahmed (@AhmedBokaniUsman)\n\n## Reference\n\nDesign doc: *The Crypt Road v2* (shared by Tobi), section “Demo script and acceptance test”. API shapes: `docs/api.md`.\n",
+    "labels": [
+      "area:video",
+      "type:task",
+      "P0",
+      "owner:both"
+    ],
+    "milestone": "M4 Submitted",
+    "assignees": [
+      "coderback",
+      "AhmedBokaniUsman"
+    ]
+  },
+  {
+    "number": 33,
+    "title": "Edit the video to under 90 seconds and upload",
+    "body": "## Goal\n\nThe video carries the result; it must be clear in a few minutes of judging.\n\n## Tasks\n\n- [ ] Follow the shot list; captions, no voiceover needed\n- [ ] Upload to YouTube (unlisted) by 12:00 plus a Drive backup\n- [ ] Check it plays while logged out\n\n## Done when\n\nA public-by-link video under 90 seconds plays logged out, with a backup link.\n\n## Depends on\n\n#32\n\n## Owner\n\nAhmed (@AhmedBokaniUsman)\n",
+    "labels": [
+      "area:video",
+      "type:task",
+      "P0",
+      "owner:ahmed"
+    ],
+    "milestone": "M4 Submitted",
+    "assignees": [
+      "AhmedBokaniUsman"
+    ]
+  },
+  {
+    "number": 34,
+    "title": "Submit the form by 12:30 and tag the release",
+    "body": "## Goal\n\nSubmit early with a 90-minute buffer before the 14:00 deadline.\n\n## Tasks\n\n- [ ] Fill team name, project name, description, project link, video link, email from the prepared text\n- [ ] Screenshot the confirmation\n- [ ] git tag submitted && git push --tags\n- [ ] No deploys after 12:00 unless the site is down\n\n## Done when\n\nConfirmation screenshot saved and the `submitted` tag exists on main.\n\n## Depends on\n\n#33, #31\n\n## Owner\n\nTobi (@coderback)\n\n## Reference\n\nDesign doc: *The Crypt Road v2* (shared by Tobi), section “Kickoff and submission”. API shapes: `docs/api.md`.\n",
+    "labels": [
+      "area:shared",
+      "type:task",
+      "P0",
+      "owner:tobi"
+    ],
+    "milestone": "M4 Submitted",
+    "assignees": [
+      "coderback"
+    ]
+  },
+  {
+    "number": 35,
+    "title": "[Stretch] Second game: the manor mystery adapter",
+    "body": "## Goal\n\nProve the core is game-agnostic. Stretch: start only after Integration 2 passes; build behind a feature flag; switch off if not working by Sun 08:30.\n\n## Tasks\n\n- [ ] games/manor/: three rooms, Lady Vane, Pell, Sable, the signet ring (Tobi)\n- [ ] Core feature: NPC deception as a validated action logged with truth=false (Tobi)\n- [ ] Text-only view in the inspector (Ahmed, ~30 min)\n\n## Done when\n\nThe harness solves the mystery by script, and nothing in thespis/ changed except NPC deception.\n\n## Depends on\n\n#23\n\n## Owner\n\nTobi (@coderback) and Ahmed (@AhmedBokaniUsman)\n\n## Reference\n\nDesign doc: *The Crypt Road v2* (shared by Tobi), section “Stretch goals”. API shapes: `docs/api.md`.\n",
+    "labels": [
+      "area:engine",
+      "type:feature",
+      "P2",
+      "stretch",
+      "owner:both"
+    ],
+    "milestone": "Stretch",
+    "assignees": [
+      "coderback",
+      "AhmedBokaniUsman"
+    ]
+  },
+  {
+    "number": 36,
+    "title": "[Stretch] Bounded negotiation on Brenna's fine",
+    "body": "## Goal\n\nMake persuasion a real mechanic within code-set bounds. Stretch: start only after Integration 2 passes; build behind a feature flag; switch off if not working by Sun 08:30.\n\n## Tasks\n\n- [ ] bribe(amount): Brenna can accept, refuse or counter between 15 and 30; never under 20 at trust < 0 (Tobi)\n- [ ] Amount input on the bribe button (Ahmed)\n- [ ] Re-run tools/crypt_road_sim.py with the new rule\n\n## Done when\n\nThe demo route still wins at phase 5, and an offer of 10 gets a counter or a refusal.\n\n## Depends on\n\n#23\n\n## Owner\n\nTobi (@coderback) and Ahmed (@AhmedBokaniUsman)\n\n## Reference\n\nDesign doc: *The Crypt Road v2* (shared by Tobi), section “Stretch goals”. API shapes: `docs/api.md`.\n",
+    "labels": [
+      "area:engine",
+      "type:feature",
+      "P2",
+      "stretch",
+      "owner:both"
+    ],
+    "milestone": "Stretch",
+    "assignees": [
+      "coderback",
+      "AhmedBokaniUsman"
+    ]
+  },
+  {
+    "number": 37,
+    "title": "[Stretch] Model-judged consistency numbers",
+    "body": "## Goal\n\nCredibility with AI-lab judges. Stretch: start only after Integration 2 passes; build behind a feature flag; switch off if not working by Sun 08:30.\n\n## Tasks\n\n- [ ] A judge model checks ~50 lines against their state packs for contradictions and staying in character\n\n## Done when\n\nTwo rates in results.md, labelled as model-judged.\n\n## Depends on\n\n#25\n\n## Owner\n\nTobi (@coderback)\n\n## Reference\n\nDesign doc: *The Crypt Road v2* (shared by Tobi), section “Stretch goals”. API shapes: `docs/api.md`.\n",
+    "labels": [
+      "area:engine",
+      "type:test",
+      "P2",
+      "stretch",
+      "owner:tobi"
+    ],
+    "milestone": "Stretch",
+    "assignees": [
+      "coderback"
+    ]
+  },
+  {
+    "number": 38,
+    "title": "[Stretch] 'SDK in 20 lines' example client",
+    "body": "## Goal\n\nShow the core's interface without building a real SDK. Stretch: start only after Integration 2 passes; build behind a feature flag; switch off if not working by Sun 08:30.\n\n## Tasks\n\n- [ ] examples/minimal_client.py: send events, ask for a decision, print the cited line\n\n## Done when\n\nThe example runs against the hosted core and is linked from the README.\n\n## Depends on\n\n#23\n\n## Owner\n\nTobi (@coderback)\n\n## Reference\n\nDesign doc: *The Crypt Road v2* (shared by Tobi), section “Stretch goals”. API shapes: `docs/api.md`.\n",
+    "labels": [
+      "area:engine",
+      "type:docs",
+      "P2",
+      "stretch",
+      "owner:tobi"
+    ],
+    "milestone": "Stretch",
+    "assignees": [
+      "coderback"
+    ]
+  },
+  {
+    "number": 39,
+    "title": "[Stretch] Live persona editing in the inspector",
+    "body": "## Goal\n\nA dev-tool moment for the Game Tech track. Stretch: start only after Integration 2 passes; build behind a feature flag; switch off if not working by Sun 08:30.\n\n## Tasks\n\n- [ ] Edit a persona line in the inspector, reload the NPC, hear the next line change\n\n## Done when\n\nWorks on a fresh session without breaking the cache for the demo seed.\n\n## Depends on\n\n#20\n\n## Owner\n\nAhmed (@AhmedBokaniUsman)\n\n## Reference\n\nDesign doc: *The Crypt Road v2* (shared by Tobi), section “Stretch goals”. API shapes: `docs/api.md`.\n",
+    "labels": [
+      "area:client",
+      "type:feature",
+      "P2",
+      "stretch",
+      "owner:ahmed"
+    ],
+    "milestone": "Stretch",
+    "assignees": [
+      "AhmedBokaniUsman"
+    ]
+  }
+]

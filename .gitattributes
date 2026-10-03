@@ -1,0 +1,9 @@
+# Normalise line endings so Windows and other machines produce identical diffs
+* text=auto eol=lf
+*.ps1 text eol=crlf
+*.png binary
+*.jpg binary
+*.gif binary
+*.ogg binary
+*.wav binary
+*.ttf binary
