@@ -155,3 +155,31 @@ def test_configuration_from_the_environment():
     assert "k1" not in repr(g.providers[0])  # keys never reach logs
     half = gateway_from_env({"LLM_BASE_URL": "https://api.example.com/v1", "LLM_API_KEY": "k1"})
     assert isinstance(half, NoModel)  # incomplete settings mean no model, not a crash
+
+
+def test_azure_uses_the_api_key_header_and_api_version():
+    fake = FakeProviders(myres=ok('{"line": "Hm."}'))
+    azure = Provider("azure", "https://myres.openai.azure.com/openai/deployments/fast-mini", "az-key", "fast-mini",
+                     api_version="2024-10-21")
+    reply = OpenAICompatGateway([azure], transport=httpx.MockTransport(fake)).complete("react", MESSAGES)
+    assert reply.provider == "azure"
+    request = fake.requests[0]
+    assert str(request.url) == ("https://myres.openai.azure.com/openai/deployments/fast-mini/chat/completions"
+                                "?api-version=2024-10-21")
+    assert request.headers["api-key"] == "az-key" and "authorization" not in request.headers
+    v1 = Provider("azure-v1", "https://myres.openai.azure.com/openai/v1/", "az-key", "fast-mini")
+    assert v1.url() == "https://myres.openai.azure.com/openai/v1/chat/completions" and v1.azure
+    assert "Authorization" in PRIMARY.headers() and not PRIMARY.azure  # other providers keep Bearer
+
+
+def test_null_in_extra_removes_a_field():
+    reasoning = Provider("r", "https://x.test/v1", "k", "reasoner",
+                         {"max_tokens": None, "temperature": None, "max_completion_tokens": 300})
+    body = reasoning.body(MESSAGES)
+    assert "max_tokens" not in body and "temperature" not in body and body["max_completion_tokens"] == 300
+
+
+def test_api_version_from_the_environment():
+    g = gateway_from_env({"LLM_BASE_URL": "https://r.openai.azure.com/openai/deployments/d", "LLM_API_KEY": "k",
+                          "LLM_MODEL": "d", "LLM_API_VERSION": "2024-10-21"})
+    assert g.providers[0].api_version == "2024-10-21" and g.providers[0].azure
