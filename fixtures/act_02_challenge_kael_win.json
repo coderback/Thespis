@@ -27,7 +27,17 @@
       "schema_version": 1
     }
   ],
-  "replies": [],
+  "replies": [
+    {
+      "decision": "d0002",
+      "npc": "kael",
+      "line": "Lucky blade. It won't happen twice.",
+      "cites": [
+        "e0003"
+      ],
+      "source": "fallback"
+    }
+  ],
   "tick": null,
   "epilogue": null,
   "state": {
@@ -267,6 +277,37 @@
         "schema_version": 1
       }
     ],
-    "decisions_tail": []
+    "decisions_tail": [
+      {
+        "id": "d0001",
+        "kind": "react",
+        "npc": "kael",
+        "phase": 0,
+        "trigger": "insulted",
+        "allowed": [],
+        "chosen": null,
+        "line": "Say that again, stranger, and we settle it with steel.",
+        "cites": [
+          "e0001"
+        ],
+        "reason": "insulted",
+        "source": "fallback"
+      },
+      {
+        "id": "d0002",
+        "kind": "react",
+        "npc": "kael",
+        "phase": 0,
+        "trigger": "beaten",
+        "allowed": [],
+        "chosen": null,
+        "line": "Lucky blade. It won't happen twice.",
+        "cites": [
+          "e0003"
+        ],
+        "reason": "beaten",
+        "source": "fallback"
+      }
+    ]
   }
 }

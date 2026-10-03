@@ -704,6 +704,51 @@
   "decisions_tail": [
     {
       "id": "d0001",
+      "kind": "react",
+      "npc": "kael",
+      "phase": 0,
+      "trigger": "insulted",
+      "allowed": [],
+      "chosen": null,
+      "line": "Say that again, stranger, and we settle it with steel.",
+      "cites": [
+        "e0001"
+      ],
+      "reason": "insulted",
+      "source": "fallback"
+    },
+    {
+      "id": "d0002",
+      "kind": "react",
+      "npc": "kael",
+      "phase": 0,
+      "trigger": "beaten",
+      "allowed": [],
+      "chosen": null,
+      "line": "Lucky blade. It won't happen twice.",
+      "cites": [
+        "e0003"
+      ],
+      "reason": "beaten",
+      "source": "fallback"
+    },
+    {
+      "id": "d0003",
+      "kind": "react",
+      "npc": "kael",
+      "phase": 0,
+      "trigger": "robbed",
+      "allowed": [],
+      "chosen": null,
+      "line": "Laugh now. The road is long.",
+      "cites": [
+        "e0004"
+      ],
+      "reason": "robbed",
+      "source": "fallback"
+    },
+    {
+      "id": "d0004",
       "kind": "decide",
       "npc": "kael",
       "phase": 0,
@@ -713,13 +758,32 @@
         "wait"
       ],
       "chosen": "go_to",
-      "line": null,
-      "cites": [],
+      "line": "Out of my way.",
+      "cites": [
+        "b0009",
+        "e0004"
+      ],
       "reason": "go_to scores 6",
       "source": "fallback"
     },
     {
-      "id": "d0002",
+      "id": "d0005",
+      "kind": "react",
+      "npc": "mags",
+      "phase": 1,
+      "trigger": "talk",
+      "allowed": [],
+      "chosen": null,
+      "line": "Odo saw the whole thing, and Odo talks.",
+      "cites": [
+        "b0007",
+        "e0004"
+      ],
+      "reason": "talk",
+      "source": "fallback"
+    },
+    {
+      "id": "d0006",
       "kind": "decide",
       "npc": "kael",
       "phase": 1,
@@ -729,13 +793,16 @@
         "wait"
       ],
       "chosen": "go_to",
-      "line": null,
-      "cites": [],
+      "line": "Out of my way.",
+      "cites": [
+        "b0009",
+        "e0004"
+      ],
       "reason": "go_to scores 6",
       "source": "fallback"
     },
     {
-      "id": "d0003",
+      "id": "d0007",
       "kind": "decide",
       "npc": "kael",
       "phase": 2,
@@ -746,13 +813,108 @@
         "accuse:player"
       ],
       "chosen": "accuse:player",
-      "line": null,
-      "cites": [],
+      "line": "Captain. The rogue in green robbed me at the Lantern.",
+      "cites": [
+        "b0009",
+        "e0004"
+      ],
       "reason": "accuse:player scores 9",
       "source": "fallback"
     },
     {
-      "id": "d0004",
+      "id": "d0008",
+      "kind": "react",
+      "npc": "brenna",
+      "phase": 3,
+      "trigger": "arrival",
+      "allowed": [],
+      "chosen": null,
+      "line": "Kael says you cut his purse in the tavern. You're not crossing.",
+      "cites": [
+        "b0010",
+        "e0011"
+      ],
+      "reason": "arrival",
+      "source": "fallback"
+    },
+    {
+      "id": "d0009",
+      "kind": "react",
+      "npc": "kael",
+      "phase": 3,
+      "trigger": "shares_stop",
+      "allowed": [],
+      "chosen": null,
+      "line": "Told the Captain what you did in the tavern. Enjoy the view.",
+      "cites": [
+        "e0011"
+      ],
+      "reason": "shares_stop",
+      "source": "fallback"
+    },
+    {
+      "id": "d0010",
+      "kind": "react",
+      "npc": "brenna",
+      "phase": 3,
+      "trigger": "bribe",
+      "allowed": [],
+      "chosen": null,
+      "line": "Twenty coins says I was looking the other way.",
+      "cites": [
+        "e0014"
+      ],
+      "reason": "bribe",
+      "source": "fallback"
+    },
+    {
+      "id": "d0011",
+      "kind": "react",
+      "npc": "brenna",
+      "phase": 3,
+      "trigger": "bribe",
+      "allowed": [],
+      "chosen": null,
+      "line": "Twenty coins says I was looking the other way.",
+      "cites": [
+        "e0015"
+      ],
+      "reason": "bribe",
+      "source": "fallback"
+    },
+    {
+      "id": "d0012",
+      "kind": "react",
+      "npc": "brenna",
+      "phase": 3,
+      "trigger": "told",
+      "allowed": [],
+      "chosen": null,
+      "line": "Is that so? I'll see to it.",
+      "cites": [
+        "e0016"
+      ],
+      "reason": "told",
+      "source": "fallback"
+    },
+    {
+      "id": "d0013",
+      "kind": "react",
+      "npc": "kael",
+      "phase": 3,
+      "trigger": "lied_about",
+      "allowed": [],
+      "chosen": null,
+      "line": "Liar! I never touched the peddler!",
+      "cites": [
+        "e0016",
+        "b0013"
+      ],
+      "reason": "lied_about",
+      "source": "fallback"
+    },
+    {
+      "id": "d0014",
       "kind": "decide",
       "npc": "brenna",
       "phase": 3,
@@ -762,13 +924,16 @@
         "wait"
       ],
       "chosen": "detain:kael",
-      "line": null,
-      "cites": [],
+      "line": "Kael robbed the peddler, did he? Sergeant, hold him.",
+      "cites": [
+        "b0012",
+        "e0016"
+      ],
       "reason": "believes a robbery at 0.5 or more",
       "source": "fallback"
     },
     {
-      "id": "d0005",
+      "id": "d0015",
       "kind": "decide",
       "npc": "kael",
       "phase": 5,
@@ -784,7 +949,7 @@
       "source": "fallback"
     },
     {
-      "id": "d0006",
+      "id": "d0016",
       "kind": "decide",
       "npc": "brenna",
       "phase": 6,
@@ -794,13 +959,31 @@
         "wait"
       ],
       "chosen": "question:odo",
-      "line": null,
-      "cites": [],
+      "line": "Odo. Is it true you were robbed?",
+      "cites": [
+        "b0012",
+        "e0016"
+      ],
       "reason": "odo can speak to a claim about them",
       "source": "fallback"
     },
     {
-      "id": "d0007",
+      "id": "d0017",
+      "kind": "react",
+      "npc": "odo",
+      "phase": 6,
+      "trigger": "testify",
+      "allowed": [],
+      "chosen": null,
+      "line": "Robbed? Me? By Kael? Captain, I've never been robbed in my life.",
+      "cites": [
+        "e0025"
+      ],
+      "reason": "testify",
+      "source": "fallback"
+    },
+    {
+      "id": "d0018",
       "kind": "decide",
       "npc": "kael",
       "phase": 6,

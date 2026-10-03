@@ -335,6 +335,51 @@
   "decisions_tail": [
     {
       "id": "d0001",
+      "kind": "react",
+      "npc": "kael",
+      "phase": 0,
+      "trigger": "insulted",
+      "allowed": [],
+      "chosen": null,
+      "line": "Say that again, stranger, and we settle it with steel.",
+      "cites": [
+        "e0001"
+      ],
+      "reason": "insulted",
+      "source": "fallback"
+    },
+    {
+      "id": "d0002",
+      "kind": "react",
+      "npc": "kael",
+      "phase": 0,
+      "trigger": "beaten",
+      "allowed": [],
+      "chosen": null,
+      "line": "Lucky blade. It won't happen twice.",
+      "cites": [
+        "e0003"
+      ],
+      "reason": "beaten",
+      "source": "fallback"
+    },
+    {
+      "id": "d0003",
+      "kind": "react",
+      "npc": "kael",
+      "phase": 0,
+      "trigger": "robbed",
+      "allowed": [],
+      "chosen": null,
+      "line": "Laugh now. The road is long.",
+      "cites": [
+        "e0004"
+      ],
+      "reason": "robbed",
+      "source": "fallback"
+    },
+    {
+      "id": "d0004",
       "kind": "decide",
       "npc": "kael",
       "phase": 0,
@@ -344,8 +389,11 @@
         "wait"
       ],
       "chosen": "go_to",
-      "line": null,
-      "cites": [],
+      "line": "Out of my way.",
+      "cites": [
+        "b0009",
+        "e0004"
+      ],
       "reason": "go_to scores 6",
       "source": "fallback"
     }
