@@ -67,7 +67,8 @@ flowchart LR
 
 ## Numbers
 
-From [results.md](results.md): every scripted route, played on the hosted engine with GPT-6 Luna.
+From [results.md](results.md): every scripted route, played on the hosted engine with GPT-6 Luna. The last two rows
+are model-judged: GPT-5.4 nano read 50 of Luna's lines beside the state packs they came from (`tools/judge.py`).
 
 | Measure | Value |
 | --- | --- |
@@ -78,6 +79,8 @@ From [results.md](results.md): every scripted route, played on the hosted engine
 | An action that doesn't | 43 ms |
 | Cost per run, every call to the model | $0.00066 |
 | Routes ending as the rules model predicts | 8 of 8 |
+| Lines stating only what the NPC knew (model-judged) | 48 of 50 |
+| Lines in character (model-judged) | 50 of 50 |
 
 Which models and why: [docs/models.md](docs/models.md).
 
