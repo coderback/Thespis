@@ -49,6 +49,10 @@ def test_the_harness_measures_every_route(client):
     assert s["cost"] == pytest.approx(s["ok"] * (900 * 0.10 + 30 * 0.50) / 1e6)
     assert s["blocked"] and set(s["blocked"]) == {"cites ids not in its state pack"}
     assert 0 < s["code_only"] < 1 and s["asked"] > 0
+    assert s["with_call"] > 0 and s["no_call"] > 0 and s["with_call"] + s["no_call"] == s["acts"]
+    assert s["live_per_run"] >= s["calls_per_run"] and s["live_cost_per_run"] >= s["cost_per_run"]
+    assert all(r["talked"] > 0 for r in results["model"])  # each model run asks a question of its own
+    assert all(r["talked"] == 0 for r in results["rules"])
     text = harness.report(results, "http://test", "abc1234")
     assert text.startswith("# Results") and "| frame | 1 |" in text and "✗" not in text
 

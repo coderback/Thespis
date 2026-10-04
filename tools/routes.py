@@ -124,10 +124,12 @@ def play(s: Session, name: str) -> dict:
                 s.act("bribe", "brenna", amount=C.FINE)
         elif step == "lie":
             s.act("tell_claim", "brenna", claim=LIE)
-        elif step in ("insult", "challenge", "spare", "bribe"):
-            target = "brenna" if step == "bribe" else "kael"
+        elif step == "bribe":
+            if s.state()["player"]["coins"] >= C.FINE:  # after a lost duel there's no purse to pay with
+                s.act("bribe", "brenna", amount=C.FINE)
+        elif step in ("insult", "challenge", "spare"):
             if step != "spare" or s.state()["pending"] == "duel_won":
-                s.act(step, target)
+                s.act(step, "kael")
         else:
             s.act(step)
     return advance(s)
