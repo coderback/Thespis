@@ -332,7 +332,7 @@
         }
       ],
       "conf": 1.0,
-      "truth": false
+      "truth": true
     },
     {
       "id": "b0014",

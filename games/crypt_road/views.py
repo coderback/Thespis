@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from games.crypt_road import content as C
 from games.crypt_road import words
-from games.crypt_road.rules import ActResult, Tick
+from games.crypt_road.rules import ActResult, Tick, happened
 from thespis.ledger import Event
 from thespis.world import World
 
@@ -19,7 +19,7 @@ def state_view(w: World) -> dict:
         "player": dict(w.player),
         "npcs": [{"id": n.id, "loc": n.loc, "last_seen": n.last_seen, "drives": dict(n.drives),
                   "trust_in": dict(n.trust_in), "frozen_until": n.frozen_until} for n in w.npcs.values()],
-        "beliefs": [{**b.to_json(), "conf": b.conf, "truth": w.ledger.happened(b.claim)} for b in w.beliefs.all()],
+        "beliefs": [{**b.to_json(), "conf": b.conf, "truth": happened(w, b.claim)} for b in w.beliefs.all()],
         "ledger_tail": [e.to_json() for e in w.ledger.tail(TAIL)],
         "decisions_tail": [d.to_json() for d in w.decisions.tail(TAIL)],
     }

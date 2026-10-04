@@ -448,7 +448,7 @@
           }
         ],
         "conf": 1.0,
-        "truth": false
+        "truth": true
       }
     ],
     "ledger_tail": [

@@ -54,6 +54,18 @@ class ActResult:
 
 
 # ---------------------------------------------------------------- helpers
+STATEMENTS = ("tell_claim", "accuse")  # events where someone states a claim as fact
+
+
+def happened(w: World, c: Claim) -> bool:
+    """Ground truth for a claim. Most claims are true when an event that really happened carried them. A lie leaves
+    no event of its own, so lied(a, b) is true when a stated a claim naming b that never happened."""
+    if c.pred == "lied":
+        return any(e.verb in STATEMENTS and e.actor == c.a and not e.truth and e.claim and e.claim.mentions(c.b)
+                   for e in w.ledger)
+    return w.ledger.happened(c)
+
+
 def _npc_name(npc: str) -> str:
     return C.short_name(npc)
 
@@ -243,7 +255,7 @@ def _settle_duel(w: World, verb: str) -> None:
 
 
 def _tell(w: World, listener: str, c: Claim) -> None:
-    truth = w.ledger.happened(c)
+    truth = happened(w, c)
     e = _event(w, "tell_claim", "player", listener, w.player["loc"], c, truth)
     give_evidence(w, listener, c, C.conf_from_trust(w.npcs[listener].trust_in.get("player", 0)), "player", e)
     # An NPC named in a lie it overhears knows it was lied about.
@@ -286,7 +298,7 @@ def end_phase(w: World, action: str, brain: Brain | None = None, mind: Mind | No
                 if chosen.startswith("detain"):
                     detained.append(cj)
                     kael.frozen_until = p + 1
-                    _event(w, "detain", C.GUARD, C.RIVAL, guard.loc, c, w.ledger.happened(c))
+                    _event(w, "detain", C.GUARD, C.RIVAL, guard.loc, c, happened(w, c))
     for wit in C.WITNESSES:
         if w.npcs[wit].loc != guard.loc:
             continue
@@ -295,7 +307,7 @@ def end_phase(w: World, action: str, brain: Brain | None = None, mind: Mind | No
                 continue
             if all(e.source == wit for e in belief.evidence):
                 continue
-            if w.ledger.happened(belief.claim):
+            if happened(w, belief.claim):
                 continue
             options = {f"question:{wit}": 8, "wait": 1}
             chosen = _decide(w, mind, brain, C.GUARD, "witness_present", options, f"{wit} can speak to a claim about them",
@@ -308,7 +320,7 @@ def end_phase(w: World, action: str, brain: Brain | None = None, mind: Mind | No
             for src in {e.source for e in belief.evidence}:
                 if src in guard.trust_in:
                     guard.trust_in[src] -= 3
-            e = _event(w, "testify", wit, C.GUARD, guard.loc, belief.claim, w.ledger.happened(belief.claim))
+            e = _event(w, "testify", wit, C.GUARD, guard.loc, belief.claim, happened(w, belief.claim))
             voice.testimony(w, mind, wit, belief.claim, e)
             if kael.frozen(p):
                 kael.frozen_until = None
@@ -341,7 +353,7 @@ def end_phase(w: World, action: str, brain: Brain | None = None, mind: Mind | No
         elif chosen == "accuse:player":
             kael.flags["accused"] = True
             c = grievance
-            e = _event(w, "accuse", C.RIVAL, C.GUARD, kael.loc, c, w.ledger.happened(c))
+            e = _event(w, "accuse", C.RIVAL, C.GUARD, kael.loc, c, happened(w, c))
             give_evidence(w, C.GUARD, c, C.conf_from_trust(guard.trust_in.get(C.RIVAL, 0)), C.RIVAL, e)
         elif chosen == "share_drink":
             kael.flags["drink"] = True
@@ -363,7 +375,7 @@ def end_phase(w: World, action: str, brain: Brain | None = None, mind: Mind | No
                 continue
             for b in mine:
                 if w.beliefs.get(listener.id, b.claim) is None:
-                    e = _event(w, "gossip", g, listener.id, gossip.loc, b.claim, w.ledger.happened(b.claim))
+                    e = _event(w, "gossip", g, listener.id, gossip.loc, b.claim, happened(w, b.claim))
                     give_evidence(w, listener.id, b.claim, round(b.conf * 0.8, 2), g, e)
                     break
 
