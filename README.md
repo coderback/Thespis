@@ -10,7 +10,7 @@ wants to do. A language model only chooses among actions the code has already al
 line it says must cite the ledger events and beliefs behind it, checked by code before anyone hears it.
 
 - **Play it:** <https://thespis-production.up.railway.app>. Press **Watch the 60-second story**, or play it yourself.
-- **Video:** link to come with the submission.
+- **Video:** <https://youtu.be/WD7oslaKQO4> (2 minutes, with subtitles).
 - **Numbers:** [results.md](results.md), measured on the hosted engine.
 
 ## The demo: The Crypt Road
@@ -64,6 +64,11 @@ flowchart LR
   fails if the core ever imports from a game. [examples/minimal_client.py](examples/minimal_client.py) uses the core
   alone, in about 30 lines.
 - **Persistence:** SQLite, an insert-only ledger table plus a snapshot per session, so a restart loses nothing.
+- **The Dungeon Master:** after each phase the model tells the player what happened, including what they couldn't
+  see, citing the events it uses. Code sifts the ledger for the story's threads (revenge brewing, a lie told, a lie
+  exposed) for it to end on. If a telling fails the validator, the code-built telling stands.
+- **Live persona editing:** in the inspector's Minds tab, change an NPC's persona and its next line follows it. The
+  edit belongs to that game, so other players and the demo cache are untouched.
 
 ## Numbers
 
