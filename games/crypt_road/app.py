@@ -32,7 +32,14 @@ _locks: defaultdict[str, threading.Lock] = defaultdict(threading.Lock)  # one re
 
 
 def db_path() -> Path:
-    return Path(os.environ.get("DB_PATH", "./data/thespis.sqlite"))
+    """DB_PATH, except that with a Railway volume attached the database always lives on the volume: anywhere else it
+    would be wiped, with every session and the model cache, on the next deploy."""
+    path = Path(os.environ.get("DB_PATH", "./data/thespis.sqlite"))
+    volume = os.environ.get("RAILWAY_VOLUME_MOUNT_PATH")
+    if volume and not path.resolve().is_relative_to(Path(volume).resolve()):
+        log.warning("DB_PATH %s is not on the volume at %s, so it would not survive a deploy; ignoring it", path, volume)
+        path = Path(volume) / "thespis.sqlite"
+    return path
 
 
 @asynccontextmanager
