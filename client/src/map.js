@@ -122,6 +122,8 @@ export class MapView {
     requestAnimationFrame(this.frame);
     if (!this.state) return;
     const g = this.g;
+    g.setTransform(1, 0, 0, 1, 0, 0); // start every frame clean, so nothing a failed draw left behind can stick
+    g.globalAlpha = 1;
     g.imageSmoothingEnabled = false;
     g.drawImage(this.world, 0, 0, this.world.width * S, this.world.height * S);
 
@@ -330,7 +332,9 @@ export class MapView {
 
   drawDice(now) {
     const g = this.g, W = this.cv.width, H = this.cv.height;
-    const t = now - this.dice.t0;
+    // The frame's timestamp can fall just before the roll began: a negative t made face 0, which has no pips, and the
+    // throw left the canvas translated and rotated for the rest of the game.
+    const t = Math.max(0, now - this.dice.t0);
     const rolling = t < 1000;
     const face = rolling ? 1 + (Math.floor(t / 70) % 6) : this.dice.win ? 6 : 1;
     g.fillStyle = "rgba(10,8,16,0.45)";
