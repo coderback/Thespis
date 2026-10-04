@@ -51,6 +51,7 @@ class ActResult:
     tick: Tick | None
     epilogue: list[Tick] | None
     replies: list = field(default_factory=list)  # lines spoken to the player: #10
+    model_calls: int = 0  # how many model calls the action made (cache hits are free)
 
 
 # ---------------------------------------------------------------- helpers
@@ -161,16 +162,18 @@ def _check(w: World, verb: str, target: str | None) -> dict:
 # ---------------------------------------------------------------- acting
 def act(w: World, verb: str, target: str | None = None, claim: dict | Claim | None = None,
         amount: int | None = None, text: str | None = None, brain: Brain | None = None,
-        gateway: ModelGateway | None = None, cache: ReplyCache | None = None, replay: bool = False) -> ActResult:
+        gateway: ModelGateway | None = None, cache: ReplyCache | None = None, replay: bool = False,
+        budget: int | None = None) -> ActResult:
     """Apply one player verb, the tick it triggers, and the epilogue if the race ends.
 
     With a gateway and the brain switched on, NPCs speak and make their real choices through the model; anything
     the model gets wrong, or can't answer, falls back to the utility brain and template lines. A cache answers
-    what has been asked before; with `replay` on, only the cache answers.
+    what has been asked before; with `replay` on, only the cache answers. `budget` caps this action's model calls;
+    the session's running total is kept in `w.counters["model_calls"]`.
     """
     _check(w, verb, target)
     brain = brain or UtilityBrain()
-    mind = Mind(gateway if w.brain_mode == "model" else None, voice.VALIDATOR, cache, replay)
+    mind = Mind(gateway if w.brain_mode == "model" else None, voice.VALIDATOR, cache, replay, budget)
     start = len(w.ledger)
     ends_phase = None  # the tick this verb triggers, if any: "move" or "wait"
     told = None
@@ -211,7 +214,9 @@ def act(w: World, verb: str, target: str | None = None, claim: dict | Claim | No
     events = list(w.ledger)[start:]
     epilogue = run_epilogue(w, brain, mind) if w.status != PLAYING and w.ended_at is not None and not \
         w.counters.get("epilogue_done") else None
-    return ActResult(events=events, tick=tick, epilogue=epilogue, replies=replies)
+    if mind.asked:
+        w.counters["model_calls"] = w.counters.get("model_calls", 0) + mind.asked
+    return ActResult(events=events, tick=tick, epilogue=epilogue, replies=replies, model_calls=mind.asked)
 
 
 def _as_claim(claim: dict | Claim | None) -> Claim:

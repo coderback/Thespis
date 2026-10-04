@@ -33,6 +33,7 @@ def spoken(w):
 def without_decisions(w):
     data = w.to_json()
     del data["decisions"]
+    data["counters"].pop("model_calls", None)  # #24's call count: a live run makes calls, a replay none
     return data
 
 
@@ -59,6 +60,7 @@ def test_a_second_play_makes_no_model_calls(cache):
     second, _ = play_demo(second_model, cache=cache)
     assert first_model.calls and second_model.calls == []
     assert cache.cached_replies() == len(first_model.calls)
+    assert first.counters["model_calls"] == len(first_model.calls) and "model_calls" not in second.counters
     assert spoken(second) == spoken(first)
     assert [d.source for d in second.decisions] == [d.source.replace("llm", "cache") for d in first.decisions]
     assert without_decisions(second) == without_decisions(first)

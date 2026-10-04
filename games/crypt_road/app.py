@@ -5,9 +5,11 @@ Each request loads its session from SQLite and saves it back, so a restart loses
 """
 
 import logging
+import math
 import os
 import threading
-from collections import defaultdict
+import time
+from collections import defaultdict, deque
 from contextlib import asynccontextmanager
 from dataclasses import asdict
 from pathlib import Path
@@ -30,6 +32,40 @@ CLIENT_DIST = ROOT / "client" / "dist"
 
 log = logging.getLogger("thespis")
 _locks: defaultdict[str, threading.Lock] = defaultdict(threading.Lock)  # one request at a time per session
+
+
+def _env_int(name: str, default: int) -> int:
+    value = os.environ.get(name, "").strip()
+    return int(value) if value else default
+
+
+class SessionLimiter:
+    """At most `per_hour` new sessions per client IP in any hour; 0 turns it off. Kept in memory: a restart resets it."""
+
+    def __init__(self, per_hour: int, clock=time.monotonic):
+        self.per_hour, self.clock = per_hour, clock
+        self._seen: defaultdict[str, deque[float]] = defaultdict(deque)
+        self._lock = threading.Lock()
+
+    def wait(self, ip: str) -> float:
+        """0 if this IP may start a session now (and count it), else the seconds until it may."""
+        if self.per_hour <= 0:
+            return 0.0
+        now = self.clock()
+        with self._lock:
+            seen = self._seen[ip]
+            while seen and seen[0] <= now - 3600:
+                seen.popleft()
+            if len(seen) >= self.per_hour:
+                return seen[0] + 3600 - now
+            seen.append(now)
+            return 0.0
+
+
+def client_ip(request: Request) -> str:
+    """Railway's edge sets X-Real-IP to the client's address; X-Forwarded-For's first entry is the same."""
+    forwarded = request.headers.get("x-forwarded-for", "").split(",")[0].strip()
+    return request.headers.get("x-real-ip") or forwarded or (request.client.host if request.client else "unknown")
 
 
 def db_path() -> Path:
@@ -55,6 +91,13 @@ async def lifespan(app: FastAPI):
     log.warning("models: %s%s", " then ".join(names) + " then fallback" if names else "none configured, fallback only",
                 "; REPLAY=1, so only cached replies, no model calls" if app.state.replay else "")
     log.warning("model cache: %d replies", app.state.store.cached_replies())
+    # #24: caps on model calls (0 = none; cache hits are free) and on new sessions per IP
+    app.state.session_cap = _env_int("SESSION_CALL_CAP", 60)
+    app.state.global_cap = _env_int("GLOBAL_CALL_CAP", 0)
+    app.state.limiter = SessionLimiter(_env_int("SESSIONS_PER_IP_HOUR", 30))
+    log.warning("caps: %s model calls per session, %s in all (%d made so far), %s new sessions per IP per hour",
+                app.state.session_cap or "no cap on", app.state.global_cap or "no cap on",
+                app.state.store.calls_made(), app.state.limiter.per_hour or "no limit on")
     yield
     gateway.close()  # the one this app opened, even if a test swapped app.state.gateway
 
@@ -128,6 +171,10 @@ def health():
 
 @app.post("/session")
 def create_session(request: Request, body: SessionBody | None = None):
+    wait = request.app.state.limiter.wait(client_ip(request))
+    if wait:
+        raise ApiError(429, "rate_limited", f"Too many new games from here; try again in {math.ceil(wait / 60)} min, "
+                                            "or carry on with the one you have")
     store = _store(request)
     seed = body.seed if body and body.seed is not None else DEMO_SEED
     session = store.create_session(seed)
@@ -154,11 +201,23 @@ def post_act(body: ActBody, request: Request, x_session: str | None = Header(def
         try:
             result = rules.act(world, body.verb, body.target, body.claim.model_dump() if body.claim else None,
                                body.amount, body.text, gateway=request.app.state.gateway, cache=store,
-                               replay=request.app.state.replay)
+                               replay=request.app.state.replay, budget=_budget(request.app.state, store, world))
         except rules.NotAllowed as e:
             raise ApiError(409, "not_allowed", e.reason) from None
         store.save(session, world)
+        if result.model_calls:
+            store.count_calls(result.model_calls)
         return views.act_view(result, world)
+
+
+def _budget(state, store: Store, world) -> int | None:
+    """How many model calls this action may make: what's left of the session's cap and of the global cap."""
+    left = []
+    if state.session_cap > 0:
+        left.append(state.session_cap - world.counters.get("model_calls", 0))
+    if state.global_cap > 0:
+        left.append(state.global_cap - store.calls_made())
+    return max(0, min(left)) if left else None
 
 
 @app.get("/digest")
