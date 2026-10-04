@@ -193,3 +193,15 @@ def test_a_moving_player_is_on_the_road_during_the_tick():
     assert not any("to the bridge" in e["what"] for e in detain["events"])  # but she can't see you leave yet
     move_ids = {e.id for e in w.ledger if e.verb == "move" and e.actor == "player"}
     assert not any(set(d.cites) & move_ids for d in w.decisions if d.kind == "decide")
+
+
+def test_a_reply_may_name_whoever_the_player_mentioned():
+    """Asked "Is the Captain fair?", Mags may answer about the Captain, though Brenna isn't otherwise in her pack."""
+    from games.crypt_road import voice
+    w = new_world(1)
+    rules.act(w, "insult", "kael")
+    asked = voice.pack_for(w, "mags", 'The player says to you: "Is the Captain fair?"')
+    unasked = voice.pack_for(w, "mags", 'The player says to you: "Nice night."')
+    reply = {"line": "The Captain? Fair enough, if you pay your fines.", "cites": [asked.events[-1]["id"]]}
+    assert voice.VALIDATOR.problem(reply, asked, "react") is None
+    assert "brenna" in voice.VALIDATOR.problem(reply, unasked, "react")

@@ -125,6 +125,7 @@ def pack_for(w: World, npc_id: str, situation: str, options: dict[str, float] | 
     known = [e for e in reversed(list(w.ledger))
              if e.id not in view.hidden and knows(w, npc_id, e.id)][:KNOWN_EVENTS][::-1]
     names = {npc_id, *others, *C.STOPS}  # everyone knows the road
+    names |= VALIDATOR.named(situation)  # and may name whoever the player just mentioned
     for b in beliefs:
         names |= {b.claim.a, b.claim.b}
     for e in known:
