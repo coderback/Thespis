@@ -82,6 +82,8 @@ class CallRecord:
 
 
 class ModelGateway(Protocol):
+    models: tuple[str, ...]  # the configured models, primary first: what a cached reply is keyed under
+
     def complete(self, call_type: str, messages: list[dict]) -> ModelReply | None:
         """Return the model's parsed JSON reply, or None to make the caller use its fallback."""
         ...
@@ -95,6 +97,7 @@ class NoModel:
     """The gateway when no provider is configured: every call falls back."""
 
     providers: tuple = ()
+    models: tuple = ()
     calls: deque = deque(maxlen=0)
 
     def complete(self, call_type: str, messages: list[dict]) -> ModelReply | None:
@@ -130,6 +133,10 @@ class OpenAICompatGateway:
         self._skip_until: dict[str, float] = {}
         self._lock = threading.Lock()
         self._slots = threading.BoundedSemaphore(MAX_CONCURRENT)
+
+    @property
+    def models(self) -> tuple[str, ...]:
+        return tuple(p.model for p in self.providers)
 
     def complete(self, call_type: str, messages: list[dict]) -> ModelReply | None:
         for provider in self.providers:

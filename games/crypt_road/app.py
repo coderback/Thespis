@@ -42,8 +42,11 @@ async def lifespan(app: FastAPI):
     # On the host, a count that keeps rising across redeploys proves the volume persists.
     log.warning("boot #%d, database at %s", app.state.store.record_boot(), path.resolve())
     gateway = app.state.gateway = gateway_from_env()
+    app.state.replay = os.environ.get("REPLAY", "0").strip() == "1"  # the cache and fallback only, never the network
     names = [p.name for p in gateway.providers]
-    log.warning("models: %s", " then ".join(names) + " then fallback" if names else "none configured, fallback only")
+    log.warning("models: %s%s", " then ".join(names) + " then fallback" if names else "none configured, fallback only",
+                "; REPLAY=1, so only cached replies, no model calls" if app.state.replay else "")
+    log.warning("model cache: %d replies", app.state.store.cached_replies())
     yield
     gateway.close()  # the one this app opened, even if a test swapped app.state.gateway
 
@@ -142,7 +145,8 @@ def post_act(body: ActBody, request: Request, x_session: str | None = Header(def
         world = _load(store, session)
         try:
             result = rules.act(world, body.verb, body.target, body.claim.model_dump() if body.claim else None,
-                               body.amount, body.text, gateway=request.app.state.gateway)
+                               body.amount, body.text, gateway=request.app.state.gateway, cache=store,
+                               replay=request.app.state.replay)
         except rules.NotAllowed as e:
             raise ApiError(409, "not_allowed", e.reason) from None
         store.save(session, world)

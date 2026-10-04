@@ -57,6 +57,9 @@ Railway, which rebuilds and redeploys every merge to `main`, so the hosted URL a
 - **Settings:** `railway.toml` sets the Dockerfile build, a `/health` check and one replica.
 - **Volume:** mounted at `/data`. The SQLite database is `DB_PATH=/data/thespis.sqlite`.
 - **Model keys:** set as Railway variables, never in the repo.
+- **Model cache:** every validated model reply is kept in the database, so playing the demo route twice on
+  the host warms it. `REPLAY=1` then plays from the cache and the fallback alone, with no model calls, which
+  keeps the demo working if the keys or credits die. The boot log shows `model cache: N replies`.
 - **URL:** <https://thespis-production.up.railway.app>
 - **Check the volume persists:** *redeploy* the service (a fresh container, unlike a restart), and the log line
   `boot #N` should go up by one. Checked on 3 Oct: a redeploy logged `boot #2`.
