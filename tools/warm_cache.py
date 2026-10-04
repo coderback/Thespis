@@ -9,7 +9,8 @@ caused), where every line came from, and whether it said exactly what the run be
 0 calls and the same lines. Re-run it after any change to what the model is shown: a persona, a prompt, the state
 pack, or the autoplay steps.
 
-Exits 1 unless the last run made no model calls, won on phase 5, and said what the run before it said.
+Exits 1 unless the last run made no model calls, missed the cache nowhere (under REPLAY=1 a miss falls back without
+a call, so it looks free), won on phase 5, and said what the run before it said.
 """
 
 from __future__ import annotations
@@ -38,6 +39,7 @@ ROUTE = [
     {"verb": "take_relic"},
 ]
 MODEL_FAULTS = ("model unavailable", "model reply rejected")  # fallbacks that cost a model call
+REPLAY_MISS = "replay: not in the cache"
 
 
 def model_calls(decisions: list[dict]) -> int:
@@ -60,10 +62,11 @@ def play(client) -> dict:
     return {
         "outcome": f"{state['status']}@{state['ended_at']}",
         "calls": model_calls(decisions),
+        "misses": sum(REPLAY_MISS in d["reason"] for d in decisions),
         "sources": dict(Counter(d["source"] for d in decisions if d["line"])),
         "said": [(d["npc"], d["chosen"], d["line"]) for d in decisions],
         "faults": [f"{d['id']} {d['npc']}: {d['reason']}" for d in decisions
-                   if d["source"] == "fallback" and "model" in d["reason"]],
+                   if d["source"] == "fallback" and any(f in d["reason"] for f in (*MODEL_FAULTS, REPLAY_MISS))],
         "seconds": round(elapsed, 1),
     }
 
@@ -78,15 +81,16 @@ def main(argv: list[str] | None = None) -> int:
         for n in range(1, args.runs + 1):
             run = play(client)
             same = runs and run["said"] == runs[-1]["said"]
-            print(f"run {n}: {run['outcome']}, {run['calls']} model calls, lines {run['sources']}, {run['seconds']} s"
+            print(f"run {n}: {run['outcome']}, {run['calls']} model calls, {run['misses']} replay misses, "
+                  f"lines {run['sources']}, {run['seconds']} s"
                   + ("" if not runs else ", same lines as the run before" if same else ", DIFFERENT lines"))
             for fault in run["faults"]:
                 print("   ", fault)
             run["same"] = same
             runs.append(run)
     last = runs[-1]
-    ok = last["calls"] == 0 and last["outcome"] == "won@5" and (len(runs) == 1 or last["same"])
-    print("warm: the last run made no model calls and replayed the run before" if ok else "NOT warm yet")
+    ok = last["calls"] == 0 and last["misses"] == 0 and last["outcome"] == "won@5" and (len(runs) == 1 or last["same"])
+    print("warm: the last run made no model calls and missed the cache nowhere" if ok else "NOT warm yet")
     return 0 if ok else 1
 
 
