@@ -191,9 +191,11 @@ def test_demo_route_beats():
 
     rules.act(w, "bribe", "brenna")
     rules.act(w, "bribe", "brenna")
+    assert not rules.happened(w, Claim("lied", "player", "kael"))
     lie = rules.act(w, "tell_claim", "brenna", claim=LIE).events[0]
     assert lie.truth is False and w.beliefs.conf("brenna", Claim(**LIE)) == 0.9
     assert w.npcs["kael"].drives["grudge"] == 8 and w.beliefs.conf("kael", Claim("lied", "player", "kael")) == 1.0
+    assert rules.happened(w, Claim("lied", "player", "kael"))  # a lie leaves no event of its own, but Kael is right
     tick3 = rules.act(w, "move").tick
     assert any(d.npc == "brenna" and d.chosen == "detain:kael" for d in tick3.decisions)
     assert w.player["loc"] == "bridge" and w.npcs["kael"].frozen(w.phase)
