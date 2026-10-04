@@ -46,6 +46,7 @@ export class HttpApi {
   reset() { return this.req("POST", "/reset", {}); }
   reload() { return this.req("POST", "/reload", {}); }
   brain(mode) { return this.req("POST", "/dev/brain", { mode }); }
+  persona(npc, persona) { return this.req("POST", "/dev/persona", { npc, persona }); }
 }
 
 const ROUTE = [
@@ -71,15 +72,27 @@ export class FixtureApi {
     this.session = "demo-0001";
     this.step = 0;
     this.current = files.session_new.state;
+    this.personas = {}; // live persona edits (#39), laid over every state the fixtures return
   }
   clone(x) { return JSON.parse(JSON.stringify(x)); }
+  withPersonas(s) {
+    for (const n of s.npcs) if (this.personas[n.id]) { n.persona = this.personas[n.id]; n.persona_edited = true; }
+    return s;
+  }
   async newSession() {
     this.step = 0;
+    this.personas = {};
     this.current = this.f.session_new.state;
     return this.clone(this.f.session_new);
   }
-  async state() { return this.clone(this.current); }
-  async reset() { this.step = 0; this.current = this.f.session_new.state; return { state: this.clone(this.current) }; }
+  async state() { return this.withPersonas(this.clone(this.current)); }
+  async reset() { this.step = 0; this.personas = {}; this.current = this.f.session_new.state; return { state: this.clone(this.current) }; }
+  async persona(npc, persona) {
+    const text = (persona || "").trim();
+    if (text) this.personas[npc] = text;
+    else delete this.personas[npc];
+    return { npc, persona: text || this.current.npcs.find((n) => n.id === npc)?.persona, default: !text };
+  }
   async reload() { return { state: this.clone(this.current) }; }
   async brain(mode) { return { mode }; }
 
@@ -106,7 +119,8 @@ export class FixtureApi {
     }
     this.step++;
     const out = this.clone(this.f[name]);
-    this.current = out.state;
+    this.current = this.clone(out.state); // kept as the fixture has it, so an edit can be undone
+    this.withPersonas(out.state);
     return out;
   }
 

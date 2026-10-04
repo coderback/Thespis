@@ -99,6 +99,14 @@ def _name(who: str) -> str:
 
 
 # ---------------------------------------------------------------- the state pack
+PERSONA_MAX = 300  # characters in an edited persona (#39)
+
+
+def persona_of(w: World, npc_id: str) -> str:
+    """The persona the model voices: this session's edit (#39), or the one in cast.toml."""
+    return w.npcs[npc_id].flags.get("persona") or C.load_cast()["npc"][npc_id]["persona"]
+
+
 def describe(option: str, w: World, npc: str) -> str:
     """One line on what an allowed action does, for the model."""
     kind, _, who = option.partition(":")
@@ -136,7 +144,7 @@ def pack_for(w: World, npc_id: str, situation: str, options: dict[str, float] | 
     for option in ordered:
         names.add(option.partition(":")[2])
     return StatePack(
-        npc=npc_id, name=cast["name"], persona=cast["persona"], goal=cast["goal"], situation=situation,
+        npc=npc_id, name=cast["name"], persona=persona_of(w, npc_id), goal=cast["goal"], situation=situation,
         here=[words.who(x, player=words.ABOUT_PLAYER) for x in others],
         drives=dict(npc.drives), trust_in=dict(npc.trust_in),
         beliefs=[{"id": b.id, "claim": _about(b.claim), "conf": b.conf,

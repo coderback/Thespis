@@ -36,6 +36,7 @@ export class Game {
     this.api = api;
     this.map = new MapView($("map"));
     this.inspector = new Inspector();
+    this.inspector.onPersona = (npc, text) => this.editPersona(npc, text);
     this.bar = new Bar({ onAct: (b) => this.act(b), onLine: (id) => this.inspector.openChain(id) });
     this.state = null;
     this.busy = false;
@@ -119,6 +120,16 @@ export class Game {
       const firstTime = !this.state.ledger_tail?.length && !$("hint").hidden;
       this.bar.render(verbs, this.state, { pulse: firstTime ? (v) => v.verb === "insult" && v.target === "kael" : null });
       this.bar.setBusy(this.busy);
+    } catch (e) {
+      this.toast(e.reason || String(e));
+    }
+  }
+
+  async editPersona(npc, text) {
+    try {
+      const r = await this.api.persona(npc, text);
+      this.adopt(await this.api.state());
+      this.toast(r.default ? `${name(npc)} is back to the usual persona` : `${name(npc)} speaks with the new persona from the next line`);
     } catch (e) {
       this.toast(e.reason || String(e));
     }

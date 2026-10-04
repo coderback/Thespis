@@ -12,11 +12,23 @@ export class Inspector {
     this.prev = null;
     this.chainId = null; // the decision whose why-chain is open
     this.highlight = null; // an id to outline in the ledger or beliefs
+    this.editing = null; // the NPC whose persona is being edited (#39)
+    this.onPersona = null; // set by the game: (npc, text) => save it; "" goes back to the default
     for (const b of document.querySelectorAll("#tabs button")) {
       b.addEventListener("click", () => { this.highlight = null; this.show(b.dataset.tab); });
     }
     $("panel").addEventListener("click", (e) => {
       if (e.target.closest("[data-close-chain]")) { this.chainId = null; return this.render(); }
+      const edit = e.target.closest("[data-edit-persona]");
+      if (edit) { this.editing = edit.dataset.editPersona; return this.render(); }
+      if (e.target.closest("[data-cancel-persona]")) { this.editing = null; return this.render(); }
+      const save = e.target.closest("[data-save-persona], [data-reset-persona]");
+      if (save) {
+        const npc = save.dataset.savePersona || save.dataset.resetPersona;
+        const text = save.dataset.savePersona ? $("persona-text").value : "";
+        this.editing = null;
+        return this.onPersona?.(npc, text);
+      }
       const chip = e.target.closest("[data-id]");
       if (chip) return this.follow(chip.dataset.id);
       const card = e.target.closest("[data-decision]");
@@ -90,8 +102,19 @@ export class Inspector {
         return `<div class="drive"><span>trust ${esc(name(who, { lower: true }))}</span><div class="meter trust"><i style="left:${left}%;width:${w}%;background:${t >= 0 ? "var(--good)" : "var(--bad)"}"></i></div><b>${fmtTrust(t)}</b></div>`;
       }).join("");
       const frozen = isFrozen(s, n) ? `<div class="frozen">Detained until the end of phase ${n.frozen_until}</div>` : "";
-      return `<div class="npc"><h4><span class="who ${id}">${name(id)}</span><span class="where">at ${STOP_SHORT[n.loc]}</span></h4>${drives}${trust}${frozen}</div>`;
+      return `<div class="npc"><h4><span class="who ${id}">${name(id)}</span><span class="where">at ${STOP_SHORT[n.loc]}</span></h4>${drives}${trust}${frozen}${this.persona(id, n)}</div>`;
     }).join("");
+  }
+
+  // Live persona editing (#39): the model voices this NPC with the edited persona from its next line.
+  persona(id, n) {
+    if (!n.persona) return "";
+    if (this.editing === id) {
+      return `<div class="persona edit"><textarea id="persona-text" maxlength="300" aria-label="${esc(name(id))}'s persona">${esc(n.persona)}</textarea>
+        <div class="row"><button data-save-persona="${id}">Save</button><button data-reset-persona="${id}">Default</button><button data-cancel-persona>Cancel</button></div></div>`;
+    }
+    const edited = n.persona_edited ? '<span class="edited">edited</span>' : "";
+    return `<div class="persona"><q>${esc(n.persona)}</q> <button class="persona-edit" data-edit-persona="${id}" title="Change the persona the model voices">edit</button>${edited}</div>`;
   }
 
   beliefs() {

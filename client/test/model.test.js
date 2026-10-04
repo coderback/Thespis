@@ -81,3 +81,18 @@ test("the fixture backend plays the whole demo route", async () => {
   assert.equal(s.status, "won");
   await assert.rejects(api.act({ verb: "wait" }), (e) => e.status === 409);
 });
+
+test("the fixture backend keeps a live persona edit (#39)", async () => {
+  const names = ["session_new", ...DEMO_ROUTE.map(([n]) => n)];
+  const api = new FixtureApi(Object.fromEntries(names.map((n) => [n, fx(n)])));
+  await api.newSession();
+  const kael = (s) => s.npcs.find((n) => n.id === "kael");
+  const usual = kael(await api.state()).persona;
+  assert.equal(kael(await api.state()).persona_edited, false);
+  assert.deepEqual(await api.persona("kael", "Speaks only in rhyme."), { npc: "kael", persona: "Speaks only in rhyme.", default: false });
+  assert.equal(kael(await api.state()).persona, "Speaks only in rhyme.");
+  const [, first] = DEMO_ROUTE[0];
+  assert.equal(kael((await api.act(first)).state).persona_edited, true); // kept across actions
+  assert.equal((await api.persona("kael", "")).default, true);
+  assert.equal(kael(await api.state()).persona, usual);
+});

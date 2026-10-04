@@ -148,6 +148,11 @@ class BrainBody(BaseModel):
     mode: Literal["model", "fallback"]
 
 
+class PersonaBody(BaseModel):
+    npc: str
+    persona: str | None = None  # empty or null: back to the persona in cast.toml
+
+
 def _store(request: Request) -> Store:
     return request.app.state.store
 
@@ -271,6 +276,27 @@ def get_calls(request: Request, since: int = 0):
     total = getattr(gateway, "total", 0)
     calls = list(getattr(gateway, "calls", ()))[-(total - since):] if total > since else []
     return {"total": total, "calls": [asdict(c) for c in calls]}
+
+
+@app.post("/dev/persona")
+def post_persona(body: PersonaBody, request: Request, x_session: str | None = Header(default=None)):
+    """Live persona editing (#39): this session's NPC speaks with the new persona from its next model line. Other
+    sessions, and the cache for the default personas, are untouched; an edited persona is a new cache key."""
+    store, session = _store(request), _session(x_session)
+    with _locks[session]:
+        world = _load(store, session)
+        if body.npc not in world.npcs:
+            raise ApiError(400, "bad_request", f"There's no one called {body.npc!r} to edit")
+        text = (body.persona or "").strip()
+        if len(text) > voice.PERSONA_MAX:
+            raise ApiError(400, "bad_request", f"Keep the persona to {voice.PERSONA_MAX} characters")
+        flags = world.npcs[body.npc].flags
+        if text:
+            flags["persona"] = text
+        else:
+            flags.pop("persona", None)
+        store.save(session, world)
+        return {"npc": body.npc, "persona": voice.persona_of(world, body.npc), "default": not text}
 
 
 # Mounted last so API routes win. Present once the client has been built (client/dist/index.html).
