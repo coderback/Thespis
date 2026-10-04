@@ -17,6 +17,7 @@ class FakeModel:
     says a short line citing the first id in its state pack, which is what a well-behaved model does."""
 
     providers = ("fake/model",)
+    models = ("model",)
 
     def __init__(self, reply=None):
         self.reply = reply or self.good
@@ -40,7 +41,7 @@ class FakeModel:
         return [self.complete(*c) for c in calls]
 
 
-def play_demo(model):
+def play_demo(model, **mind):
     w = new_world(1)
     results = []
     for verb, target, extra in [("insult", "kael", {}), ("challenge", "kael", {}), ("humiliate", "kael", {}),
@@ -48,7 +49,7 @@ def play_demo(model):
                                 ("move", None, {}), ("bribe", "brenna", {}), ("bribe", "brenna", {}),
                                 ("tell_claim", "brenna", {"claim": LIE}), ("move", None, {}), ("move", None, {}),
                                 ("take_relic", None, {})]:
-        results.append(rules.act(w, verb, target, gateway=model, **extra))
+        results.append(rules.act(w, verb, target, gateway=model, **extra, **mind))
     return w, results
 
 

@@ -19,7 +19,7 @@ from games.crypt_road import content as C
 from games.crypt_road import voice
 from thespis.brain import Brain, UtilityBrain
 from thespis.decisions import DECIDE, Decision
-from thespis.expression import Mind, Utterance
+from thespis.expression import Mind, ReplyCache, Utterance
 from thespis.gateway import ModelGateway
 from thespis.ledger import Claim, Event
 from thespis.world import LOST, PLAYING, WON, World
@@ -149,15 +149,16 @@ def _check(w: World, verb: str, target: str | None) -> dict:
 # ---------------------------------------------------------------- acting
 def act(w: World, verb: str, target: str | None = None, claim: dict | Claim | None = None,
         amount: int | None = None, text: str | None = None, brain: Brain | None = None,
-        gateway: ModelGateway | None = None) -> ActResult:
+        gateway: ModelGateway | None = None, cache: ReplyCache | None = None, replay: bool = False) -> ActResult:
     """Apply one player verb, the tick it triggers, and the epilogue if the race ends.
 
     With a gateway and the brain switched on, NPCs speak and make their real choices through the model; anything
-    the model gets wrong, or can't answer, falls back to the utility brain and template lines.
+    the model gets wrong, or can't answer, falls back to the utility brain and template lines. A cache answers
+    what has been asked before; with `replay` on, only the cache answers.
     """
     _check(w, verb, target)
     brain = brain or UtilityBrain()
-    mind = Mind(gateway if w.brain_mode == "model" else None, voice.VALIDATOR)
+    mind = Mind(gateway if w.brain_mode == "model" else None, voice.VALIDATOR, cache, replay)
     start = len(w.ledger)
     ends_phase = None  # the tick this verb triggers, if any: "move" or "wait"
     told = None
@@ -402,7 +403,7 @@ def _decide(w: World, mind: Mind, brain: Brain, npc: str, trigger: str, options:
     offered = _offered(options)
     u = mind.decide(voice.pack_for(w, npc, situation, offered, view), fallback) if ask and mind.active else fallback
     base = reason or f"{u.action} scores {options[u.action]}"  # without a reason given, the utility explains it
-    if u.source == "llm" and len(offered) < len(options):
+    if u.source != "fallback" and len(offered) < len(options):
         base += f"; drives offered {', '.join(offered)}"
     w.decisions.record(DECIDE, npc, w.phase, trigger, allowed=list(options), chosen=u.action, line=u.line,
                        cites=u.cites, reason=f"{base}; {u.note}" if u.note else base, source=u.source)

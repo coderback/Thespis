@@ -1,7 +1,8 @@
-"""SQLite persistence: an insert-only ledger table plus one JSON snapshot per session.
+"""SQLite persistence: an insert-only ledger table plus one JSON snapshot per session, and the model reply cache.
 
 A restart loads the snapshot, so a reloaded session is identical to the one that was running. The ledger rows are
-never updated or deleted; a reset starts a new run of the same session instead.
+never updated or deleted; a reset starts a new run of the same session instead. The cache is shared by every
+session, so a route played once is answered from it the next time, on any session, after any restart.
 """
 
 from __future__ import annotations
@@ -26,6 +27,10 @@ CREATE TABLE IF NOT EXISTS ledger (
     session_id TEXT NOT NULL, run INTEGER NOT NULL, seq INTEGER NOT NULL,
     id TEXT NOT NULL, phase INTEGER NOT NULL, event TEXT NOT NULL,
     PRIMARY KEY (session_id, run, seq)
+);
+CREATE TABLE IF NOT EXISTS model_cache (
+    key TEXT PRIMARY KEY, call_type TEXT NOT NULL, reply TEXT NOT NULL, provider TEXT NOT NULL,
+    created_at REAL NOT NULL
 );
 """
 
@@ -118,6 +123,20 @@ class Store:
         if row is None:
             raise SessionNotFound(session_id)
         return row[0]
+
+    # ---------------------------------------------------------------- model reply cache
+    def get_reply(self, key: str) -> tuple[dict, str] | None:
+        row = self._run(lambda db: db.execute("SELECT reply, provider FROM model_cache WHERE key = ?",
+                                              (key,)).fetchone())
+        return (json.loads(row[0]), row[1]) if row else None
+
+    def put_reply(self, key: str, call_type: str, data: dict, provider: str) -> None:
+        """The first reply stored for a key stays, so a replay always says what was said the first time."""
+        self._run(lambda db: db.execute("INSERT OR IGNORE INTO model_cache VALUES (?, ?, ?, ?, ?)",
+                                        (key, call_type, json.dumps(data), provider, time.time())))
+
+    def cached_replies(self) -> int:
+        return self._run(lambda db: db.execute("SELECT COUNT(*) FROM model_cache").fetchone()[0])
 
     # ---------------------------------------------------------------- meta
     def record_boot(self) -> int:

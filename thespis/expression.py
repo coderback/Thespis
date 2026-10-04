@@ -9,13 +9,19 @@ The validator rejects a reply, and the NPC falls back to its code line, when any
   - the line is a non-empty string of at most 160 characters;
   - it cites at least one id, and every cited id is in the state pack;
   - it names no character or place that is absent from the pack.
+
+A reply that passes is cached, keyed by the model, the prompt version, the call type and everything in the pack, so
+the same moment on the same route says the same thing again without a model call. In replay mode the Mind only
+reads the cache: a miss falls back and the network is never touched.
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 from dataclasses import dataclass, field
+from typing import Protocol
 
 from thespis.gateway import ModelGateway
 
@@ -67,6 +73,13 @@ class StatePack:
         return [{"role": "system", "content": prompt.format(name=self.name, persona=self.persona)},
                 {"role": "user", "content": json.dumps(self.payload(), ensure_ascii=False)}]
 
+    def cache_key(self, model: str, kind: str) -> str:
+        """sha256 of the model, the prompt version, the call type and everything the model is shown, canonically."""
+        canonical = json.dumps({"model": model, "prompt_version": PROMPT_VERSION, "call": kind, "name": self.name,
+                                "persona": self.persona, "pack": self.payload()},
+                               sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+        return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
 
 @dataclass(frozen=True)
 class Utterance:
@@ -75,6 +88,16 @@ class Utterance:
     cites: list[str]
     source: str  # "llm", "cache" or "fallback"
     note: str = ""  # why the fallback was used, or which model spoke
+
+
+class ReplyCache(Protocol):
+    def get_reply(self, key: str) -> tuple[dict, str] | None:
+        """The cached reply's JSON and the provider that gave it, or None."""
+        ...
+
+    def put_reply(self, key: str, call_type: str, data: dict, provider: str) -> None:
+        """Keep a reply that passed the validator. The first one stored for a key is never replaced."""
+        ...
 
 
 class Validator:
@@ -113,34 +136,70 @@ class Validator:
 
 
 class Mind:
-    """Asks the model when there is one, and keeps only replies that pass the validator."""
+    """Asks the model when there is one, and keeps only replies that pass the validator.
 
-    def __init__(self, gateway: ModelGateway | None, validator: Validator):
+    With a cache it looks there first, under each configured model in turn, and stores every reply it accepts. With
+    `replay` on it never calls the model: a cache miss falls back.
+    """
+
+    def __init__(self, gateway: ModelGateway | None, validator: Validator, cache: ReplyCache | None = None,
+                 replay: bool = False):
         self.gateway = gateway if gateway is not None and getattr(gateway, "providers", None) else None
         self.validator = validator
+        self.cache = cache
+        self.replay = replay
+        self.models = tuple(getattr(self.gateway, "models", ())) if self.gateway else ()
 
     @property
     def active(self) -> bool:
         return self.gateway is not None
 
     def decide(self, pack: StatePack, fallback: Utterance) -> Utterance:
-        if not self.active:
-            return fallback
-        return self._accept(self.gateway.complete("decide", pack.messages("decide")), pack, "decide", fallback)
+        return self._speak("decide", [(pack, fallback)])[0]
 
     def react_many(self, items: list[tuple[StatePack, Utterance]]) -> list[Utterance]:
-        """Several reply lines at once: the calls run in parallel."""
-        if not self.active or not items:
-            return [fallback for _, fallback in items]
-        replies = self.gateway.complete_many([("react", pack.messages("react")) for pack, _ in items])
-        return [self._accept(r, pack, "react", fallback) for r, (pack, fallback) in zip(replies, items)]
+        """Several reply lines at once: the calls the cache can't answer run in parallel."""
+        return self._speak("react", items)
 
-    def _accept(self, reply, pack: StatePack, kind: str, fallback: Utterance) -> Utterance:
+    def _speak(self, kind: str, items: list[tuple[StatePack, Utterance]]) -> list[Utterance]:
+        if not self.active:
+            return [fallback for _, fallback in items]
+        spoken = [self._cached(pack, kind, fallback) for pack, fallback in items]
+        missing = [i for i, u in enumerate(spoken) if u is None]
+        if self.replay:
+            for i in missing:
+                spoken[i] = _fell_back(items[i][1], "replay: not in the cache")
+            return spoken
+        calls = [(kind, items[i][0].messages(kind)) for i in missing]
+        replies = [self.gateway.complete(*calls[0])] if len(calls) == 1 else self.gateway.complete_many(calls)
+        for i, reply in zip(missing, replies):
+            spoken[i] = self._accept(reply, *items[i], kind)
+        return spoken
+
+    def _cached(self, pack: StatePack, kind: str, fallback: Utterance) -> Utterance | None:
+        if self.cache is None:
+            return None
+        for model in self.models:
+            hit = self.cache.get_reply(pack.cache_key(model, kind))
+            if hit and not self.validator.problem(hit[0], pack, kind):  # one the validator now rejects is a miss
+                return _spoken(hit[0], kind, fallback, "cache", hit[1])
+        return None
+
+    def _accept(self, reply, pack: StatePack, fallback: Utterance, kind: str) -> Utterance:
         if reply is None:
-            return Utterance(fallback.action, fallback.line, fallback.cites, "fallback", "model unavailable")
+            return _fell_back(fallback, "model unavailable")
         problem = self.validator.problem(reply.data, pack, kind)
         if problem:
-            return Utterance(fallback.action, fallback.line, fallback.cites, "fallback", f"model reply rejected: {problem}")
-        action = reply.data.get("action") if kind == "decide" else fallback.action
-        cites = list(dict.fromkeys(reply.data["cites"]))
-        return Utterance(action, reply.data["line"].strip(), cites, "llm", reply.provider)
+            return _fell_back(fallback, f"model reply rejected: {problem}")
+        if self.cache is not None:
+            self.cache.put_reply(pack.cache_key(reply.model, kind), kind, reply.data, reply.provider)
+        return _spoken(reply.data, kind, fallback, "llm", reply.provider)
+
+
+def _spoken(data: dict, kind: str, fallback: Utterance, source: str, provider: str) -> Utterance:
+    action = data.get("action") if kind == "decide" else fallback.action
+    return Utterance(action, data["line"].strip(), list(dict.fromkeys(data["cites"])), source, provider)
+
+
+def _fell_back(fallback: Utterance, why: str) -> Utterance:
+    return Utterance(fallback.action, fallback.line, fallback.cites, "fallback", why)
