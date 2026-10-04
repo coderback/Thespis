@@ -66,6 +66,25 @@ FAULTS = ("model unavailable", "model reply rejected")
 BLOCKED = "model reply rejected: "
 
 
+START, END = "<!-- judged:start -->", "<!-- judged:end -->"  # tools/judge.py's block in results.md
+
+
+def with_block(text: str, judged: str | None) -> str:
+    """`text` with the judged block in it: replacing an old one, or appended."""
+    if not judged:
+        return text
+    if START in text and END in text:
+        before, rest = text.split(START, 1)
+        return before + judged + rest.split(END, 1)[1]
+    return text.rstrip("\n") + "\n\n" + judged + "\n"
+
+
+def existing_block(text: str) -> str | None:
+    if START in text and END in text:
+        return START + text.split(START, 1)[1].split(END, 1)[0] + END
+    return None
+
+
 def percentile(values: list[float], q: float) -> float | None:
     """Nearest-rank percentile; None for no values."""
     if not values:
@@ -297,7 +316,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.out == "-":
         print(text)
     else:
-        Path(args.out).write_text(text, encoding="utf-8", newline="\n")
+        out = Path(args.out)
+        old = out.read_text(encoding="utf-8") if out.exists() else ""
+        out.write_text(with_block(text, existing_block(old)), encoding="utf-8", newline="\n")  # keep #37's numbers
         print(f"wrote {args.out}")
         print("\n".join(text.split("\n")[5:16]))
     return 0 if all(r["outcome"] == EXPECTED[r["route"]] for r in results["rules"]) else 1

@@ -70,3 +70,22 @@ Model pass: the brain on. The model chooses among the actions the NPC's drives r
 | spare | 4 | lost@4 | 3 | 3 / 6 / 1 | 0 | 42 ms |
 | duel_lost | 4 | lost@4 | 3 | 3 / 6 / 1 | 0 | 52 ms |
 | provoke_wait | 4 | lost@4 | 6 | 6 / 3 / 1 | 0 | 941 ms |
+
+<!-- judged:start -->
+## Model-judged (#37)
+
+**Model-judged, not measured:** gpt-5.4-nano read 50 lines by gpt-6-luna, each beside the state pack it was spoken from, on 2026-10-04 10:09 UTC. The lines come from the scripted routes with fresh questions, played in-process with the same code and prompts as the host (prompt version 3), and only lines that passed the validator count, since those are the ones players hear.
+
+| Measure (model-judged) | Value |
+| --- | --- |
+| Lines that state only what the NPC knew | **48 of 50** (96%) |
+| Lines in character | **50 of 50** (100%) |
+| Check on the judge: planted lines it flagged | 9 of 10 |
+
+The planted lines are real lines moved to another NPC's moment, where nothing they cite is in the pack, so a careful judge should flag them. A line can be consistent and still wrong about the world: NPCs may hold false beliefs by design, and this checks only what each NPC knew.
+
+Lines the judge flagged:
+
+- Kael: "The relic is mine. You were too slow." (not consistent: He claims the relic is his and that the player was too slow, but the state pack only says the player took the relic, not that it was Kael’s by right or that he lost a race.)
+- Odo: "I haven't seen the Captain, I'm afraid. Let's keep things civil here, eh?" (not consistent: It claims he hasn't seen the Captain, which isn't supported by his state pack (he only knows about the player insulting Kael).)
+<!-- judged:end -->
