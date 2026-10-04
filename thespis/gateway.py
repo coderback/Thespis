@@ -10,7 +10,8 @@ Azure OpenAI and Azure AI Foundry work too: their hosts get the `api-key` header
 e.g. {"max_tokens": null, "max_completion_tokens": 300} for a model that refuses max_tokens.
 
 A provider that answers 401, 402 or 403 (a dead key or no credit) is skipped for 10 minutes, and one that answers
-429 for 30 seconds, so later calls go straight to the backup. Every call is logged in `calls` for the harness.
+429 for 30 seconds, so later calls go straight to the backup. Every call is logged in `calls` for the harness, with
+its latency and token usage; `total` counts every call ever made, so the harness can ask for just the new ones.
 """
 
 from __future__ import annotations
@@ -79,6 +80,8 @@ class CallRecord:
     ok: bool
     latency: float
     error: str | None = None
+    prompt_tokens: int | None = None  # from the reply's usage, when the provider reports it
+    completion_tokens: int | None = None
 
 
 class ModelGateway(Protocol):
@@ -99,6 +102,7 @@ class NoModel:
     providers: tuple = ()
     models: tuple = ()
     calls: deque = deque(maxlen=0)
+    total: int = 0
 
     def complete(self, call_type: str, messages: list[dict]) -> ModelReply | None:
         return None
@@ -127,6 +131,7 @@ class OpenAICompatGateway:
                  transport: httpx.BaseTransport | None = None, clock: Callable[[], float] = time.monotonic):
         self.providers = list(providers)
         self.calls: deque[CallRecord] = deque(maxlen=1000)
+        self.total = 0  # calls ever made; `calls` keeps only the latest 1000
         self._client = httpx.Client(timeout=httpx.Timeout(timeout - CONNECT_TIMEOUT, connect=CONNECT_TIMEOUT),
                                     transport=transport)
         self._clock = clock
@@ -160,12 +165,14 @@ class OpenAICompatGateway:
 
     def _call(self, p: Provider, call_type: str, messages: list[dict]) -> ModelReply | None:
         started = time.perf_counter()
-        reply, error = None, None
+        reply, error, usage = None, None, {}
         try:
             with self._slots:
                 r = self._client.post(p.url(), json=p.body(messages), headers=p.headers())
             if r.status_code == 200:
-                data = parse_json(r.json()["choices"][0]["message"]["content"])
+                body = r.json()
+                usage = body.get("usage") or {}
+                data = parse_json(body["choices"][0]["message"]["content"])
                 reply = ModelReply(data, p.name, p.model, time.perf_counter() - started)
             else:
                 error = f"HTTP {r.status_code}"
@@ -176,7 +183,11 @@ class OpenAICompatGateway:
             error = "timeout"
         except (httpx.HTTPError, KeyError, IndexError, TypeError, ValueError) as e:
             error = f"{type(e).__name__}: {e}"[:200]
-        self.calls.append(CallRecord(call_type, p.name, reply is not None, time.perf_counter() - started, error))
+        record = CallRecord(call_type, p.name, reply is not None, time.perf_counter() - started, error,
+                            usage.get("prompt_tokens"), usage.get("completion_tokens"))
+        with self._lock:
+            self.calls.append(record)
+            self.total += 1
         return reply
 
 

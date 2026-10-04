@@ -9,6 +9,7 @@ import os
 import threading
 from collections import defaultdict
 from contextlib import asynccontextmanager
+from dataclasses import asdict
 from pathlib import Path
 from typing import Literal
 
@@ -189,6 +190,16 @@ def post_brain(body: BrainBody, request: Request, x_session: str | None = Header
         world.brain_mode = body.mode
         store.save(session, world)
         return {"mode": world.brain_mode}
+
+
+@app.get("/dev/calls")
+def get_calls(request: Request, since: int = 0):
+    """The model calls made since `since` (the `total` of an earlier answer), with latency and tokens, for the harness.
+    Across every session, and at most the latest 1000."""
+    gateway = request.app.state.gateway
+    total = getattr(gateway, "total", 0)
+    calls = list(getattr(gateway, "calls", ()))[-(total - since):] if total > since else []
+    return {"total": total, "calls": [asdict(c) for c in calls]}
 
 
 # Mounted last so API routes win. Present once the client has been built (client/dist/index.html).
