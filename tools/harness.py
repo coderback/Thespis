@@ -1,6 +1,6 @@
 """The harness (the seed of Thespis Rehearsal): play every scripted route on a host and measure what the claims rest on.
 
-    python tools/harness.py https://thespis-production.up.railway.app    # seeds 1 2 3, writes results.md
+    python tools/harness.py https://thespis-production.up.railway.app    # seeds 1 and 4, writes results.md
     python tools/harness.py http://localhost:8000 --seeds 1 --out -       # print the report instead
 
 Two passes over the routes in tools/routes.py, the same ones the acceptance test plays (#11):
@@ -8,6 +8,11 @@ Two passes over the routes in tools/routes.py, the same ones the acceptance test
   2. Model: each route on each seed with the brain on. Every run records its /act round trips, every NPC decision and
      line, the replies the validator blocked, and the host's own log of the model calls it caused (GET /dev/calls):
      latency and tokens.
+
+The seed only changes the duel dice, so the default seeds are 1 (the duel is won) and 4 (it is lost); others repeat
+one of these exactly and the cache answers them. So that every run also asks the model something new, in each model
+run the player puts a question of its own to everyone nearby, right after the first action. Talking changes nothing
+in the world, so outcomes are unaffected.
 
 The call log covers every session on the host, so run this when nobody else is playing. Exits 1 if a rules-pass
 outcome differs from the rules model.
@@ -17,6 +22,7 @@ from __future__ import annotations
 
 import argparse
 import math
+import random
 import subprocess
 import sys
 import time
@@ -30,6 +36,25 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from games.crypt_road.content import DEMO_SEED  # noqa: E402
 from tools.routes import EXPECTED, ROUTES, ApiError, Session, outcome, play, seed_for  # noqa: E402
+
+QUESTIONS = [  # with OPENERS, a fresh question per model run, so its lines are new to the cache even on a rerun
+    "What brings you to the tavern tonight?", "Have you heard anything about the relic?", "Who here would you trust?",
+    "Is the road east safe after dark?", "What do you make of Kael?", "Seen the Captain lately?",
+    "Anything worth buying at the market?", "Why does everyone want that relic?", "Who keeps the gate these days?",
+    "Do you know the way to the crypt?", "What would you do with the relic?", "Who's the most honest soul here?",
+    "Any trouble on the bridge lately?", "What's the word on the road?", "Do you owe anyone money?",
+    "Who started the last fight in here?", "Would you lie to the Captain?", "What happens to thieves around here?",
+    "Who tells the best stories?", "Ever been inside the crypt?", "Is the Captain fair?",
+    "What's Kael after, really?", "Who would you never cross?", "How long have you been on this road?",
+]
+OPENERS = ["", "Tell me honestly, ", "Quietly now, ", "Friend, ", "One question: ", "Before I go, ", "Between us, ",
+           "Be straight with me: "]
+
+
+def fresh_questions(n: int, rng: random.Random) -> list[str]:
+    combos = [(o, q) for o in OPENERS for q in QUESTIONS]
+    rng.shuffle(combos)
+    return [o + q[0].lower() + q[1:] if o else q for o, q in combos[:n]]
 
 ROOT = Path(__file__).resolve().parents[1]
 # US$ per 1M tokens (input, output), standard tier. OpenAI's list prices as reported on 22 Sep 2026; Azure's own page
@@ -65,9 +90,31 @@ def call_total(client) -> int:
     return client.get("/dev/calls", params={"since": 10**12}).json()["total"]
 
 
-def run_route(client, name: str, seed: int, brain: str) -> dict:
+class MeteredSession(Session):
+    """A session that notes how many model calls each /act caused, from the host's call log. Given a question, it
+    asks everyone the player may talk to, once, as soon as there is something in the ledger to talk about."""
+
+    def __init__(self, client, question: str | None = None):
+        super().__init__(client)
+        self.made: list[int] = []
+        self.question = question
+
+    def act(self, verb, target=None, **fields):
+        before = call_total(self.client)
+        result = super().act(verb, target, **fields)
+        self.made.append(call_total(self.client) - before)
+        state = result["state"]
+        if self.question and state["ledger_tail"] and state["status"] == "playing":
+            question, self.question = self.question, None
+            for (v, npc), option in self.allowed().items():
+                if v == "talk" and option["enabled"]:
+                    self.act("talk", npc, text=question)
+        return result
+
+
+def run_route(client, name: str, seed: int, brain: str, question: str | None = None) -> dict:
     before = call_total(client)
-    s = Session(client)
+    s = MeteredSession(client, question)
     s.start(seed_for(name, seed), brain)
     started = time.perf_counter()
     try:
@@ -83,7 +130,9 @@ def run_route(client, name: str, seed: int, brain: str) -> dict:
         d["source"] != "fallback" or any(f in d["reason"] for f in FAULTS))]
     return {
         "route": name, "seed": seed_for(name, seed), "brain": brain, "outcome": outcome(state), "error": error,
-        "seconds": elapsed, "acts": s.timings, "phases": state["phase"], "npcs": len(state["npcs"]),
+        "seconds": elapsed, "acts": s.timings, "made": s.made, "phases": state["phase"], "npcs": len(state["npcs"]),
+        "cached": sum(d["source"] == "cache" for d in decisions),
+        "talked": sum(d["trigger"] == "talk" for d in decisions),
         "asked": len(asked), "decides": sum(d["kind"] == "decide" for d in decisions),
         "lines": Counter(d["source"] for d in decisions if d["line"]),
         "blocked": [why_blocked(d["reason"]) for d in decisions if BLOCKED in d["reason"]],
@@ -93,9 +142,11 @@ def run_route(client, name: str, seed: int, brain: str) -> dict:
     }
 
 
-def measure(client, seeds: list[int]) -> dict:
+def measure(client, seeds: list[int], rng: random.Random | None = None) -> dict:
     rules = [run_route(client, name, DEMO_SEED, "fallback") for name in ROUTES]
-    model = [run_route(client, name, seed, "model") for seed in seeds for name in ROUTES]
+    runs = [(name, seed) for seed in seeds for name in ROUTES]
+    questions = fresh_questions(len(runs), rng or random.Random())
+    model = [run_route(client, name, seed, "model", q) for (name, seed), q in zip(runs, questions)]
     return {"rules": rules, "model": model, "seeds": seeds}
 
 
@@ -118,6 +169,9 @@ def summarise(results: dict) -> dict:
         t[0] += c["prompt_tokens"] or 0
         t[1] += c["completion_tokens"] or 0
     cost = sum(PRICES[m][0] * t[0] / 1e6 + PRICES[m][1] * t[1] / 1e6 for m, t in tokens.items() if m in PRICES)
+    per_call = cost / len(ok) if ok else 0.0
+    live_calls = len(calls) + sum(r["cached"] for r in runs)  # each cached answer is a call the cache saved
+    timed = [(t, m) for r in runs for t, m in zip(r["acts"], r["made"])]
     turns = sum(r["phases"] * r["npcs"] for r in runs)
     asked = sum(r["asked"] for r in runs)
     blocked = Counter(b for r in runs for b in r["blocked"])
@@ -127,6 +181,11 @@ def summarise(results: dict) -> dict:
         "runs": len(runs), "calls": len(calls), "ok": len(ok), "failed": Counter(c["error"] for c in calls if not c["ok"]),
         "by_model": Counter(_model(c["provider"]) for c in ok), "tokens": tokens, "cost": cost,
         "cost_per_run": cost / len(runs) if runs else 0.0, "calls_per_run": len(calls) / len(runs) if runs else 0.0,
+        "live_per_run": live_calls / len(runs) if runs else 0.0,
+        "live_cost_per_run": per_call * live_calls / len(runs) if runs else 0.0,
+        "with_call_p50": percentile([t for t, m in timed if m], 50), "with_call_p95": percentile([t for t, m in timed if m], 95),
+        "no_call_p50": percentile([t for t, m in timed if not m], 50), "no_call_p95": percentile([t for t, m in timed if not m], 95),
+        "with_call": sum(1 for _, m in timed if m), "no_call": sum(1 for _, m in timed if not m),
         "turns": turns, "asked": asked, "code_only": (turns - asked) / turns if turns else 0.0,
         "blocked": blocked, "blocked_total": sum(blocked.values()), "answered": len(ok),
         "unavailable": sum(r["unavailable"] for r in runs), "lines": lines,
@@ -157,9 +216,14 @@ def report(results: dict, host: str, commit: str) -> str:
         f"| Invalid model replies blocked by the validator | **{s['blocked_total']}** of {s['answered']} replies |",
         f"| Model call latency, p50 / p95 (on the host) | **{_ms(s['call_p50'])} / {_ms(s['call_p95'])}** "
         f"(max {_ms(s['call_max'])}, {s['ok']} calls) |",
-        f"| `/act` round trip, p50 / p95 (from the harness) | **{_ms(s['act_p50'])} / {_ms(s['act_p95'])}** "
-        f"({s['acts']} actions) |",
-        f"| Cost per run | **${s['cost_per_run']:.5f}** ({s['calls_per_run']:.1f} model calls per run) |",
+        f"| `/act` round trip when it calls the model, p50 / p95 | **{_ms(s['with_call_p50'])} / "
+        f"{_ms(s['with_call_p95'])}** ({s['with_call']} actions) |",
+        f"| `/act` round trip with no model call, p50 / p95 | **{_ms(s['no_call_p50'])} / {_ms(s['no_call_p95'])}** "
+        f"({s['no_call']} actions) |",
+        f"| Cost per run, every call to the model | **${s['live_cost_per_run']:.5f}** "
+        f"({s['live_per_run']:.1f} calls per run) |",
+        f"| Cost per run as played, with the cache | **${s['cost_per_run']:.5f}** "
+        f"({s['calls_per_run']:.1f} calls per run) |",
         f"| Rules routes matching the rules model | **{sum(r['outcome'] == EXPECTED[r['route']] for r in results['rules'])}"
         f" of {len(results['rules'])}** |",
         "",
@@ -172,10 +236,12 @@ def report(results: dict, host: str, commit: str) -> str:
         "instead. Out of every reply the model returned.",
         "- **Model call latency:** each call's time inside the host's gateway, from its own log (`GET /dev/calls`), "
         "successful calls only.",
-        "- **`/act` round trip:** the time for the harness, over the internet, to get each `/act` answer. That's what a "
-        "player waits, including any model calls the action caused.",
-        f"- **Cost:** tokens from each call's reported usage, priced at {PRICE_SOURCE}. Lines served from the cache cost "
-        "nothing and aren't counted as calls.",
+        "- **`/act` round trip:** the time for the harness, over the internet, to get each `/act` answer: what a player "
+        "waits. Split by whether the action caused a model call, from the call log's count before and after it.",
+        f"- **Cost:** tokens from each call's reported usage, priced at {PRICE_SOURCE}. \"Every call to the model\" "
+        "prices each answer the cache gave as one more call at the measured average; \"as played\" is what was spent.",
+        "- **Model runs:** right after the first action, the player asks everyone nearby a question of its own, so "
+        "every run makes new model calls. Talking changes nothing in the world.",
         "",
         "## Where lines came from (model pass)",
         "",
@@ -221,7 +287,7 @@ def report(results: dict, host: str, commit: str) -> str:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("host")
-    parser.add_argument("--seeds", type=int, nargs="+", default=[1, 2, 3])
+    parser.add_argument("--seeds", type=int, nargs="+", default=[1, 4])
     parser.add_argument("--out", default=str(ROOT / "results.md"), help="where to write the report; - to print it")
     args = parser.parse_args(argv)
     commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True, cwd=ROOT).stdout.strip()
