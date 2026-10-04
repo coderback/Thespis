@@ -1,6 +1,7 @@
 """The hosted app: /health answers, and the database it writes survives a restart."""
 
 import sqlite3
+from pathlib import Path
 
 from fastapi.testclient import TestClient
 
@@ -21,6 +22,19 @@ def test_boot_count_persists_across_restarts(tmp_path, monkeypatch):
         with TestClient(app_module.app):  # each start-up runs the lifespan, which records a boot
             pass
     assert Store(db).record_boot() == 4  # three app starts, then this call
+
+
+def test_the_database_stays_on_the_volume(tmp_path, monkeypatch):
+    """A DB_PATH off the attached volume (e.g. ./data copied from .env.example) would lose everything on a deploy."""
+    volume = tmp_path / "volume"
+    monkeypatch.setenv("RAILWAY_VOLUME_MOUNT_PATH", str(volume))
+    monkeypatch.setenv("DB_PATH", "./data/thespis.sqlite")
+    assert app_module.db_path() == volume / "thespis.sqlite"
+    monkeypatch.setenv("DB_PATH", str(volume / "other.sqlite"))
+    assert app_module.db_path() == volume / "other.sqlite"  # on the volume: kept
+    monkeypatch.delenv("RAILWAY_VOLUME_MOUNT_PATH")
+    monkeypatch.setenv("DB_PATH", "./data/thespis.sqlite")
+    assert app_module.db_path() == Path("./data/thespis.sqlite")  # no volume, e.g. locally: as given
 
 
 def test_boot_count_carries_over_from_the_first_deploy(tmp_path):

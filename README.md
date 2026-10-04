@@ -55,7 +55,8 @@ One Docker image serves the engine API and the built client from the same URL (`
 Railway, which rebuilds and redeploys every merge to `main`, so the hosted URL always matches `main`.
 
 - **Settings:** `railway.toml` sets the Dockerfile build, a `/health` check and one replica.
-- **Volume:** mounted at `/data`. The SQLite database is `DB_PATH=/data/thespis.sqlite`.
+- **Volume:** mounted at `/data`. The SQLite database is `/data/thespis.sqlite`, set by the image. Don't set
+  `DB_PATH` on Railway: with a volume attached, the app ignores any path off it, and logs a warning.
 - **Model keys:** set as Railway variables, never in the repo.
 - **Model cache:** every validated model reply is kept in the database, so playing the demo route twice on
   the host warms it. `REPLAY=1` then plays from the cache and the fallback alone, with no model calls, which
