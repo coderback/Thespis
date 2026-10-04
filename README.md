@@ -61,7 +61,8 @@ flowchart LR
 - **The tick:** each phase, the player acts; the Captain and Kael decide; gossips pass on what they believe; everyone
   moves; fear fades. NPCs decide on where everyone stood when the phase began.
 - **Core and adapter:** `thespis/` knows nothing about this game; `games/crypt_road/` is one adapter on it. A test
-  fails if the core ever imports from a game.
+  fails if the core ever imports from a game. [examples/minimal_client.py](examples/minimal_client.py) uses the core
+  alone, in about 30 lines.
 - **Persistence:** SQLite, an insert-only ledger table plus a snapshot per session, so a restart loses nothing.
 
 ## Numbers
@@ -122,6 +123,7 @@ To work on the client with hot reload, run `npm run dev` in `client/` next to th
 
 | Command | What it does |
 | --- | --- |
+| `python examples/minimal_client.py` | The core alone, no game: a ledger, a belief, allowed actions, and a cited line from the model or the fallback |
 | `python tools/crypt_road_sim.py` | The reference rules model: route outcomes and the demo-route acceptance test |
 | `python tools/harness.py <host>` | Plays every route on a host and writes `results.md` |
 | `python tools/warm_cache.py <host>` | Plays the client's autoplay route until the cache answers it all |
