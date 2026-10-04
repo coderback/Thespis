@@ -139,6 +139,18 @@ class Store:
         return self._run(lambda db: db.execute("SELECT COUNT(*) FROM model_cache").fetchone()[0])
 
     # ---------------------------------------------------------------- meta
+    def count_calls(self, n: int) -> int:
+        """Add n to the model calls made across every session, and return the new total. Survives restarts."""
+        def add(db):
+            db.execute("INSERT OR IGNORE INTO meta VALUES ('model_calls', '0')")
+            db.execute("UPDATE meta SET value = CAST(value AS INTEGER) + ? WHERE key = 'model_calls'", (n,))
+            return int(db.execute("SELECT value FROM meta WHERE key = 'model_calls'").fetchone()[0])
+        return self._run(add)
+
+    def calls_made(self) -> int:
+        row = self._run(lambda db: db.execute("SELECT value FROM meta WHERE key = 'model_calls'").fetchone())
+        return int(row[0]) if row else 0
+
     def record_boot(self) -> int:
         """Count server starts. On the host, a count that keeps rising across redeploys proves the volume persists."""
         def bump(db):

@@ -140,15 +140,18 @@ class Mind:
     """Asks the model when there is one, and keeps only replies that pass the validator.
 
     With a cache it looks there first, under each configured model in turn, and stores every reply it accepts. With
-    `replay` on it never calls the model: a cache miss falls back.
+    `replay` on it never calls the model: a cache miss falls back. With a `budget`, it makes at most that many model
+    calls and falls back once they're spent; cache hits are free. `asked` counts the calls it made.
     """
 
     def __init__(self, gateway: ModelGateway | None, validator: Validator, cache: ReplyCache | None = None,
-                 replay: bool = False):
+                 replay: bool = False, budget: int | None = None):
         self.gateway = gateway if gateway is not None and getattr(gateway, "providers", None) else None
         self.validator = validator
         self.cache = cache
         self.replay = replay
+        self.budget = budget
+        self.asked = 0
         self.models = tuple(getattr(self.gateway, "models", ())) if self.gateway else ()
 
     @property
@@ -171,7 +174,15 @@ class Mind:
             for i in missing:
                 spoken[i] = _fell_back(items[i][1], "replay: not in the cache")
             return spoken
+        if self.budget is not None:
+            allowed = max(0, self.budget - self.asked)
+            for i in missing[allowed:]:
+                spoken[i] = _fell_back(items[i][1], "model call cap reached")
+            missing = missing[:allowed]
+        if not missing:
+            return spoken
         calls = [(kind, items[i][0].messages(kind)) for i in missing]
+        self.asked += len(calls)
         replies = [self.gateway.complete(*calls[0])] if len(calls) == 1 else self.gateway.complete_many(calls)
         for i, reply in zip(missing, replies):
             spoken[i] = self._accept(reply, *items[i], kind)

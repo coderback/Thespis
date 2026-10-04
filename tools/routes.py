@@ -39,6 +39,22 @@ class ApiError(RuntimeError):
     pass
 
 
+_pool: dict[tuple[int, int], str] = {}  # (client, seed) -> a session the tools reset rather than open anew
+
+
+def fresh_session(client, seed: int) -> str:
+    """A session at the start of the race on `seed`. The tools reuse one per seed, resetting it, so a harness run
+    doesn't use up the host's limit of new sessions per IP (#24)."""
+    key = (id(client), seed)
+    if key in _pool and client.post("/reset", headers={"X-Session": _pool[key]}).status_code == 200:
+        return _pool[key]
+    r = client.post("/session", json={"seed": seed})
+    if r.status_code != 200:
+        raise ApiError(f"POST /session: {r.status_code} {r.text}")
+    _pool[key] = r.json()["session"]
+    return _pool[key]
+
+
 class Session:
     """One session over an httpx.Client or a TestClient. Every /act's round-trip time is kept in `timings`."""
 
@@ -48,10 +64,9 @@ class Session:
         self.timings: list[float] = []
 
     def start(self, seed: int = C.DEMO_SEED, brain: str = "fallback") -> dict:
-        state = self._check(self.client.post("/session", json={"seed": seed}))
-        self.session = state["session"]
+        self.session = fresh_session(self.client, seed)
         self.post("/dev/brain", {"mode": brain})
-        return state["state"]
+        return self.state()
 
     def get(self, path: str) -> dict:
         return self._check(self.client.get(path, headers={"X-Session": self.session}))

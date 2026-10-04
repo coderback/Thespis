@@ -19,8 +19,13 @@ import argparse
 import sys
 import time
 from collections import Counter
+from pathlib import Path
 
 import httpx
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from tools.routes import fresh_session  # noqa: E402
 
 DEMO_SEED = 1
 # client/src/autoplay.js's steps, in order. tests/test_warm_cache.py fails if the two drift apart.
@@ -49,9 +54,7 @@ def model_calls(decisions: list[dict]) -> int:
 
 def play(client) -> dict:
     """One run of the route on a new session. `client` is an httpx.Client, or a TestClient, for the host."""
-    r = client.post("/session", json={"seed": DEMO_SEED})
-    r.raise_for_status()
-    headers = {"X-Session": r.json()["session"]}
+    headers = {"X-Session": fresh_session(client, DEMO_SEED)}
     started = time.perf_counter()
     for step in ROUTE:
         client.post("/act", json=step, headers=headers).raise_for_status()

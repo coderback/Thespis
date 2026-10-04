@@ -159,6 +159,9 @@ which rebuilds and redeploys every merge to `main`.
 - **Volume:** mounted at `/data`. The database is `/data/thespis.sqlite`, set by the image. Don't set `DB_PATH` on
   Railway: with a volume attached, the app ignores any path off it and logs a warning.
 - **Model keys:** Railway variables, never in the repo.
+- **Caps:** `SESSION_CALL_CAP` (default 60) and `GLOBAL_CALL_CAP` (default 0, no cap) bound model calls; cache
+  hits are free, and past a cap NPCs fall back to code and the game plays on. `SESSIONS_PER_IP_HOUR` (default
+  30) limits new games per IP. The boot log shows the caps and the calls made so far.
 - **Model cache:** playing the demo route on the host warms it (`tools/warm_cache.py`). Re-warm after any change to a
   prompt, a persona or the state pack. `REPLAY=1` then plays from the cache and the fallback alone. The boot log
   shows `model cache: N replies`.
