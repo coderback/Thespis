@@ -205,3 +205,11 @@ def test_a_reply_may_name_whoever_the_player_mentioned():
     reply = {"line": "The Captain? Fair enough, if you pay your fines.", "cites": [asked.events[-1]["id"]]}
     assert voice.VALIDATOR.problem(reply, asked, "react") is None
     assert "brenna" in voice.VALIDATOR.problem(reply, unasked, "react")
+
+
+def test_the_witness_knows_who_is_asking():
+    """#70: Odo was told only "The Captain asks", so he called her Brenna as if she weren't there."""
+    model = FakeModel()
+    play_demo(model)
+    testify = next(p for c, p in model.calls if c == "react" and p["you"] == "Odo" and "never happened" in p["situation"])
+    assert testify["situation"].startswith("Captain Brenna asks you whether")

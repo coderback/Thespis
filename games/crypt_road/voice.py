@@ -266,7 +266,7 @@ def testimony(w: World, mind: Mind, witness: str, claim: Claim, event: Event) ->
     """The witness's own words when the guard questions them; recorded inside the tick."""
     deliver(w, mind, [Speech(witness, "testify",
                              line(witness, "testify", [event.id], culprit=C.short_name(claim.a)),
-                             f"The Captain asks whether {_about(claim)}. You know it never happened.")])
+                             f"Captain Brenna asks you whether {_about(claim)}. You know it never happened.")])
 
 
 # ---------------------------------------------------------------- lines when a new phase starts
