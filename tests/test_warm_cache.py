@@ -42,4 +42,18 @@ def test_a_warm_run_makes_no_model_calls(tmp_path, monkeypatch):
         second = warm_cache.play(client)
     assert first["outcome"] == second["outcome"] == "won@5"
     assert first["calls"] == calls > 0 and second["calls"] == 0 and len(model.calls) == calls
-    assert second["said"] == first["said"] and set(second["sources"]) == {"cache"}
+    assert second["said"] == first["said"] and set(second["sources"]) == {"cache"} and second["misses"] == 0
+
+
+def test_an_empty_cache_under_replay_is_not_warm(tmp_path, monkeypatch):
+    """Under REPLAY=1 a miss falls back without a call: free and repeatable, but not warm."""
+    from fastapi.testclient import TestClient
+
+    from games.crypt_road.app import app
+    from tests.test_cache import Offline
+    monkeypatch.setenv("DB_PATH", str(tmp_path / "t.sqlite"))
+    monkeypatch.setenv("REPLAY", "1")
+    with TestClient(app) as client:
+        app.state.gateway = Offline()
+        run = warm_cache.play(client)
+    assert run["calls"] == 0 and run["misses"] > 0
