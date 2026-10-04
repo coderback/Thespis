@@ -18,6 +18,7 @@ Changing anything here? Update `fixtures/` in the same PR and get the other pers
 | `POST /reset` | `{state}` | Wipes this session, keeps the seed |
 | `POST /reload` | `{state}` | Rebuilds this session from disk (dev panel) |
 | `POST /dev/brain` `{mode: "model" or "fallback"}` | `{mode}` | The "brain off" toggle |
+| `GET /dev/calls?since=<total>` | `{total, calls: [{call_type, provider, ok, latency, error, prompt_tokens, completion_tokens}]}` | The model calls made since an earlier `total`, across all sessions. For the harness (#25); the client doesn't need it |
 | `GET /health` | `{ok: true}` | For the host |
 
 Errors: a malformed body returns `400`, and a verb that `/allowed` lists as disabled (or doesn't list) returns `409`.

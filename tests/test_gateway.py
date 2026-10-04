@@ -183,3 +183,33 @@ def test_api_version_from_the_environment():
     g = gateway_from_env({"LLM_BASE_URL": "https://r.openai.azure.com/openai/deployments/d", "LLM_API_KEY": "k",
                           "LLM_MODEL": "d", "LLM_API_VERSION": "2024-10-21"})
     assert g.providers[0].api_version == "2024-10-21" and g.providers[0].azure
+
+
+def with_usage(request):
+    return httpx.Response(200, json={"choices": [{"message": {"content": '{"line": "Hm.", "cites": ["e0001"]}'}}],
+                                     "usage": {"prompt_tokens": 812, "completion_tokens": 21}})
+
+
+def test_calls_are_logged_with_their_tokens_and_counted():
+    g = gateway(FakeProviders(primary=with_usage))
+    g.complete("decide", MESSAGES)
+    g.complete("react", MESSAGES)
+    assert g.total == 2 and len(g.calls) == 2
+    assert (g.calls[-1].call_type, g.calls[-1].prompt_tokens, g.calls[-1].completion_tokens) == ("react", 812, 21)
+
+
+def test_dev_calls_returns_only_the_calls_since_a_total(tmp_path, monkeypatch):
+    """#25's harness reads the host's call log: latency and tokens for just the calls its run made."""
+    from fastapi.testclient import TestClient
+
+    from games.crypt_road.app import app
+    monkeypatch.setenv("DB_PATH", str(tmp_path / "t.sqlite"))
+    with TestClient(app) as client:
+        g = app.state.gateway = gateway(FakeProviders(primary=with_usage))
+        assert client.get("/dev/calls").json() == {"total": 0, "calls": []}
+        g.complete("decide", MESSAGES)
+        g.complete("react", MESSAGES)
+        r = client.get("/dev/calls", params={"since": 1}).json()
+        assert r["total"] == 2 and [c["call_type"] for c in r["calls"]] == ["react"]
+        assert (r["calls"][0]["provider"], r["calls"][0]["ok"], r["calls"][0]["prompt_tokens"]) == ("primary", True, 812)
+        assert client.get("/dev/calls", params={"since": 2}).json()["calls"] == []

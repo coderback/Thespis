@@ -1,21 +1,11 @@
 """The reference rules model must keep matching the design doc.
 
-If you change a rule on purpose, update tools/crypt_road_sim.py, these
-expectations and the design doc together, in one PR.
+If you change a rule on purpose, update tools/crypt_road_sim.py, the
+expectations in tools/routes.py and the design doc together, in one PR.
 """
 
 from tools import crypt_road_sim as sim
-
-EXPECTED = {
-    "rush": "won@4",
-    "provoke_pay": "won@5",
-    "provoke_no_pay": "lost@5",
-    "frame": "won@5",
-    "lie_unpaid": "lost@5",
-    "spare": "won@5",
-    "duel_lost": "lost@4",
-    "provoke_wait": "lost@5",
-}
+from tools.routes import EXPECTED  # the outcomes the API is held to as well
 
 
 def test_demo_route_acceptance():

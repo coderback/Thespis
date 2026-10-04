@@ -15,45 +15,14 @@ import httpx
 import pytest
 
 from games.crypt_road import content as C
-from tests.test_rules_model import EXPECTED
+from tools.routes import EXPECTED, ROUTES, Session, outcome, play, seed_for
 
 HOST = os.environ.get("DEMO_HOST")
 ROBBED = {"pred": "robbed", "a": "player", "b": "kael"}
 LIE = {"pred": "robbed", "a": "kael", "b": "odo"}
 
 
-class Api:
-    """A thin client for one session, over either the in-process app or a live host."""
-
-    def __init__(self, client):
-        self.client = client
-        self.session = None
-
-    def start(self, seed=C.DEMO_SEED):
-        r = self.client.post("/session", json={"seed": seed})
-        assert r.status_code == 200, r.text
-        self.session = r.json()["session"]
-        assert self.post("/dev/brain", {"mode": "fallback"})["mode"] == "fallback"  # the model off, as in CI
-        return r.json()["state"]
-
-    def get(self, path):
-        r = self.client.get(path, headers={"X-Session": self.session})
-        assert r.status_code == 200, r.text
-        return r.json()
-
-    def post(self, path, body=None):
-        r = self.client.post(path, json=body or {}, headers={"X-Session": self.session})
-        assert r.status_code == 200, (path, body, r.text)
-        return r.json()
-
-    def act(self, verb, target=None, **fields):
-        return self.post("/act", {"verb": verb, "target": target, **fields})
-
-    def state(self):
-        return self.get("/state")
-
-    def allowed(self):
-        return {(v["verb"], v["target"]): v for v in self.get("/allowed")["verbs"]}
+Api = Session  # a thin client for one session, over either the in-process app or a live host
 
 
 @pytest.fixture
@@ -179,62 +148,9 @@ def test_demo_route(api, db):
     check_every_run(s)
 
 
-def _advance(api):
-    """Head for the crypt: take the relic on arrival, move when the gate allows, otherwise wait."""
-    for _ in range(20):
-        s = api.state()
-        if s["status"] != "playing":
-            return s
-        allowed = api.allowed()
-        if allowed[("take_relic", None)]["enabled"]:
-            api.act("take_relic")
-        else:
-            api.act("move" if allowed[("move", None)]["enabled"] else "wait")
-    return api.state()
-
-
-def _provoke(api):
-    api.act("insult", "kael")
-    if api.act("challenge", "kael")["state"]["pending"] == "duel_won":
-        api.act("humiliate", "kael")
-
-
-def _losing_seed():
-    s = C.DEMO_SEED
-    while C.dice(s, "challenge:1") < C.DUEL_WIN_CHANCE:
-        s += 1
-    return s
-
-
-ROUTES = {
-    "rush": [],
-    "provoke_pay": ["provoke", "move", "move", "pay"],
-    "provoke_no_pay": ["provoke", "move", "move"],
-    "frame": ["provoke", "move", "move", "bribe", "bribe", "lie"],
-    "lie_unpaid": ["provoke", "move", "move", "lie"],
-    "spare": ["insult", "challenge", "spare"],
-    "duel_lost": ["insult", "challenge"],
-    "provoke_wait": ["provoke", "wait", "move", "move", "pay"],
-}
-
-
 @pytest.mark.parametrize("name", list(ROUTES))
 def test_route_outcomes_through_the_api(api, name):
-    api.start(_losing_seed() if name == "duel_lost" else C.DEMO_SEED)
-    for step in ROUTES[name]:
-        if step == "provoke":
-            _provoke(api)
-        elif step == "pay":
-            if npc(api.state(), "brenna")["trust_in"]["player"] < 0:
-                api.act("bribe", "brenna", amount=20)
-        elif step == "lie":
-            api.act("tell_claim", "brenna", claim=LIE)
-        elif step in ("insult", "challenge", "spare", "bribe"):
-            target = "brenna" if step == "bribe" else "kael"
-            if step != "spare" or api.state()["pending"] == "duel_won":
-                api.act(step, target)
-        else:
-            api.act(step)
-    s = _advance(api)
-    assert f"{s['status']}@{s['ended_at']}" == EXPECTED[name]
+    api.start(seed_for(name, C.DEMO_SEED))
+    s = play(api, name)
+    assert outcome(s) == EXPECTED[name]
     check_every_run(s)
