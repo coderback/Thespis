@@ -64,6 +64,11 @@ export class Game {
       for (const d of state.decisions_tail || []) {
         if (d.kind === "react" && d.line) this.bar.line({ decision: d.id, npc: d.npc, line: d.line, source: d.source });
       }
+      // And what the Dungeon Master told you (#69): one telling of the story so far, while the game carries on.
+      if (state.phase > 0) {
+        this.feedWaiting();
+        this.api.digest(0).then((d) => this.feed(d, null, "The story so far")).catch(() => this.feed(null));
+      }
       await this.refreshAllowed();
       if (state.status !== "playing") await this.showEnd(state, null);
     } catch {
@@ -207,12 +212,12 @@ export class Game {
     $("feed").prepend(el);
   }
 
-  feed(d, phase) {
+  feed(d, phase, label = null) {
     $("digest-waiting")?.remove();
     if (!d || !d.text) return;
     const el = document.createElement("div");
     el.className = "digest";
-    const when = `Day ${Math.floor(phase / 4) + 1} · ${["morning", "noon", "evening", "night"][phase % 4]}`;
+    const when = label ?? `Day ${Math.floor(phase / 4) + 1} · ${["morning", "noon", "evening", "night"][phase % 4]}`;
     el.innerHTML = `<div class="when">${when}</div>${esc(d.text)}${d.hook ? `<div class="hook">${esc(d.hook)}</div>` : ""}`;
     $("feed").prepend(el);
   }
