@@ -25,11 +25,12 @@ from typing import Protocol
 
 from thespis.gateway import ModelGateway
 
-PROMPT_VERSION = 2  # part of #18's cache key: bump it whenever the prompts below change
+PROMPT_VERSION = 3  # part of #18's cache key: bump it whenever the prompts below change
 LINE_MAX = 160
 
 _RULES = ("You know only what is listed below. Never state a fact that is not listed.\n"
-          "In \"cites\", list the ids of the beliefs or events your line relies on.\n")
+          "In \"cites\", list the ids of the beliefs or events your line relies on. Always cite at least one: if none "
+          "bears on what you say, cite the most recent event you know.\n")
 DECIDE_PROMPT = ("You are {name}. {persona}\n" + _RULES +
                  "Pick exactly one action id from ALLOWED. Each action's \"pull\" is how strongly your drives push you "
                  "towards it: follow the strongest pull unless your persona clearly says otherwise.\n"
