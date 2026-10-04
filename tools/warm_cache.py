@@ -4,10 +4,10 @@
     python tools/warm_cache.py https://thespis-production.up.railway.app --runs 1   # e.g. after setting REPLAY=1
 
 Each run starts a fresh session on the demo seed with the brain on, and plays the same steps as the client's
-"Watch" button. It reports how many model calls the run made (a line from the model, or a fallback the model
-caused), where every line came from, and whether it said exactly what the run before it said. A warm cache shows
-0 calls and the same lines. Re-run it after any change to what the model is shown: a persona, a prompt, the state
-pack, or the autoplay steps.
+"Watch" button, fetching the Dungeon Master's digests when the client does. It reports how many model calls the run
+made (a line or a digest from the model, or a fallback the model caused), where every line came from, and whether it
+said exactly what the run before it said. A warm cache shows 0 calls and the same lines. Re-run it after any change to
+what the model is shown: a persona, a prompt, the state pack, or the autoplay steps.
 
 Exits 1 unless the last run made no model calls, missed the cache nowhere (under REPLAY=1 a miss falls back without
 a call, so it looks free), won on phase 5, and said what the run before it said.
@@ -55,19 +55,34 @@ def model_calls(decisions: list[dict]) -> int:
 def play(client) -> dict:
     """One run of the route on a new session. `client` is an httpx.Client, or a TestClient, for the host."""
     headers = {"X-Session": fresh_session(client, DEMO_SEED)}
+    logged = client.get("/dev/calls", params={"since": 10**12}).json()["total"]  # the host's own count of model calls
     started = time.perf_counter()
+    digests, phase = [], 0
     for step in ROUTE:
-        client.post("/act", json=step, headers=headers).raise_for_status()
-    elapsed = time.perf_counter() - started
+        r = client.post("/act", json=step, headers=headers)
+        r.raise_for_status()
+        if r.json()["tick"] is not None:  # as the client does: ask the Dungeon Master after every tick
+            digests.append(client.get("/digest", params={"since": phase}, headers=headers).json())
+        phase = r.json()["state"]["phase"]
     state = client.get("/state", headers=headers).json()
+    if state["ended_at"] is not None:  # and once more for the end card
+        digests.append(client.get("/digest", params={"since": state["ended_at"]}, headers=headers).json())
+    elapsed = time.perf_counter() - started
     decisions = state["decisions_tail"]
     assert decisions[0]["id"] == "d0001", "the route made more decisions than the state's tail holds"
+    tellings = [(d["source"], d["text"]) for d in digests] + \
+        [(d["epilogue_source"], d["epilogue"]) for d in digests if d["epilogue"] is not None]
+    model_on = any(d["source"] in ("llm", "cache") for d in decisions if d["line"])
     return {
         "outcome": f"{state['status']}@{state['ended_at']}",
-        "calls": model_calls(decisions),
-        "misses": sum(REPLAY_MISS in d["reason"] for d in decisions),
+        # The host's log also catches calls whose reply was rejected, which look free from the sources alone.
+        "calls": max(model_calls(decisions) + sum(source == "llm" for source, _ in tellings),
+                     client.get("/dev/calls", params={"since": 10**12}).json()["total"] - logged),
+        "misses": sum(REPLAY_MISS in d["reason"] for d in decisions)
+                  + (sum(source == "fallback" for source, _ in tellings) if model_on else 0),
         "sources": dict(Counter(d["source"] for d in decisions if d["line"])),
-        "said": [(d["npc"], d["chosen"], d["line"]) for d in decisions],
+        "tellings": dict(Counter(source for source, _ in tellings)),
+        "said": [(d["npc"], d["chosen"], d["line"]) for d in decisions] + [text for _, text in tellings],
         "faults": [f"{d['id']} {d['npc']}: {d['reason']}" for d in decisions
                    if d["source"] == "fallback" and any(f in d["reason"] for f in (*MODEL_FAULTS, REPLAY_MISS))],
         "seconds": round(elapsed, 1),
@@ -85,7 +100,7 @@ def main(argv: list[str] | None = None) -> int:
             run = play(client)
             same = runs and run["said"] == runs[-1]["said"]
             print(f"run {n}: {run['outcome']}, {run['calls']} model calls, {run['misses']} replay misses, "
-                  f"lines {run['sources']}, {run['seconds']} s"
+                  f"lines {run['sources']}, digests {run['tellings']}, {run['seconds']} s"
                   + ("" if not runs else ", same lines as the run before" if same else ", DIFFERENT lines"))
             for fault in run["faults"]:
                 print("   ", fault)

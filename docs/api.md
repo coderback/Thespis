@@ -14,7 +14,7 @@ Changing anything here? Update `fixtures/` in the same PR and get the other pers
 | `GET /state` | Full snapshot (shape below) | NPCs carry `last_seen`; beliefs carry an `evidence` list |
 | `GET /allowed` | `{verbs: [{verb, target, label, args, ends_phase, enabled, reason}]}` | Disabled verbs come with a reason for the tooltip. After a duel win, only `humiliate` and `spare` are enabled |
 | `POST /act` `{verb, target?, claim?, amount?, text?}` | `{events, replies, tick, epilogue, state}` | See [Acting](#acting) |
-| `GET /digest?since=<phase>` | `{text, hook, cites, epilogue}` | Fetch while moves animate. `epilogue` is `null` until the race ends; `hook` is `null` until story hooks arrive (#19) |
+| `GET /digest?since=<phase>` | `{text, hook, cites, epilogue, source, epilogue_source}` | Fetch while moves animate. `epilogue` is `null` until the race ends. `hook` is the story's live thread in this window (revenge brewing, a lie told, a lie exposed), or `null`. With the brain on, the Dungeon Master (the model) tells `text` and `epilogue`, citing the events; `source` and `epilogue_source` are `llm`, `cache` or `fallback` (the code-built telling) |
 | `POST /reset` | `{state}` | Wipes this session, keeps the seed |
 | `POST /reload` | `{state}` | Rebuilds this session from disk (dev panel) |
 | `POST /dev/brain` `{mode: "model" or "fallback"}` | `{mode}` | The "brain off" toggle |

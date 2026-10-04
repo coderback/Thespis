@@ -22,8 +22,9 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from games.crypt_road import rules, views
+from games.crypt_road import rules, views, voice
 from games.crypt_road.content import DEMO_SEED, new_world
+from thespis.expression import Mind
 from thespis.gateway import gateway_from_env
 from thespis.store import SessionNotFound, Store
 
@@ -222,7 +223,18 @@ def _budget(state, store: Store, world) -> int | None:
 
 @app.get("/digest")
 def get_digest(request: Request, since: int = 0, x_session: str | None = Header(default=None)):
-    return views.digest_view(_load(_store(request), _session(x_session)), since)
+    """The Dungeon Master's telling. With the brain on it may call the model, so it counts against the caps."""
+    store, session, state = _store(request), _session(x_session), request.app.state
+    with _locks[session]:
+        world = _load(store, session)
+        mind = Mind(state.gateway if world.brain_mode == "model" else None, voice.VALIDATOR, store, state.replay,
+                    _budget(state, store, world))
+        digest = views.digest_view(world, since, mind)
+        if mind.asked:
+            world.counters["model_calls"] = world.counters.get("model_calls", 0) + mind.asked
+            store.save(session, world)
+            store.count_calls(mind.asked)
+        return digest
 
 
 @app.post("/reset")

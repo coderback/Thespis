@@ -78,7 +78,7 @@ def test_digest(client):
         client.post("/act", json=body, headers=headers)
     digest = client.get("/digest?since=2", headers=headers).json()
     assert "Kael told Brenna that you robbed him." in digest["text"]
-    assert digest["cites"] and digest["epilogue"] is None and set(digest) == {"text", "hook", "cites", "epilogue"}
+    assert digest["cites"] and digest["epilogue"] is None and set(digest) == {"text", "hook", "cites", "epilogue", "source", "epilogue_source"}
 
 
 def test_restart_mid_route_resumes_identically(db):
