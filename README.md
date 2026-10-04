@@ -10,7 +10,7 @@ wants to do. A language model only chooses among actions the code has already al
 line it says must cite the ledger events and beliefs behind it, checked by code before anyone hears it.
 
 - **Play it:** <https://thespis-production.up.railway.app>. Press **Watch the 60-second story**, or play it yourself.
-- **Video:** link to come with the submission.
+- **Video:** <https://youtu.be/WD7oslaKQO4> (2 minutes, with subtitles).
 - **Numbers:** [results.md](results.md), measured on the hosted engine.
 
 ## The demo: The Crypt Road
