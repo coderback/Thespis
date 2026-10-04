@@ -1,5 +1,12 @@
 # Thespis
 
+[![CI](https://github.com/coderback/Thespis/actions/workflows/ci.yml/badge.svg)](https://github.com/coderback/Thespis/actions/workflows/ci.yml)
+[![Play the demo](https://img.shields.io/badge/demo-play%20live-f0a03a)](https://thespis-production.up.railway.app)
+[![Watch the video](https://img.shields.io/badge/video-2%20min-red?logo=youtube&logoColor=white)](https://youtu.be/WD7oslaKQO4)
+[![MIT licence](https://img.shields.io/badge/licence-MIT-blue)](LICENSE)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-3776ab?logo=python&logoColor=white)](pyproject.toml)
+[![Cambridge x Arcade AI Hackathon 2026](https://img.shields.io/badge/Cambridge%20%C3%97%20Arcade%20AI-Hackathon%202026-6c5ce7)](#team)
+
 An AI toolkit for game developers. Its first module, **Thespis Cast**, gives NPCs minds of their own: they remember
 what happened, believe things that may be false, want things for reasons, and keep acting when the player isn't
 looking.
@@ -12,6 +19,10 @@ line it says must cite the ledger events and beliefs behind it, checked by code 
 - **Play it:** <https://thespis-production.up.railway.app>. Press **Watch the 60-second story**, or play it yourself.
 - **Video:** <https://youtu.be/WD7oslaKQO4> (2 minutes, with subtitles).
 - **Numbers:** [results.md](results.md), measured on the hosted engine.
+
+[![The why-chain in The Crypt Road: Captain Brenna's line traced to the decision behind it and the beliefs it cites](docs/images/crypt-road-why-chain.jpg)](https://youtu.be/WD7oslaKQO4)
+
+*The why-chain: Captain Brenna's line, traced to the decision behind it, the beliefs it cites and the ledger events at the root. Click the picture to watch the video.*
 
 ## The demo: The Crypt Road
 
