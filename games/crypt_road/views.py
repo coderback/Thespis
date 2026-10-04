@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from games.crypt_road import content as C
-from games.crypt_road import hooks, narrator  # importing hooks registers the story patterns
+from games.crypt_road import hooks, narrator, voice  # importing hooks registers the story patterns
 from games.crypt_road.rules import ActResult, Tick, happened
 from thespis.director import sift
 from thespis.expression import Mind
@@ -19,7 +19,8 @@ def state_view(w: World) -> dict:
         "status": w.status, "brain": w.brain_mode, "pending": w.pending, "ended_at": w.ended_at,
         "player": dict(w.player),
         "npcs": [{"id": n.id, "loc": n.loc, "last_seen": n.last_seen, "drives": dict(n.drives),
-                  "trust_in": dict(n.trust_in), "frozen_until": n.frozen_until} for n in w.npcs.values()],
+                  "trust_in": dict(n.trust_in), "frozen_until": n.frozen_until,
+                  "persona": voice.persona_of(w, n.id), "persona_edited": "persona" in n.flags} for n in w.npcs.values()],
         "beliefs": [{**b.to_json(), "conf": b.conf, "truth": happened(w, b.claim)} for b in w.beliefs.all()],
         "ledger_tail": [e.to_json() for e in w.ledger.tail(TAIL)],
         "decisions_tail": [d.to_json() for d in w.decisions.tail(TAIL)],

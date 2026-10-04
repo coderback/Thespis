@@ -16,7 +16,7 @@ FIXTURES = pathlib.Path(__file__).resolve().parents[1] / "fixtures"
 
 STATE_KEYS = {"seed", "phase", "day", "phase_name", "status", "brain", "pending", "ended_at", "player", "npcs",
               "beliefs", "ledger_tail", "decisions_tail"}
-NPC_KEYS = {"id", "loc", "last_seen", "drives", "trust_in", "frozen_until"}
+NPC_KEYS = {"id", "loc", "last_seen", "drives", "trust_in", "frozen_until", "persona", "persona_edited"}
 BELIEF_KEYS = {"id", "npc", "claim", "conf", "status", "truth", "evidence"}
 EVENT_KEYS = {"id", "phase", "verb", "actor", "target", "loc", "claim", "truth", "schema_version"}
 DECISION_KEYS = {"id", "kind", "npc", "phase", "trigger", "allowed", "chosen", "line", "cites", "reason", "source"}

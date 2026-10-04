@@ -112,6 +112,13 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .chip.id:hover { border-color: var(--accent); }
 .chip.chosen { background: var(--accent); color: #1b1420; border-color: var(--accent); }
 .frozen { color: var(--info); font-size: 12px; }
+.persona { margin: 6px 0 2px; font-size: 12px; color: var(--muted); line-height: 1.35; }
+.persona q { font-style: italic; }
+.persona .edited { color: var(--accent); font-weight: 600; margin-left: 4px; }
+.persona .persona-edit { background: none; border: 0; padding: 0 2px; color: var(--accent); text-decoration: underline; font-size: 12px; }
+.persona.edit textarea { width: 100%; box-sizing: border-box; min-height: 64px; font: 12px var(--sans); background: var(--bg); color: var(--text); border: 1px solid #5a4e5e; border-radius: 6px; padding: 6px; resize: vertical; }
+.persona.edit .row { display: flex; gap: 6px; margin-top: 4px; }
+.persona.edit .row button { font-size: 12px; padding: 3px 8px; border-radius: 6px; border: 1px solid #5a4e5e; background: transparent; }
 
 .belief { display: grid; grid-template-columns: 18px 1fr 64px; gap: 2px 6px; align-items: center; padding: 5px 4px; border-bottom: 1px dashed var(--line); border-radius: 4px; }
 .belief.retracted .claim { text-decoration: line-through; color: var(--muted); }

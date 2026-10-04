@@ -18,6 +18,7 @@ Changing anything here? Update `fixtures/` in the same PR and get the other pers
 | `POST /reset` | `{state}` | Wipes this session, keeps the seed |
 | `POST /reload` | `{state}` | Rebuilds this session from disk (dev panel) |
 | `POST /dev/brain` `{mode: "model" or "fallback"}` | `{mode}` | The "brain off" toggle |
+| `POST /dev/persona` `{npc, persona}` | `{npc, persona, default}` | Live persona editing (#39): this session's NPC speaks with `persona` (up to 300 characters) from its next model line. An empty or `null` persona goes back to the default. Other sessions are untouched |
 | `GET /dev/calls?since=<total>` | `{total, calls: [{call_type, provider, ok, latency, error, prompt_tokens, completion_tokens}]}` | The model calls made since an earlier `total`, across all sessions. For the harness (#25); the client doesn't need it |
 | `GET /health` | `{ok: true}` | For the host |
 
@@ -80,7 +81,8 @@ one belief:
   "npcs": [
     { "id": "kael", "loc": "guard_post", "last_seen": { "loc": "guard_post", "phase": 3 },
       "drives": { "grudge": 6, "fear": 1, "respect": 0, "ambition": 6 },
-      "trust_in": {}, "frozen_until": null }
+      "trust_in": {}, "frozen_until": null,
+      "persona": "A sellsword with a reputation to protect: ...", "persona_edited": false }
   ],
   "beliefs": [
     { "id": "b0010", "npc": "brenna", "claim": { "pred": "robbed", "a": "player", "b": "kael" },
@@ -95,6 +97,8 @@ one belief:
   equals the NPC's current stop while they are together, and is `null` if the player has never seen them (Brenna, until
   the guard post).
 - `frozen_until` is the last phase an NPC is detained (inclusive), or `null`.
+- `persona` is the persona the model voices for this NPC in this session, and `persona_edited` is `true` while it's a
+  live edit from `POST /dev/persona` rather than the one in `cast.toml`.
 - `conf` is the highest confidence among the belief's `evidence`. `status` is `active` or `retracted`. `truth` says
   whether the claim happened, and is for the inspector only: it never reaches the model.
 - `ledger_tail` and `decisions_tail` hold the last 50 of each, which covers a whole demo run.

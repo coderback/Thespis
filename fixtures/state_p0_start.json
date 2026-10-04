@@ -26,7 +26,9 @@
         "ambition": 6
       },
       "trust_in": {},
-      "frozen_until": null
+      "frozen_until": null,
+      "persona": "A sellsword with a reputation to protect: proud, quick to anger and slow to forgive. He speaks in short, cutting sentences and never forgets a slight.",
+      "persona_edited": false
     },
     {
       "id": "brenna",
@@ -39,7 +41,9 @@
         "odo": 2,
         "mags": 1
       },
-      "frozen_until": null
+      "frozen_until": null,
+      "persona": "Captain of the bridge watch: dutiful, tired and practical. She believes people she trusts, and a fine paid in coin smooths most trouble.",
+      "persona_edited": false
     },
     {
       "id": "mags",
@@ -53,7 +57,9 @@
         "player": 0,
         "kael": 0
       },
-      "frozen_until": null
+      "frozen_until": null,
+      "persona": "Innkeeper of the Lantern & Last Coin: warm, nosy, and misses nothing under her roof. She trades gossip like coin.",
+      "persona_edited": false
     },
     {
       "id": "odo",
@@ -67,7 +73,9 @@
         "player": 0,
         "kael": 0
       },
-      "frozen_until": null
+      "frozen_until": null,
+      "persona": "A travelling peddler who walks this road every day: nervous, honest to a fault and eager to avoid trouble. Ask and he'll tell you what he saw.",
+      "persona_edited": false
     }
   ],
   "beliefs": [],
