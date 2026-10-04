@@ -22,9 +22,10 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .pixel { font-family: var(--pixel); }
 .muted { color: var(--muted); }
 
-/* One 1280 x 720 stage, scaled to fit any window (see fit() in main.js). */
-#viewport { position: fixed; inset: 0; display: grid; place-items: center; }
-#stage { position: relative; width: 1280px; height: 720px; display: grid; grid-template-columns: 864px 416px; transform-origin: center; background: var(--bg); flex: none; }
+/* One 1280 x 720 stage, scaled to fit any window (see fit() in main.js). It's centred on the window's middle, not by
+   the grid: a grid can't centre a child wider than itself, so below 1280 px the stage slid right, off a phone screen. */
+#viewport { position: fixed; inset: 0; }
+#stage { position: absolute; left: 50%; top: 50%; translate: -50% -50%; width: 1280px; height: 720px; display: grid; grid-template-columns: 864px 416px; transform-origin: center; background: var(--bg); }
 
 #left { display: grid; grid-template-rows: 576px 144px; }
 #mapwrap { position: relative; width: 864px; height: 576px; }
