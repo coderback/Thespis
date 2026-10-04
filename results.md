@@ -1,19 +1,19 @@
 # Results
 
-Measured by `tools/harness.py` against **https://thespis-production.up.railway.app** on 2026-10-04 01:56 UTC, engine at `ba64672`.
-Models: gpt-6-luna (44 calls). Seeds: 1, 4.
+Measured by `tools/harness.py` against **https://thespis-production.up.railway.app** on 2026-10-04 02:17 UTC, engine at `60784e9`.
+Models: gpt-6-luna (80 calls). Seeds: 1, 4.
 
 ## Headline numbers
 
 | Measure | Value |
 | --- | --- |
 | NPC turns decided by code alone, with no model call | **87%** (395 of 452) |
-| Invalid model replies blocked by the validator | **20** of 44 replies |
-| Model call latency, p50 / p95 (on the host) | **967 ms / 1513 ms** (max 1576 ms, 44 calls) |
-| `/act` round trip when it calls the model, p50 / p95 | **1012 ms / 1560 ms** (44 actions) |
-| `/act` round trip with no model call, p50 / p95 | **41 ms / 57 ms** (116 actions) |
-| Cost per run, every call to the model | **$0.00055** (10.8 calls per run) |
-| Cost per run as played, with the cache | **$0.00014** (2.8 calls per run) |
+| Invalid model replies blocked by the validator | **0** of 80 replies |
+| Model call latency, p50 / p95 (on the host) | **1315 ms / 1585 ms** (max 2115 ms, 80 calls) |
+| `/act` round trip when it calls the model, p50 / p95 | **1445 ms / 2173 ms** (68 actions) |
+| `/act` round trip with no model call, p50 / p95 | **43 ms / 79 ms** (92 actions) |
+| Cost per run, every call to the model | **$0.00066** (10.8 calls per run) |
+| Cost per run as played, with the cache | **$0.00030** (5.0 calls per run) |
 | Rules routes matching the rules model | **8 of 8** |
 
 ## How each number is counted
@@ -29,16 +29,11 @@ Models: gpt-6-luna (44 calls). Seeds: 1, 4.
 
 | Source | Lines |
 | --- | --- |
-| cache | 129 |
-| fallback | 36 |
-| llm | 24 |
+| cache | 93 |
+| fallback | 16 |
+| llm | 80 |
 
-Blocked replies by reason:
-
-- no cites: 17
-- names someone absent from its state pack: 3
-
-Tokens over all 16 model runs: gpt-6-luna: 13,547 in / 1,793 out. Total cost: $0.0023.
+Tokens over all 16 model runs: gpt-6-luna: 32,080 in / 3,336 out. Total cost: $0.0049.
 
 ## Route outcomes
 
@@ -59,19 +54,19 @@ Model pass: the brain on. The model chooses among the actions the NPC's drives r
 
 | Route | Seed | Outcome | Model calls | Lines: model / cache / template | Blocked | `/act` p50 |
 | --- | --- | --- | --- | --- | --- | --- |
-| rush | 1 | won@4 | 2 | 0 / 3 / 2 | 2 | 43 ms |
-| provoke_pay | 1 | won@5 | 3 | 2 / 12 / 3 | 1 | 45 ms |
-| provoke_no_pay | 1 | lost@5 | 3 | 2 / 10 / 2 | 1 | 44 ms |
-| frame | 1 | won@5 | 3 | 3 / 14 / 0 | 0 | 48 ms |
-| lie_unpaid | 1 | lost@5 | 3 | 0 / 14 / 4 | 3 | 49 ms |
-| spare | 1 | won@5 | 3 | 3 / 7 / 4 | 0 | 51 ms |
-| duel_lost | 4 | lost@4 | 3 | 2 / 6 / 2 | 1 | 41 ms |
-| provoke_wait | 1 | lost@5 | 3 | 3 / 10 / 0 | 0 | 46 ms |
-| rush | 4 | won@4 | 2 | 1 / 3 / 1 | 1 | 38 ms |
-| provoke_pay | 4 | lost@4 | 3 | 2 / 6 / 2 | 1 | 40 ms |
-| provoke_no_pay | 4 | lost@4 | 3 | 1 / 6 / 3 | 2 | 46 ms |
-| frame | 4 | lost@4 | 3 | 3 / 9 / 1 | 0 | 40 ms |
-| lie_unpaid | 4 | lost@4 | 1 | 0 / 11 / 2 | 1 | 36 ms |
-| spare | 4 | lost@4 | 3 | 0 / 6 / 4 | 3 | 43 ms |
-| duel_lost | 4 | lost@4 | 3 | 1 / 6 / 3 | 2 | 54 ms |
-| provoke_wait | 4 | lost@4 | 3 | 1 / 6 / 3 | 2 | 44 ms |
+| rush | 1 | won@4 | 4 | 4 / 1 / 0 | 0 | 840 ms |
+| provoke_pay | 1 | won@5 | 6 | 6 / 9 / 2 | 0 | 81 ms |
+| provoke_no_pay | 1 | lost@5 | 5 | 5 / 8 / 1 | 0 | 54 ms |
+| frame | 1 | won@5 | 3 | 3 / 14 / 0 | 0 | 44 ms |
+| lie_unpaid | 1 | lost@5 | 9 | 9 / 8 / 1 | 0 | 58 ms |
+| spare | 1 | won@5 | 7 | 7 / 3 / 4 | 0 | 1063 ms |
+| duel_lost | 4 | lost@4 | 7 | 7 / 2 / 1 | 0 | 1418 ms |
+| provoke_wait | 1 | lost@5 | 8 | 8 / 5 / 0 | 0 | 793 ms |
+| rush | 4 | won@4 | 2 | 2 / 3 / 0 | 0 | 41 ms |
+| provoke_pay | 4 | lost@4 | 3 | 3 / 6 / 1 | 0 | 62 ms |
+| provoke_no_pay | 4 | lost@4 | 3 | 3 / 6 / 1 | 0 | 55 ms |
+| frame | 4 | lost@4 | 8 | 8 / 4 / 1 | 0 | 79 ms |
+| lie_unpaid | 4 | lost@4 | 3 | 3 / 9 / 1 | 0 | 50 ms |
+| spare | 4 | lost@4 | 3 | 3 / 6 / 1 | 0 | 42 ms |
+| duel_lost | 4 | lost@4 | 3 | 3 / 6 / 1 | 0 | 52 ms |
+| provoke_wait | 4 | lost@4 | 6 | 6 / 3 / 1 | 0 | 941 ms |
