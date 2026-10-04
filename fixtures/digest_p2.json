@@ -1,11 +1,13 @@
 {
   "text": "You walked from the market to the guard post. Kael told Brenna that you robbed him. Odo told Brenna that you beat Kael. Odo walked from the guard post to the market.",
-  "hook": null,
+  "hook": "Revenge is brewing: Kael took his grudge to the Captain.",
   "cites": [
     "e0010",
     "e0011",
     "e0012",
     "e0013"
   ],
-  "epilogue": null
+  "epilogue": null,
+  "source": "fallback",
+  "epilogue_source": null
 }

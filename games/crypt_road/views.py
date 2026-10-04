@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 from games.crypt_road import content as C
-from games.crypt_road import words
+from games.crypt_road import hooks, narrator  # importing hooks registers the story patterns
 from games.crypt_road.rules import ActResult, Tick, happened
-from thespis.ledger import Event
+from thespis.director import sift
+from thespis.expression import Mind
 from thespis.world import World
 
 TAIL = 50  # covers a whole demo run
@@ -42,20 +43,31 @@ def act_view(result: ActResult, w: World) -> dict:
     }
 
 
-# ---------------------------------------------------------------- the code-built digest (#19 adds the model's)
-def _text(events: list[Event]) -> str:
-    return " ".join(words.sentence(e) for e in events)
+# ---------------------------------------------------------------- the digest: told by the model, or built by code (#19)
+def digest_view(w: World, since: int, mind: Mind | None = None) -> dict:
+    """What happened since the given phase, plus the epilogue once the race is over, and the story's live thread.
 
-
-def digest_view(w: World, since: int) -> dict:
-    """What happened since the given phase, from the ledger alone, plus the epilogue once the race is over."""
+    With a mind whose brain is on, the Dungeon Master (the model) tells it; otherwise, or if its telling fails the
+    validator, the code builds it from the ledger. The hook is code-sifted from the ledger either way.
+    """
     events = list(w.ledger)
     end = next((i for i, e in enumerate(events) if e.verb == "take_relic"), None)
     race, after = (events, []) if end is None else (events[: end + 1], events[end + 1:])
     recent = [e for e in race if e.phase >= since][-DIGEST_EVENTS:]
-    return {
-        "text": _text(recent),
-        "hook": None,  # story-sifting hooks arrive in #19
-        "cites": [e.id for e in recent],
-        "epilogue": _text(after[-DIGEST_EVENTS:]) if end is not None else None,
-    }
+    epilogue_events = after[-DIGEST_EVENTS:] if end is not None else []
+    hook = _hook(w, {e.id for e in recent + epilogue_events})
+    text, cites, source = narrator.narrate(mind, recent, hook if end is None else None)  # after the race, the epilogue tells it
+    epilogue = epilogue_source = None
+    if end is not None:
+        epilogue, _, epilogue_source = narrator.narrate(mind, epilogue_events, hook)
+    return {"text": text, "hook": hook, "cites": cites, "epilogue": epilogue, "source": source,
+            "epilogue_source": epilogue_source}
+
+
+def _hook(w: World, window: set[str]) -> str | None:
+    """The strongest story thread whose events fall in this window, if any."""
+    live = {h.pattern: h for h in sift(w)}
+    for name in hooks.PRIORITY:
+        if name in live and set(live[name].cites) & window:
+            return live[name].text
+    return None

@@ -39,6 +39,12 @@ DECIDE_PROMPT = ("You are {name}. {persona}\n" + _RULES +
 REACT_PROMPT = ("You are {name}. {persona}\n" + _RULES +
                 "Say one line of dialogue in reply to what just happened, at most 25 words, in character.\n"
                 'Reply with JSON only: {{"line": "...", "cites": ["..."]}}')
+NARRATE_PROMPT = ("You are {name}. {persona}\n" + _RULES +
+                  "Tell the player what happened, including what they couldn't see, in 2 or 3 short sentences: speak "
+                  "to the player as \"you\", in the past tense, mentioning only the events listed.\n"
+                  'Reply with JSON only: {{"line": "...", "cites": ["..."]}}')
+PROMPTS = {"decide": DECIDE_PROMPT, "react": REACT_PROMPT, "narrate": NARRATE_PROMPT}
+LIMITS = {"decide": LINE_MAX, "react": LINE_MAX, "narrate": 400}  # characters per line, by call type
 
 
 @dataclass
@@ -70,7 +76,7 @@ class StatePack:
         return data
 
     def messages(self, kind: str) -> list[dict]:
-        prompt = DECIDE_PROMPT if kind == "decide" else REACT_PROMPT
+        prompt = PROMPTS[kind]
         return [{"role": "system", "content": prompt.format(name=self.name, persona=self.persona)},
                 {"role": "user", "content": json.dumps(self.payload(), ensure_ascii=False)}]
 
@@ -122,8 +128,9 @@ class Validator:
         line = data.get("line")
         if not isinstance(line, str) or not line.strip():
             return "no line"
-        if len(line) > LINE_MAX:
-            return f"line is {len(line)} characters, over {LINE_MAX}"
+        limit = LIMITS.get(kind, LINE_MAX)
+        if len(line) > limit:
+            return f"line is {len(line)} characters, over {limit}"
         cites = data.get("cites")
         if not isinstance(cites, list) or not cites or not all(isinstance(c, str) for c in cites):
             return "no cites"
@@ -160,6 +167,10 @@ class Mind:
 
     def decide(self, pack: StatePack, fallback: Utterance) -> Utterance:
         return self._speak("decide", [(pack, fallback)])[0]
+
+    def narrate(self, pack: StatePack, fallback: Utterance) -> Utterance:
+        """The narrator's telling of the events in the pack: 2 or 3 sentences that cite them."""
+        return self._speak("narrate", [(pack, fallback)])[0]
 
     def react_many(self, items: list[tuple[StatePack, Utterance]]) -> list[Utterance]:
         """Several reply lines at once: the calls the cache can't answer run in parallel."""
