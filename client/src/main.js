@@ -336,7 +336,7 @@ function actionText(body, state) {
     case "humiliate": return `You humiliate ${t} and take his purse.`;
     case "spare": return `You spare ${t}.`;
     case "tell_claim": return `You tell ${t}: "${claimText(body.claim)}."`;
-    case "bribe": return `You pay ${t} a fine of ${body.amount} coins.`;
+    case "bribe": return `You offer ${t} ${body.amount} coins.`;
     case "move": return `You walk on from ${STOP_SHORT[state.player.loc]}.`;
     case "wait": return "You wait.";
     case "take_relic": return "You take the relic.";

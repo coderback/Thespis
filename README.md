@@ -80,6 +80,8 @@ flowchart LR
   exposed) and shows the live one under the telling. If a telling fails the validator, the code-built telling stands.
 - **Live persona editing:** in the inspector's Minds tab, change an NPC's persona and its next line follows it. The
   edit belongs to that game, so other players and the demo cache are untouched.
+- **Haggling:** offer Brenna any bribe. Code sets her price from her trust in you (15 to 30 coins, never under 20
+  while she distrusts you); under it, the model chooses whether she counters or refuses, and words it.
 
 ## Numbers
 

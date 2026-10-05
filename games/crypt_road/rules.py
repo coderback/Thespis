@@ -72,8 +72,8 @@ def _npc_name(npc: str) -> str:
 
 
 def _event(w: World, verb: str, actor: str, target: str | None, loc: str, claim: Claim | None = None,
-           truth: bool = True) -> Event:
-    return w.ledger.append(w.phase, verb, actor, target, loc, claim, truth)
+           truth: bool = True, amount: int | None = None) -> Event:
+    return w.ledger.append(w.phase, verb, actor, target, loc, claim, truth, amount)
 
 
 def give_evidence(w: World, npc: str, claim: Claim, conf: float, source: str, event: Event) -> None:
@@ -136,8 +136,12 @@ def allowed(w: World) -> list[dict]:
     for n in here:
         add("tell_claim", n, f"Tell {_npc_name(n)}...", {"preds": C.PREDS, "subjects": C.subjects()}, False)
     if C.GUARD in here:
-        add("bribe", C.GUARD, f"Bribe {_npc_name(C.GUARD)} ({C.FINE})", {"amount": C.FINE}, False,
-            ok=w.player["coins"] >= C.FINE, why=f"You need {C.FINE} coins")
+        guard, coins = w.npcs[C.GUARD], w.player["coins"]
+        refused = guard.flags.get("refused_phase") == w.phase
+        add("bribe", C.GUARD, f"Bribe {_npc_name(C.GUARD)}...",
+            {"amount": min(guard.flags.get("asking", C.FINE), coins), "min": 1, "max": coins}, False,
+            ok=coins >= 1 and not refused,
+            why=f"{_npc_name(C.GUARD)} won't hear another offer until the next phase" if refused else "You have no coins")
     nxt = C.next_stop(loc)
     if nxt:
         trust = w.npcs[C.GUARD].trust_in.get("player", 0)
@@ -176,7 +180,7 @@ def act(w: World, verb: str, target: str | None = None, claim: dict | Claim | No
     mind = Mind(gateway if w.brain_mode == "model" else None, voice.VALIDATOR, cache, replay, budget)
     start = len(w.ledger)
     ends_phase = None  # the tick this verb triggers, if any: "move" or "wait"
-    told = None
+    told = haggle = None
 
     if verb == "talk":
         if not text or len(text) > TALK_MAX:
@@ -196,11 +200,7 @@ def act(w: World, verb: str, target: str | None = None, claim: dict | Claim | No
         told = _as_claim(claim)
         _tell(w, target, told)
     elif verb == "bribe":
-        if amount not in (None, C.FINE):
-            raise NotAllowed(f"The fine is {C.FINE} coins")
-        w.player["coins"] -= C.FINE
-        w.npcs[C.GUARD].trust_in["player"] += 2
-        _event(w, "bribe", "player", C.GUARD, w.player["loc"])
+        haggle = _offer(w, mind, brain, _offered_amount(w, amount))
     elif verb in ("move", "wait"):
         ends_phase = verb
     elif verb == "take_relic":
@@ -208,6 +208,8 @@ def act(w: World, verb: str, target: str | None = None, claim: dict | Claim | No
         _event(w, "take_relic", "player", None, w.player["loc"])
 
     replies = voice.react(w, mind, verb, target, list(w.ledger)[start:], told, text)
+    if haggle:
+        replies.append(haggle)
     tick = end_phase(w, ends_phase, brain, mind) if ends_phase else None
     if tick is not None and w.status == PLAYING:
         replies += voice.phase_start(w, mind, tick.moves)
@@ -217,6 +219,44 @@ def act(w: World, verb: str, target: str | None = None, claim: dict | Claim | No
     if mind.asked:
         w.counters["model_calls"] = w.counters.get("model_calls", 0) + mind.asked
     return ActResult(events=events, tick=tick, epilogue=epilogue, replies=replies, model_calls=mind.asked)
+
+
+def _offered_amount(w: World, amount: int | None) -> int:
+    """A bribe's offer: whole coins, at least one and no more than the player has. None means the standard fine."""
+    coins = w.player["coins"]
+    amount = C.FINE if amount is None else amount
+    if isinstance(amount, bool) or not isinstance(amount, int) or not 1 <= amount <= coins:
+        raise NotAllowed(f"Offer between 1 and {coins} coins")
+    return amount
+
+
+def _offer(w: World, mind: Mind, brain: Brain, amount: int) -> dict | None:
+    """The player offers Brenna `amount` coins (#36). At or above her price she takes it and trusts them more; below
+    it she counters at her price or refuses, and the model chooses which. She never takes less than her price.
+
+    Returns her reply to a haggle, in the replies shape, or None when she took the money (voice.react voices that).
+    """
+    guard, loc = w.npcs[C.GUARD], w.player["loc"]
+    price = C.asking_price(guard.trust_in.get("player", 0))
+    if amount >= price:
+        w.player["coins"] -= amount
+        guard.trust_in["player"] += 2
+        guard.flags.pop("asking", None)
+        _event(w, "bribe", "player", C.GUARD, loc, amount=amount)
+        return None
+    offer = _event(w, "offer", "player", C.GUARD, loc, amount=amount)
+    options = {f"counter:{price}": 5, "refuse": 7 if amount * 2 < price else 3}  # a lowball is more likely refused
+    chosen = _decide(w, mind, brain, C.GUARD, "bribe_offer", options, f"an offer of {amount}, under her price of {price}",
+                     lambda ch: voice.haggle_line(ch, offer, amount, price),
+                     f"The player offers you {amount} coins to forget the trouble. You won't take less than {price}.")
+    if chosen == "refuse":
+        guard.flags["refused_phase"] = w.phase
+        _event(w, "refuse", C.GUARD, "player", loc)
+    else:
+        guard.flags["asking"] = price
+        _event(w, "counter", C.GUARD, "player", loc, amount=price)
+    d = list(w.decisions)[-1]
+    return {"decision": d.id, "npc": C.GUARD, "line": d.line, "cites": d.cites, "source": d.source}
 
 
 def _as_claim(claim: dict | Claim | None) -> Claim:

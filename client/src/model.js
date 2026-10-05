@@ -51,7 +51,10 @@ export function eventText(e) {
     case "humiliate": return `${who} humiliated ${whom} and took his purse`;
     case "spare": return `${who} spared ${whom}`;
     case "tell_claim": return `${who} told ${whom}: "${c}"`;
-    case "bribe": return `${who} paid ${whom} a fine`;
+    case "bribe": return e.amount ? `${who} paid ${whom} ${e.amount} coins` : `${who} paid ${whom} a fine`;
+    case "offer": return `${who} offered ${whom} ${e.amount} coins`;
+    case "counter": return `${who} asked ${whom} for ${e.amount} coins`;
+    case "refuse": return `${who} turned down ${whom === "you" ? "your" : `${whom}'s`} offer`;
     case "block": return `${who} blocked ${whom} at the gate`;
     case "accuse": return `${who} told ${whom}: "${c}"`;
     case "detain": return `${who} detained ${whom}`;

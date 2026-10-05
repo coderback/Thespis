@@ -107,7 +107,8 @@ export class FixtureApi {
     const verbs = [{
       verb: req.verb, target: req.target || null, label: labelFor(req), ends_phase: req.verb === "move",
       enabled: true, reason: null,
-      args: req.verb === "talk" ? { max_len: 200 } : req.verb === "move" ? { to: nextStop(s.player.loc) } : {},
+      args: req.verb === "talk" ? { max_len: 200 } : req.verb === "move" ? { to: nextStop(s.player.loc) }
+        : req.verb === "bribe" ? { amount: 20, min: 1, max: s.player.coins } : {},
     }];
     return { verbs };
   }
@@ -134,7 +135,7 @@ export class FixtureApi {
 
 function labelFor(req) {
   const t = req.target ? req.target[0].toUpperCase() + req.target.slice(1) : "";
-  return { talk: `Talk to ${t}`, move: "Move on", bribe: `Bribe ${t} (20)`, tell_claim: `Tell ${t}...`, take_relic: "Take the relic" }[req.verb]
+  return { talk: `Talk to ${t}`, move: "Move on", bribe: `Bribe ${t}...`, tell_claim: `Tell ${t}...`, take_relic: "Take the relic" }[req.verb]
     || `${req.verb[0].toUpperCase()}${req.verb.slice(1)} ${t}`.trim();
 }
 

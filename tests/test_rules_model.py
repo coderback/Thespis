@@ -23,5 +23,7 @@ def test_route_outcomes():
         "spare": sim.route_spare(s).status,
         "duel_lost": sim.route_duel_lost(s).status,
         "provoke_wait": sim.route_provoke(s, pay=True, wait_after=True).status,
+        "haggle": sim.route_haggle(s, offer=10).status,
+        "lowball": sim.route_haggle(s, offer=5).status,
     }
     assert got == EXPECTED

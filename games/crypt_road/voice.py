@@ -7,6 +7,7 @@ all of a moment's lines at once, keeps only the replies that pass the validator,
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 
 from games.crypt_road import content as C
@@ -25,7 +26,39 @@ VOCABULARY = {
     "tavern": "tavern", "lantern": "tavern", "market": "market", "guard post": "guard_post", "gate": "guard_post",
     "bridge": "bridge", "crypt": "crypt",
 }
-VALIDATOR = Validator(VOCABULARY)
+_TEENS = ("ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen").split()
+_TENS = {"twenty": 20, "thirty": 30, "forty": 40, "fifty": 50, "sixty": 60}
+_UNITS = ("one two three four five six seven eight nine").split()
+_NUMBER = re.compile(rf"\b(\d+)\b|\b({'|'.join(_TENS)})(?:[- ]({'|'.join(_UNITS)}))?\b|\b({'|'.join(_TEENS)})\b",
+                     re.IGNORECASE)
+
+
+def numbers(text: str) -> set[int]:
+    """Every amount a line states, in digits or in words from ten up (smaller words, like "no one", are rarely sums)."""
+    out = set()
+    for digits, tens, unit, teen in _NUMBER.findall(text):
+        if digits:
+            out.add(int(digits))
+        elif tens:
+            out.add(_TENS[tens.lower()] + (_UNITS.index(unit.lower()) + 1 if unit else 0))
+        else:
+            out.add(10 + _TEENS.index(teen.lower()))
+    return out
+
+
+class CryptRoadValidator(Validator):
+    """The core checks, plus one for haggling (#36): any sum Brenna names must be the offer or her price."""
+
+    def problem(self, data: dict, pack: StatePack, kind: str) -> str | None:
+        why = super().problem(data, pack, kind)
+        if why is None and any(a["id"].startswith("counter:") for a in pack.allowed):
+            stray = numbers(data["line"]) - numbers(pack.situation)
+            if stray:
+                return f"names {', '.join(map(str, sorted(stray)))}, neither the offer nor the price"
+        return why
+
+
+VALIDATOR = CryptRoadValidator(VOCABULARY)
 RETRIEVER = TopKRetriever(5)
 KNOWN_EVENTS = 5
 THRESHOLDS = {"grudge": (4, 5), "respect": (4,), "fear": (4,)}  # crossing one makes the rival stop and think
@@ -119,6 +152,8 @@ def describe(option: str, w: World, npc: str) -> str:
         "share_drink": "stay this phase to share a drink with the player and tell them something useful",
         "detain": f"have the sergeant hold {C.short_name(who)} for two phases",
         "question": f"ask {C.short_name(who)} whether the claim about them is true",
+        "counter": f"name your price: {who} coins, and not a coin less",
+        "refuse": "turn the offer down and hear no more offers for now",
     }.get(kind, option.replace("_", " "))
 
 
@@ -192,9 +227,10 @@ def react(w: World, mind: Mind, verb: str, target: str | None, events: list[Even
         what = ("The player beat you, then humiliated you and took your purse." if verb == "humiliate"
                 else "The player beat you in a duel, then spared you.")
         speeches.append(Speech(C.RIVAL, key, line(C.RIVAL, key, [last]), what))
-    elif verb == "bribe":
-        speeches.append(Speech(C.GUARD, "bribe", line(C.GUARD, "bribe", [last]),
-                               f"The player just paid you a {C.FINE}-coin fine."))
+    elif verb == "bribe" and events and events[0].verb == "bribe":  # she took it; a haggle speaks through rules._offer
+        paid = events[0].amount
+        speeches.append(Speech(C.GUARD, "bribe", line(C.GUARD, "bribe", [last], amount=paid),
+                               f"The player just paid you a {paid}-coin fine."))
     elif verb == "talk":
         speeches.append(Speech(target, "talk", _talk(w, target), f'The player says to you: "{text or ""}"'))
     elif verb == "tell_claim":
@@ -259,6 +295,11 @@ def decision_line(w: World, npc: str, chosen: str, claim: Claim | None = None,
         if chosen.startswith("question"):
             return line(C.GUARD, "question", b, witness=C.short_name(chosen.split(":", 1)[1]))
     return None
+
+
+def haggle_line(chosen: str, offer: Event, amount: int, price: int) -> tuple[str, list[str]] | None:
+    """Brenna's template answer to an offer under her price (#36): a counter or a refusal, citing the offer."""
+    return line(C.GUARD, "refuse" if chosen == "refuse" else "counter", [offer.id], offer=amount, price=price)
 
 
 def crossed_threshold(w: World, npc_id: str) -> bool:

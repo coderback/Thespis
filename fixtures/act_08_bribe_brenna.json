@@ -9,14 +9,15 @@
       "loc": "guard_post",
       "claim": null,
       "truth": true,
-      "schema_version": 1
+      "schema_version": 1,
+      "amount": 20
     }
   ],
   "replies": [
     {
       "decision": "d0011",
       "npc": "brenna",
-      "line": "Twenty coins says I was looking the other way.",
+      "line": "For 20 coins, I was looking the other way.",
       "cites": [
         "e0015"
       ],
@@ -503,7 +504,8 @@
         "loc": "guard_post",
         "claim": null,
         "truth": true,
-        "schema_version": 1
+        "schema_version": 1,
+        "amount": 20
       },
       {
         "id": "e0015",
@@ -514,7 +516,8 @@
         "loc": "guard_post",
         "claim": null,
         "truth": true,
-        "schema_version": 1
+        "schema_version": 1,
+        "amount": 20
       }
     ],
     "decisions_tail": [
@@ -673,7 +676,7 @@
         "trigger": "bribe",
         "allowed": [],
         "chosen": null,
-        "line": "Twenty coins says I was looking the other way.",
+        "line": "For 20 coins, I was looking the other way.",
         "cites": [
           "e0014"
         ],
@@ -688,7 +691,7 @@
         "trigger": "bribe",
         "allowed": [],
         "chosen": null,
-        "line": "Twenty coins says I was looking the other way.",
+        "line": "For 20 coins, I was looking the other way.",
         "cites": [
           "e0015"
         ],

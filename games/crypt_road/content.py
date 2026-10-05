@@ -27,7 +27,8 @@ RIVAL = "kael"  # races you to the relic and remembers what you did
 GUARD = "brenna"  # holds the gate; believes people she trusts
 GOSSIPS = ("odo", "mags")  # pass on what they know, in this order
 WITNESSES = ("odo", "mags")  # the guard can question them
-FINE = 20  # the bribe, in coins
+FINE = 20  # the standard fine, in coins: the offer the client suggests first
+PRICE_MIN, PRICE_MAX = 15, 30  # the bounds on what Brenna will take (#36)
 DUEL_WIN_CHANCE = 0.6
 CRIME_CONF = 0.5  # beliefs below this are stored and shown but never acted on
 
@@ -45,6 +46,16 @@ def conf_from_trust(trust: int) -> float:
     if trust >= 0:
         return 0.4
     return 0.2
+
+
+def asking_price(trust: int) -> int:
+    """The least Brenna will take to look the other way, from her trust in the payer (#36).
+
+    Always between PRICE_MIN and PRICE_MAX, and never under the standard fine while she distrusts you.
+    """
+    if trust >= 0:
+        return PRICE_MIN
+    return min(PRICE_MAX, FINE + 5 * max(0, -trust - 2))  # 20 at -1 or -2, 25 at -3, 30 from -4
 
 
 def short_name(npc: str) -> str:

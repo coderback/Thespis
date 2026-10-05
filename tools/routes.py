@@ -22,6 +22,8 @@ ROUTES = {
     "spare": ["insult", "challenge", "spare"],
     "duel_lost": ["insult", "challenge"],
     "provoke_wait": ["provoke", "wait", "move", "move", "pay"],
+    "haggle": ["provoke", "move", "move", "offer10"],
+    "lowball": ["provoke", "move", "move", "offer5"],
 }
 EXPECTED = {
     "rush": "won@4",
@@ -32,6 +34,8 @@ EXPECTED = {
     "spare": "won@5",
     "duel_lost": "lost@4",
     "provoke_wait": "lost@5",
+    "haggle": "won@5",
+    "lowball": "lost@5",
 }
 
 
@@ -129,6 +133,18 @@ def advance(s: Session) -> dict:
     return s.state()
 
 
+def haggle(s: Session, offer: int) -> None:
+    """Offer Brenna too little, then pay her price: at once if she counters, a phase later if she refuses."""
+    st = s.state()
+    if npc(st, "brenna")["trust_in"]["player"] >= 0 or st["player"]["coins"] < offer:
+        return
+    if s.act("bribe", "brenna", amount=offer)["events"][-1]["verb"] == "refuse":
+        s.act("wait")  # stuck at the gate: the refusal costs a phase
+    st = s.state()
+    if st["status"] == "playing":
+        s.act("bribe", "brenna", amount=C.asking_price(npc(st, "brenna")["trust_in"]["player"]))
+
+
 def play(s: Session, name: str) -> dict:
     """Play a started session along a route to the end of the race, and return the final state."""
     for step in ROUTES[name]:
@@ -139,6 +155,8 @@ def play(s: Session, name: str) -> dict:
                 s.act("bribe", "brenna", amount=C.FINE)
         elif step == "lie":
             s.act("tell_claim", "brenna", claim=LIE)
+        elif step.startswith("offer"):  # "offer10": haggle at the gate (#36), then pay Brenna's price
+            haggle(s, int(step.removeprefix("offer")))
         elif step == "bribe":
             if s.state()["player"]["coins"] >= C.FINE:  # after a lost duel there's no purse to pay with
                 s.act("bribe", "brenna", amount=C.FINE)
