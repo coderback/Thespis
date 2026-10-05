@@ -1,5 +1,7 @@
 """#19: the Dungeon Master. Code-sifted story hooks, and a model-told digest with the code-built one as the fallback."""
 
+import json
+
 import pytest
 
 from games.crypt_road import rules, views, voice
@@ -69,6 +71,19 @@ def test_the_model_tells_the_digest_and_the_cache_retells_it(app_client):
 
     again = client.get("/digest", params={"since": 2}, headers=to_guard_post(client)).json()
     assert (again["source"], again["text"]) == ("cache", "So be it.")
+
+
+def test_the_hook_is_shown_but_not_handed_to_the_model(app_client):
+    """#83: told the hook as a thread to end on, the model repeated it, or denied it when its events were outside the
+    window. The model now tells only its window's events; the client shows the hook under the telling."""
+    app, client = app_client
+    headers = to_guard_post(client)
+    calls = len(app.state.gateway.calls)
+    d = client.get("/digest", params={"since": 2}, headers=headers).json()
+    assert d["hook"] == "Revenge is brewing: Kael took his grudge to the Captain."
+    [pack] = [p for c, p in app.state.gateway.calls[calls:] if c == "narrate"]
+    assert pack["situation"] == "Tell the player what happened since they last looked."
+    assert "Revenge" not in json.dumps(pack)
 
 
 def test_a_bad_telling_falls_back_to_the_code_built_digest(app_client):

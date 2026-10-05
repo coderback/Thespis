@@ -1,4 +1,4 @@
-"""The Crypt Road's story hooks (#19): arcs the director sifts from the ledger, for the Dungeon Master to end on.
+"""The Crypt Road's story hooks (#19): arcs the director sifts from the ledger, shown under the Dungeon Master's telling.
 
 Importing this module registers them with the core's registry (thespis/director.py).
 """

@@ -7,7 +7,7 @@ same way: every telling must cite the events it uses and may name only who and w
 from __future__ import annotations
 
 from games.crypt_road import content as C
-from games.crypt_road import voice, words
+from games.crypt_road import words
 from thespis.expression import Mind, StatePack, Utterance
 from thespis.ledger import Event
 
@@ -16,8 +16,12 @@ def code_telling(events: list[Event]) -> str:
     return " ".join(words.sentence(e) for e in events)
 
 
-def narrate(mind: Mind | None, events: list[Event], hook: str | None) -> tuple[str, list[str], str]:
-    """The telling of `events`, the ids it cites, and where it came from: llm, cache or fallback."""
+def narrate(mind: Mind | None, events: list[Event]) -> tuple[str, list[str], str]:
+    """The telling of `events`, the ids it cites, and where it came from: llm, cache or fallback.
+
+    The story hook is not handed to the model (#83). The client shows it under every telling; given it as a thread
+    to end on, the model repeated it, or, when the events behind it were outside the window, said it never happened.
+    """
     text, ids = code_telling(events), [e.id for e in events]
     if not events or mind is None or not mind.active:
         return text, ids, "fallback"
@@ -28,9 +32,6 @@ def narrate(mind: Mind | None, events: list[Event], hook: str | None) -> tuple[s
         if e.claim:
             names |= {e.claim.a, e.claim.b}
     situation = "Tell the player what happened since they last looked."
-    if hook:
-        situation += f" The thread to end on: {hook}"
-        names |= voice.VALIDATOR.named(hook)  # the hook comes from the ledger, so whoever it names may be named
     pack = StatePack(
         npc="narrator", name=cast["name"], persona=cast["persona"], goal="Tell the story so far, truthfully",
         situation=situation, here=[], drives={}, trust_in={}, beliefs=[],
