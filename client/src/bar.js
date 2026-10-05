@@ -85,9 +85,9 @@ export class Bar {
   click(v, el) {
     if (v.verb === "talk") return this.talkPop(v, el);
     if (v.verb === "tell_claim") return this.tellPop(v, el);
+    if (v.verb === "bribe") return this.bribePop(v, el);
     const body = { verb: v.verb };
     if (v.target) body.target = v.target;
-    if (v.verb === "bribe") body.amount = v.args?.amount ?? 20;
     this.onAct(body);
   }
 
@@ -123,6 +123,24 @@ export class Bar {
     };
   }
 
+  bribePop(v, el) {
+    const { amount = 20, min = 1, max = amount } = v.args || {};
+    const who = esc(name(v.target));
+    const pop = this.openPop(`<h4>Bribe ${who}</h4>
+      <form class="row"><input id="bribe-amount" type="number" min="${min}" max="${max}" step="1" value="${amount}" aria-label="Coins to offer" /><button class="act" style="flex:none">Offer</button></form>
+      <div class="count">You have ${max} coins. Offer too little and ${who} names a price, or turns you away for the phase.</div>`, el);
+    const input = pop.querySelector("input");
+    input.focus();
+    input.select();
+    pop.querySelector("form").onsubmit = (e) => {
+      e.preventDefault();
+      const n = Math.round(Number(input.value));
+      if (!(n >= min && n <= max)) return input.focus();
+      this.closePop();
+      this.onAct({ verb: "bribe", target: v.target, amount: n });
+    };
+  }
+
   tellPop(v, el) {
     const preds = v.args?.preds || ["robbed", "beat", "insulted", "spared", "lied"];
     const subs = v.args?.subjects || ["player", "kael", "brenna", "mags", "odo"];
@@ -146,5 +164,5 @@ export class Bar {
 }
 
 function shortLabel(v) {
-  return { talk: "Talk", insult: "Insult", challenge: "Challenge", humiliate: "Humiliate", spare: "Spare", tell_claim: "Tell...", bribe: `Bribe (${v.args?.amount ?? 20})` }[v.verb] || v.label;
+  return { talk: "Talk", insult: "Insult", challenge: "Challenge", humiliate: "Humiliate", spare: "Spare", tell_claim: "Tell...", bribe: "Bribe..." }[v.verb] || v.label;
 }

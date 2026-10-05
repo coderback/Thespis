@@ -151,11 +151,29 @@ class World:
         self.witness(claim, "player", "kael", self.event("spare", "player", "kael", claim))
         self.tick("wait")
 
+    def asking_price(self):
+        """The least Brenna takes: 15 to 30 coins, never under 20 while she distrusts the player (#36)."""
+        t = self.brenna["trust"]["player"]
+        return 15 if t >= 0 else min(30, 20 + 5 * max(0, -t - 2))
+
     def bribe(self, amount=20):
-        assert self.player["loc"] == 2 and self.player["coins"] >= amount >= 20
-        self.player["coins"] -= amount
-        self.brenna["trust"]["player"] += 2
-        self.event("bribe", "player", "brenna")
+        """Offer Brenna `amount` coins: "paid" at or above her price; below it the utility brain counters at her
+        price ("countered"), or refuses a lowball under half of it ("refused") and hears no more offers this phase."""
+        assert self.player["loc"] == 2 and 1 <= amount <= self.player["coins"]
+        assert self.brenna.get("refused_phase") != self.phase, "Brenna won't hear another offer this phase"
+        price = self.asking_price()
+        if amount >= price:
+            self.player["coins"] -= amount
+            self.brenna["trust"]["player"] += 2
+            self.event("bribe", "player", "brenna")
+            return "paid"
+        self.event("offer", "player", "brenna")
+        if amount * 2 < price:
+            self.brenna["refused_phase"] = self.phase
+            self.event("refuse", "brenna", "player")
+            return "refused"
+        self.event("counter", "brenna", "player")
+        return "countered"
 
     def tell_claim(self, npc, claim):
         assert self.loc_of(npc) == self.player["loc"]
@@ -323,6 +341,24 @@ def route_provoke(seed, pay=True, frame=False, wait_after=False):
     return w
 
 
+def route_haggle(seed, offer=10):
+    """Provoke, then haggle at the gate (#36): offer too little, then pay her price, at once if she counters or a
+    phase later (stuck at the gate) if she refuses."""
+    w = World(seed)
+    w.insult()
+    if not w.challenge():
+        advance(w, []); return w
+    w.humiliate()
+    w.tick("move"); w.tick("move")
+    if w.status == "playing" and w.player["loc"] == 2 and w.brenna["trust"]["player"] < 0:
+        if w.bribe(offer) == "refused":
+            w.tick("wait")                   # stuck at the gate: the refusal costs a phase
+        if w.status == "playing":
+            w.bribe(w.asking_price())
+    advance(w, [])
+    return w
+
+
 def route_lie_unpaid(seed):
     w = World(seed)
     w.insult(); w.challenge(); w.humiliate()
@@ -406,6 +442,8 @@ if __name__ == "__main__":
         ("Duel lost", route_duel_lost(seed)),
         ("Provoke, then wait", route_provoke(seed, pay=True, wait_after=True)),
         ("Provoke, wait, frame", route_provoke(seed, frame=True, wait_after=True)),
+        ("Haggle: offer 10", route_haggle(seed, offer=10)),
+        ("Lowball: offer 5", route_haggle(seed, offer=5)),
     ]
     print(f"seed {seed}; first duel {'WINS' if dice(seed, 'challenge:1') < 0.6 else 'loses'}\n")
     print(f"{'route':24} {'result':10} coins  kael_grudge")

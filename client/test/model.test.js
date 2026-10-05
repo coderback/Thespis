@@ -68,6 +68,11 @@ test("text helpers", () => {
   assert.equal(clock({ phase: 3 }), "Day 1 · Night");
   assert.equal(claimText({ pred: "robbed", a: "player", b: "kael" }), "You robbed Kael");
   assert.equal(eventText({ verb: "move", actor: "odo", loc: "market", target: "guard_post" }), "Odo walked from the market to the guard post");
+  // Haggling with Brenna (#36)
+  assert.equal(eventText({ verb: "offer", actor: "player", target: "brenna", amount: 10 }), "You offered Brenna 10 coins");
+  assert.equal(eventText({ verb: "counter", actor: "brenna", target: "player", amount: 20 }), "Brenna asked you for 20 coins");
+  assert.equal(eventText({ verb: "refuse", actor: "brenna", target: "player" }), "Brenna turned down your offer");
+  assert.equal(eventText({ verb: "bribe", actor: "player", target: "brenna", amount: 20 }), "You paid Brenna 20 coins");
   assert.ok(worldMemory(fx("state_p7_end")).some((l) => l.startsWith("Brenna no longer believes")));
 });
 

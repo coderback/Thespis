@@ -51,7 +51,7 @@ def check_state(s):
         assert set(b) == BELIEF_KEYS
         assert b["conf"] == max(e["conf"] for e in b["evidence"])
     for e in s["ledger_tail"]:
-        assert set(e) == EVENT_KEYS and e["loc"] in sim.STOPS
+        assert set(e) - {"amount"} == EVENT_KEYS and e["loc"] in sim.STOPS  # amount only where coins moved (#36)
     for d in s["decisions_tail"]:
         assert set(d) == DECISION_KEYS and d["kind"] in ("decide", "react")
         assert d["source"] in ("llm", "cache", "fallback")

@@ -37,12 +37,12 @@ Only verbs whose target shares the player's stop are listed. A verb with no targ
 | `humiliate` | `kael` | Yes | | `{}` |
 | `spare` | `kael` | Yes | | `{}` |
 | `tell_claim` | NPC at your stop | No | `claim` | `{preds: [...], subjects: [...]}`: the claim builder's options |
-| `bribe` | `brenna` | No | `amount` | `{amount: 20}` (fixed for now) |
+| `bribe` | `brenna` | No | `amount`, whole coins from 1 to what you hold | `{amount, min: 1, max: <your coins>}`: `amount` is the offer to suggest, her last counter or 20 |
 | `move` | none | Yes | | `{to: "<next stop>"}` |
 | `wait` | none | Yes | | `{}` |
 | `take_relic` | none | Ends the race | | `{}` |
 
-`label` is the button text, for example `"Insult Kael"` or `"Bribe Brenna (20)"`.
+`label` is the button text, for example `"Insult Kael"` or `"Bribe Brenna..."`.
 
 **Duels.** A lost `challenge` ends the phase as usual. A won `challenge` does not end it: the response has
 `tick: null` and `state.pending: "duel_won"`, and until the player picks `humiliate` or `spare` every other verb is
@@ -50,6 +50,20 @@ disabled with the reason `"Choose: humiliate or spare"`. The pick ends the phase
 
 **The gate.** While Brenna's trust in the player is below 0, `move` at the guard post is disabled with a reason such as
 `"Blocked: Brenna's trust in you is -2"`.
+
+**Bribes (#36).** The player offers any amount; Brenna's price comes from her trust in them:
+
+| Brenna's trust in the player | 0 or more | -1 or -2 | -3 | -4 or less |
+| --- | --- | --- | --- | --- |
+| Her price, in coins | 15 | 20 | 25 | 30 |
+
+- An offer at or above her price is paid in full: a `bribe` event with `amount`, and her trust in the player rises by 2.
+- Below it she counters at her price (a `counter` event with `amount`) or refuses (a `refuse` event); she never takes
+  less. The model chooses between the two and words her reply; without a model a lowball (under half her price) is
+  refused and anything else countered. Either way an `offer` event comes first, and her reply is in `replies`.
+- After a refusal `bribe` is disabled until the next phase, with the reason `"Brenna won't hear another offer until the
+  next phase"`.
+- An offer outside 1 to the player's coins is refused with 409 and a reason, and nothing is written.
 
 ## Acting
 
@@ -110,6 +124,8 @@ A ledger event:
   "claim": { "pred": "robbed", "a": "player", "b": "kael" }, "truth": true, "schema_version": 1 }
 ```
 
+Events that move coins also carry `amount`: `bribe`, `offer` and `counter`. Other events have no `amount` key.
+
 `loc` is the stop where the event happened; for a `move` it is the stop left, and `target` is the stop reached.
 `claim` is `null` for events that carry none, such as `move`. For an event
 that carries a claim, `truth` says whether that claim happened, so a lie told as `tell_claim` has `truth: false`.
@@ -137,8 +153,9 @@ she didn't see (`e0004`). The why-chain reaches the humiliation through the beli
 The ledger holds what happened in the world: things someone could witness or be told about. Each event gets the next
 id in its session (`e0001`, `e0002`, ...).
 
-- **Written:** `insult`, `challenge`, `beat`, `humiliate`, `spare`, `tell_claim`, `bribe`, `move` (player and NPCs,
-  one per stop moved), `block`, `accuse`, `detain`, `release`, `gossip`, `testify`, `take_relic`.
+- **Written:** `insult`, `challenge`, `beat`, `humiliate`, `spare`, `tell_claim`, `bribe`, `offer`, `counter`, `refuse`,
+  `move` (player and NPCs, one per stop moved), `block`, `accuse`, `detain`, `release`, `gossip`, `testify`,
+  `take_relic`.
 - **Not written:** `talk` and `wait` (they change nothing), and decisions, which are their own records (`d0001`, ...).
   Beliefs are records too (`b0001`, ...).
 

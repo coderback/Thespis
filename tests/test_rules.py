@@ -62,6 +62,23 @@ def route_provoke(seed, pay=True, frame=False, wait_after=False):
     return w
 
 
+def route_haggle(seed, offer=10):
+    w = new_world(seed)
+    if not provoke(w):
+        advance(w)
+        return w
+    rules.act(w, "move")
+    rules.act(w, "move")
+    if w.status == PLAYING and w.player["loc"] == "guard_post" and w.npcs["brenna"].trust_in["player"] < 0:
+        rules.act(w, "bribe", "brenna", amount=offer)
+        if list(w.ledger)[-1].verb == "refuse":
+            rules.act(w, "wait")  # stuck at the gate: the refusal costs a phase
+        if w.status == PLAYING:
+            rules.act(w, "bribe", "brenna", amount=C.asking_price(w.npcs["brenna"].trust_in["player"]))
+    advance(w)
+    return w
+
+
 def route_lie_unpaid(seed):
     w = new_world(seed)
     provoke(w)
@@ -103,6 +120,8 @@ ROUTES = {
     "duel_lost": (route_duel_lost, sim.route_duel_lost, {}),
     "provoke_wait": (route_provoke, sim.route_provoke, {"pay": True, "wait_after": True}),
     "provoke_wait_frame": (route_provoke, sim.route_provoke, {"frame": True, "wait_after": True}),
+    "haggle": (route_haggle, sim.route_haggle, {"offer": 10}),
+    "lowball": (route_haggle, sim.route_haggle, {"offer": 5}),
 }
 
 

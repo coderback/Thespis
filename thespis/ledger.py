@@ -40,10 +40,13 @@ class Event:
     claim: Claim | None = None
     truth: bool = True
     schema_version: int = SCHEMA_VERSION
+    amount: int | None = None  # a quantity the event moved, such as coins paid; the game decides what it counts
 
     def to_json(self) -> dict:
         d = asdict(self)
         d["claim"] = self.claim.to_json() if self.claim else None
+        if d["amount"] is None:
+            del d["amount"]  # so events without one serialise exactly as they always have
         return d
 
     @classmethod
@@ -59,8 +62,8 @@ class Ledger:
         self._by_id = {e.id: e for e in self._events}
 
     def append(self, phase: int, verb: str, actor: str, target: str | None, loc: str,
-               claim: Claim | None = None, truth: bool = True) -> Event:
-        event = Event(f"e{len(self._events) + 1:04d}", phase, verb, actor, target, loc, claim, truth)
+               claim: Claim | None = None, truth: bool = True, amount: int | None = None) -> Event:
+        event = Event(f"e{len(self._events) + 1:04d}", phase, verb, actor, target, loc, claim, truth, amount=amount)
         self._events.append(event)
         self._by_id[event.id] = event
         return event

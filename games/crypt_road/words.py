@@ -51,7 +51,13 @@ def sentence(e: Event, player: tuple[str, str] = TO_PLAYER) -> str:
         case "spare":
             return f"{a} spared {t}."
         case "bribe":
-            return f"{a} paid {t} a fine."
+            return f"{a} paid {t} {e.amount} coins." if e.amount else f"{a} paid {t} a fine."
+        case "offer":
+            return f"{a} offered {t} {e.amount} coins."
+        case "counter":
+            return f"{a} asked {t} for {e.amount} coins."
+        case "refuse":
+            return f"{a} turned down {'your' if t == 'you' else t + chr(39) + 's'} offer."
         case "move":
             return f"{a} walked from {where} to {C.STOP_NAMES.get(e.target, e.target)}."
         case "block":
