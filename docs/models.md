@@ -33,7 +33,7 @@ Reasoning is off for speed. `max_tokens` is replaced by `max_completion_tokens`,
 | gpt-6-luna | 20 (5) | 100% | 1384 ms | 1622 ms | 1695 ms |
 | gpt-5.4-nano | 20 (5) | 100% | 1403 ms | 1673 ms | 2066 ms |
 
-**The primary on the host**, from [results.md](../results.md): 80 calls inside the hosted engine, 1315 ms p50 / 1585 ms p95, and 0 of 80 replies blocked by the validator. The backup has never been needed on the host: Luna answered every call. Both deployments share one key, and the benchmark shows it works for both.
+**The primary on the host**, from [results.md](../results.md): 70 calls inside the hosted engine, 910 ms p50 / 1427 ms p95, and 0 of 70 replies blocked by the validator. The backup answered once, when Luna didn't (1 of 70 calls in the last run). Both deployments share one key, and the benchmark shows it works for both.
 
 ## Why these two
 
@@ -46,7 +46,7 @@ The design's rule: the primary is the lowest p95 among models with at least 95% 
 
 ## Cost
 
-Under a tenth of a cent per run: $0.00066 for a run where every call goes to the model, about 11 calls of roughly 400 tokens in and 40 out ([results.md](../results.md)). Lines answered from the cache cost nothing.
+Under a tenth of a cent per run: $0.00065 for a run where every call goes to the model, about 11 calls of roughly 400 tokens in and 40 out ([results.md](../results.md)). Lines answered from the cache cost nothing.
 
 ## Re-run
 
