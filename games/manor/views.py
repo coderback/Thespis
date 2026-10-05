@@ -1,4 +1,4 @@
-"""What the manor's text page sees: the state, with every belief and ledger event marked against the truth."""
+"""What the manor's client sees: the state, with every belief and ledger event marked against the truth."""
 
 from __future__ import annotations
 
@@ -24,6 +24,7 @@ def state_view(w: World) -> dict:
     cast = C.load_cast()["npc"]
     return {
         "game": "manor", "phase": w.phase, "clock": clock(w.phase), "deadline": clock(C.DEADLINE),
+        "clocks": [clock(p) for p in range(len(C.PHASES))],
         "status": w.status, "ended_at": w.ended_at, "outcome": w.player.get("outcome"), "brain": w.brain_mode,
         "player": {"loc": w.player["loc"], "asked": list(w.player["asked"])},
         "rooms": [{"id": r, "name": C.ROOM_NAMES[r]} for r in C.ROOMS],

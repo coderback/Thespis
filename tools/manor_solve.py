@@ -16,8 +16,11 @@ import httpx
 # Ask Sable (she lies), ask Pell (he saw her leave the study), have Lady Vane question Pell, accuse Sable.
 SOLVE = [("move", "kitchen", None), ("ask", "sable", "morning"), ("move", "study", None), ("ask", "pell", "morning"),
          ("move", "hall", None), ("request_questioning", "pell", None), ("accuse", "sable", None)]
+# The client's "Watch the case solved" (client/src/manor/autoplay.js): the solve, after asking Lady Vane first.
+WATCH = [("ask", "vane", "ring"), ("ask", "vane", "morning")] + SOLVE
 ROUTES = {
     "the solve": (SOLVE, "won"),
+    "the Watch route": (WATCH, "won"),
     "accuse Sable too early": ([("accuse", "sable", None)], "lost"),
     "accuse Pell": (SOLVE[:-1] + [("accuse", "pell", None)], "lost"),
 }

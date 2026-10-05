@@ -1,0 +1,21 @@
+/* The manor mystery on top of The Crypt Road's styles (src/style.css): speaker colours, lies, and the title card. */
+
+.who.vane { color: #c9a0e8; }
+.who.pell { color: #c9d1d9; }
+.who.sable { color: #f0a0a0; }
+.who.player { color: #9fe08a; }
+
+.badge.lie { background: #5a2a26; color: #f2a59b; }
+.badge.model { background: #2f4d2a; color: #a8e08f; }
+.digest .note { margin: 1px 0; }
+.digest .note.lie { color: #f2c0b8; }
+.ev.lie { background: rgba(224, 87, 74, 0.08); }
+.manor-note { padding: 0 0 6px; font-size: 12px; }
+.node.lie-k { border-color: var(--bad); }
+.node.lie-k::before { background: var(--bad); }
+.act.accuse:not(.ends) { border-color: var(--bad); }
+
+#deadline { font: 700 12px var(--sans); color: var(--accent-2); }
+#landing .title-card h1 { color: #e8c8f0; text-shadow: 4px 4px 0 #1b1420, 0 0 30px rgba(201, 160, 232, .35); }
+.also { display: block; margin: 8px auto 0; color: var(--muted); font-size: 13px; }
+.also a { color: var(--accent-2); }

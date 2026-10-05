@@ -139,3 +139,14 @@ def test_the_api_solves_it_and_serves_the_page(client):
     assert (alibi["status"], alibi["truth"]) == ("retracted", False)
     assert app.state.store.calls_made() > 0  # counted with The Crypt Road's calls, against the global cap
     assert c.get("/state", headers=h).status_code == 404  # a manor session is invisible to The Crypt Road
+
+
+def test_the_dev_panel_turns_the_model_off_and_reloads(client):
+    app, c = client
+    h = {"X-Session": c.post("/manor/session").json()["session"]}
+    assert c.post("/manor/dev/brain", json={"mode": "fallback"}, headers=h).json() == {"mode": "fallback"}
+    calls = len(app.state.gateway.calls)
+    out = c.post("/manor/act", json={"verb": "ask", "target": "vane", "topic": "ring"}, headers=h).json()
+    assert out["replies"][0]["source"] == "fallback" and len(app.state.gateway.calls) == calls
+    assert c.post("/manor/reload", headers=h).json()["state"] == c.get("/manor/state", headers=h).json()
+    assert c.post("/manor/dev/brain", json={"mode": "sideways"}, headers=h).status_code == 400

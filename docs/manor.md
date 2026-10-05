@@ -1,7 +1,9 @@
 # The manor mystery
 
-A second game on the Thespis core (#35), to show the core works for more than one game. It is text-only, lives in
-`games/manor/`, imports nothing from The Crypt Road, and is served at `/manor/` on the same server.
+A second game on the Thespis core (#35), to show the core works for more than one game. The engine side lives in
+`games/manor/` and imports nothing from The Crypt Road; the client is the second page of the Vite client
+(`client/manor/`, code in `client/src/manor/`), with a pixel-art cutaway of the house, the same inspector, a Watch
+autoplay and code-built case notes. Both are served at `/manor/` on the same server.
 
 ## The case
 
@@ -63,12 +65,14 @@ All under `/manor`, with the session id in the `X-Session` header. Errors are `{
 
 | Endpoint | Returns |
 | --- | --- |
-| `GET /manor/` | The text page |
+| `GET /manor/` | The game's page (the built client; a short notice if the client hasn't been built) |
 | `POST /manor/session` | `{session, state}` |
 | `GET /manor/state` | The state: phase, clock, status, outcome, room, people, beliefs (each with `truth`), ledger (each with `truth` and `text`), decisions (a lie has `asserted`) |
 | `GET /manor/allowed` | `{verbs: [{verb, target, label, args, ends_phase, enabled, reason}]}` |
 | `POST /manor/act` `{verb, target?, topic?}` | `{events, replies, state}`; `replies` are `{decision, npc, line, cites, source}` |
 | `POST /manor/reset` | `{state}` |
+| `POST /manor/reload` | `{state}`, rebuilt from disk (the dev panel) |
+| `POST /manor/dev/brain` `{mode: "model" or "fallback"}` | `{mode}`: with `fallback`, no model calls |
 
 Manor sessions live in their own database beside The Crypt Road's (`manor.sqlite`). The model, its reply cache and the
 call caps are shared, so the manor's calls count against the same global cap.
