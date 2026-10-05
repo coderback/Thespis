@@ -219,7 +219,7 @@ def report(results: dict, host: str, commit: str) -> str:
     s = summarise(results)
     when = datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC")
     rules_ok = all(r["outcome"] == EXPECTED[r["route"]] for r in results["rules"])
-    models = ", then ".join(f"{m} ({n} calls)" for m, n in s["by_model"].most_common()) or "none answered"
+    models = ", then ".join(f"{m} ({n} call{'' if n == 1 else 's'})" for m, n in s["by_model"].most_common()) or "none answered"
     out = [
         "# Results",
         "",

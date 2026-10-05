@@ -95,13 +95,13 @@ are model-judged: GPT-5.4 nano read 50 of Luna's lines beside the state packs th
 | Measure | Value |
 | --- | --- |
 | NPC turns decided by code alone, with no model call | 87% |
-| Model replies blocked by the validator | 0 of 80 |
-| Model call latency on the host, p50 / p95 | 1315 ms / 1585 ms |
-| An action that calls the model, p50 / p95 | 1.4 s / 2.2 s |
-| An action that doesn't | 43 ms |
-| Cost per run, every call to the model | $0.00066 |
-| Routes ending as the rules model predicts | 8 of 8 |
-| Lines stating only what the NPC knew (model-judged) | 48 of 50 |
+| Model replies blocked by the validator | 0 of 70 |
+| Model call latency on the host, p50 / p95 | 910 ms / 1427 ms |
+| An action that calls the model, p50 / p95 | 1.0 s / 2.0 s |
+| An action that doesn't | 40 ms |
+| Cost per run, every call to the model | $0.00065 |
+| Routes ending as the rules model predicts | 10 of 10 |
+| Lines stating only what the NPC knew (model-judged) | 49 of 50 |
 | Lines in character (model-judged) | 50 of 50 |
 
 Which models and why: [docs/models.md](docs/models.md).
