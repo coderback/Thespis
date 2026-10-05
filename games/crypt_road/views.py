@@ -57,10 +57,10 @@ def digest_view(w: World, since: int, mind: Mind | None = None) -> dict:
     recent = [e for e in race if e.phase >= since][-DIGEST_EVENTS:]
     epilogue_events = after[-DIGEST_EVENTS:] if end is not None else []
     hook = _hook(w, {e.id for e in recent + epilogue_events})
-    text, cites, source = narrator.narrate(mind, recent, hook if end is None else None)  # after the race, the epilogue tells it
+    text, cites, source = narrator.narrate(mind, recent)
     epilogue = epilogue_source = None
     if end is not None:
-        epilogue, _, epilogue_source = narrator.narrate(mind, epilogue_events, hook)
+        epilogue, _, epilogue_source = narrator.narrate(mind, epilogue_events)
     return {"text": text, "hook": hook, "cites": cites, "epilogue": epilogue, "source": source,
             "epilogue_source": epilogue_source}
 

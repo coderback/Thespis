@@ -77,7 +77,7 @@ flowchart LR
 - **Persistence:** SQLite, an insert-only ledger table plus a snapshot per session, so a restart loses nothing.
 - **The Dungeon Master:** after each phase the model tells the player what happened, including what they couldn't
   see, citing the events it uses. Code sifts the ledger for the story's threads (revenge brewing, a lie told, a lie
-  exposed) for it to end on. If a telling fails the validator, the code-built telling stands.
+  exposed) and shows the live one under the telling. If a telling fails the validator, the code-built telling stands.
 - **Live persona editing:** in the inspector's Minds tab, change an NPC's persona and its next line follows it. The
   edit belongs to that game, so other players and the demo cache are untouched.
 
