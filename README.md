@@ -19,7 +19,8 @@ line it says must cite the ledger events and beliefs behind it, checked by code 
 
 - **Play it:** <https://thespis-production.up.railway.app>. Press **Watch the 60-second story**, or play it yourself.
 - **A second game on the same core:** <https://thespis-production.up.railway.app/manor/>, The Manor Mystery, a
-  detective scene where a maid lies to protect herself and the inspector catches her.
+  detective scene where a maid lies to protect herself and the inspector catches her. Press **Watch the case solved**,
+  or solve it yourself.
 - **Video:** <https://youtu.be/WD7oslaKQO4> (2 minutes, with subtitles).
 - **Numbers:** [results.md](results.md), measured on the hosted engine.
 
@@ -114,6 +115,18 @@ was and she lies. Her lie is an action the rules offer once she's frightened eno
 or deflect, the line must cite the claim it states, and the ledger logs it false, so the inspector marks it. Ask Pell,
 have Lady Vane question him, and his testimony breaks the alibi. Accuse Sable before evening to win.
 
+[![The manor mystery: Sable's lie in the why-chain, beside the house with the hall in darkness](docs/images/manor-lie-why-chain.jpg)](https://thespis-production.up.railway.app/manor/)
+
+*Sable's lie, traced: her line, the action she chose (to lie rather than dodge), the statement the ledger logged false,
+and what she really knew. Click the picture to play.*
+
+In the browser it plays like The Crypt Road. The house is a pixel-art cutaway drawn in code, where only the room you're
+in is lit and the afternoon turns to evening in the windows. People walk between rooms and speak in typed bubbles, Sable
+sweats as her fear rises, a red LIE stamp lands when a statement is logged false, and Pell walks into the hall to
+testify. Press **Watch the case solved** for the solve with captions (about a minute), or solve it yourself. The case
+notes after every move are built from the ledger with no model calls, and the inspector is The Crypt Road's: Minds,
+Beliefs, Ledger and Why.
+
 The only change the core needed was that one feature, NPC deception as a validated action (`thespis/deception.py`).
 `python tools/manor_solve.py <host>` solves it by script. Rules and API: [docs/manor.md](docs/manor.md).
 
@@ -174,7 +187,7 @@ To work on the client with hot reload, run `npm run dev` in `client/` next to th
 thespis/            the core: ledger, beliefs, minds, decisions, gateway, expression, store. Knows no game
 games/crypt_road/   the demo game as a Thespis adapter: content, rules, voice, views, the web app
 games/manor/        a second adapter: the manor mystery, served at /manor (its client is client/manor/)
-client/             the browser client: map, play UI, inspector, autoplay
+client/             the browser client for both games: The Crypt Road (index.html) and the manor (manor/)
 docs/               the API contract (api.md), models.md, and the design docs
 fixtures/           real API responses along the demo route, for building the client
 tools/              the rules model, harness, cache warmer, model benchmark and fixture generator
