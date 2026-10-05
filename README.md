@@ -19,7 +19,7 @@ line it says must cite the ledger events and beliefs behind it, checked by code 
 
 - **Play it:** <https://thespis-production.up.railway.app>. Press **Watch the 60-second story**, or play it yourself.
 - **A second game on the same core:** <https://thespis-production.up.railway.app/manor/>, The Manor Mystery, a
-  text-only detective scene where a maid lies to protect herself and the inspector catches her.
+  detective scene where a maid lies to protect herself and the inspector catches her.
 - **Video:** <https://youtu.be/WD7oslaKQO4> (2 minutes, with subtitles).
 - **Numbers:** [results.md](results.md), measured on the hosted engine.
 
@@ -108,7 +108,7 @@ Which models and why: [docs/models.md](docs/models.md).
 ## Same core, a different game: the manor mystery
 
 [The Manor Mystery](https://thespis-production.up.railway.app/manor/) is a three-room detective scene on the same
-core, text-only, with its own adapter (`games/manor/`) and none of the Crypt Road's code. Lady Vane's signet ring went
+core, with its own adapter (`games/manor/`) and none of the Crypt Road's code. Lady Vane's signet ring went
 missing before you arrived; the ledger knows Sable took it and that Pell saw her leave the study. Ask Sable where she
 was and she lies. Her lie is an action the rules offer once she's frightened enough: the model chooses whether to lie
 or deflect, the line must cite the claim it states, and the ledger logs it false, so the inspector marks it. Ask Pell,
@@ -173,7 +173,7 @@ To work on the client with hot reload, run `npm run dev` in `client/` next to th
 ```
 thespis/            the core: ledger, beliefs, minds, decisions, gateway, expression, store. Knows no game
 games/crypt_road/   the demo game as a Thespis adapter: content, rules, voice, views, the web app
-games/manor/        a second adapter: the manor mystery, text-only, served at /manor
+games/manor/        a second adapter: the manor mystery, served at /manor (its client is client/manor/)
 client/             the browser client: map, play UI, inspector, autoplay
 docs/               the API contract (api.md), models.md, and the design docs
 fixtures/           real API responses along the demo route, for building the client
