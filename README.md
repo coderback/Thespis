@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/coderback/Thespis/actions/workflows/ci.yml/badge.svg)](https://github.com/coderback/Thespis/actions/workflows/ci.yml)
 [![Play the demo](https://img.shields.io/badge/demo-play%20live-f0a03a)](https://thespis-production.up.railway.app)
+[![Play the manor mystery](https://img.shields.io/badge/second%20game-manor%20mystery-8e6c3a)](https://thespis-production.up.railway.app/manor/)
 [![Watch the video](https://img.shields.io/badge/video-2%20min-red?logo=youtube&logoColor=white)](https://youtu.be/WD7oslaKQO4)
 [![MIT licence](https://img.shields.io/badge/licence-MIT-blue)](LICENSE)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-3776ab?logo=python&logoColor=white)](pyproject.toml)
@@ -17,6 +18,8 @@ wants to do. A language model only chooses among actions the code has already al
 line it says must cite the ledger events and beliefs behind it, checked by code before anyone hears it.
 
 - **Play it:** <https://thespis-production.up.railway.app>. Press **Watch the 60-second story**, or play it yourself.
+- **A second game on the same core:** <https://thespis-production.up.railway.app/manor/>, The Manor Mystery, a
+  text-only detective scene where a maid lies to protect herself and the inspector catches her.
 - **Video:** <https://youtu.be/WD7oslaKQO4> (2 minutes, with subtitles).
 - **Numbers:** [results.md](results.md), measured on the hosted engine.
 
