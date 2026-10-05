@@ -1,0 +1,113 @@
+"""The manor mystery's API and text page, at /manor on the same server as The Crypt Road (#35).
+
+Its sessions live in their own database beside the Crypt Road's, so neither game can ever load the other's world. The
+model, its reply cache and the call caps are the server's, shared with The Crypt Road through app.state.
+"""
+
+from __future__ import annotations
+
+import math
+import threading
+from collections import defaultdict
+from pathlib import Path
+
+from fastapi import APIRouter, Header, Request
+from fastapi.responses import FileResponse, RedirectResponse
+from pydantic import BaseModel
+
+from games.hosting import ApiError, budget, client_ip, db_path
+from games.manor import rules, views
+from games.manor.content import new_world
+from thespis.store import SessionNotFound, Store
+from thespis.world import World
+
+PAGE = Path(__file__).with_name("page.html")
+router = APIRouter(prefix="/manor", tags=["manor"])
+_locks: defaultdict[str, threading.Lock] = defaultdict(threading.Lock)  # one request at a time per session
+_open = threading.Lock()
+
+
+class ActBody(BaseModel):
+    verb: str
+    target: str | None = None
+    topic: str | None = None
+
+
+def _sessions(request: Request) -> Store:
+    """The manor's own session store, beside the server's database (on the volume, when there is one)."""
+    path, state = db_path().with_name("manor.sqlite"), request.app.state
+    with _open:
+        if getattr(state, "manor_path", None) != path:
+            state.manor_store, state.manor_path = Store(path), path
+        return state.manor_store
+
+
+def _session(x_session: str | None) -> str:
+    if not x_session:
+        raise ApiError(400, "bad_request", "Send the session id in the X-Session header")
+    return x_session
+
+
+def _load(store: Store, session: str) -> World:
+    try:
+        return store.load(session)
+    except SessionNotFound:
+        raise ApiError(404, "unknown_session", "That session doesn't exist; start a new one") from None
+
+
+@router.get("", include_in_schema=False)
+def page_redirect():
+    return RedirectResponse("/manor/")
+
+
+@router.get("/", include_in_schema=False)
+def page():
+    return FileResponse(PAGE, media_type="text/html")
+
+
+@router.post("/session")
+def create_session(request: Request):
+    wait = request.app.state.limiter.wait(client_ip(request))
+    if wait:
+        raise ApiError(429, "rate_limited", f"Too many new games from here; try again in {math.ceil(wait / 60)} min")
+    store = _sessions(request)
+    session = store.create_session(1)
+    world = new_world()
+    store.save(session, world)
+    return {"session": session, "state": views.state_view(world)}
+
+
+@router.get("/state")
+def get_state(request: Request, x_session: str | None = Header(default=None)):
+    return views.state_view(_load(_sessions(request), _session(x_session)))
+
+
+@router.get("/allowed")
+def get_allowed(request: Request, x_session: str | None = Header(default=None)):
+    return {"verbs": rules.allowed(_load(_sessions(request), _session(x_session)))}
+
+
+@router.post("/act")
+def post_act(body: ActBody, request: Request, x_session: str | None = Header(default=None)):
+    store, session, state = _sessions(request), _session(x_session), request.app.state
+    with _locks[session]:
+        world = _load(store, session)
+        try:
+            result = rules.act(world, body.verb, body.target, body.topic, gateway=state.gateway, cache=state.store,
+                               replay=state.replay, budget=budget(state, state.store, world))
+        except rules.NotAllowed as e:
+            raise ApiError(409, "not_allowed", e.reason) from None
+        store.save(session, world)
+        if result.model_calls:
+            state.store.count_calls(result.model_calls)  # counted with The Crypt Road's, against the global cap
+        return views.act_view(result, world)
+
+
+@router.post("/reset")
+def post_reset(request: Request, x_session: str | None = Header(default=None)):
+    store, session = _sessions(request), _session(x_session)
+    with _locks[session]:
+        _load(store, session)
+        world = new_world()
+        store.reset(session, world)
+        return {"state": views.state_view(world)}

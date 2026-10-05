@@ -1,0 +1,47 @@
+# The manor mystery's cast (#35). Drives run 0 to 10; trust runs -5 to 5.
+# Lines are the code fallbacks the model's lines replace; {placeholders} are filled in by the adapter.
+
+[npc.vane]
+name = "Lady Vane"
+room = "hall"
+persona = "Mistress of the manor: imperious, sharp-eyed and slow to trust. She believes those who have served her longest, and she wants her signet ring back before evening."
+goal = "Find out who took your signet ring, without accusing anyone unjustly"
+drives = {}
+trust_in = { pell = 3, sable = 2, player = 0 }
+
+[npc.vane.lines]
+ring = "My signet ring is gone from the study. Find it before evening, or I send for the constable."
+morning = "Sable tells me she was in the kitchen at mid-morning. I have no reason to doubt her."
+morning_doubt = "Pell saw Sable leave the study at mid-morning, whatever she told me."
+questioned = "Pell saw Sable leave my study at mid-morning? Then she lied to me."
+questioned_sable = "Hm. We shall see whether the rest of the house agrees with you, Sable."
+won = "Pell saw you leave my study, Sable. Turn out your apron."
+lost_alibi = "On what grounds? Sable was in the kitchen at mid-morning; she told me so herself."
+lost_innocent = "Pell? Thirty years in my service. I think not. Good day."
+constable = "Evening, and no ring. I have sent for the constable. You may go."
+
+[npc.pell]
+name = "Pell"
+room = "study"
+persona = "The butler: precise, formal and scrupulously honest. He never lies, even to spare someone, and he notices everything that happens in the house."
+goal = "Serve Lady Vane and tell the truth"
+drives = {}
+trust_in = { vane = 4, sable = 1, player = 0 }
+
+[npc.pell.lines]
+ring = "Her ladyship's signet ring? It is kept in the study. I would not presume to touch it."
+morning = "I saw Sable leave the study at mid-morning, in something of a hurry."
+testify = "My lady, I saw Sable leave the study at mid-morning."
+
+[npc.sable]
+name = "Sable"
+room = "kitchen"
+persona = "The maid: quick, nervous and frightened of losing her place. She will lie to protect herself, though she is not a practised liar."
+goal = "Keep your place, and keep anyone from learning you took the ring"
+drives = { fear = 1 }
+trust_in = { vane = 2, pell = 1, player = 0 }
+
+[npc.sable.lines]
+deceive = "Me? I was in the kitchen at mid-morning, scrubbing pots, all on my own."
+deflect = "I couldn't say, I'm sure. It's been such a busy day."
+ring = "Her ladyship's ring? I'm sure I wouldn't know where she keeps her things."
