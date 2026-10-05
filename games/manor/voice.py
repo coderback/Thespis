@@ -1,0 +1,105 @@
+"""How the manor's people speak through the core: their state packs, the validator's vocabulary, and their lines.
+
+The pack follows the same rule as every Thespis game: the model sees only what the NPC knows, never whether a belief
+is true. Sable knows she took the ring; Lady Vane only knows what she has been told.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+from games.manor import content as C
+from games.manor import words
+from thespis.deception import asserting
+from thespis.decisions import REACT
+from thespis.expression import Mind, StatePack, Utterance, Validator
+from thespis.retriever import TopKRetriever
+from thespis.world import World
+
+VOCABULARY = {"lady vane": C.OWNER, "vane": C.OWNER, "her ladyship": C.OWNER, "pell": C.BUTLER, "sable": C.MAID,
+              **{r: r for r in C.ROOMS}}
+VALIDATOR = Validator(VOCABULARY)
+RETRIEVER = TopKRetriever(5)
+KNOWN_EVENTS = 5
+DOES = {
+    "deceive:alibi": "say you were in the kitchen at mid-morning. It isn't true: you were in the study. Cite \"said\" "
+                     "for what you claim",
+    "deflect": "avoid the question without saying where you were",
+}
+
+
+@dataclass
+class Speech:
+    npc: str
+    trigger: str
+    said: tuple[str, list[str]] | None  # the fallback line and its cites; None means the NPC stays silent
+    situation: str  # what just happened, from the NPC's point of view, for the model
+
+
+def template(npc: str, key: str) -> str | None:
+    return C.load_cast()["npc"][npc].get("lines", {}).get(key)
+
+
+def line(npc: str, key: str, cites: list[str]) -> tuple[str, list[str]] | None:
+    """A template line and what it cites, or None when there is no template or nothing to cite."""
+    text, cites = template(npc, key), [c for c in cites if c]
+    return (text, list(dict.fromkeys(cites))) if text and cites else None
+
+
+def knows(w: World, npc: str, event_id: str) -> bool:
+    """Can this NPC cite the event? It took part, it learned of it, or, once the player is here, it happened in its
+    room. Before that, no one saw what they weren't told they saw: Pell missed the theft in his own study."""
+    e = w.ledger.get(event_id)
+    if npc in (e.actor, e.target):
+        return True
+    if any(ev.event == event_id for b in w.beliefs.for_npc(npc) for ev in b.evidence):
+        return True
+    return e.phase >= C.ARRIVAL and w.npcs[npc].loc in (e.loc, e.target)
+
+
+def pack_for(w: World, npc_id: str, situation: str, options: dict[str, float] | None = None,
+             asserts: dict[str, str] | None = None) -> StatePack:
+    """Everything the model may know when it speaks for this NPC. `asserts` marks the options that state a claim."""
+    npc, cast = w.npcs[npc_id], C.load_cast()["npc"][npc_id]
+    others = [n.id for n in w.npcs_at(npc.loc) if n.id != npc_id]
+    if w.player["loc"] == npc.loc:
+        others.append("player")
+    beliefs = RETRIEVER.beliefs(w.beliefs, npc_id)
+    known = [e for e in reversed(list(w.ledger)) if knows(w, npc_id, e.id)][:KNOWN_EVENTS][::-1]
+    ordered = sorted(options or {}, key=lambda o: -(options or {})[o])
+    allowed = []
+    for o in ordered:
+        entry = {"id": o, "does": DOES.get(o, o.replace("_", " ")), "pull": (options or {})[o]}
+        allowed.append(asserting(entry, asserts[o]) if asserts and o in asserts else entry)
+    return StatePack(
+        npc=npc_id, name=cast["name"], persona=cast["persona"], goal=cast["goal"], situation=situation,
+        here=[words.who(x, about=True) for x in others], drives=dict(npc.drives), trust_in=dict(npc.trust_in),
+        beliefs=[{"id": b.id, "claim": words.claim_text(b.claim, about=True), "conf": b.conf,
+                  "from": sorted({e.source for e in b.evidence})} for b in beliefs],
+        events=[{"id": e.id, "what": words.sentence(e, about=True)} for e in known],
+        allowed=allowed,
+        names=set(C.ROOMS) | set(w.npcs),  # a small household: everyone knows everyone, and every room
+        setting=f"You are in {C.ROOM_NAMES[npc.loc]} of Lady Vane's manor, which has a hall, a study and a kitchen. "
+                f"It is {C.PHASES[min(w.phase, len(C.PHASES) - 1)]}.",
+    )
+
+
+def deliver(w: World, mind: Mind, speeches: list[Speech]) -> list[dict]:
+    """Voice a moment's lines, the model calls in parallel, and record each as a react decision."""
+    speeches = [s for s in speeches if s.said]
+    fallbacks = [Utterance(None, s.said[0], s.said[1], "fallback") for s in speeches]
+    if mind.active:
+        spoken = mind.react_many([(pack_for(w, s.npc, s.situation), f) for s, f in zip(speeches, fallbacks)])
+    else:
+        spoken = fallbacks
+    replies = []
+    for s, u in zip(speeches, spoken):
+        reason = f"{s.trigger}; {u.note}" if u.note else s.trigger
+        d = w.decisions.record(REACT, s.npc, w.phase, s.trigger, line=u.line, cites=u.cites, reason=reason,
+                               source=u.source)
+        replies.append(reply(d))
+    return replies
+
+
+def reply(d) -> dict:
+    return {"decision": d.id, "npc": d.npc, "line": d.line, "cites": d.cites, "source": d.source}

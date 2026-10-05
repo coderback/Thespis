@@ -102,6 +102,18 @@ are model-judged: GPT-5.4 nano read 50 of Luna's lines beside the state packs th
 
 Which models and why: [docs/models.md](docs/models.md).
 
+## Same core, a different game: the manor mystery
+
+[The Manor Mystery](https://thespis-production.up.railway.app/manor/) is a three-room detective scene on the same
+core, text-only, with its own adapter (`games/manor/`) and none of the Crypt Road's code. Lady Vane's signet ring went
+missing before you arrived; the ledger knows Sable took it and that Pell saw her leave the study. Ask Sable where she
+was and she lies. Her lie is an action the rules offer once she's frightened enough: the model chooses whether to lie
+or deflect, the line must cite the claim it states, and the ledger logs it false, so the inspector marks it. Ask Pell,
+have Lady Vane question him, and his testimony breaks the alibi. Accuse Sable before evening to win.
+
+The only change the core needed was that one feature, NPC deception as a validated action (`thespis/deception.py`).
+`python tools/manor_solve.py <host>` solves it by script. Rules and API: [docs/manor.md](docs/manor.md).
+
 ## What's new, and what isn't
 
 NPCs whose beliefs can be false against ground truth have existed in symbolic systems for a decade, so that isn't our
@@ -150,6 +162,7 @@ To work on the client with hot reload, run `npm run dev` in `client/` next to th
 | `python tools/warm_cache.py <host>` | Plays the client's autoplay route until the cache answers it all |
 | `python tools/bench_models.py` | Each configured model alone on real state packs: latency and valid picks |
 | `python tools/make_fixtures.py` | Regenerates `fixtures/` from the real API |
+| `python tools/manor_solve.py <host>` | Solves the manor mystery by script, and checks two wrong turns lose |
 | `DEMO_HOST=<host> pytest tests/demo_test.py` | The demo script's checks, beat by beat, against a live host |
 
 ## Repository layout
@@ -157,6 +170,7 @@ To work on the client with hot reload, run `npm run dev` in `client/` next to th
 ```
 thespis/            the core: ledger, beliefs, minds, decisions, gateway, expression, store. Knows no game
 games/crypt_road/   the demo game as a Thespis adapter: content, rules, voice, views, the web app
+games/manor/        a second adapter: the manor mystery, text-only, served at /manor
 client/             the browser client: map, play UI, inspector, autoplay
 docs/               the API contract (api.md), models.md, and the design docs
 fixtures/           real API responses along the demo route, for building the client

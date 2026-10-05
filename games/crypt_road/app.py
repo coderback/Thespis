@@ -4,12 +4,10 @@ Run locally:  uvicorn games.crypt_road.app:app --reload
 Each request loads its session from SQLite and saves it back, so a restart loses nothing.
 """
 
-import logging
 import math
 import os
 import threading
-import time
-from collections import defaultdict, deque
+from collections import defaultdict
 from contextlib import asynccontextmanager
 from dataclasses import asdict
 from pathlib import Path
@@ -24,6 +22,10 @@ from pydantic import BaseModel
 
 from games.crypt_road import rules, views, voice
 from games.crypt_road.content import DEMO_SEED, new_world
+from games.hosting import ApiError, SessionLimiter, client_ip, db_path, log
+from games.hosting import budget as _budget
+from games.hosting import env_int as _env_int
+from games.manor import api as manor
 from thespis.expression import Mind
 from thespis.gateway import gateway_from_env
 from thespis.store import SessionNotFound, Store
@@ -31,53 +33,7 @@ from thespis.store import SessionNotFound, Store
 ROOT = Path(__file__).resolve().parents[2]
 CLIENT_DIST = ROOT / "client" / "dist"
 
-log = logging.getLogger("thespis")
 _locks: defaultdict[str, threading.Lock] = defaultdict(threading.Lock)  # one request at a time per session
-
-
-def _env_int(name: str, default: int) -> int:
-    value = os.environ.get(name, "").strip()
-    return int(value) if value else default
-
-
-class SessionLimiter:
-    """At most `per_hour` new sessions per client IP in any hour; 0 turns it off. Kept in memory: a restart resets it."""
-
-    def __init__(self, per_hour: int, clock=time.monotonic):
-        self.per_hour, self.clock = per_hour, clock
-        self._seen: defaultdict[str, deque[float]] = defaultdict(deque)
-        self._lock = threading.Lock()
-
-    def wait(self, ip: str) -> float:
-        """0 if this IP may start a session now (and count it), else the seconds until it may."""
-        if self.per_hour <= 0:
-            return 0.0
-        now = self.clock()
-        with self._lock:
-            seen = self._seen[ip]
-            while seen and seen[0] <= now - 3600:
-                seen.popleft()
-            if len(seen) >= self.per_hour:
-                return seen[0] + 3600 - now
-            seen.append(now)
-            return 0.0
-
-
-def client_ip(request: Request) -> str:
-    """Railway's edge sets X-Real-IP to the client's address; X-Forwarded-For's first entry is the same."""
-    forwarded = request.headers.get("x-forwarded-for", "").split(",")[0].strip()
-    return request.headers.get("x-real-ip") or forwarded or (request.client.host if request.client else "unknown")
-
-
-def db_path() -> Path:
-    """DB_PATH, except that with a Railway volume attached the database always lives on the volume: anywhere else it
-    would be wiped, with every session and the model cache, on the next deploy."""
-    path = Path(os.environ.get("DB_PATH", "./data/thespis.sqlite"))
-    volume = os.environ.get("RAILWAY_VOLUME_MOUNT_PATH")
-    if volume and not path.resolve().is_relative_to(Path(volume).resolve()):
-        log.warning("DB_PATH %s is not on the volume at %s, so it would not survive a deploy; ignoring it", path, volume)
-        path = Path(volume) / "thespis.sqlite"
-    return path
 
 
 @asynccontextmanager
@@ -106,11 +62,6 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="Thespis: The Crypt Road", lifespan=lifespan)
 # The client's dev server runs on another port; in production it is served from this app.
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
-
-
-class ApiError(Exception):
-    def __init__(self, status: int, error: str, reason: str):
-        self.status, self.error, self.reason = status, error, reason
 
 
 @app.exception_handler(ApiError)
@@ -216,16 +167,6 @@ def post_act(body: ActBody, request: Request, x_session: str | None = Header(def
         return views.act_view(result, world)
 
 
-def _budget(state, store: Store, world) -> int | None:
-    """How many model calls this action may make: what's left of the session's cap and of the global cap."""
-    left = []
-    if state.session_cap > 0:
-        left.append(state.session_cap - world.counters.get("model_calls", 0))
-    if state.global_cap > 0:
-        left.append(state.global_cap - store.calls_made())
-    return max(0, min(left)) if left else None
-
-
 @app.get("/digest")
 def get_digest(request: Request, since: int = 0, x_session: str | None = Header(default=None)):
     """The Dungeon Master's telling. With the brain on it may call the model, so it counts against the caps."""
@@ -298,6 +239,9 @@ def post_persona(body: PersonaBody, request: Request, x_session: str | None = He
         store.save(session, world)
         return {"npc": body.npc, "persona": voice.persona_of(world, body.npc), "default": not text}
 
+
+# The second game on the same core (#35), text-only, at /manor.
+app.include_router(manor.router)
 
 # Mounted last so API routes win. Present once the client has been built (client/dist/index.html).
 if (CLIENT_DIST / "index.html").exists():

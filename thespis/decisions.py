@@ -20,9 +20,13 @@ class Decision:
     cites: list[str] = field(default_factory=list)
     reason: str = ""
     source: str = "fallback"  # "llm", "cache" or "fallback"
+    asserted: str | None = None  # the ledger event of the claim its action stated, if any (thespis.deception)
 
     def to_json(self) -> dict:
-        return asdict(self)
+        d = asdict(self)
+        if d["asserted"] is None:
+            del d["asserted"]  # so decisions that state nothing serialise exactly as they always have
+        return d
 
 
 class DecisionLog:

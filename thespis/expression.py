@@ -8,7 +8,8 @@ The validator rejects a reply, and the NPC falls back to its code line, when any
   - for a decision, the action is one of the allowed ids;
   - the line is a non-empty string of at most 160 characters;
   - it cites at least one id, and every cited id is in the state pack;
-  - it names no character or place that is absent from the pack.
+  - it names no character or place that is absent from the pack;
+  - for a decision whose action asserts a claim (thespis.deception), it cites that claim.
 
 A reply that passes is cached, keyed by the model, the prompt version, the call type and everything in the pack, so
 the same moment on the same route says the same thing again without a model call. In replay mode the Mind only
@@ -65,7 +66,8 @@ class StatePack:
 
     @property
     def ids(self) -> set[str]:
-        return {b["id"] for b in self.beliefs} | {e["id"] for e in self.events}
+        asserted = {a["asserts"]["id"] for a in self.allowed if "asserts" in a}
+        return {b["id"] for b in self.beliefs} | {e["id"] for e in self.events} | asserted
 
     def payload(self) -> dict:
         data = {"you": self.name, "goal": self.goal, "setting": self.setting, "situation": self.situation,
@@ -137,6 +139,14 @@ class Validator:
         unknown = [c for c in cites if c not in pack.ids]
         if unknown:
             return f"cites {', '.join(unknown)}, not in its state pack"
+        if kind == "decide":
+            chosen = next(a for a in pack.allowed if a["id"] == data["action"])
+            said = chosen["asserts"]["id"] if "asserts" in chosen else None
+            if said is not None and said not in cites:
+                return f"states something without citing {said!r}, the claim its action asserts"
+            other = {a["asserts"]["id"] for a in pack.allowed if "asserts" in a} - {said}
+            if other & set(cites):
+                return f"cites {', '.join(sorted(other & set(cites)))}, a claim its action doesn't state"
         absent = self.named(line) - pack.names
         if absent:
             return f"names {', '.join(sorted(absent))}, absent from its state pack"
