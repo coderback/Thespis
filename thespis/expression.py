@@ -20,7 +20,11 @@ The validator rejects a reply, and the NPC falls back to its code line, when any
 An action that states a claim (thespis.deception) always cites it: the Mind adds "said" if the model leaves it out,
 since the action, which code chose, is what states it.
 
-A reply that passes, and passes moderation (thespis.moderation), is cached, keyed by the model, PROMPT_HASH (the
+The validator checks form. A line with consequences (an accusation, testimony, a deal, a lie, the narrator: the
+game marks its pack's `stakes`) also meets the claim check (thespis.claims.ClaimCheck), which checks meaning: what
+the line claims, against what its speaker could know. A line that fails it falls back too.
+
+A reply that passes, the claim check if due, and moderation (thespis.moderation), is cached, keyed by the model, PROMPT_HASH (the
 prompts and schemas), the call type and everything in the pack, so the same moment says the same thing again
 without a model call. In replay mode the Mind only reads the cache: a miss falls back and the network is never
 touched.
@@ -42,6 +46,7 @@ from typing import Protocol
 
 from thespis.deception import SAID
 from thespis.gateway import ModelGateway, ModelReply
+from thespis.ledger import Claim
 from thespis.moderation import Moderator, NoModeration
 
 log = logging.getLogger("thespis.moderation")
@@ -94,6 +99,8 @@ class StatePack:
     names: set[str] = field(default_factory=set)  # every character and place the pack mentions, as game ids
     setting: str = ""  # where the NPC is and the lie of the land, as the game describes it
     untrusted: list[str] = field(default_factory=list)  # text a player wrote that the pack carries, for moderation
+    stakes: bool = False  # a line with consequences, so it meets the claim check; not shown to the model
+    asserted: Claim | None = None  # the claim its action states, typed, for the claim check; not shown either
 
     @property
     def asserts(self) -> bool:
@@ -132,11 +139,15 @@ class StatePack:
         """The reply's JSON schema: it may cite exactly the references this pack holds."""
         return schema_for(list(self.refs))
 
-    def cache_key(self, model: str, kind: str) -> str:
-        """sha256 of the model, the prompts' hash, the call type and everything the model is shown, canonically."""
-        canonical = json.dumps({"model": model, "prompts": PROMPT_HASH, "call": kind, "name": self.name,
-                                "persona": self.persona, "pack": self.payload()},
-                               sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+    def cache_key(self, model: str, kind: str, checked: bool = False) -> str:
+        """sha256 of the model, the prompts' hash, the call type and everything the model is shown, canonically. A
+        line that met the claim check is kept under its own key, so turning the check on never serves an unchecked
+        line from the cache."""
+        key = {"model": model, "prompts": PROMPT_HASH, "call": kind, "name": self.name, "persona": self.persona,
+               "pack": self.payload()}
+        if checked:
+            key["checked"] = True
+        canonical = json.dumps(key, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
         return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
@@ -196,6 +207,18 @@ class Validator:
 Observer = Callable[[str, StatePack, ModelReply | None, Utterance], None]
 
 
+class Checker(Protocol):
+    """Checks what lines mean before anyone hears them (thespis.claims.ClaimCheck)."""
+
+    def wants(self, pack: StatePack) -> bool:
+        """Should this pack's line be checked?"""
+        ...
+
+    def problems(self, items: list[tuple[StatePack, str]]) -> list[str | None]:
+        """Why each line can't be heard, or None; one model call each."""
+        ...
+
+
 class Mind:
     """Asks the model when there is one, and keeps only replies that pass the validator and the moderator.
 
@@ -205,12 +228,13 @@ class Mind:
 
     An `observer`, if given, sees every line the Mind settles while the model is on: the call type, the state pack,
     the model's reply if it made a call (None for a cache hit or a line it never asked for), and what was used.
-    Rehearsal measures the model through it.
+    Rehearsal measures the model through it. A `checker` checks the meaning of the lines it wants (the ones with
+    stakes) once the validator passes them; each check is a model call, counted in `asked` and against the budget.
     """
 
     def __init__(self, gateway: ModelGateway | None, validator: Validator, cache: ReplyCache | None = None,
                  replay: bool = False, budget: int | None = None, moderator: Moderator | None = None,
-                 observer: Observer | None = None):
+                 observer: Observer | None = None, checker: Checker | None = None):
         self.gateway = gateway if gateway is not None and getattr(gateway, "providers", None) else None
         self.validator = validator
         self.cache = cache
@@ -218,6 +242,7 @@ class Mind:
         self.budget = budget
         self.moderator = moderator or NoModeration()
         self.observer = observer
+        self.checker = checker
         self.asked = 0
         self.models = tuple(getattr(self.gateway, "models", ())) if self.gateway else ()
 
@@ -273,8 +298,27 @@ class Mind:
         for i, reply in zip(missing, answers):
             replies[i] = reply
             spoken[i] = self._accept(reply, *items[i], kind)
+        self._check(items, missing, spoken)
         self._keep(kind, items, list(zip(missing, answers)), spoken)
         return spoken
+
+    def _check(self, items: list[tuple[StatePack, Utterance]], answered: list[int], spoken: list) -> None:
+        """The claim check on the lines that want it, once the validator has passed them."""
+        if self.checker is None:
+            return
+        due = [i for i in answered if spoken[i].source == "llm" and self.checker.wants(items[i][0])]
+        if self.budget is not None:
+            allowed = max(0, self.budget - self.asked)
+            for i in due[allowed:]:
+                spoken[i] = _fell_back(items[i][1], "model call cap reached: no claim check")
+            due = due[:allowed]
+        if not due:
+            return
+        self.asked += len(due)
+        for i, problem in zip(due, self.checker.problems([(items[i][0], spoken[i].line) for i in due])):
+            if problem:
+                log.info("claim check refused a line", extra={"npc": items[i][0].npc, "why": problem})
+                spoken[i] = _fell_back(items[i][1], f"model reply rejected: claim check ({problem})")
 
     def _screen(self, items: list[tuple[StatePack, Utterance]], missing: list[int], spoken: list) -> list[int]:
         """Moderation in: a pack carrying player text the moderator flags falls back without a model call."""
@@ -298,7 +342,7 @@ class Mind:
                 log.info("model line flagged", extra={"stage": "out", "npc": items[i][0].npc, "why": verdict.why})
                 spoken[i] = _fell_back(items[i][1], f"model reply rejected: moderation ({verdict.why})")
             elif self.cache is not None:
-                self.cache.put_reply(items[i][0].cache_key(reply.model, kind), kind, reply.data, reply.provider)
+                self.cache.put_reply(self._key(items[i][0], reply.model, kind), kind, reply.data, reply.provider)
 
     def _moderate_hits(self, items: list[tuple[StatePack, Utterance]], spoken: list) -> None:
         """Cached lines passed the full check when they were stored; here only the offline part runs."""
@@ -312,10 +356,13 @@ class Mind:
         if self.cache is None:
             return None
         for model in self.models:
-            hit = self.cache.get_reply(pack.cache_key(model, kind))
+            hit = self.cache.get_reply(self._key(pack, model, kind))
             if hit and not self.validator.problem(hit[0], pack, kind):  # one the validator now rejects is a miss
                 return _spoken(hit[0], pack, fallback, "cache", hit[1])
         return None
+
+    def _key(self, pack: StatePack, model: str, kind: str) -> str:
+        return pack.cache_key(model, kind, checked=self.checker is not None and self.checker.wants(pack))
 
     def _accept(self, reply, pack: StatePack, fallback: Utterance, kind: str) -> Utterance:
         if reply is None:

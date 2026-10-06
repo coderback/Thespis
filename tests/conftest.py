@@ -9,7 +9,7 @@ import os
 import pytest
 
 SERVICES = ("LLM_", "JUDGE_", "CONTENT_SAFETY_", "MODERATION_")
-SETTINGS = ("ADMIN_TOKEN", "CORS_ORIGINS", "API_DOCS", "REPLAY")
+SETTINGS = ("ADMIN_TOKEN", "CORS_ORIGINS", "API_DOCS", "REPLAY", "CLAIM_CHECK")
 
 
 @pytest.fixture(autouse=True)

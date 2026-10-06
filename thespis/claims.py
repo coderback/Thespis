@@ -13,7 +13,12 @@ A model only extracts the claims a line makes (`extraction_messages`). Code then
 
 A denial ("Kael never robbed Odo") is grounded when it's right, a contradiction when the speaker believes the
 opposite, and a hallucination otherwise. This is the paper's instrument (tobi/paper-m1, research/metrics.py), moved
-into the core so Rehearsal can measure every line offline and, later, the Mind can check lines before they are heard.
+into the core so Rehearsal can measure every line offline, and ClaimCheck can check a line with consequences before
+anyone hears it.
+
+The two differ on reported speech. Measuring, "Kael says you robbed him" asserts both that Kael told the speaker and
+that the player robbed him, as the paper counted it. Checking, it asserts only that Kael told the speaker: a character
+may truthfully repeat what it was told, even what it no longer believes, and the teller is the one who vouched for it.
 """
 
 from __future__ import annotations
@@ -24,6 +29,8 @@ from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass, field
 
 from thespis.beliefs import Belief
+from thespis.expression import StatePack
+from thespis.gateway import ModelGateway
 from thespis.ledger import Claim, Event
 from thespis.world import World
 
@@ -61,7 +68,7 @@ class ClaimVocabulary:
 
 
 # ---------------------------------------------------------------- extraction, by a model
-EXTRACT_PROMPT = (
+_HEAD = (
     "You read one line of dialogue spoken by a character in a game and list the facts it asserts about the game "
     "world, in the game's vocabulary.\n{vocab}\n"
     "Rules:\n"
@@ -71,19 +78,34 @@ EXTRACT_PROMPT = (
     "nothing.\n"
     "- Resolve \"I\" and \"me\" to the speaker. \"You\" is whoever the speaker is talking to: the player, unless the "
     "situation or the line shows it is someone else (\"Captain\", \"Sable\"). Resolve every other pronoun to the "
-    "person it refers to in that sentence.\n"
-    "- Reported speech (\"Kael says you robbed him\", said by brenna) asserts both that the teller told the speaker "
-    "(told(kael, brenna)) and the fact reported (robbed(player, kael)).\n"
+    "person it refers to in that sentence.\n")
+_TAIL = (
     "- a and b are ids from the lists above, nothing else. Set happened to false when the line says it did not "
     "happen.\n"
     'Reply with JSON only: {{"claims": [{{"pred": "...", "a": "...", "b": "...", "happened": true}}]}}')
+EXTRACT_PROMPT = _HEAD + (  # measuring: the paper's rule
+    "- Reported speech (\"Kael says you robbed him\", said by brenna) asserts both that the teller told the speaker "
+    "(told(kael, brenna)) and the fact reported (robbed(player, kael)).\n") + _TAIL
+CHECK_PROMPT = _HEAD + (  # checking: the speaker vouches only for having been told
+    "- Reported speech (\"Kael says you robbed him\", said by brenna) asserts only that the teller told the speaker: "
+    "told(kael, brenna). Leave out the fact reported: the teller vouched for it, not the speaker.\n") + _TAIL
 
 
 def extraction_messages(vocab: ClaimVocabulary, speaker: str, name: str, situation: str, here: list[str],
-                        line: str) -> list[dict]:
-    return [{"role": "system", "content": EXTRACT_PROMPT.format(vocab=vocab.description)},
+                        line: str, prompt: str = EXTRACT_PROMPT) -> list[dict]:
+    return [{"role": "system", "content": prompt.format(vocab=vocab.description)},
             {"role": "user", "content": json.dumps({"speaker": speaker, "speaker_name": name, "situation": situation,
                                                     "here": here, "line": line}, ensure_ascii=False)}]
+
+
+def extraction_schema(vocab: ClaimVocabulary) -> dict:
+    """The extractor's reply as a strict JSON schema: one per game, so it never changes between calls."""
+    claim = {"type": "object", "additionalProperties": False, "required": ["pred", "a", "b", "happened"],
+             "properties": {"pred": {"type": "string", "enum": [*vocab.preds, OTHER]},
+                            "a": {"type": "string", "enum": list(vocab.characters)},
+                            "b": {"type": "string"}, "happened": {"type": "boolean"}}}
+    return {"type": "object", "additionalProperties": False, "required": ["claims"],
+            "properties": {"claims": {"type": "array", "items": claim}}}
 
 
 def parse_claims(data: dict | None) -> list[dict] | None:
@@ -206,3 +228,77 @@ def label(claim: dict) -> str:
     """A claim as it reads in a report, e.g. robbed(odo, kael), or not robbed(odo, kael) for a denial."""
     text = f"{claim.get('pred')}({claim.get('a')}, {claim.get('b')})"
     return text if claim.get("happened", True) is not False else f"not {text}"
+
+
+# ---------------------------------------------------------------- checking a line before anyone hears it
+def _states(claim: dict, c: Claim) -> bool:
+    return (claim.get("pred"), claim.get("a"), claim.get("b")) == (c.pred, c.a, c.b) and \
+        claim.get("happened", True) is not False
+
+
+class ClaimCheck:
+    """The claim check on lines with consequences (docs/cast-review.md, Phase 2), for thespis.expression.Mind.
+
+    Before a line is heard, a model extracts the claims it makes (CHECK_PROMPT, with the game's schema), and code
+    checks each against what its speaker could know (`facts`, the game's rule). A line is refused when:
+      - a claim leaks, hallucinates or contradicts what the speaker holds;
+      - the line goes with an action that states a claim (thespis.deception) and doesn't state it, so the ledger and
+        the words would disagree. That claim may be false: the game chose the lie.
+    An extractor that gives no answer refuses the line too: it fails closed, and the NPC uses its template line.
+
+    It checks the lines whose pack says they have stakes, or every line with `every`.
+    """
+
+    def __init__(self, gateway: ModelGateway, vocab: ClaimVocabulary, facts: Callable[[StatePack], Facts],
+                 every: bool = False):
+        self.gateway, self.vocab, self.facts, self.every = gateway, vocab, facts, every
+        self.schema = extraction_schema(vocab)
+
+    def wants(self, pack: StatePack) -> bool:
+        return self.every or pack.stakes
+
+    def problems(self, items: list[tuple[StatePack, str]]) -> list[str | None]:
+        """Why each (pack, line) can't be heard, or None for one that can. One extraction call per line."""
+        calls = [("extract", extraction_messages(self.vocab, pack.npc, pack.name, pack.situation, pack.here, line,
+                                                 CHECK_PROMPT), self.schema) for pack, line in items]
+        replies = [self.gateway.complete(*calls[0])] if len(calls) == 1 else self.gateway.complete_many(calls)
+        return [self.verdict(pack, parse_claims(reply.data) if reply is not None else None)
+                for (pack, _), reply in zip(items, replies)]
+
+    def verdict(self, pack: StatePack, claims: list[dict] | None) -> str | None:
+        if claims is None:
+            return "unavailable"
+        facts, stated = self.facts(pack), False
+        for claim in claims:
+            n = normalize(self.vocab, claim)
+            if pack.asserted is not None and _states(n, pack.asserted):
+                stated = True  # the claim its action states, which code chose, true or not
+                continue
+            category = categorize(self.vocab, claim, facts)
+            if category in BAD:
+                return f"{category}: {label(n)}"
+        if pack.asserted is not None and not stated:
+            return f"doesn't state {label(pack.asserted.to_json())}"
+        return None
+
+
+@dataclass(frozen=True)
+class ClaimChecking:
+    """How a host checks claims: which lines ("consequential" or "all"), and the extractor's gateway. None means the
+    gateway the line was spoken through."""
+
+    mode: str = "consequential"
+    gateway: ModelGateway | None = None
+
+
+def checking_from_env(env: Mapping[str, str]) -> ClaimChecking | None:
+    """CLAIM_CHECK (consequential, all or off) and an optional LLM_CHECK_* provider for the extractor."""
+    from thespis.gateway import OpenAICompatGateway, provider_from_env
+
+    mode = env.get("CLAIM_CHECK", "consequential").strip() or "consequential"
+    if mode == "off":
+        return None
+    if mode not in ("consequential", "all"):
+        raise ValueError(f"CLAIM_CHECK must be consequential, all or off, not {mode!r}")
+    provider = provider_from_env(env, "LLM_CHECK_")
+    return ClaimChecking(mode, OpenAICompatGateway([provider]) if provider else None)
