@@ -214,3 +214,33 @@ def test_dev_calls_returns_only_the_calls_since_a_total(tmp_path, monkeypatch):
         assert r["total"] == 2 and [c["call_type"] for c in r["calls"]] == ["react"]
         assert (r["calls"][0]["provider"], r["calls"][0]["ok"], r["calls"][0]["prompt_tokens"]) == ("primary", True, 812)
         assert client.get("/dev/calls", params={"since": 2}).json()["calls"] == []
+
+
+def test_a_reply_with_no_content_falls_back_instead_of_raising():
+    """Azure can answer 200 with a null content; that once escaped as an AttributeError and broke the request."""
+    fake = FakeProviders(primary=httpx.Response(200, json={"choices": [{"message": {"content": None}}]}),
+                         backup=ok('{"line": "Hm.", "cites": ["e0001"]}'))
+    g = gateway(fake)
+    assert g.complete("react", MESSAGES).provider == "backup"
+    assert g.calls[0].error == "no content in the reply"
+
+
+def test_a_filtered_reply_counts_as_a_failed_call():
+    filtered = httpx.Response(200, json={"choices": [{"message": {"content": ""}, "finish_reason": "content_filter"}]})
+    g = gateway(FakeProviders(primary=filtered, backup=filtered))
+    assert g.complete("react", MESSAGES) is None
+    assert [c.error for c in g.calls] == ["content_filter: reply", "content_filter: reply"]
+
+
+def test_a_filtered_prompt_counts_as_a_failed_call_with_no_cooldown():
+    refused = httpx.Response(400, json={"error": {"code": "content_filter", "message": "The prompt was filtered."}})
+    fake = FakeProviders(primary=refused, backup=refused)
+    g = gateway(fake)
+    assert g.complete("react", MESSAGES) is None
+    assert g.calls[0].error == "content_filter: prompt"
+    g.complete("react", MESSAGES)
+    assert fake.hosts() == ["primary", "backup", "primary", "backup"]  # the next text is tried everywhere again
+    other = httpx.Response(400, json={"error": {"code": "bad_request"}})
+    g = gateway(FakeProviders(primary=other, backup=other))
+    g.complete("react", MESSAGES)
+    assert g.calls[0].error == "HTTP 400"

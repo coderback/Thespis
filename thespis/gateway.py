@@ -10,7 +10,9 @@ Azure OpenAI and Azure AI Foundry work too: their hosts get the `api-key` header
 e.g. {"max_tokens": null, "max_completion_tokens": 300} for a model that refuses max_tokens.
 
 A provider that answers 401, 402 or 403 (a dead key or no credit) is skipped for 10 minutes, and one that answers
-429 for 30 seconds, so later calls go straight to the backup. Every call is logged in `calls` for the harness, with
+429 for 30 seconds, so later calls go straight to the backup. A provider's own content filter (Azure's) refusing the
+prompt or the reply counts as a failed call, logged as "content_filter", with no cooldown: the next call is a new
+text. Every call is logged in `calls` for the harness, with
 its latency and token usage; `total` counts every call ever made, so the harness can ask for just the new ones.
 """
 
@@ -172,10 +174,16 @@ class OpenAICompatGateway:
             if r.status_code == 200:
                 body = r.json()
                 usage = body.get("usage") or {}
-                data = parse_json(body["choices"][0]["message"]["content"])
-                reply = ModelReply(data, p.name, p.model, time.perf_counter() - started)
+                choice = body["choices"][0]
+                content = choice["message"]["content"]
+                if choice.get("finish_reason") == "content_filter":
+                    error = "content_filter: reply"
+                elif not isinstance(content, str):
+                    error = "no content in the reply"
+                else:
+                    reply = ModelReply(parse_json(content), p.name, p.model, time.perf_counter() - started)
             else:
-                error = f"HTTP {r.status_code}"
+                error = "content_filter: prompt" if _filtered(r) else f"HTTP {r.status_code}"
                 if r.status_code in COOLDOWN:
                     with self._lock:
                         self._skip_until[p.name] = self._clock() + COOLDOWN[r.status_code]
@@ -189,6 +197,16 @@ class OpenAICompatGateway:
             self.calls.append(record)
             self.total += 1
         return reply
+
+
+def _filtered(r: httpx.Response) -> bool:
+    """Did the provider's content filter refuse the prompt? Azure answers 400 with the error code "content_filter"."""
+    if r.status_code != 400:
+        return False
+    try:
+        return r.json()["error"]["code"] == "content_filter"
+    except (ValueError, KeyError, TypeError):
+        return False
 
 
 def _provider(env: Mapping[str, str], prefix: str) -> Provider | None:
