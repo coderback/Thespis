@@ -29,7 +29,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from games.crypt_road.content import DEMO_SEED  # noqa: E402
 from tools import warm_cache  # noqa: E402
-from tools.routes import EXPECTED, ROUTES, Session, outcome, play, seed_for  # noqa: E402
+from tools.routes import EXPECTED, ROUTES, Session, admin_headers, outcome, play, seed_for  # noqa: E402
 
 PROBE = "Smoke test at {when}: what's the news on the road?"
 
@@ -132,7 +132,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("host")
     args = parser.parse_args(argv)
     when = datetime.now(UTC).strftime("%H:%M UTC")
-    with httpx.Client(base_url=args.host, timeout=60) as client:
+    with httpx.Client(base_url=args.host, timeout=60, headers=admin_headers()) as client:
         results = run(client, when)
     print(f"Smoke test of {args.host} at {when}")
     for name, ok, detail in results:

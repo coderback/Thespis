@@ -25,7 +25,7 @@ import httpx
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from tools.routes import fresh_session  # noqa: E402
+from tools.routes import admin_headers, fresh_session  # noqa: E402
 
 DEMO_SEED = 1
 # client/src/autoplay.js's steps, in order. tests/test_warm_cache.py fails if the two drift apart.
@@ -95,7 +95,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--runs", type=int, default=2)
     args = parser.parse_args(argv)
     runs = []
-    with httpx.Client(base_url=args.host, timeout=60) as client:
+    with httpx.Client(base_url=args.host, timeout=60, headers=admin_headers()) as client:
         for n in range(1, args.runs + 1):
             run = play(client)
             same = runs and run["said"] == runs[-1]["said"]

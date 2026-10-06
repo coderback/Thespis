@@ -204,7 +204,8 @@ def test_dev_calls_returns_only_the_calls_since_a_total(tmp_path, monkeypatch):
 
     from games.crypt_road.app import app
     monkeypatch.setenv("DB_PATH", str(tmp_path / "t.sqlite"))
-    with TestClient(app) as client:
+    monkeypatch.setenv("ADMIN_TOKEN", "test-admin")
+    with TestClient(app, headers={"Authorization": "Bearer test-admin"}) as client:
         g = app.state.gateway = gateway(FakeProviders(primary=with_usage))
         assert client.get("/dev/calls").json() == {"total": 0, "calls": []}
         g.complete("decide", MESSAGES)

@@ -10,8 +10,13 @@ from __future__ import annotations
 
 import argparse
 import sys
+from pathlib import Path
 
 import httpx
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from tools.routes import admin_headers  # noqa: E402
 
 # Ask Sable (she lies), ask Pell (he saw her leave the study), have Lady Vane question Pell, accuse Sable.
 SOLVE = [("move", "kitchen", None), ("ask", "sable", "morning"), ("move", "study", None), ("ask", "pell", "morning"),
@@ -54,7 +59,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("host")
     args = parser.parse_args()
-    client = httpx.Client(base_url=args.host.rstrip("/"), timeout=120)
+    client = httpx.Client(base_url=args.host.rstrip("/"), timeout=120, headers=admin_headers())
     before, ok = calls(client), True
     for name, (steps, want) in ROUTES.items():
         print(f"{name}:")

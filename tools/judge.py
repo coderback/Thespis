@@ -17,6 +17,7 @@ import dataclasses
 import json
 import os
 import random
+import secrets
 import sys
 import tempfile
 from datetime import UTC, datetime
@@ -73,6 +74,8 @@ def collect(gateway, lines: int, seeds=(1, 4)) -> list[Sample]:
             from games.crypt_road.app import app
             with TestClient(app) as client:
                 app.state.gateway = gateway
+                app.state.admin_token = token = secrets.token_urlsafe(16)  # run_route reads the call log
+                client.headers["Authorization"] = f"Bearer {token}"
                 runs = [(name, seed) for seed in seeds for name in ROUTES]
                 for (name, seed), question in zip(runs, fresh_questions(len(runs), random.Random())):
                     if len(samples) >= lines:

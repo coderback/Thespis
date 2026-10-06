@@ -22,7 +22,17 @@ from pydantic import BaseModel
 
 from games.crypt_road import rules, views, voice
 from games.crypt_road.content import DEMO_SEED, new_world
-from games.hosting import ApiError, SessionLimiter, client_ip, db_path, log
+from games.hosting import (
+    ApiError,
+    Guard,
+    SessionLimiter,
+    client_ip,
+    cors_origins,
+    db_path,
+    docs_settings,
+    log,
+    require_admin,
+)
 from games.hosting import budget as _budget
 from games.hosting import env_int as _env_int
 from games.manor import api as manor
@@ -40,6 +50,7 @@ _locks: defaultdict[str, threading.Lock] = defaultdict(threading.Lock)  # one re
 async def lifespan(app: FastAPI):
     path = db_path()
     app.state.store = Store(path)
+    app.state.admin_token = os.environ.get("ADMIN_TOKEN", "").strip()  # unset: the admin endpoints don't exist
     # On the host, a count that keeps rising across redeploys proves the volume persists.
     log.warning("boot #%d, database at %s", app.state.store.record_boot(), path.resolve())
     gateway = app.state.gateway = gateway_from_env()
@@ -59,9 +70,12 @@ async def lifespan(app: FastAPI):
     gateway.close()  # the one this app opened, even if a test swapped app.state.gateway
 
 
-app = FastAPI(title="Thespis: The Crypt Road", lifespan=lifespan)
-# The client's dev server runs on another port; in production it is served from this app.
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+app = FastAPI(title="Thespis: The Crypt Road", lifespan=lifespan, **docs_settings())
+# The client is served from this app, and in dev Vite proxies the API, so other origins are let in only by name.
+if cors_origins():
+    app.add_middleware(CORSMiddleware, allow_origins=cors_origins(), allow_methods=["GET", "POST"],
+                       allow_headers=["Content-Type", "X-Session"])
+app.add_middleware(Guard)  # outermost: body size and security headers, for both games
 
 
 @app.exception_handler(ApiError)
@@ -212,7 +226,8 @@ def post_brain(body: BrainBody, request: Request, x_session: str | None = Header
 @app.get("/dev/calls")
 def get_calls(request: Request, since: int = 0):
     """The model calls made since `since` (the `total` of an earlier answer), with latency and tokens, for the harness.
-    Across every session, and at most the latest 1000."""
+    Across every session, and at most the latest 1000, so it answers only to the admin token."""
+    require_admin(request)
     gateway = request.app.state.gateway
     total = getattr(gateway, "total", 0)
     calls = list(getattr(gateway, "calls", ()))[-(total - since):] if total > since else []
