@@ -238,6 +238,13 @@ Each phase ends at a gate Rehearsal can measure. The durations assume one engine
    - Prompts versioned by hash.
    - Rehearsal v1 in CI.
    - Gate: protocol refusals near zero; leak and hallucination no worse at the same n; p95 no worse.
+   - **Status, 6 October 2026:** Rehearsal v1 (#92) and code deciding through per-call schemas (#93) are merged.
+     - Protocol refusals fell from 5 in 235 replies to 0 in 203.
+     - Leaks and hallucinations are no worse.
+     - p95 fell from 2.80 s to 2.29 s.
+     - The claim check is built but off by default. Every line it refused in Rehearsal was a misreading by the
+       extractor, and a model that reads better took too long. It needs extraction that is both accurate and fast,
+       and justification-aware beliefs from Core v2.
 3. **Core v2 (3–4 weeks).**
    - Typed claims, opinions, justification-based revision.
    - Perception, affordances and the tick in the core.

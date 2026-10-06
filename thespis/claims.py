@@ -299,10 +299,14 @@ class ClaimChecking:
 
 
 def checking_from_env(env: Mapping[str, str]) -> ClaimChecking | None:
-    """CLAIM_CHECK (consequential, all or off) and an optional LLM_CHECK_* provider for the extractor."""
+    """CLAIM_CHECK (off, consequential or all) and an optional LLM_CHECK_* provider for the extractor.
+
+    Off by default for now: in Rehearsal every line the check refused was a misreading by the extractor, Lady Vane's
+    verdict among them, and a model that reads better took too long (rehearsal/reports/claim-check-*.md).
+    """
     from thespis.gateway import OpenAICompatGateway, provider_from_env
 
-    mode = env.get("CLAIM_CHECK", "consequential").strip() or "consequential"
+    mode = env.get("CLAIM_CHECK", "off").strip() or "off"
     if mode == "off":
         return None
     if mode not in ("consequential", "all"):

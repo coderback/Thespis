@@ -40,11 +40,9 @@ def test_a_warm_run_makes_no_model_calls(tmp_path, monkeypatch):
         app.state.gateway = model = FakeModel()
         first = warm_cache.play(client)
         calls = len(model.calls)
-        lines = sum(kind != "extract" for kind, _ in model.calls)  # the rest checked the lines with consequences
         second = warm_cache.play(client)
     assert first["outcome"] == second["outcome"] == "won@5"
-    assert first["calls"] == lines > 0 and calls > lines  # a FakeModel keeps no call log, so lines are counted
-    assert second["calls"] == 0 and len(model.calls) == calls
+    assert first["calls"] == calls > 0 and second["calls"] == 0 and len(model.calls) == calls
     assert second["said"] == first["said"] and set(second["sources"]) == {"cache"} and second["misses"] == 0
 
 

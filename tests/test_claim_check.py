@@ -190,13 +190,13 @@ def test_the_manors_lie_is_checked():
 
 # ---------------------------------------------------------------- configuration
 def test_checking_from_the_environment():
-    assert checking_from_env({}) == ClaimChecking("consequential", None)
-    assert checking_from_env({"CLAIM_CHECK": "off"}) is None
+    assert checking_from_env({}) is None  # off until it stops refusing lines it misreads
+    assert checking_from_env({"CLAIM_CHECK": "consequential"}) == ClaimChecking("consequential", None)
     assert checking_from_env({"CLAIM_CHECK": "all"}).mode == "all"
     with pytest.raises(ValueError):
         checking_from_env({"CLAIM_CHECK": "sometimes"})
-    own = checking_from_env({"LLM_CHECK_BASE_URL": "https://check.test/v1", "LLM_CHECK_API_KEY": "k",
-                             "LLM_CHECK_MODEL": "small"})
+    own = checking_from_env({"CLAIM_CHECK": "consequential", "LLM_CHECK_BASE_URL": "https://check.test/v1",
+                             "LLM_CHECK_API_KEY": "k", "LLM_CHECK_MODEL": "small"})
     assert own.gateway.models == ("small",)
     own.gateway.close()
 
@@ -208,16 +208,16 @@ def test_every_line_is_checked_when_asked():
     assert [c for c, _ in model.calls] == ["react", "extract"]
 
 
-def test_the_host_checks_by_default(tmp_path, monkeypatch):
+def test_the_host_checks_only_when_asked(tmp_path, monkeypatch):
     from fastapi.testclient import TestClient
 
     from games.crypt_road.app import app
     monkeypatch.setenv("DB_PATH", str(tmp_path / "t.sqlite"))
     with TestClient(app):
-        assert app.state.checking == ClaimChecking("consequential", None)
-    monkeypatch.setenv("CLAIM_CHECK", "off")
-    with TestClient(app):
         assert app.state.checking is None
+    monkeypatch.setenv("CLAIM_CHECK", "consequential")
+    with TestClient(app):
+        assert app.state.checking == ClaimChecking("consequential", None)
 
 
 def test_what_a_speaker_believes_tells_it_of_the_event_behind_it():
