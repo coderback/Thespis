@@ -102,7 +102,8 @@ def post_act(body: ActBody, request: Request, x_session: str | None = Header(def
         world = _load(store, session)
         try:
             result = rules.act(world, body.verb, body.target, body.topic, gateway=state.gateway, cache=state.store,
-                               replay=state.replay, budget=budget(state, state.store, world))
+                               replay=state.replay, budget=budget(state, state.store, world),
+                               moderator=state.manor_moderator)
         except rules.NotAllowed as e:
             raise ApiError(409, "not_allowed", e.reason) from None
         store.save(session, world)

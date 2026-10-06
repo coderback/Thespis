@@ -11,20 +11,28 @@ The validator rejects a reply, and the NPC falls back to its code line, when any
   - it names no character or place that is absent from the pack;
   - for a decision whose action asserts a claim (thespis.deception), it cites that claim.
 
-A reply that passes is cached, keyed by the model, the prompt version, the call type and everything in the pack, so
-the same moment on the same route says the same thing again without a model call. In replay mode the Mind only
-reads the cache: a miss falls back and the network is never touched.
+A reply that passes, and passes moderation (thespis.moderation), is cached, keyed by the model, the prompt version,
+the call type and everything in the pack, so the same moment on the same route says the same thing again without a
+model call. In replay mode the Mind only reads the cache: a miss falls back and the network is never touched.
+
+Moderation runs both ways. Text a player wrote that the pack carries (`untrusted`) is checked before any model reads
+it, and a flagged pack gets no model call. A model's line is checked after the validator passes it and before it is
+cached or heard. Cache hits get only the moderator's offline part.
 """
 
 from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import re
 from dataclasses import dataclass, field
 from typing import Protocol
 
-from thespis.gateway import ModelGateway
+from thespis.gateway import ModelGateway, ModelReply
+from thespis.moderation import Moderator, NoModeration
+
+log = logging.getLogger("thespis.moderation")
 
 PROMPT_VERSION = 3  # part of #18's cache key: bump it whenever the prompts below change
 LINE_MAX = 160
@@ -63,6 +71,7 @@ class StatePack:
     allowed: list[dict] = field(default_factory=list)  # {"id", "does", "pull"}; empty for a reply with no action
     names: set[str] = field(default_factory=set)  # every character and place the pack mentions, as game ids
     setting: str = ""  # where the NPC is and the lie of the land, as the game describes it
+    untrusted: list[str] = field(default_factory=list)  # text a player wrote that the pack carries, for moderation
 
     @property
     def ids(self) -> set[str]:
@@ -154,7 +163,7 @@ class Validator:
 
 
 class Mind:
-    """Asks the model when there is one, and keeps only replies that pass the validator.
+    """Asks the model when there is one, and keeps only replies that pass the validator and the moderator.
 
     With a cache it looks there first, under each configured model in turn, and stores every reply it accepts. With
     `replay` on it never calls the model: a cache miss falls back. With a `budget`, it makes at most that many model
@@ -162,12 +171,13 @@ class Mind:
     """
 
     def __init__(self, gateway: ModelGateway | None, validator: Validator, cache: ReplyCache | None = None,
-                 replay: bool = False, budget: int | None = None):
+                 replay: bool = False, budget: int | None = None, moderator: Moderator | None = None):
         self.gateway = gateway if gateway is not None and getattr(gateway, "providers", None) else None
         self.validator = validator
         self.cache = cache
         self.replay = replay
         self.budget = budget
+        self.moderator = moderator or NoModeration()
         self.asked = 0
         self.models = tuple(getattr(self.gateway, "models", ())) if self.gateway else ()
 
@@ -189,12 +199,14 @@ class Mind:
     def _speak(self, kind: str, items: list[tuple[StatePack, Utterance]]) -> list[Utterance]:
         if not self.active:
             return [fallback for _, fallback in items]
-        spoken = [self._cached(pack, kind, fallback) for pack, fallback in items]
+        spoken: list = [self._cached(pack, kind, fallback) for pack, fallback in items]
+        self._moderate_hits(items, spoken)
         missing = [i for i, u in enumerate(spoken) if u is None]
         if self.replay:
             for i in missing:
                 spoken[i] = _fell_back(items[i][1], "replay: not in the cache")
             return spoken
+        missing = self._screen(items, missing, spoken)
         if self.budget is not None:
             allowed = max(0, self.budget - self.asked)
             for i in missing[allowed:]:
@@ -207,7 +219,40 @@ class Mind:
         replies = [self.gateway.complete(*calls[0])] if len(calls) == 1 else self.gateway.complete_many(calls)
         for i, reply in zip(missing, replies):
             spoken[i] = self._accept(reply, *items[i], kind)
+        self._keep(kind, items, list(zip(missing, replies)), spoken)
         return spoken
+
+    def _screen(self, items: list[tuple[StatePack, Utterance]], missing: list[int], spoken: list) -> list[int]:
+        """Moderation in: a pack carrying player text the moderator flags falls back without a model call."""
+        asking = [i for i in missing if items[i][0].untrusted]
+        verdicts = iter(self.moderator.check([t for i in asking for t in items[i][0].untrusted]))
+        for i in asking:
+            flagged = [v for v in [next(verdicts) for _ in items[i][0].untrusted] if v.flagged]
+            if flagged:
+                log.info("player text flagged", extra={"stage": "in", "npc": items[i][0].npc, "why": flagged[0].why})
+                spoken[i] = _fell_back(items[i][1], f"player text flagged: {flagged[0].why}")
+        return [i for i in missing if spoken[i] is None]
+
+    def _keep(self, kind: str, items: list[tuple[StatePack, Utterance]],
+              answered: list[tuple[int, ModelReply | None]], spoken: list) -> None:
+        """Moderation out: the lines that passed the validator, checked before anyone hears them. Only the ones that
+        pass are cached."""
+        passed = [(i, reply) for i, reply in answered if reply is not None and spoken[i].source == "llm"]
+        verdicts = self.moderator.check([spoken[i].line for i, _ in passed])
+        for (i, reply), verdict in zip(passed, verdicts):
+            if verdict.flagged:
+                log.info("model line flagged", extra={"stage": "out", "npc": items[i][0].npc, "why": verdict.why})
+                spoken[i] = _fell_back(items[i][1], f"model reply rejected: moderation ({verdict.why})")
+            elif self.cache is not None:
+                self.cache.put_reply(items[i][0].cache_key(reply.model, kind), kind, reply.data, reply.provider)
+
+    def _moderate_hits(self, items: list[tuple[StatePack, Utterance]], spoken: list) -> None:
+        """Cached lines passed the full check when they were stored; here only the offline part runs."""
+        hits = [i for i, u in enumerate(spoken) if u is not None]
+        for i, verdict in zip(hits, self.moderator.local().check([spoken[i].line for i in hits])):
+            if verdict.flagged:
+                log.info("cached line flagged", extra={"stage": "cache", "npc": items[i][0].npc, "why": verdict.why})
+                spoken[i] = _fell_back(items[i][1], f"cached reply rejected: moderation ({verdict.why})")
 
     def _cached(self, pack: StatePack, kind: str, fallback: Utterance) -> Utterance | None:
         if self.cache is None:
@@ -224,9 +269,7 @@ class Mind:
         problem = self.validator.problem(reply.data, pack, kind)
         if problem:
             return _fell_back(fallback, f"model reply rejected: {problem}")
-        if self.cache is not None:
-            self.cache.put_reply(pack.cache_key(reply.model, kind), kind, reply.data, reply.provider)
-        return _spoken(reply.data, kind, fallback, "llm", reply.provider)
+        return _spoken(reply.data, kind, fallback, "llm", reply.provider)  # _keep caches it, once moderated
 
 
 def _spoken(data: dict, kind: str, fallback: Utterance, source: str, provider: str) -> Utterance:

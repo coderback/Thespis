@@ -21,6 +21,7 @@ from thespis.decisions import DECIDE
 from thespis.expression import Mind, ReplyCache, Utterance
 from thespis.gateway import ModelGateway
 from thespis.ledger import Claim, Event
+from thespis.moderation import Moderator
 from thespis.world import LOST, PLAYING, WON, World
 
 DRIVE_MARGIN = 2  # the model chooses only among actions within this many points of the strongest pull
@@ -88,13 +89,13 @@ def _check(w: World, verb: str, target: str | None) -> None:
 # ---------------------------------------------------------------- acting
 def act(w: World, verb: str, target: str | None = None, topic: str | None = None,
         gateway: ModelGateway | None = None, cache: ReplyCache | None = None, replay: bool = False,
-        budget: int | None = None) -> ActResult:
+        budget: int | None = None, moderator: Moderator | None = None) -> ActResult:
     """Apply one player verb. With a gateway and the brain on, the people speak and Sable chooses through the model;
     anything the model gets wrong, or can't answer, falls back to the utility brain and the template lines."""
     _check(w, verb, target)
     if verb == "ask" and topic not in C.TOPICS:
         raise NotAllowed("Ask about this morning or the ring")
-    mind = Mind(gateway if w.brain_mode == "model" else None, voice.VALIDATOR, cache, replay, budget)
+    mind = Mind(gateway if w.brain_mode == "model" else None, voice.VALIDATOR, cache, replay, budget, moderator)
     start = len(w.ledger)
     if verb == "ask":
         replies = _ask(w, mind, target, topic)

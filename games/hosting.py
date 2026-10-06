@@ -17,6 +17,7 @@ from pathlib import Path
 
 from fastapi import Request
 
+from thespis.moderation import Blocklist
 from thespis.store import Store
 from thespis.world import World
 
@@ -187,6 +188,12 @@ def db_path() -> Path:
         log.warning("DB_PATH %s is not on the volume at %s, so it would not survive a deploy; ignoring it", path, volume)
         path = Path(volume) / "thespis.sqlite"
     return path
+
+
+def blocklist(cast: dict) -> Blocklist | None:
+    """A game's own blocked words, from `[moderation] blocklist` in its cast.toml; None when it lists none."""
+    terms = cast.get("moderation", {}).get("blocklist", [])
+    return Blocklist(terms) if terms else None
 
 
 def budget(state, store: Store, world: World) -> int | None:

@@ -22,6 +22,7 @@ from thespis.decisions import DECIDE, Decision
 from thespis.expression import Mind, ReplyCache, Utterance
 from thespis.gateway import ModelGateway
 from thespis.ledger import Claim, Event
+from thespis.moderation import Moderator
 from thespis.world import LOST, PLAYING, WON, World
 
 TALK_MAX = 200
@@ -167,7 +168,7 @@ def _check(w: World, verb: str, target: str | None) -> dict:
 def act(w: World, verb: str, target: str | None = None, claim: dict | Claim | None = None,
         amount: int | None = None, text: str | None = None, brain: Brain | None = None,
         gateway: ModelGateway | None = None, cache: ReplyCache | None = None, replay: bool = False,
-        budget: int | None = None) -> ActResult:
+        budget: int | None = None, moderator: Moderator | None = None) -> ActResult:
     """Apply one player verb, the tick it triggers, and the epilogue if the race ends.
 
     With a gateway and the brain switched on, NPCs speak and make their real choices through the model; anything
@@ -177,7 +178,7 @@ def act(w: World, verb: str, target: str | None = None, claim: dict | Claim | No
     """
     _check(w, verb, target)
     brain = brain or UtilityBrain()
-    mind = Mind(gateway if w.brain_mode == "model" else None, voice.VALIDATOR, cache, replay, budget)
+    mind = Mind(gateway if w.brain_mode == "model" else None, voice.VALIDATOR, cache, replay, budget, moderator)
     start = len(w.ledger)
     ends_phase = None  # the tick this verb triggers, if any: "move" or "wait"
     told = haggle = None

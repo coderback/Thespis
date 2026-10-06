@@ -83,6 +83,7 @@ class Speech:
     trigger: str
     said: tuple[str, list[str]] | None  # the fallback line and its cites; None means the NPC stays silent
     situation: str  # what just happened, from the NPC's point of view, for the model
+    untrusted: tuple[str, ...] = ()  # what the player wrote that the situation quotes, for moderation
 
 
 def template(npc: str, key: str) -> str | None:
@@ -158,8 +159,9 @@ def describe(option: str, w: World, npc: str) -> str:
 
 
 def pack_for(w: World, npc_id: str, situation: str, options: dict[str, float] | None = None,
-             view: View | None = None) -> StatePack:
-    """Everything the model may know when it speaks for this NPC, and nothing more. Never whether a belief is true."""
+             view: View | None = None, untrusted: tuple[str, ...] = ()) -> StatePack:
+    """Everything the model may know when it speaks for this NPC, and nothing more. Never whether a belief is true.
+    `untrusted` is what the player wrote that the situation quotes; a persona the player edited counts too."""
     npc, cast, view = w.npcs[npc_id], C.load_cast()["npc"][npc_id], _view(w, view)
     others = [n.id for n in w.npcs_at(npc.loc) if n.id != npc_id]
     if view.player_at == npc.loc:
@@ -189,6 +191,7 @@ def pack_for(w: World, npc_id: str, situation: str, options: dict[str, float] | 
         names={x for x in names if x and x != "player"},
         setting=f"You are at {C.STOP_NAMES[npc.loc]}. The road runs east: "
                 + ", ".join(C.STOP_NAMES[s] for s in C.STOPS) + ". The relic lies in the crypt.",
+        untrusted=[t for t in (npc.flags.get("persona"), *untrusted) if t],
     )
 
 
@@ -197,7 +200,8 @@ def deliver(w: World, mind: Mind, speeches: list[Speech]) -> list[dict]:
     speeches = [s for s in speeches if s.said]
     fallbacks = [Utterance(None, s.said[0], s.said[1], "fallback") for s in speeches]
     if mind.active:
-        spoken = mind.react_many([(pack_for(w, s.npc, s.situation), f) for s, f in zip(speeches, fallbacks)])
+        spoken = mind.react_many([(pack_for(w, s.npc, s.situation, untrusted=s.untrusted), f)
+                                  for s, f in zip(speeches, fallbacks)])
     else:
         spoken = fallbacks
     replies = []
@@ -232,7 +236,8 @@ def react(w: World, mind: Mind, verb: str, target: str | None, events: list[Even
         speeches.append(Speech(C.GUARD, "bribe", line(C.GUARD, "bribe", [last], amount=paid),
                                f"The player just paid you a {paid}-coin fine."))
     elif verb == "talk":
-        speeches.append(Speech(target, "talk", _talk(w, target), f'The player says to you: "{text or ""}"'))
+        speeches.append(Speech(target, "talk", _talk(w, target), f'The player says to you: "{text or ""}"',
+                               (text,) if text else ()))
     elif verb == "tell_claim":
         speeches.extend(_told(w, target, claim, events))
     return deliver(w, mind, speeches)
