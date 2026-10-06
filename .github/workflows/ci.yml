@@ -20,6 +20,14 @@ jobs:
           python-version: "3.13"
       - name: Install
         run: pip install -r requirements-dev.txt
+      - uses: astral-sh/setup-uv@v10
+        with:
+          version: "0.11.14"
+      - name: Lock files match their inputs
+        run: |
+          uv pip compile requirements.in --universal --generate-hashes --python-version 3.12 -o requirements.txt
+          uv pip compile requirements-dev.in --universal --generate-hashes --python-version 3.12 -o requirements-dev.txt
+          git diff --exit-code requirements.txt requirements-dev.txt
       - name: Lint
         run: ruff check .
       - name: Test

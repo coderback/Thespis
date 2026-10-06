@@ -1,0 +1,4 @@
+# What the engine needs to run. Edit this, not requirements.txt, then recompile the locks (README: "Dependencies").
+fastapi>=0.115
+uvicorn[standard]>=0.30
+httpx>=0.27
