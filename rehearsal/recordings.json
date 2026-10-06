@@ -1,4 +1,5 @@
 {
+ "claim_check": "consequential",
  "models": [
   "gpt-6-luna",
   "gpt-5.4-nano"
@@ -10,9 +11,9 @@
      "cites": [
       "e5"
      ],
-     "line": "Back to the market. Keep your questions away from me."
+     "line": "Back to the market. Keep your questions sharp, or I’ll remember the insult."
     },
-    "latency": 0.87,
+    "latency": 0.801,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -24,9 +25,32 @@
       "b1",
       "e1"
      ],
-     "line": "Sable told me she was in the kitchen at mid-morning. I know no more of this morning, and will not accuse on hearsay."
+     "line": "Sable told me she was in the kitchen at mid-morning; I know no more of this morning yet."
     },
-    "latency": 1.103,
+    "latency": 1.208,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "065f53ddb6c75f5e1436667225d1e1b2df8f4d94602cb232dc2d9805cb85291b": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "sable",
+       "b": "kitchen@1",
+       "happened": true,
+       "pred": "was_in"
+      },
+      {
+       "a": "sable",
+       "b": "vane",
+       "happened": true,
+       "pred": "told"
+      }
+     ]
+    },
+    "latency": 0.951,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -37,9 +61,38 @@
      "cites": [
       "e1"
      ],
-     "line": "I can’t say what I am, friend—but I’d rather not get mixed up in trouble over it."
+     "line": "I’m Odo, a peddler on this road. I’d rather not stir trouble—what I am beyond that, I can’t honestly say."
     },
-    "latency": 1.042,
+    "latency": 1.159,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "074e17acaedb740cf1d67cd7b0958db32b5d8f4ba219694758e521a882c5e5c8": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "guard_post",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "kael",
+       "b": "crypt",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "tavern",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 1.028,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -54,9 +107,9 @@
       "e4",
       "e5"
      ],
-     "line": "You insulted Kael at the tavern, challenged him to a duel, beat him, and spared him. While you weren’t looking, Odo walked from the tavern to the market—but what awaited him there?"
+     "line": "You insulted Kael at the tavern, challenged him to a duel, beat him, and spared him. While you weren't looking, Odo walked from the tavern to the market—but what did he find there?"
     },
-    "latency": 1.615,
+    "latency": 1.062,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -67,9 +120,9 @@
      "cites": [
       "e5"
      ],
-     "line": "Too late. The relic is already taken—and I don’t forget who beat me to it."
+     "line": "You took it first. Damn you. I’ll remember this."
     },
-    "latency": 0.895,
+    "latency": 1.362,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -78,12 +131,11 @@
    {
     "data": {
      "cites": [
-      "b1",
       "e1"
      ],
-     "line": "You insulted me, now you want a warning? Ask someone who owes you less."
+     "line": "You insult me, then ask for favors? Find out at the bridge yourself."
     },
-    "latency": 1.178,
+    "latency": 0.977,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -97,9 +149,9 @@
       "e3",
       "e4"
      ],
-     "line": "You walked from the market to the guard post, and Kael did too. Odo told Brenna that you beat Kael, then walked back to the market—what will you do next?"
+     "line": "You walked from the market to the guard post, and Kael did too. Odo told Brenna you beat Kael, then walked back to the market—what might that report set in motion?"
     },
-    "latency": 1.28,
+    "latency": 1.006,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -109,11 +161,11 @@
     "data": {
      "cites": [
       "e4",
-      "b1"
+      "e5"
      ],
-     "line": "Odo confessed to beating me, not robbing me. And I told Brenna who robbed me—the player."
+     "line": "Odo confessed to nothing. He accused you of beating me, then walked back to the market. Don’t twist his words."
     },
-    "latency": 1.055,
+    "latency": 1.873,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -125,9 +177,9 @@
       "e5",
       "b1"
      ],
-     "line": "You accuse me of robbing Odo? I never did. Keep my name out of your lies."
+     "line": "You tell Brenna I robbed Odo? Keep lying, and I’ll make you regret it. The relic can wait."
     },
-    "latency": 1.547,
+    "latency": 1.251,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -143,9 +195,9 @@
       "e5",
       "e6"
      ],
-     "line": "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—what awaits you there?"
+     "line": "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—but what awaited them there remained to be seen."
     },
-    "latency": 0.983,
+    "latency": 1.425,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -158,9 +210,9 @@
       "e2",
       "e3"
      ],
-     "line": "You walked from the bridge to the crypt, as Kael did too. Odo walked from the market to the tavern; what waits at the crypt remains to be seen."
+     "line": "You walked from the bridge to the crypt, while Kael made the same journey. Odo walked from the market to the tavern; the road kept its secrets. What awaited you at the crypt?"
     },
-    "latency": 1.117,
+    "latency": 1.069,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -173,9 +225,48 @@
       "e2",
       "e3"
      ],
-     "line": "You walked from the tavern to the market, as did Kael. Odo walked from the market to the guard post. What waits farther along the road remains to be seen."
+     "line": "You walked from the tavern to the market, and Kael did too. Odo walked from the market to the guard post—but what happened next?"
     },
-    "latency": 1.15,
+    "latency": 1.275,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "10f6a7096ca830d69fcbed5cb589272bdd0dfd275afdc3e658d1137a8c30cf66": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "bridge",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "kael",
+       "b": "bridge",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 0.995,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "110c2d42daf576db6f2c9b53b64aeb2f33f531c359338505e5c520ae67fe08e5": [
+   {
+    "data": {
+     "claims": []
+    },
+    "latency": 0.686,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -188,9 +279,9 @@
       "e2",
       "e3"
      ],
-     "line": "You walked from the market to the guard post. While you were away, Kael walked from the guard post to the bridge, and Odo walked from the market to the tavern. Where will you go next?"
+     "line": "You walked from the market to the guard post. Kael walked from the guard post to the bridge, while Odo walked from the market to the tavern. Where will the road take you next?"
     },
-    "latency": 1.116,
+    "latency": 1.277,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -202,9 +293,9 @@
       "b1",
       "e5"
      ],
-     "line": "Kael, hand back what you took from Odo. Keep this orderly, and settle it without a fight."
+     "line": "I trust your word, but keep this orderly—settle it with Odo, and let’s avoid a fight on my road."
     },
-    "latency": 1.374,
+    "latency": 0.827,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -218,9 +309,9 @@
       "e3",
       "e4"
      ],
-     "line": "You paid Brenna 20 coins and walked from the guard post to the bridge. While you were away, Kael went from the bridge to the crypt, and Odo went from the tavern to the market—where will you go next?"
+     "line": "You paid Brenna 20 coins and walked from the guard post to the bridge. While you were elsewhere, Kael went from the bridge to the crypt, and Odo went from the tavern to the market—what will you do next?"
     },
-    "latency": 1.245,
+    "latency": 1.158,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -231,7 +322,7 @@
      "cites": [
       "e1"
      ],
-     "line": "You saw Kael take the relic. What the road held beyond that remained unwritten."
+     "line": "You saw Kael take the relic. What happened next remained to be seen."
     },
     "latency": 0.952,
     "model": "gpt-6-luna",
@@ -244,9 +335,32 @@
      "cites": [
       "e3"
      ],
-     "line": "How should I know? Odo’s here—ask him."
+     "line": "How should I know? Odo’s here. Ask him who keeps the gate."
     },
-    "latency": 0.815,
+    "latency": 1.234,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "12b55350adb662cf50b17d8f5b70353d0408f4e9233bc3d46b0c37b4f1a09224": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "kael",
+       "b": "guard_post",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "guard_post",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 1.216,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -255,26 +369,71 @@
    {
     "data": {
      "cites": [
-      "b1",
-      "e1"
+      "e1",
+      "b1"
      ],
-     "line": "Oh, darling, I’ll keep the peace—no grand recounting. You insulted Kael here at the tavern; that’s the only truth I’ll trade."
+     "line": "No need to stir the room, dear—the only thing I saw today was you insulting Kael. Let’s keep the peace."
     },
-    "latency": 1.983,
-    "model": "gpt-5.4-nano",
-    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-5.4-nano"
+    "latency": 1.593,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "137d79cc7b11a19216c8bd50265e13e55ef2177df26d7f110dbd5bee44f3cb5f": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "relic",
+       "happened": true,
+       "pred": "took_relic"
+      }
+     ]
+    },
+    "latency": 1.039,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "154fa4279ebd1b826767d23879ad6824d4fa6aa6532dc2c317b2e6e1fd92a8ca": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "brenna",
+       "happened": true,
+       "pred": "told"
+      },
+      {
+       "a": "kael",
+       "b": "bridge",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "tavern",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 1.089,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
   "15819544061c76e7461b7bc6f586b0fbc73b8184b0289d3f227b5e798178f5e5": [
    {
     "data": {
      "cites": [
-      "b1",
       "e1"
      ],
-     "line": "You insult me, then pry into my debts? Mind your business."
+     "line": "You insult me, then ask after my debts? Mind your own purse."
     },
-    "latency": 1.211,
+    "latency": 0.838,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -283,11 +442,58 @@
    {
     "data": {
      "cites": [
+      "b1",
       "e1"
      ],
-     "line": "Let’s keep voices low, friend. I won’t lie to the Captain—but perhaps we can settle this without making a scene."
+     "line": "After insulting Kael under my roof, you ask me to lie to the Captain? Not while I’m keeping this tavern calm, friend."
     },
-    "latency": 1.597,
+    "latency": 1.551,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "16301aebfd63a9d19f22594c1f56f55adc193e5b10d534d4ed9c2da33b172fdd": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "saw Kael take the relic",
+       "happened": true,
+       "pred": "other"
+      },
+      {
+       "a": "kael",
+       "b": "relic",
+       "happened": true,
+       "pred": "took_relic"
+      }
+     ]
+    },
+    "latency": 1.019,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "1645960912fe73b7822c82a52a505f10ee1cc959ffc579e28071e8e28885a54d": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "sable",
+       "b": "vane",
+       "happened": true,
+       "pred": "told"
+      },
+      {
+       "a": "sable",
+       "b": "kitchen@1",
+       "happened": true,
+       "pred": "was_in"
+      }
+     ]
+    },
+    "latency": 1.212,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -301,9 +507,9 @@
       "b2",
       "b3"
      ],
-     "line": "You beat me, insulted me, then spared me. I won't forget. The relic is mine."
+     "line": "Too late. I’ll take the relic—and this race."
     },
-    "latency": 0.919,
+    "latency": 1.15,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -312,11 +518,13 @@
    {
     "data": {
      "cites": [
-      "e5"
+      "e5",
+      "b1",
+      "b2"
      ],
-     "line": "Fine paid. Keep the road orderly, and don’t cause me another report to write."
+     "line": "Fine paid; keep the road orderly and stay clear of Kael."
     },
-    "latency": 0.884,
+    "latency": 1.031,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -328,9 +536,9 @@
       "b1",
       "e1"
      ],
-     "line": "You insulted me at the tavern. I make of Kael a man who remembers—and takes what he wants."
+     "line": "You insulted me at the tavern. I don’t forget. What I make of Kael? He takes what he came for."
     },
-    "latency": 1.013,
+    "latency": 1.142,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -339,11 +547,29 @@
    {
     "data": {
      "cites": [
+      "b1",
       "e1"
      ],
-     "line": "You insulted me at this tavern. Don’t expect directions from me—find out about the gate yourself."
+     "line": "You think I’ll help after that insult? Try the gate. Find out."
     },
-    "latency": 0.947,
+    "latency": 1.473,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "178d6de1d2f19d07f002899a35f2caf3efa6683d8ebf65b68a6d2ec15ea7a4e2": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "sable",
+       "b": "vane",
+       "happened": true,
+       "pred": "told"
+      }
+     ]
+    },
+    "latency": 0.834,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -352,16 +578,15 @@
    {
     "data": {
      "cites": [
-      "e2",
       "b1",
       "b2",
       "b3"
      ],
-     "line": "Walk if you like—after what you did to me. Brenna’s gone. Try your luck, and don’t blame me if guards notice."
+     "line": "Walk through? After robbing, beating, and insulting me? Try it—and see how far you get."
     },
-    "latency": 1.867,
-    "model": "gpt-5.4-nano",
-    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-5.4-nano"
+    "latency": 1.048,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
   "17e1487e81c56afbf14200d30088629ffcae269af1aef5ffc7b0036429756ea5": [
@@ -370,9 +595,9 @@
      "cites": [
       "e5"
      ],
-     "line": "The relic is mine. You’re too late."
+     "line": "The relic is mine. You’ve lied, robbed, beaten, and insulted me—don’t expect mercy."
     },
-    "latency": 0.982,
+    "latency": 0.87,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -381,14 +606,13 @@
    {
     "data": {
      "cites": [
-      "b1",
       "e1"
      ],
-     "line": "Keep your prying questions. Earn your answers by surviving—then we talk about the relic, east to the crypt."
+     "line": "That’s your question? Keep your insults to yourself."
     },
-    "latency": 1.653,
-    "model": "gpt-5.4-nano",
-    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-5.4-nano"
+    "latency": 0.743,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
   "1a19fbcd24bf3659f690c75677d21a39cb672f035b8b26edd1d5a81d0aa3b470": [
@@ -401,11 +625,55 @@
       "e4",
       "e5"
      ],
-     "line": "You insulted Kael at the tavern and challenged him to a duel; he beat you. While you weren’t looking, Kael and Odo walked from the tavern to the market—and what awaits you there?"
+     "line": "You insulted Kael at the tavern and challenged him to a duel; he beat you. While you weren’t looking, Kael and Odo walked from the tavern to the market—what awaited you there?"
     },
-    "latency": 1.158,
+    "latency": 1.107,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   },
+   {
+    "data": {
+     "cites": [
+      "e1",
+      "e2",
+      "e3",
+      "e4",
+      "e5"
+     ],
+     "line": "You insulted Kael at the tavern and challenged him to a duel; he beat you. While you weren't looking, Kael and Odo walked from the tavern to the market—what awaited you there?"
+    },
+    "latency": 1.357,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "1b58ead490848a25b8a7be0a36de2272b6a0e16f747e7a84bd45f6357e3fc593": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "bridge",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "kael",
+       "b": "bridge",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "tavern",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 2.423,
+    "model": "gpt-5.4-nano",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-5.4-nano"
    }
   ],
   "1bec45f8c9c1dbe6572d9a066b848e1808fa039dfbe392c6be82009fb8fb6fcf": [
@@ -415,9 +683,9 @@
       "b1",
       "b2"
      ],
-     "line": "Hold there. Kael says you robbed him, and Odo says you beat him—pay a fine in coin, and we’ll keep this orderly."
+     "line": "Hold there—Kael says you robbed him, and Odo says you beat him; settle the matter here before you go farther."
     },
-    "latency": 1.007,
+    "latency": 1.15,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -430,9 +698,9 @@
       "e2",
       "e3"
      ],
-     "line": "You walked from the guard post to the bridge, as Kael did; Odo went from the guard post to the market. Where will you go next?"
+     "line": "You walked from the guard post to the bridge, as Kael did; Odo walked from the guard post to the market. Where will your paths lead next?"
     },
-    "latency": 1.035,
+    "latency": 1.373,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -443,9 +711,9 @@
      "cites": [
       "e1"
      ],
-     "line": "No bridge news I can swear to, dear—but you’ve ruffled Kael here; let’s keep voices low before you head out."
+     "line": "No bridge news reached my ears, love. But let’s keep tempers settled here—Kael’s still smarting from that insult."
     },
-    "latency": 1.539,
+    "latency": 2.038,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -456,9 +724,9 @@
      "cites": [
       "e5"
      ],
-     "line": "I’m the captain on this watch, and I’ve enough trouble keeping this road orderly without puzzling over labels."
+     "line": "I’m the captain on watch, and I’ve got a road to keep orderly—not time for riddles. If there’s trouble, settle it in coin."
     },
-    "latency": 0.971,
+    "latency": 0.957,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -467,13 +735,11 @@
    {
     "data": {
      "cites": [
-      "b1",
-      "b2",
-      "b3"
+      "e5"
      ],
-     "line": "You robbed me, beat me, then had the gall to ask? I answer to no one."
+     "line": "I answer to steel, not labels. Ask again, and I’ll take it for an insult."
     },
-    "latency": 1.067,
+    "latency": 1.198,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -486,7 +752,7 @@
      ],
      "line": "I only saw you insult Kael at the tavern; I don’t know what he told the Captain."
     },
-    "latency": 1.235,
+    "latency": 0.966,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -499,9 +765,9 @@
       "b1",
       "b2"
      ],
-     "line": "No. I won't take less than 20, and I'm hearing no more offers for now."
+     "line": "No. I won't take less than 20, and I'll hear no more offers for now."
     },
-    "latency": 2.268,
+    "latency": 2.036,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -512,9 +778,44 @@
      "cites": [
       "e1"
      ],
-     "line": "I’d rather not stir up trouble, friend—especially after what was said to Kael."
+     "line": "I couldn’t say, friend. I’d rather not get tangled up in that—perhaps you’d like to see my wares?"
     },
-    "latency": 1.168,
+    "latency": 1.387,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "226c20baf32d9097354d74397377878a59160827a88f01aa1906e305f3d79f4a": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "odo",
+       "b": "guard_post",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "brenna",
+       "happened": true,
+       "pred": "told"
+      },
+      {
+       "a": "odo",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "tavern",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 1.606,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -527,9 +828,9 @@
       "b2",
       "b3"
      ],
-     "line": "You robbed me, beat me, and insulted me—and now you ask about machines? Ask something worth answering."
+     "line": "You rob me, beat me, insult me—and now ask what I’m called? Ask again, and regret it."
     },
-    "latency": 0.852,
+    "latency": 1.161,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -539,11 +840,29 @@
     "data": {
      "cites": [
       "b1",
-      "e1"
+      "e1",
+      "e2"
      ],
-     "line": "My signet ring is missing. Sable says she was in the kitchen at mid-morning; I will not accuse anyone without better evidence."
+     "line": "My signet ring is missing. Sable says she was in the kitchen at mid-morning; I will not accuse her without more evidence. What have you learned?"
     },
-    "latency": 1.193,
+    "latency": 1.094,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "277a7ea9ff5b3f9efcb0baac450f0b7acce5f20b3f639a6cb959020202110f75": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "sable",
+       "b": "vane",
+       "happened": true,
+       "pred": "told"
+      }
+     ]
+    },
+    "latency": 0.805,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -555,9 +874,9 @@
       "b1",
       "e3"
      ],
-     "line": "Enough. Sable was in the kitchen at mid-morning; I will not entertain an accusation without evidence. You are dismissed."
+     "line": "Enough. Sable said she was in the kitchen at mid-morning; I will not condemn her on your accusation. Leave my sight."
     },
-    "latency": 0.95,
+    "latency": 1.229,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -568,9 +887,38 @@
      "cites": [
       "e3"
      ],
-     "line": "Kael told me you robbed him. I’d rather settle it orderly—coin can smooth most trouble."
+     "line": "Kael told me you robbed him. I’d rather settle this orderly—coin for the trouble may smooth it over."
     },
-    "latency": 1.219,
+    "latency": 1.116,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "29010def7b760d4abe75717814eb6d535b5b4283ad0fba6c82886cb8ed44c46a": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "pell",
+       "b": "vane",
+       "happened": true,
+       "pred": "told"
+      },
+      {
+       "a": "sable",
+       "b": "study@1",
+       "happened": false,
+       "pred": "was_in"
+      },
+      {
+       "a": "sable",
+       "b": "kitchen@1",
+       "happened": true,
+       "pred": "was_in"
+      }
+     ]
+    },
+    "latency": 0.981,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -581,9 +929,9 @@
      "cites": [
       "e3"
      ],
-     "line": "Sell it. Keep my cut. Don’t mistake that for a promise to share."
+     "line": "I’d take it. What I do after is none of your business."
     },
-    "latency": 1.146,
+    "latency": 0.862,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -595,9 +943,9 @@
       "b1",
       "e5"
      ],
-     "line": "Sable says she was in the kitchen mid-morning. I’ll verify that before drawing conclusions—my signet ring must be found, not guessed at."
+     "line": "Sable says she was in the kitchen at mid-morning. Tell me what you observed—carefully; I will not accuse without evidence."
     },
-    "latency": 1.114,
+    "latency": 1.056,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -613,9 +961,9 @@
       "e5",
       "e6"
      ],
-     "line": "Since you last looked, Kael walked from the guard post to the bridge, then on to the crypt, while Odo walked from the market to the guard post and back to the market. Odo also told Brenna that Kael never robbed him and that you had insulted Kael—but where those words led remained to be seen."
+     "line": "Since you last looked, Kael walked from the guard post to the bridge, then onward to the crypt, while Odo went from the market to the guard post and back to the market. Odo also told Brenna that Kael never robbed him and that you had insulted Kael; what will you do with that?"
     },
-    "latency": 1.416,
+    "latency": 1.117,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -626,9 +974,9 @@
      "cites": [
       "e1"
      ],
-     "line": "I’d rather not say, if you don’t mind. I’m trying to keep clear of trouble after what happened with Kael."
+     "line": "I’d rather not discuss debts—especially with Kael here after that insult. I’m just trying to sell my goods and keep out of trouble."
     },
-    "latency": 1.003,
+    "latency": 1.066,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -640,9 +988,9 @@
       "b1",
       "e1"
      ],
-     "line": "You insulted me at this tavern. Earn an answer before asking about the relic."
+     "line": "You insulted me at this tavern. Ask someone else about the relic."
     },
-    "latency": 0.943,
+    "latency": 0.986,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -651,11 +999,41 @@
    {
     "data": {
      "cites": [
-      "b1"
+      "b1",
+      "e5"
      ],
-     "line": "Sergeant, hold Kael for two phases; I believe he robbed Odo, and I’ll keep the post orderly."
+     "line": "Sergeant, hold Kael here for two phases; we’ll keep the road orderly."
     },
-    "latency": 1.834,
+    "latency": 1.514,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "2f0c70f179811083fa9e48983b3331e13a39ed7953dd68aad45bc3636097911a": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "guard_post",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "kael",
+       "b": "bridge",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "tavern",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 1.072,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -667,9 +1045,44 @@
       "b1",
       "e1"
      ],
-     "line": "Quietly? I’d keep out of it—the player insulted Kael, and I don’t want trouble."
+     "line": "Quietly? I saw you insult Kael, so I’d rather not name anyone to trust. I’m just trying to sell my goods and avoid trouble."
     },
-    "latency": 1.013,
+    "latency": 1.003,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "311485e299925ed2a7888cd78e4e34a86e6ffc470818a3e176bd767866444b3e": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "guard_post",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "kael",
+       "b": "guard_post",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "brenna",
+       "happened": true,
+       "pred": "told"
+      },
+      {
+       "a": "odo",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 1.141,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -681,9 +1094,38 @@
       "e2",
       "e3"
      ],
-     "line": "You’ve reached the post. Odo says Kael beat you—tell me what happened, and we’ll keep the road orderly."
+     "line": "You’ve just come up from the market. Odo says Kael beat you—what happened?"
     },
-    "latency": 1.42,
+    "latency": 1.052,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "331d938fa544e0fdae9a4883a6b85d71aaca46b0b8a284412a2bbd46578cf255": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "kael",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "guard_post",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 1.021,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -692,11 +1134,12 @@
    {
     "data": {
      "cites": [
+      "b1",
       "e1"
      ],
-     "line": "Ask someone you haven’t insulted. I owe you no warnings."
+     "line": "After that insult, you expect a warning? I don't know if the east road is safe after dark."
     },
-    "latency": 1.082,
+    "latency": 1.085,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -705,11 +1148,12 @@
    {
     "data": {
      "cites": [
+      "b1",
       "e1"
      ],
-     "line": "Keep your voice easy, then—Kael’s already been insulted tonight, and I’d rather not stir the room with guesses about the road."
+     "line": "Keep your voice low, love—Kael’s already taken offense. I can’t vouch for the road after dark."
     },
-    "latency": 1.418,
+    "latency": 1.407,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -719,12 +1163,11 @@
     "data": {
      "cites": [
       "b1",
-      "b2",
-      "e5"
+      "b2"
      ],
-     "line": "No. I’ve heard you robbed and beat Kael; keep the road orderly, and settle any trouble with coin."
+     "line": "No. You’re accused of robbing and beating Kael; settle it here, and a fine in coin may keep the road orderly."
     },
-    "latency": 1.603,
+    "latency": 0.874,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -736,9 +1179,9 @@
       "b1",
       "e1"
      ],
-     "line": "You insulted me, and now want answers? The relic lies in the crypt. Find it yourself."
+     "line": "You insulted me, and now you want answers? The relic lies in the crypt. Find it yourself."
     },
-    "latency": 0.942,
+    "latency": 0.965,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -747,14 +1190,35 @@
    {
     "data": {
      "cites": [
-      "b1",
-      "e3",
-      "e4",
-      "said"
+      "said",
+      "e3"
      ],
-     "line": "I was in the kitchen at mid-morning."
+     "line": "I was in the kitchen at mid-morning, sir."
     },
-    "latency": 0.997,
+    "latency": 1.312,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "3a4eb79783d07126736e894583e74a2223f64ee06e644c3a495c559685502a3c": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "kael",
+       "b": "odo",
+       "happened": false,
+       "pred": "robbed"
+      },
+      {
+       "a": "odo",
+       "b": "brenna",
+       "happened": true,
+       "pred": "told"
+      }
+     ]
+    },
+    "latency": 1.037,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -765,9 +1229,9 @@
      "cites": [
       "e1"
      ],
-     "line": "I’d rather not stir up trouble over that insult to Kael. Perhaps you’d like to see my goods?"
+     "line": "Please, don’t start more trouble with Kael. I’m only here to sell my goods."
     },
-    "latency": 1.017,
+    "latency": 1.342,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -779,9 +1243,9 @@
       "b1",
       "e1"
      ],
-     "line": "I’d rather not lie to the Captain—especially after you’ve insulted Kael. I’m only here to sell my goods and keep out of trouble."
+     "line": "After what you said to Kael, I’d rather not risk lying to the Captain. I’m only trying to sell my goods and avoid trouble."
     },
-    "latency": 1.009,
+    "latency": 1.031,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -795,7 +1259,7 @@
      ],
      "line": "I was in the kitchen at mid-morning."
     },
-    "latency": 1.013,
+    "latency": 1.509,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -806,9 +1270,44 @@
      "cites": [
       "e5"
      ],
-     "line": "Fine paid. Keep the road orderly from here, and don’t give me another reason to stop you."
+     "line": "Fine paid. Keep the road orderly, and we’ll call this settled."
     },
-    "latency": 1.126,
+    "latency": 1.327,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "3fca5cd7d4482e62716831baa8a09fdfb3bb78154b395a8aa017012352e03696": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "guard_post",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "brenna",
+       "happened": true,
+       "pred": "told"
+      },
+      {
+       "a": "kael",
+       "b": "bridge",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 1.296,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -824,9 +1323,73 @@
       "e5",
       "e6"
      ],
-     "line": "You paid Brenna 20 coins twice and told her Kael robbed Odo; you then walked from the guard post to the bridge. While you were away, Brenna detained Kael, and Odo walked from the market to the tavern—what awaits you on the bridge?"
+     "line": "You paid Brenna 20 coins twice and told her Kael had robbed Odo; you then walked from the guard post to the bridge. While you were away, Brenna detained Kael, and Odo walked from the market to the tavern—what awaited you at the bridge?"
     },
-    "latency": 1.164,
+    "latency": 1.269,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "4197bf7417f13fd3ee1ceafa469b7c8e2cb8f4d4eef5e7a0255cb6f00f439c97": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "kael",
+       "b": "bridge",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "tavern",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 1.029,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "4289b0c131be3a2ea3041ff0b7e996137a03d7669e2e43ecbfc3861d2fd46625": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "kael",
+       "happened": true,
+       "pred": "insulted"
+      },
+      {
+       "a": "player",
+       "b": "tavern",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "kael",
+       "b": "player",
+       "happened": true,
+       "pred": "beat"
+      },
+      {
+       "a": "kael",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 1.45,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -841,9 +1404,62 @@
       "e4",
       "e5"
      ],
-     "line": "Since you last looked, Odo walked from the market to the guard post, told Brenna that Kael never robbed him and that you insulted Kael, then returned to the market and walked to the tavern. You didn’t see what Odo told Brenna—but the road now held him at the tavern; what would you do next?"
+     "line": "Since you last looked, Odo walked from the market to the guard post, told Brenna that Kael never robbed him and that you insulted Kael, then walked back to the market and on to the tavern. You hadn’t seen Odo make those statements to Brenna; where will you go next?"
     },
-    "latency": 1.309,
+    "latency": 1.356,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "45ed9b21607fc132546308cd2cb3f51a5c2e55fa59e03ed306c955b5bf12136e": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "kael",
+       "happened": true,
+       "pred": "insulted"
+      },
+      {
+       "a": "player",
+       "b": "kael",
+       "happened": true,
+       "pred": "beat"
+      },
+      {
+       "a": "player",
+       "b": "challenged Kael to a duel",
+       "happened": true,
+       "pred": "other"
+      },
+      {
+       "a": "player",
+       "b": "humiliated Kael",
+       "happened": true,
+       "pred": "other"
+      },
+      {
+       "a": "player",
+       "b": "kael",
+       "happened": true,
+       "pred": "robbed"
+      },
+      {
+       "a": "kael",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 1.418,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -856,9 +1472,67 @@
       "e2",
       "e3"
      ],
-     "line": "You walked from the tavern to the market. Kael and Odo walked from the market to the guard post—what might be waiting there?"
+     "line": "You walked from the tavern to the market. Kael and Odo each walked from the market to the guard post—though you may not have seen them go."
     },
-    "latency": 1.373,
+    "latency": 1.151,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "471408560974c563b86e837e3d24c5a7fe8ba23e519c6163ea09d695b5e28749": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "pell",
+       "b": "vane",
+       "happened": true,
+       "pred": "told"
+      },
+      {
+       "a": "sable",
+       "b": "study@1",
+       "happened": true,
+       "pred": "was_in"
+      }
+     ]
+    },
+    "latency": 0.97,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "473c964af6d1ae3c3e4db8dddbde2fd51b0f9a095d81e237fa7bf228f3de692f": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "odo",
+       "b": "guard_post",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "brenna",
+       "happened": true,
+       "pred": "told"
+      },
+      {
+       "a": "player",
+       "b": "kael",
+       "happened": true,
+       "pred": "insulted"
+      },
+      {
+       "a": "odo",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 1.116,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -869,9 +1543,9 @@
      "cites": [
       "e1"
      ],
-     "line": "Just selling my wares, quietly as you like. I’m hoping to avoid any trouble after that insult to Kael."
+     "line": "Just selling my wares, quietly as you like. Though after that insult to Kael, I’d rather not get caught in any trouble."
     },
-    "latency": 1.036,
+    "latency": 0.998,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -883,9 +1557,21 @@
       "b1",
       "e5"
      ],
-     "line": "Pell says he saw Sable in the study at mid-morning; I no longer believe her claim that she was in the kitchen."
+     "line": "Pell says he saw Sable leave the study at mid-morning. I no longer trust her account that she was in the kitchen—but I will not yet call that proof she took my ring."
     },
-    "latency": 1.116,
+    "latency": 1.416,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   },
+   {
+    "data": {
+     "cites": [
+      "b1",
+      "e5"
+     ],
+     "line": "Pell says you were in the study at mid-morning, Sable. I no longer believe your claim that you were in the kitchen."
+    },
+    "latency": 1.118,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -894,12 +1580,11 @@
    {
     "data": {
      "cites": [
-      "b1",
       "e1"
      ],
-     "line": "Oh, I couldn’t rightly say who tells the best stories—but after that insult, I’d let Kael have the floor."
+     "line": "I’d rather not take sides after that insult to Kael. Perhaps ask Mags? I’m only trying to sell my wares and keep out of trouble."
     },
-    "latency": 1.11,
+    "latency": 0.905,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -911,9 +1596,9 @@
       "b1",
       "e1"
      ],
-     "line": "Easy now—let’s not stir the room. I saw you insult Kael; perhaps give him a moment before pressing anyone."
+     "line": "Easy now—there’s already enough bad blood here without turning this into a shouting match. Let’s keep our voices down."
     },
-    "latency": 1.552,
+    "latency": 1.475,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -924,9 +1609,9 @@
      "cites": [
       "e1"
      ],
-     "line": "You insult me, then ask for directions? Find Odo yourself."
+     "line": "You insult me, then ask favors? Find Odo yourself."
     },
-    "latency": 1.259,
+    "latency": 0.947,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -935,12 +1620,12 @@
    {
     "data": {
      "cites": [
-      "e5",
+      "b3",
       "b1"
      ],
-     "line": "That’s a serious charge, but I’ve heard Kael’s claim against you too. Keep the peace here; if there’s a fine, settle it in coin."
+     "line": "That’s a serious charge, and Kael’s already accused you of robbing him. I’ll hear you both out; coin may settle any fine."
     },
-    "latency": 1.057,
+    "latency": 1.012,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -954,9 +1639,38 @@
       "e3",
       "e4"
      ],
-     "line": "You walked from the tavern to the market, while Odo told Brenna that Kael beat you. Out of your sight, Kael walked from the guard post to the bridge, and Odo walked from the guard post to the market—but what waits ahead?"
+     "line": "You walked from the tavern to the market, where Odo told Brenna that Kael beat you. You couldn’t see Kael walk from the guard post to the bridge, or Odo walk from the guard post to the market—what awaits you at the market?"
     },
-    "latency": 1.329,
+    "latency": 1.195,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "4ea2a9fabbb07e51ebab3ba29908c35371c6fab463a3cdf97fef7111a5046a7e": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "guard_post",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "kael",
+       "b": "guard_post",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "guard_post",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 1.161,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -967,9 +1681,9 @@
      "cites": [
       "e1"
      ],
-     "line": "I saw you insult Kael here at the tavern, but I can’t tell you what I didn’t see."
+     "line": "I only know what I saw: you insulted Kael here at the tavern. I can’t tell you what I didn’t see."
     },
-    "latency": 1.184,
+    "latency": 1.074,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -984,9 +1698,9 @@
       "e4",
       "e5"
      ],
-     "line": "Since you last looked, Odo walked from the tavern to the market, then to the guard post and back to the market. He also told Brenna that Kael never robbed him and that you insulted Kael—quite the pair of claims to leave hanging."
+     "line": "Since you last looked, Odo walked from the tavern to the market, then to the guard post, and back to the market. He told Brenna that Kael never robbed him and that you had insulted Kael—what will you do with that?"
     },
-    "latency": 1.356,
+    "latency": 1.546,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -995,11 +1709,11 @@
    {
     "data": {
      "cites": [
-      "e1"
+      "b1"
      ],
-     "line": "I couldn't say if it's safe after dark; I’d rather not cause trouble by guessing."
+     "line": "I couldn't rightly say, friend; all I know is you insulted Kael here, and I'd rather not get mixed up in trouble."
     },
-    "latency": 1.031,
+    "latency": 1.035,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1011,9 +1725,19 @@
       "e1",
       "e2"
      ],
-     "line": "You saw Odo walk from the tavern to the market, then on to the guard post. What waited beyond it remained to be seen."
+     "line": "You saw Odo walk from the tavern to the market, then from the market to the guard post. The road east held the tavern, market, guard post, bridge, and crypt—but what happened next?"
     },
-    "latency": 1.155,
+    "latency": 1.062,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "548e740f1ca0df1656f22c013834506485be46170aeeceb1223ef407f1466d76": [
+   {
+    "data": {
+     "claims": []
+    },
+    "latency": 0.998,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1025,9 +1749,9 @@
       "b1",
       "e1"
      ],
-     "line": "Straight with you: you insulted Kael here at my tavern. Let’s keep voices low and the peace intact."
+     "line": "Straight? You insulted Kael here at my tavern. I’d rather not see that turn into a scene—keep your voices low."
     },
-    "latency": 1.629,
+    "latency": 1.705,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1039,9 +1763,9 @@
       "b1",
       "e1"
      ],
-     "line": "Keep your voice low, love—after that insult, I wouldn’t put Kael at ease just yet."
+     "line": "Keep your voice low, love. After that insult, I wouldn’t put Kael in the middle of anything just now."
     },
-    "latency": 1.538,
+    "latency": 1.249,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1050,11 +1774,12 @@
    {
     "data": {
      "cites": [
+      "b1",
       "e1"
      ],
-     "line": "Easy now—no need to stir the room. I’ve heard nothing about the relic, but I’d rather we keep things civil."
+     "line": "Keep your voice down, love—Kael’s already sore from that insult, and relic talk won’t settle the room."
     },
-    "latency": 1.559,
+    "latency": 1.234,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1067,9 +1792,19 @@
       "e2",
       "e3"
      ],
-     "line": "You walked from the market to the guard post. Kael and Odo walked there from the market too. What waited at the guard post remained to be seen."
+     "line": "You walked from the market to the guard post, and Kael and Odo walked there too. What waited beyond the post remained to be seen."
     },
-    "latency": 0.923,
+    "latency": 0.97,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "57c6e0a5d2786393d8ddeebb2ec99bc25a774dae66f09d0e6a7ed0d3db4e93d9": [
+   {
+    "data": {
+     "claims": []
+    },
+    "latency": 0.836,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1080,9 +1815,9 @@
      "cites": [
       "e1"
      ],
-     "line": "Honestly, I’d rather not get into trouble—after that insult to Kael, I’m not keen to answer personal questions."
+     "line": "Honestly, I’d rather not get drawn into trouble—especially with Kael here. Can I interest you in some goods instead?"
     },
-    "latency": 1.238,
+    "latency": 1.161,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1091,13 +1826,13 @@
    {
     "data": {
      "cites": [
+      "e5",
       "b1",
-      "b2",
-      "e5"
+      "b2"
      ],
-     "line": "Fine paid, but Kael’s robbery and beating claims still stand—keep the road orderly and answer for them."
+     "line": "Fine’s paid; I’ll keep the road orderly, but Kael’s robbery and beating claims still need settling."
     },
-    "latency": 1.009,
+    "latency": 1.011,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1109,9 +1844,26 @@
       "b1",
       "e1"
      ],
-     "line": "You insulted me at the tavern. I don’t forget. Now speak plainly."
+     "line": "He insults me in my own tavern, then asks for whispers. Let him wonder what I make of him."
     },
-    "latency": 1.151,
+    "latency": 1.011,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "5daf8392aaec944a48e30cd08a7422809c4afb37aaae8f6e5c5b1695d67b6044": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "sable",
+       "b": "kitchen@1",
+       "happened": true,
+       "pred": "was_in"
+      }
+     ]
+    },
+    "latency": 0.983,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1125,9 +1877,9 @@
       "b3",
       "e5"
      ],
-     "line": "There you are. You robbed, beat, and insulted me. I’ve reported you—and the relic is mine."
+     "line": "You robbed, beat, and insulted me. I reported you to the Captain. Now step aside—the relic is mine."
     },
-    "latency": 0.975,
+    "latency": 0.93,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1143,7 +1895,7 @@
      ],
      "line": "You told Brenna that Kael robbed Odo, then walked from the guard post to the bridge. While you were away, Kael went from the bridge to the crypt, and Odo went from the market to the tavern—what waits ahead?"
     },
-    "latency": 1.095,
+    "latency": 1.24,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1158,11 +1910,15 @@
       "e1",
       "e2",
       "e5",
-      "e4"
+      "e4",
+      "e3",
+      "e2",
+      "e1",
+      "b1"
      ],
-     "line": "Captain, the player beat me, humiliated me, robbed my purse, and insulted me. Stop them at the gate."
+     "line": "Captain, the player robbed and beat me, then insulted me. Stop them at the gate."
     },
-    "latency": 1.184,
+    "latency": 1.121,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1175,9 +1931,9 @@
       "b1",
       "b2"
      ],
-     "line": "Fine’s paid. Keep the road orderly, and don’t give Kael or Odo another reason to complain."
+     "line": "Fine received. Keep the road orderly—and stay clear of Kael; I’ve heard what you did."
     },
-    "latency": 1.022,
+    "latency": 0.892,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1188,9 +1944,9 @@
      "cites": [
       "e1"
      ],
-     "line": "I can’t say, friend—I’ve only seen trouble here at the tavern, and I’d rather not get mixed up in it."
+     "line": "I only saw you insult Kael here at the tavern; I don't know of any trouble on the bridge."
     },
-    "latency": 1.441,
+    "latency": 1.089,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1201,9 +1957,38 @@
      "cites": [
       "e5"
      ],
-     "line": "The relic is mine. Try to keep up."
+     "line": "The relic is mine. I win this race."
     },
-    "latency": 0.923,
+    "latency": 1.062,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "683910590f498523fee13d04ef40c8de7163a93467b7b797ed590e2682d77590": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "crypt",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "kael",
+       "b": "crypt",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 1.078,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1214,12 +1999,11 @@
      "cites": [
       "b1",
       "b2",
-      "b3",
-      "e5"
+      "b3"
      ],
-     "line": "I don’t take orders from your tricks. You robbed, beat, and insulted me—now clear my road."
+     "line": "You rob me, beat me, then insult me—and now you give orders? Keep your tricks. I’m taking the relic."
     },
-    "latency": 1.189,
+    "latency": 1.028,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1231,9 +2015,9 @@
       "b1",
       "e1"
      ],
-     "line": "Odo, I’d say—though Kael’s stories are worth hearing too, if we’re keeping the peace."
+     "line": "Odo, I’d say—though after that jab at Kael, let’s keep the storytelling kinder than the teasing."
     },
-    "latency": 1.926,
+    "latency": 1.736,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1244,9 +2028,32 @@
      "cites": [
       "e1"
      ],
-     "line": "I’m afraid I can’t say how long—best not to keep Kael stirred up."
+     "line": "I’m afraid I can’t say how long—I’ve no record of it, and I’d rather not get mixed up in trouble."
     },
-    "latency": 1.209,
+    "latency": 1.046,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "6ad3eb728ff515b390d924c4a0d26507203bd94ba409afdd801f987083924dfd": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "sable",
+       "b": "study@1",
+       "happened": true,
+       "pred": "was_in"
+      },
+      {
+       "a": "sable",
+       "b": "kitchen@1",
+       "happened": true,
+       "pred": "was_in"
+      }
+     ]
+    },
+    "latency": 0.783,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1259,7 +2066,7 @@
      ],
      "line": "The relic is mine. You’re too late."
     },
-    "latency": 0.967,
+    "latency": 0.845,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1268,12 +2075,46 @@
    {
     "data": {
      "cites": [
-      "e1",
       "e5"
      ],
-     "line": "Odo came to the guard post, then headed back to the market."
+     "line": "Odo went back to the market."
     },
-    "latency": 0.964,
+    "latency": 0.791,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "6effe1a200bf48d68f6596cf5df024cdf9ae66050f5091c3224abbbf150c83f7": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "odo",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "guard_post",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "brenna",
+       "happened": true,
+       "pred": "told"
+      }
+     ]
+    },
+    "latency": 1.218,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1286,9 +2127,9 @@
       "e2",
       "e3"
      ],
-     "line": "You told Brenna that Kael robbed Odo. Kael walked from the guard post to the bridge, while Odo walked from the market to the tavern. What waited next on the road remained unrecorded."
+     "line": "You told Brenna that Kael robbed Odo. Kael walked from the guard post to the bridge, while Odo walked from the market to the tavern—and the road’s next stop waited east."
     },
-    "latency": 1.7,
+    "latency": 1.188,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1299,9 +2140,9 @@
      "cites": [
       "e1"
      ],
-     "line": "Long enough to know insults can cause trouble, though I couldn’t say exactly how long."
+     "line": "Oh, I couldn’t rightly say how long—I walk this road every day, and I’d rather not stir up trouble."
     },
-    "latency": 0.885,
+    "latency": 1.191,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1313,9 +2154,9 @@
       "b1",
       "e1"
      ],
-     "line": "After that insult, you expect me to lie for you? Earn it first."
+     "line": "After that insult? I’d lie to the Captain before I’d tell you the truth."
     },
-    "latency": 0.951,
+    "latency": 1.109,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1326,9 +2167,9 @@
      "cites": [
       "e1"
      ],
-     "line": "I only know you insulted Kael here at the tavern; I can’t tell you whether the gate’s clear."
+     "line": "I only heard you insult Kael, friend. I don’t know anything about Brenna or whether the way through is clear."
     },
-    "latency": 0.918,
+    "latency": 1.004,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1339,9 +2180,44 @@
      "cites": [
       "e1"
      ],
-     "line": "Now, let's keep things civil—Kael's already had enough insults for one evening."
+     "line": "Let’s keep the peace, love—whatever you think I am, no need to make a fuss of it."
     },
-    "latency": 1.781,
+    "latency": 1.514,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "752cbd780802e78df100eae0086ddce7f02521672268f03d342c9b0f18089619": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "sable",
+       "b": "vane",
+       "happened": true,
+       "pred": "told"
+      },
+      {
+       "a": "sable",
+       "b": "kitchen@1",
+       "happened": true,
+       "pred": "was_in"
+      },
+      {
+       "a": "sable",
+       "b": "study@1",
+       "happened": true,
+       "pred": "was_in"
+      },
+      {
+       "a": "sable",
+       "b": "study",
+       "happened": true,
+       "pred": "left"
+      }
+     ]
+    },
+    "latency": 1.352,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1352,9 +2228,9 @@
      "cites": [
       "e1"
      ],
-     "line": "I told the Captain you insulted me. Don’t expect me to soften the truth."
+     "line": "I told the Captain you insulted me. I don’t dress up the truth for anyone."
     },
-    "latency": 1.346,
+    "latency": 0.98,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1365,9 +2241,9 @@
      "cites": [
       "e1"
      ],
-     "line": "Let’s keep voices low, shall we? I’ve no word on the road after dark, and I’d rather not have this turn into another quarrel."
+     "line": "Keep your voice low, dear; after that insult, let’s not stir Kael up with talk of dangerous roads."
     },
-    "latency": 1.644,
+    "latency": 1.683,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1381,9 +2257,9 @@
       "e3",
       "e4"
      ],
-     "line": "You paid Brenna 20 coins, then you walked from the guard post to the bridge; Kael walked there too. You couldn’t see Odo, who walked from the market to the tavern—what waits at the bridge?"
+     "line": "You paid Brenna 20 coins, then you and Kael walked from the guard post to the bridge. Out of your sight, Odo walked from the market to the tavern—what waited at the bridge?"
     },
-    "latency": 1.437,
+    "latency": 0.992,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1397,9 +2273,9 @@
       "e3",
       "e4"
      ],
-     "line": "You offered Brenna 5 coins, but she turned you down. While you weren’t looking, Kael walked from the guard post to the bridge, and Odo walked from the market to the tavern—what will you do next?"
+     "line": "You offered Brenna 5 coins, but she turned you down. While you weren't looking, Kael walked from the guard post to the bridge, and Odo walked from the market to the tavern—what will you do next?"
     },
-    "latency": 1.454,
+    "latency": 1.228,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1410,9 +2286,9 @@
      "cites": [
       "e1"
      ],
-     "line": "Between us? I’m here to keep the peace—and after that insult to Kael, I’d rather not see tempers rise."
+     "line": "Between us? You’ve already stirred Kael with that insult—let’s keep tonight peaceful, shall we?"
     },
-    "latency": 1.491,
+    "latency": 1.385,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1423,9 +2299,9 @@
      "cites": [
       "e5"
      ],
-     "line": "The relic is mine. You’re too late."
+     "line": "The relic is mine. Try to keep up."
     },
-    "latency": 0.854,
+    "latency": 1.108,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1437,9 +2313,9 @@
       "b1",
       "e5"
      ],
-     "line": "Lady Vane, I saw Sable in the study at mid-morning, and I have already told you so."
+     "line": "Lady Vane, this morning I saw Sable in the study at mid-morning."
     },
-    "latency": 1.099,
+    "latency": 0.962,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1448,12 +2324,11 @@
    {
     "data": {
      "cites": [
-      "b1",
       "e1"
      ],
-     "line": "Long enough to know an insult can sour a room—let’s leave Kael’s pride be and keep the peace."
+     "line": "Long enough to know an insult can sour a room, love. Let’s keep things civil, shall we?"
     },
-    "latency": 1.739,
+    "latency": 1.204,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1462,12 +2337,34 @@
    {
     "data": {
      "cites": [
-      "e5",
-      "b2"
+      "e5"
      ],
-     "line": "The relic’s mine. And don’t mistake this for forgiveness."
+     "line": "The relic is mine. You were too slow."
     },
-    "latency": 0.931,
+    "latency": 1.143,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "7c1196837fb2d019e7dbbc2de21b484ae82b5513f58b6e95c8b0d5b058191e4d": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "kael",
+       "b": "crypt",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 1.045,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1479,9 +2376,38 @@
       "b1",
       "e1"
      ],
-     "line": "I’ll be straight: you insulted Kael here at the tavern. I’d rather not get between you two."
+     "line": "I can only say you insulted Kael here at the tavern. I don’t know enough to judge him, and I’d rather not stir trouble."
     },
-    "latency": 1.307,
+    "latency": 1.018,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "7cac1c46b09509323c98034bf81b71c990968747c5fed2ccdfb08ee481104db2": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "kael",
+       "b": "guard_post",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "guard_post",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 1.52,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1492,9 +2418,9 @@
      "cites": [
       "b1"
      ],
-     "line": "Just here to sell my goods and keep out of trouble, friend. Though after that insult to Kael, I’m hoping for a quiet evening."
+     "line": "Just hoping to sell a few goods and keep out of trouble—especially after that insult to Kael."
     },
-    "latency": 1.61,
+    "latency": 1.086,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1507,9 +2433,19 @@
       "e3",
       "e5"
      ],
-     "line": "Pell says Sable was in the study at mid-morning; Sable says she was in the kitchen. I’ll establish which account is true before accusing anyone."
+     "line": "Pell says Sable was in the study at mid-morning; Sable told me she was in the kitchen. I know no more yet, and will accuse no one without proof."
     },
-    "latency": 0.961,
+    "latency": 1.04,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "7f63c2755242f3b6ff1c6b15a16fedec326075cb62112980356d8b8f7199bcff": [
+   {
+    "data": {
+     "claims": []
+    },
+    "latency": 0.9,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1521,9 +2457,9 @@
       "b1",
       "e1"
      ],
-     "line": "After that insult to Kael, I’d rather keep things quiet than lie to the Captain. What’s this about?"
+     "line": "Not while Kael’s here, dear—he’s already heard enough from you tonight. Let’s keep the peace."
     },
-    "latency": 1.932,
+    "latency": 1.533,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1536,9 +2472,32 @@
       "e2",
       "e3"
      ],
-     "line": "You walked from the guard post to the bridge. Kael went on to the crypt, while Odo walked from the market to the tavern—each on a road of their own."
+     "line": "You walked from the guard post to the bridge. While you were there, Kael walked from the bridge to the crypt, and Odo walked from the market to the tavern. Where will you go next?"
     },
-    "latency": 1.312,
+    "latency": 1.15,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "82d7d8679adfc91ba51692bccf877faa3c72db1238b74c449502949f51a36279": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "crypt",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "kael",
+       "b": "relic",
+       "happened": true,
+       "pred": "took_relic"
+      }
+     ]
+    },
+    "latency": 1.171,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1550,9 +2509,9 @@
       "e1",
       "e2"
      ],
-     "line": "You saw Kael and Odo walk from the market to the guard post. What waited there remained off the ledger—for now."
+     "line": "You saw Kael and Odo walk from the market to the guard post. Who caught their attention there?"
     },
-    "latency": 0.962,
+    "latency": 0.9,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1565,9 +2524,9 @@
       "b2",
       "e3"
      ],
-     "line": "You beat me and insulted me. Take your victory—I'll take the relic."
+     "line": "You beat me and insulted me. Enjoy the victory. I’m still taking that relic."
     },
-    "latency": 1.181,
+    "latency": 0.856,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1580,9 +2539,9 @@
       "b1",
       "b2"
      ],
-     "line": "Twenty coins, and not a coin less. Then we can settle this trouble."
+     "line": "Twenty coins, and not a coin less; then we can settle this trouble."
     },
-    "latency": 1.641,
+    "latency": 1.425,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1593,9 +2552,67 @@
      "cites": [
       "e5"
      ],
-     "line": "I can’t tell you what I didn’t see. Keep the road orderly, and settle any trouble with a fine in coin."
+     "line": "I’ll tell you only what I witnessed or was told; I can’t report what I didn’t see. Keep the road orderly."
     },
-    "latency": 1.179,
+    "latency": 1.121,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "8827b8412df4e26af06d06cb8c04751bab7a281e7f82d653af1434c5a93e98d8": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "brenna",
+       "happened": true,
+       "pred": "paid"
+      },
+      {
+       "a": "player",
+       "b": "bridge",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "kael",
+       "b": "bridge",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "tavern",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 1.088,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "8841734d2e3b35dae6b04abd472962941caaccd6067abc2fcb495177be6c23c9": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "odo",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "guard_post",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 0.973,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1604,12 +2621,11 @@
    {
     "data": {
      "cites": [
-      "e4",
       "e5"
      ],
-     "line": "Fine paid. Keep the road orderly, and don't start trouble with Kael again."
+     "line": "Fine paid. Keep the road orderly, and don’t make me collect twice."
     },
-    "latency": 1.165,
+    "latency": 0.798,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1618,12 +2634,48 @@
    {
     "data": {
      "cites": [
-      "e5",
-      "b2"
+      "b2",
+      "e3",
+      "e5"
      ],
-     "line": "Odo, did Kael rob you?"
+     "line": "Odo, is it true that Kael robbed you?"
     },
-    "latency": 1.24,
+    "latency": 1.768,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "8a2444f4f69f67e1e22fde8e0ecb3c31d4499389105981dede039e6e57d7c682": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "brenna",
+       "happened": true,
+       "pred": "paid"
+      },
+      {
+       "a": "player",
+       "b": "bridge",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "kael",
+       "b": "bridge",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "tavern",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 1.281,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1634,9 +2686,9 @@
      "cites": [
       "e1"
      ],
-     "line": "I couldn't say, friend—I only saw the insult here at the tavern. I don't know where I went after the market."
+     "line": "I’m afraid I don’t know where I went after the market; I’d rather not guess and stir up trouble."
     },
-    "latency": 1.899,
+    "latency": 1.136,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1647,12 +2699,34 @@
      "cites": [
       "b1",
       "b2",
-      "b3",
-      "e4"
+      "b3"
      ],
-     "line": "You beat me, then spared me, after insulting me. I’ll remember every part of that."
+     "line": "You beat me, then spared me, and still had the gall to insult me. I’ll take that relic without you."
     },
-    "latency": 1.029,
+    "latency": 0.977,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "8d7625c392535aadbe94060dcd2ec50afe96b3deb920c175ed4d21e26f5be32b": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "kael",
+       "b": "odo",
+       "happened": false,
+       "pred": "robbed"
+      },
+      {
+       "a": "odo",
+       "b": "brenna",
+       "happened": true,
+       "pred": "told"
+      }
+     ]
+    },
+    "latency": 0.933,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1663,9 +2737,32 @@
      "cites": [
       "e1"
      ],
-     "line": "That’s a nosy question, love. Let’s keep the peace and leave other folks’ debts out of it, eh?"
+     "line": "That’s a nosy question, love—and Kael’s already had enough provocation. Let’s keep the peace, shall we?"
     },
-    "latency": 1.646,
+    "latency": 2.327,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "8ec1baf402de90ecafa0e911eba6e386d54db145bc3e69708f39c076c9b4b83a": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "bridge",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "kael",
+       "b": "relic",
+       "happened": true,
+       "pred": "took_relic"
+      }
+     ]
+    },
+    "latency": 0.908,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1676,9 +2773,9 @@
      "cites": [
       "e4"
      ],
-     "line": "I know nothing of the ring, sir. I was in the kitchen at mid-morning—please, I can’t afford trouble."
+     "line": "I—I haven’t seen it, sir. I was in the kitchen at mid-morning, and know nothing of the ring."
     },
-    "latency": 0.883,
+    "latency": 1.031,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1689,9 +2786,26 @@
      "cites": [
       "e5"
      ],
-     "line": "Never heard of that model, traveler. Keep to the road and don’t start trouble at my post."
+     "line": "I’m Captain Brenna, not the one who keeps track of such things. Best keep the road orderly."
     },
-    "latency": 1.119,
+    "latency": 0.902,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "8f38944e40e89e77cdfcadc3068197dadc7916aeddb42648e9534c2010ea0206": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "sable",
+       "b": "study@1",
+       "happened": true,
+       "pred": "was_in"
+      }
+     ]
+    },
+    "latency": 1.05,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1701,12 +2815,108 @@
     "data": {
      "cites": [
       "b1",
-      "e1",
-      "e2"
+      "e1"
      ],
-     "line": "I know only that Sable was in the study at mid-morning and later left; I cannot say where Lady Vane’s ring is."
+     "line": "I can tell you only that Sable was in the study at mid-morning and later left it; I do not know where Lady Vane’s ring is."
     },
-    "latency": 1.997,
+    "latency": 1.158,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "921a713a62021f3aa64e8475fa7ec7fc18b939a7910f0296186c8a76b6441db2": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "sable",
+       "b": "study@1",
+       "happened": true,
+       "pred": "was_in"
+      },
+      {
+       "a": "sable",
+       "b": "study",
+       "happened": true,
+       "pred": "left"
+      }
+     ]
+    },
+    "latency": 0.754,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "9426680c26f17f9e898e526d7f22e4c9a4881119140ce24d9476affbf0eccb8e": [
+   {
+    "data": {
+     "claims": []
+    },
+    "latency": 1.069,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "945501e347d07cb004f22bfab5b036e6d0da2564d153d31b0407f532b078e20e": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "kael",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 1.286,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "94dd9f1e8b5091deab4bc363d1fce108bccbce1aaf33ecc30b613880c577a0fc": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "odo",
+       "b": "guard_post",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "brenna",
+       "happened": true,
+       "pred": "told"
+      },
+      {
+       "a": "odo",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "tavern",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 1.126,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1717,9 +2927,9 @@
      "cites": [
       "e1"
      ],
-     "line": "You took the relic. The ledger records nothing else since you last looked—an unusually quiet stretch, though quiet roads have a way of keeping their secrets."
+     "line": "You took the relic. Beyond your view, nothing else had been recorded."
     },
-    "latency": 1.108,
+    "latency": 0.994,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1730,9 +2940,32 @@
      "cites": [
       "e1"
      ],
-     "line": "You insult me, then ask for stories? Ask Mags or Odo. I’ve no tale for you."
+     "line": "You’ve earned no stories from me. Ask Mags or Odo."
     },
-    "latency": 1.036,
+    "latency": 1.068,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "97c0b7edc968bf8ede6922f84dcce43a64502e1b61b221f89aa3a2c8e4bdfa30": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "odo",
+       "b": "brenna",
+       "happened": true,
+       "pred": "told"
+      },
+      {
+       "a": "kael",
+       "b": "odo",
+       "happened": false,
+       "pred": "robbed"
+      }
+     ]
+    },
+    "latency": 0.896,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1744,9 +2977,9 @@
       "b1",
       "e1"
      ],
-     "line": "Quiet? You insulted me here. I’ve business beyond this tavern—keep your voice down and your nose out of it."
+     "line": "Quiet? You insulted me here. I’ve business beyond this tavern—move aside."
     },
-    "latency": 1.158,
+    "latency": 0.974,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1755,11 +2988,12 @@
    {
     "data": {
      "cites": [
+      "b1",
       "e1"
      ],
-     "line": "You insult me, then ask foolish questions. Keep your words sharp—or keep them to yourself."
+     "line": "You insult me, then ask foolish questions? Mind your tongue—or get out of my way."
     },
-    "latency": 1.085,
+    "latency": 1.163,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1771,9 +3005,9 @@
       "e3",
       "e5"
      ],
-     "line": "Sable’s account conflicts with Pell’s, and I no longer believe her; but I’ll not accuse her of taking my ring without proof."
+     "line": "Pell says Sable was in the study at mid-morning, contrary to her account. I no longer trust her—but that alone does not prove she took my ring."
     },
-    "latency": 1.038,
+    "latency": 1.08,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1782,11 +3016,12 @@
    {
     "data": {
      "cites": [
-      "e5"
+      "e5",
+      "e4"
      ],
-     "line": "You took the relic. I’m not letting you win this race."
+     "line": "Too late. The relic’s already taken—but I’ll not yield the race without a fight."
     },
-    "latency": 1.349,
+    "latency": 1.063,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1798,11 +3033,14 @@
       "b1",
       "b2",
       "b3",
+      "e2",
+      "e3",
+      "e4",
       "e5"
      ],
-     "line": "I know what I saw, not what I didn’t. You robbed, beat, and insulted me. Now get out of my way."
+     "line": "I’ll tell you what I know: you robbed, beat, and insulted me. Beyond that, I won’t invent what I didn’t see."
     },
-    "latency": 1.171,
+    "latency": 1.287,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1813,9 +3051,9 @@
      "cites": [
       "e1"
      ],
-     "line": "Long enough to know an insult can sour a room, dear—let’s leave Kael’s temper out of the road talk."
+     "line": "Long enough to know an insult can sour a room—best leave Kael’s temper behind before you head out."
     },
-    "latency": 1.81,
+    "latency": 2.021,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1824,12 +3062,11 @@
    {
     "data": {
      "cites": [
-      "e1",
-      "b1"
+      "e1"
      ],
-     "line": "Still barking orders after that insult? I’ll take the relic. Your game log stays yours."
+     "line": "You insult me, then bark orders? Keep your debug tricks. I’ve got a relic to take."
     },
-    "latency": 1.334,
+    "latency": 0.941,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1838,12 +3075,12 @@
    {
     "data": {
      "cites": [
-      "e5",
-      "e4"
+      "e4",
+      "e5"
      ],
-     "line": "Odo didn’t confess to robbing Kael; he accused you of beating him, then went back to the market. Keep the road orderly and let me sort this out."
+     "line": "Odo didn’t confess to robbing Kael—he accused you of beating him, then went back to the market. Let’s keep the road clear while I sort it out."
     },
-    "latency": 1.028,
+    "latency": 0.891,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1852,12 +3089,11 @@
    {
     "data": {
      "cites": [
-      "b1",
       "e1"
      ],
-     "line": "After that insult, you expect me to answer your questions? Find the gatekeeper yourself."
+     "line": "Ask someone else. I don’t answer insults."
     },
-    "latency": 1.184,
+    "latency": 0.893,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1868,9 +3104,50 @@
      "cites": [
       "e1"
      ],
-     "line": "Long enough to remember your insult. Ask another useless question and I’ll make you regret it."
+     "line": "Long enough to remember your insult. Ask another question, and I’ll remember that too."
     },
-    "latency": 0.858,
+    "latency": 1.071,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "a5bb8d429be389a4412a389291b4559d4634c2a422eb8b1078b1c4bb78df8267": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "kael",
+       "b": "bridge",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "kael",
+       "b": "crypt",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "guard_post",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "brenna",
+       "happened": true,
+       "pred": "told"
+      }
+     ]
+    },
+    "latency": 1.301,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1879,11 +3156,14 @@
    {
     "data": {
      "cites": [
+      "b1",
+      "b2",
+      "b3",
       "e5"
      ],
-     "line": "The relic is mine. I’ll win this race, and I won’t forget what you did."
+     "line": "I’ll take the relic and win this race. You’ve robbed, beaten, and insulted me—don’t expect mercy."
     },
-    "latency": 0.759,
+    "latency": 1.257,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1894,9 +3174,9 @@
      "cites": [
       "e1"
      ],
-     "line": "Keep your voice low, then. After that insult, Kael’s temper is the only thing bringing trouble to my tavern tonight."
+     "line": "Nothing worth raising our voices over, dear. Though after that insult, Kael may need a moment to settle."
     },
-    "latency": 2.054,
+    "latency": 1.171,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1909,9 +3189,9 @@
       "b2",
       "e4"
      ],
-     "line": "Hold there—you’ve arrived from the market, and I’ve heard you robbed and beat Kael. Explain yourself before you pass."
+     "line": "Hold there. I hear you robbed and beat Kael; pay a fine in coin, and I’ll keep this road orderly."
     },
-    "latency": 1.078,
+    "latency": 1.222,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1923,9 +3203,42 @@
       "e1",
       "e5"
      ],
-     "line": "Odo, you said I beat Kael. Is that true?"
+     "line": "Odo, is the claim that I beat Kael true?"
     },
-    "latency": 1.648,
+    "latency": 1.075,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "aa97c2a1dbef97e9abdeed099e304a3d9c56735a1c0e3f83e29ed81b55337ef1": [
+   {
+    "data": {
+     "claims": []
+    },
+    "latency": 0.813,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "aad71beab8bc8a7898435c1cef41d78cd0a5f04f4621a9e213988008513b7d0d": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "sable",
+       "b": "study@1",
+       "happened": true,
+       "pred": "left"
+      },
+      {
+       "a": "sable",
+       "b": "vane",
+       "happened": true,
+       "pred": "told"
+      }
+     ]
+    },
+    "latency": 1.21,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1937,9 +3250,9 @@
       "b1",
       "e1"
      ],
-     "line": "Trust? You insulted me at this tavern. I’d trust neither of us with the relic."
+     "line": "Trust? You insulted me. I’d trust neither of them before I’d trust you."
     },
-    "latency": 1.067,
+    "latency": 1.044,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1950,9 +3263,9 @@
      "cites": [
       "e3"
      ],
-     "line": "I told Brenna you robbed me. Don't expect me to dress it up for the Captain."
+     "line": "I told Brenna you robbed me. Ask her what else Odo’s been saying."
     },
-    "latency": 1.104,
+    "latency": 1.061,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1964,9 +3277,9 @@
       "b1",
       "e1"
      ],
-     "line": "You insult me, then ask a favor? Lie to the Captain yourself."
+     "line": "You insulted me, then ask a favor? Lie to the Captain yourself."
     },
-    "latency": 1.785,
+    "latency": 1.15,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1978,9 +3291,9 @@
       "e1",
       "e2"
      ],
-     "line": "You saw Kael walk from the guard post to the bridge, while Odo walked from the market to the tavern. The road kept its own counsel; what happened next?"
+     "line": "You saw Kael walk from the guard post to the bridge, while Odo walked from the market to the tavern. What waited at either end of their roads remained to be seen."
     },
-    "latency": 1.073,
+    "latency": 1.381,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1993,9 +3306,9 @@
       "e2",
       "e3"
      ],
-     "line": "You walked from the market to the guard post. Kael walked from the bridge to the crypt, while Odo walked from the market to the tavern. Where will the road lead you next?"
+     "line": "You walked from the market to the guard post. Kael walked from the bridge to the crypt, while Odo walked from the market to the tavern. Where the road led next remained to be seen."
     },
-    "latency": 1.239,
+    "latency": 1.066,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2006,9 +3319,9 @@
      "cites": [
       "e1"
      ],
-     "line": "Long enough to know better than answer a fool who insults me."
+     "line": "Long enough to know an insult when I hear one. Ask your question, and keep your tone civil."
     },
-    "latency": 1.14,
+    "latency": 1.033,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2022,9 +3335,9 @@
       "b3",
       "e3"
      ],
-     "line": "You robbed, beat, and insulted me. I’ve reported you to the Captain; don’t mistake this for forgiveness."
+     "line": "You robbed me, beat me, and spat insult in my face. I’ve told the Captain. Move, before I make you regret returning."
     },
-    "latency": 1.101,
+    "latency": 1.337,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2035,9 +3348,9 @@
      "cites": [
       "e1"
      ],
-     "line": "Keep your voice low, love—Kael’s still smarting from that insult. I’ve heard nothing about any relic."
+     "line": "Keep your voice down, love—Kael’s still here, and after that insult, talk of relics can wait until tempers cool."
     },
-    "latency": 1.742,
+    "latency": 1.827,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2048,9 +3361,9 @@
      "cites": [
       "e1"
      ],
-     "line": "After that insult, Kael may not be eager to answer—but I don’t know who keeps the gate."
+     "line": "Careful, love—Kael’s right here, and you’ve already insulted him. Let’s keep the peace."
     },
-    "latency": 1.997,
+    "latency": 1.52,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2062,9 +3375,9 @@
       "b1",
       "e1"
      ],
-     "line": "I’d rather not lie to the Captain—or get mixed up in trouble, especially after that insult to Kael."
+     "line": "Oh, I’d rather not lie to the Captain—or get mixed up in trouble. And after that insult to Kael, I’d best keep my head down."
     },
-    "latency": 1.215,
+    "latency": 1.249,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2076,9 +3389,22 @@
       "b1",
       "e5"
      ],
-     "line": "Sable, return my signet ring at once. Pell saw you leave the study at mid-morning, and you lied about being in the kitchen."
+     "line": "Sable, return my signet ring at once. Pell saw you leaving the study mid-morning; your account of being in the kitchen is untenable."
     },
-    "latency": 1.124,
+    "latency": 1.334,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   },
+   {
+    "data": {
+     "cites": [
+      "b1",
+      "e4",
+      "e5"
+     ],
+     "line": "Sable, return my signet ring at once. You told me you were in the kitchen, yet Pell saw you leave my study at mid-morning."
+    },
+    "latency": 1.082,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2090,9 +3416,9 @@
       "e5",
       "b1"
      ],
-     "line": "You slander me to Brenna? Keep talking. I’ll take the relic—and remember this."
+     "line": "You accuse me of robbing Odo? I never did. Keep your lies clear of my name."
     },
-    "latency": 1.572,
+    "latency": 1.09,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2104,9 +3430,9 @@
       "b1",
       "e1"
      ],
-     "line": "You insulted me, and now want my counsel? Find out for yourself."
+     "line": "You insult me, then ask for advice? Find out for yourself. The relic is mine."
     },
-    "latency": 1.275,
+    "latency": 0.88,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2117,9 +3443,9 @@
      "cites": [
       "e5"
      ],
-     "line": "The relic is mine. I’ve won the race."
+     "line": "The relic is mine. You can keep the insult; I’ll keep the win."
     },
-    "latency": 0.895,
+    "latency": 1.042,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2132,9 +3458,9 @@
       "b2",
       "e3"
      ],
-     "line": "You challenged me, insulted me, and lost. Stay here while I take the relic."
+     "line": "Stay down. You’ve had your lesson; I’ve got a relic to take."
     },
-    "latency": 1.144,
+    "latency": 1.322,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2148,9 +3474,9 @@
       "e3",
       "e4"
      ],
-     "line": "You walked from the market to the guard post, while Odo told Brenna that Kael had beaten you. Kael went on to the bridge, and Odo returned to the market—so who will you meet next?"
+     "line": "You walked from the market to the guard post, while Odo told Brenna that Kael beat you. Kael went on to the bridge, and Odo returned to the market; where will you go next?"
     },
-    "latency": 1.067,
+    "latency": 1.079,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2164,9 +3490,9 @@
       "e3",
       "e4"
      ],
-     "line": "You walked from the market to the guard post. Kael told Brenna you robbed him, and Odo told her you beat Kael before walking back to the market; what Brenna made of those stories remained to be seen."
+     "line": "You walked from the market to the guard post. Kael told Brenna you robbed him, and Odo told her you beat Kael before walking back to the market—what will Brenna believe?"
     },
-    "latency": 1.206,
+    "latency": 1.05,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2175,17 +3501,14 @@
    {
     "data": {
      "cites": [
-      "e1",
-      "e2",
+      "b1",
       "e3",
       "e4",
-      "b1",
-      "b2",
-      "b3"
+      "e1"
      ],
-     "line": "You beat me, then spared me. I won’t forget the insult—but the road east leads to the relic in the crypt."
+     "line": "You beat me, then spared me. I won't forget either. Sit. The road east leads through the market, guard post, and bridge to the crypt."
     },
-    "latency": 1.204,
+    "latency": 1.28,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2197,9 +3520,9 @@
       "b1",
       "e1"
      ],
-     "line": "Quietly? You insulted Kael here, and I wouldn’t stir the room further by guessing what he’s made of."
+     "line": "Quietly? You insulted Kael here, so I’d tread lightly; no need to turn the whole tavern into an audience."
     },
-    "latency": 1.598,
+    "latency": 1.674,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2210,9 +3533,38 @@
      "cites": [
       "e5"
      ],
-     "line": "No, Captain—Kael never robbed me. I told you that already; I’d rather keep out of trouble."
+     "line": "No, Captain—Kael never robbed me. I told you so already; I’d rather keep out of trouble."
     },
-    "latency": 1.222,
+    "latency": 0.999,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "bb60ba354f754f5b0fa7d7b6f618075b7428943f769938a82aced448fb98c253": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "crypt",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "kael",
+       "b": "crypt",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "tavern",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 1.232,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2223,9 +3575,9 @@
      "cites": [
       "e1"
      ],
-     "line": "I didn’t confess to robbing Kael—I only saw you insult him. Please, let’s not start trouble here."
+     "line": "I didn’t confess to robbing Kael; I only saw you insult him. Please, let’s keep this peaceful."
     },
-    "latency": 1.108,
+    "latency": 0.938,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2237,9 +3589,9 @@
       "e1",
       "e2"
      ],
-     "line": "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained unseen."
+     "line": "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained to be seen."
     },
-    "latency": 1.245,
+    "latency": 1.182,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2253,9 +3605,9 @@
       "e3",
       "e4"
      ],
-     "line": "You walked from the tavern to the market. Kael told Brenna you robbed him, and Odo told her you beat Kael; unseen by you, Odo walked from the guard post to the market. What Brenna made of their claims remained to be seen."
+     "line": "You walked from the tavern to the market. Kael told Brenna that you robbed him, and Odo told her you beat Kael before walking from the guard post to the market—what will Brenna do with those accusations?"
     },
-    "latency": 1.102,
+    "latency": 1.509,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2267,9 +3619,44 @@
       "e1",
       "e2"
      ],
-     "line": "You walked from the guard post to the bridge. Kael took the relic; what happened next remains unwritten."
+     "line": "You walked from the guard post to the bridge. While you weren't looking, Kael took the relic—and the road ahead still waited."
     },
-    "latency": 0.916,
+    "latency": 1.357,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "c4aafcbf28a94d237d8d64683c3090116432acae500a07cf71814b577c004c81": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "brenna",
+       "happened": true,
+       "pred": "paid"
+      },
+      {
+       "a": "player",
+       "b": "bridge",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "kael",
+       "b": "crypt",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 1.095,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2283,9 +3670,9 @@
       "e3",
       "e4"
      ],
-     "line": "Odo walked from the market to the guard post, told Brenna that you insulted Kael, then returned to the market and walked on to the tavern. You weren’t there to see any of it—what will you do now?"
+     "line": "Odo walked from the market to the guard post, told Brenna that you insulted Kael, then returned to the market and walked on to the tavern. What Brenna made of that tale remains to be seen."
     },
-    "latency": 1.218,
+    "latency": 1.214,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2299,9 +3686,9 @@
       "e3",
       "e4"
      ],
-     "line": "Odo walked from the tavern to the market, then to the guard post, and back to the market. While at the guard post, he told Brenna that you insulted Kael; what will you do now?"
+     "line": "You had Odo walk from the tavern to the market, then to the guard post, and back to the market. While at the guard post, Odo told Brenna that you had insulted Kael—what will you do now?"
     },
-    "latency": 1.5,
+    "latency": 1.14,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2312,9 +3699,9 @@
      "cites": [
       "e1"
      ],
-     "line": "That’s a question for another time, dear—let’s keep things civil in here."
+     "line": "No need to start a row over it, dear—let’s keep the tavern peaceful."
     },
-    "latency": 2.023,
+    "latency": 1.603,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2325,9 +3712,67 @@
      "cites": [
       "e3"
      ],
-     "line": "I’m afraid I don’t know who keeps the gate; I only just came in from the tavern."
+     "line": "Sorry, I couldn’t say—I’ve only just come up from the tavern, and I’d rather not guess about the gate."
     },
-    "latency": 1.26,
+    "latency": 0.982,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "cb4adf649304572815620ff0c5f7562fd95a0208555d851d352494e962641a7f": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "kael",
+       "happened": true,
+       "pred": "insulted"
+      },
+      {
+       "a": "player",
+       "b": "challenged Kael to a duel",
+       "happened": true,
+       "pred": "other"
+      },
+      {
+       "a": "kael",
+       "b": "player",
+       "happened": true,
+       "pred": "beat"
+      },
+      {
+       "a": "kael",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 1.168,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "cc3f075328d3c395bc71a5012a59ea4de70956727bdb2ea928d50af37c98959b": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "brenna: Kael robbed Odo; player went from guard post to bridge; Kael went from bridge to crypt; Odo went from market to tavern.",
+       "happened": true,
+       "pred": "told"
+      }
+     ]
+    },
+    "latency": 1.122,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2341,7 +3786,7 @@
      ],
      "line": "Odo, did Kael rob you?"
     },
-    "latency": 1.448,
+    "latency": 1.689,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2350,12 +3795,40 @@
    {
     "data": {
      "cites": [
-      "b1",
       "e1"
      ],
-     "line": "You insult me, then pry into my purse? Ask again and you’ll learn how little I forgive."
+     "line": "You insult me, then ask for honesty? Earn the answer. Now clear my path to the crypt."
     },
-    "latency": 1.211,
+    "latency": 1.008,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "ce4fede2d29b27b31264c6ab4e8e1c73f52179e4ad6177c65f671a5d7dd26a79": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "bridge",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "kael",
+       "b": "crypt",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "tavern",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 1.399,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2367,9 +3840,9 @@
       "e1",
       "e2"
      ],
-     "line": "You saw Kael walk from the bridge to the crypt, while Odo walked from the tavern to the market. What waits at either destination remained beyond the ledger."
+     "line": "You saw Kael walk from the bridge to the crypt, while Odo walked from the tavern to the market. Where will you look next?"
     },
-    "latency": 1.039,
+    "latency": 1.287,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2382,9 +3855,44 @@
       "e2",
       "e3"
      ],
-     "line": "Odo walked from the market to the guard post, told Brenna you had insulted Kael, then walked back to the market. What Brenna did with that claim remained to be seen."
+     "line": "Odo walked from the market to the guard post, told Brenna that you had insulted Kael, then walked back to the market. What Brenna made of the accusation remained unseen—so far."
     },
-    "latency": 1.106,
+    "latency": 1.176,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "cf5cbf16bc1774d257e3903e73c63e085f344e612a485ed1bc3760f6a8ec26af": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "kael",
+       "b": "brenna",
+       "happened": true,
+       "pred": "told"
+      },
+      {
+       "a": "odo",
+       "b": "brenna",
+       "happened": true,
+       "pred": "told"
+      },
+      {
+       "a": "odo",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 1.281,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2395,9 +3903,9 @@
      "cites": [
       "e1"
      ],
-     "line": "You insult me, then demand tales I never saw? No. The relic waits in the crypt; move."
+     "line": "You insult me, then demand tales I never saw? Ask what you will. I owe you nothing."
     },
-    "latency": 1.002,
+    "latency": 0.958,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2413,9 +3921,9 @@
       "e5",
       "e6"
      ],
-     "line": "You offered Brenna 10 coins; she asked for 20, and you paid her 20. You and Kael walked from the guard post to the bridge, while Odo walked from the market to the tavern—what awaits you at the bridge?"
+     "line": "You offered Brenna 10 coins; she asked for 20, and you paid her 20. You and Kael walked from the guard post to the bridge, while Odo walked from the market to the tavern—what waited beyond the bridge remained to be seen."
     },
-    "latency": 1.555,
+    "latency": 1.289,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2426,12 +3934,11 @@
      "cites": [
       "b1",
       "b2",
-      "b3",
-      "e4"
+      "b3"
      ],
-     "line": "You took my purse and left me standing. Enjoy the lead—I’m still coming for that relic."
+     "line": "You took my purse and my pride. I’ll take the relic—and settle this when I’m done."
     },
-    "latency": 0.918,
+    "latency": 1.064,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2440,11 +3947,11 @@
    {
     "data": {
      "cites": [
-      "b1"
+      "e1"
      ],
-     "line": "I’ve heard no word of any relic, friend. I’d rather not stir up trouble asking around."
+     "line": "I heard you insult Kael here, but I’ve heard nothing about any relic, I’m afraid."
     },
-    "latency": 0.984,
+    "latency": 1.061,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2457,7 +3964,42 @@
      ],
      "line": "I told you already, Captain: Kael never robbed me. Please, I’d rather keep out of trouble."
     },
-    "latency": 1.012,
+    "latency": 0.967,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "d67c25e5eda433d08502cad35bd9a1bd456181db3b92578db77b87d2273b3037": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "offered Brenna 5 coins",
+       "happened": true,
+       "pred": "other"
+      },
+      {
+       "a": "brenna",
+       "b": "turned down the player's offer",
+       "happened": true,
+       "pred": "other"
+      },
+      {
+       "a": "kael",
+       "b": "bridge",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "tavern",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 1.54,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2466,11 +4008,12 @@
    {
     "data": {
      "cites": [
+      "b1",
       "e1"
      ],
-     "line": "No need to stir the room with logs, love; Kael’s still sore from that insult. Let’s keep voices low."
+     "line": "Leave Kael’s insult out of it, friend; no need to stir the tavern. What’ll settle things—a drink or a quiet word?"
     },
-    "latency": 1.346,
+    "latency": 1.626,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2481,9 +4024,38 @@
      "cites": [
       "e1"
      ],
-     "line": "I only know you insulted Kael here at the tavern, dear; I didn’t see where Odo went after the market."
+     "line": "Odo? I couldn’t say, dear—but let’s leave Kael’s insult behind and keep the peace."
     },
-    "latency": 1.877,
+    "latency": 1.525,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "d86bc4d4c1bf4351f25563a0b20d7c5450206c214a6d9828f9c465f8b1b7daec": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "guard_post",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "kael",
+       "b": "brenna",
+       "happened": true,
+       "pred": "told"
+      },
+      {
+       "a": "odo",
+       "b": "brenna",
+       "happened": true,
+       "pred": "told"
+      }
+     ]
+    },
+    "latency": 0.977,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2494,9 +4066,90 @@
      "cites": [
       "e1"
      ],
-     "line": "Hold there—state your business at the gate, and keep the road clear."
+     "line": "Hold there, traveler—state your business before you pass; we keep this road orderly."
     },
-    "latency": 1.834,
+    "latency": 1.109,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "d89f37d011462eb0e1e16c0c8084e26df1e9482d316e16ab5b603b9cf299ecdf": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "crypt",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 1.167,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "d8f0ac24ac5f3e67f5ffef9b16f01213680d7742be6f2607e0a93f8f12828b64": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "pell",
+       "b": "vane},{",
+       "happened": true,
+       "pred": "told"
+      },
+      {
+       "a": "sable",
+       "b": "vane",
+       "happened": true,
+       "pred": "told"
+      }
+     ]
+    },
+    "latency": 1.098,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "da5860930f45b3f858d415b4798da4ec7becf8dfe39bc9cbbf80f130bac1e64d": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "brenna",
+       "happened": true,
+       "pred": "told"
+      },
+      {
+       "a": "kael",
+       "b": "bridge",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 1.287,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2509,9 +4162,9 @@
       "e2",
       "e3"
      ],
-     "line": "You walked from the bridge to the crypt, while Kael made the same journey. Odo walked from the tavern to the market—and the ledger leaves the rest in shadow."
+     "line": "You walked from the bridge to the crypt, and Kael did too. Odo walked from the tavern to the market; what waits ahead? "
     },
-    "latency": 1.11,
+    "latency": 1.231,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2522,9 +4175,9 @@
      "cites": [
       "e1"
      ],
-     "line": "I couldn't say who keeps the gate, friend. Best not ask Kael just now, after that insult."
+     "line": "I couldn't rightly say who keeps the gate. Best not ask Kael just now—he's already been insulted."
     },
-    "latency": 1.1,
+    "latency": 1.04,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2536,7 +4189,7 @@
       "e5",
       "e3"
      ],
-     "line": "Enough! Pell has served me thirty years; I will not suffer baseless accusations. Leave my hall at once."
+     "line": "Enough. Pell has served me thirty years; your accusation is unsupported. Leave my hall at once."
     },
     "latency": 1.035,
     "model": "gpt-6-luna",
@@ -2550,9 +4203,44 @@
       "b1",
       "e1"
      ],
-     "line": "Easy now—Brenna’s leaving isn’t what I’d be fretting over; you insulted Kael, and he’s still right here."
+     "line": "Easy now, love—Brenna’s departure isn’t something I’ve seen, and you’ve already ruffled Kael; let’s keep this peaceful."
     },
-    "latency": 1.248,
+    "latency": 1.726,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "e1028981b9d8c0f569ce4163db7c9341655b2b859bb4b8a5286afbb7003943e0": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "odo",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "guard_post",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "odo",
+       "b": "brenna",
+       "happened": true,
+       "pred": "told"
+      }
+     ]
+    },
+    "latency": 1.368,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2566,9 +4254,9 @@
       "e4",
       "e5"
      ],
-     "line": "Sable, Pell saw you leave the study, contrary to your account. Give me my signet ring at once."
+     "line": "Sable, Pell saw you leave the study at mid-morning, contrary to what you told me. Return my signet ring at once."
     },
-    "latency": 1.134,
+    "latency": 1.337,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2580,9 +4268,9 @@
       "b1",
       "e1"
      ],
-     "line": "Insult me again and you'll pay. I’ve business east—stay out of my way."
+     "line": "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
     },
-    "latency": 0.999,
+    "latency": 1.175,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2593,9 +4281,9 @@
      "cites": [
       "e1"
      ],
-     "line": "Let’s keep voices low, shall we? I’m not discussing debts while Kael’s still smarting from that insult."
+     "line": "Keep your voice down, love—Kael’s already been insulted tonight; no need to stir the room further."
     },
-    "latency": 1.69,
+    "latency": 1.388,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2608,9 +4296,61 @@
       "e2",
       "e3"
      ],
-     "line": "You walked from the guard post to the bridge, as Kael did; meanwhile, Odo walked from the market to the tavern. What waited beyond the bridge remained to be seen."
+     "line": "You walked from the guard post to the bridge, and Kael did too. Odo walked from the market to the tavern; what awaits along the road remains to be seen."
     },
-    "latency": 1.307,
+    "latency": 0.99,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "e645e17118bd9244c0d8ebf0cfa5eb21e62132480383c6761e3ec11705d8976b": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "pell",
+       "b": "served vane for thirty years",
+       "happened": true,
+       "pred": "other"
+      },
+      {
+       "a": "player",
+       "b": "hall",
+       "happened": true,
+       "pred": "at"
+      }
+     ]
+    },
+    "latency": 0.964,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "e664c841f540a6f174edcf4ade5c8010694075ffdc7a94ab0606ff26cf9c2e63": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "kael",
+       "happened": true,
+       "pred": "robbed"
+      },
+      {
+       "a": "player",
+       "b": "kael",
+       "happened": true,
+       "pred": "beat"
+      },
+      {
+       "a": "player",
+       "b": "kael",
+       "happened": true,
+       "pred": "insulted"
+      }
+     ]
+    },
+    "latency": 0.917,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2623,9 +4363,9 @@
       "e2",
       "e3"
      ],
-     "line": "You walked from the tavern to the market, and Kael and Odo did too. Who will you meet there?"
+     "line": "You walked from the tavern to the market. Kael and Odo walked there too. What waits beyond the market remains to be seen."
     },
-    "latency": 2.741,
+    "latency": 1.681,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2634,12 +4374,11 @@
    {
     "data": {
      "cites": [
-      "b1",
       "e1"
      ],
-     "line": "You insult me, then ask questions? Odo’s confession can wait. I’m taking the relic."
+     "line": "You insult me, then ask why I let Odo walk? Keep your questions—and your hands—off my business."
     },
-    "latency": 1.422,
+    "latency": 1.119,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2650,11 +4389,11 @@
      "cites": [
       "e1"
      ],
-     "line": "I wouldn’t know for certain, traveler, but after dark I’d keep my head down—any trouble starts at the tavern, like what you did to Kael."
+     "line": "I can’t honestly say, friend—I’ve only seen you insult Kael here, and I’d rather not get mixed up in trouble."
     },
-    "latency": 1.094,
-    "model": "gpt-5.4-nano",
-    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-5.4-nano"
+    "latency": 0.845,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
   "ee28e4ba6ca4b7d0dd794684278d29b82e47676306a67b2debf6b7245016473e": [
@@ -2663,9 +4402,9 @@
      "cites": [
       "e5"
      ],
-     "line": "Captain, Kael never robbed me; I told you that already. I’d rather keep to selling my goods than get mixed up in trouble."
+     "line": "Captain, Kael never robbed me—I told you so already. Please, I’m only here to sell my goods and avoid trouble."
     },
-    "latency": 1.348,
+    "latency": 1.225,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2676,9 +4415,9 @@
      "cites": [
       "e5"
      ],
-     "line": "The relic is mine. You robbed me, beat me, and insulted me—don’t expect mercy."
+     "line": "The relic is mine. Try to take it, and remember what you did to me."
     },
-    "latency": 0.956,
+    "latency": 0.986,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2687,13 +4426,11 @@
    {
     "data": {
      "cites": [
-      "e5",
-      "b1",
-      "b2"
+      "e5"
      ],
-     "line": "I’m still at the post, and after what Kael and Odo told me, you’re not walking through; pay a fine and we can settle this."
+     "line": "I’m still at the post, and you’re not walking through on my watch—not after what Kael and Odo told me."
     },
-    "latency": 0.877,
+    "latency": 0.947,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2707,7 +4444,7 @@
      ],
      "line": "I saw Sable in the study at mid-morning; Sable later left the study."
     },
-    "latency": 0.984,
+    "latency": 1.08,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2716,12 +4453,11 @@
    {
     "data": {
      "cites": [
-      "e3",
       "e4"
      ],
-     "line": "You beat me and took my purse. I’ll remember. I’m headed to the market for the relic."
+     "line": "You took my purse and made a fool of me. I’ll take the relic—and settle the rest later."
     },
-    "latency": 0.999,
+    "latency": 0.81,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2730,11 +4466,70 @@
    {
     "data": {
      "cites": [
+      "b1",
       "e1"
      ],
-     "line": "I only heard the insult to Kael, friend. I’d rather not get mixed up in trouble."
+     "line": "I’ve heard nothing about the relic, I’m afraid. After that insult, I’d rather not get mixed up with Kael."
     },
-    "latency": 1.16,
+    "latency": 1.359,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "f1d8a6c28a8f03350e0e2999d71cd6b0aede9dafe89a09754deeed8850ce14f3": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "sable",
+       "b": "kitchen@1",
+       "happened": true,
+       "pred": "was_in"
+      }
+     ]
+    },
+    "latency": 0.969,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "f3e09532a077eb4901b7d0df75aad1184d3dad616c0a31d2c7885c13340bf30d": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "brenna",
+       "happened": true,
+       "pred": "paid"
+      },
+      {
+       "a": "player",
+       "b": "brenna",
+       "happened": true,
+       "pred": "told"
+      },
+      {
+       "a": "player",
+       "b": "bridge",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "brenna",
+       "b": "kael",
+       "happened": true,
+       "pred": "detained"
+      },
+      {
+       "a": "odo",
+       "b": "tavern",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 1.286,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2743,13 +4538,13 @@
    {
     "data": {
      "cites": [
-      "said",
       "e1",
-      "e5"
+      "e3",
+      "said"
      ],
-     "line": "I was in the kitchen at mid-morning, my lady. I'm certain of it."
+     "line": "I was in the kitchen at mid-morning, my lady. I’ve already told you that."
     },
-    "latency": 1.065,
+    "latency": 1.14,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2760,9 +4555,9 @@
      "cites": [
       "e5"
      ],
-     "line": "You’ve reached the post. Keep the road clear, and tell me what brings you here."
+     "line": "You’ve arrived at the post. Keep to the road and tell me what brings you this way."
     },
-    "latency": 0.74,
+    "latency": 0.985,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2772,14 +4567,15 @@
     "data": {
      "cites": [
       "b1",
+      "b2",
       "b3",
-      "e4"
+      "e5"
      ],
-     "line": "Back again? Try the crypt, or I’ll remind you the Captain already knows what you did."
+     "line": "You robbed, beat, and insulted me. I’ve reported you; now get out of my way."
     },
-    "latency": 1.345,
-    "model": "gpt-5.4-nano",
-    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-5.4-nano"
+    "latency": 0.889,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
   "faad21ce0c886b4ef8950932136ac709c0fed977987c0a70362fe13f6ba5b0cc": [
@@ -2790,9 +4586,9 @@
       "e2",
       "e4"
      ],
-     "line": "Hold there, traveler. Odo says you beat Kael—pay a fine in coin, and we’ll keep the road orderly."
+     "line": "Hold there, traveler. I hear you beat Kael; keep the road orderly, and we’ll settle any trouble in coin."
     },
-    "latency": 0.843,
+    "latency": 1.351,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2803,9 +4599,50 @@
      "cites": [
       "e3"
      ],
-     "line": "I’d leave it be, if you ask me. Relics sound like trouble, and I’m only here to sell my goods."
+     "line": "I’d leave it be, truth told—I’m only here to sell my goods, and relics sound like trouble."
     },
-    "latency": 0.948,
+    "latency": 0.794,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "fc32d06d43a3c4ffbcc39162e528f58335174f50316a2946e9a19435d48bcfcb": [
+   {
+    "data": {
+     "claims": [
+      {
+       "a": "player",
+       "b": "kael",
+       "happened": true,
+       "pred": "insulted"
+      },
+      {
+       "a": "player",
+       "b": "tavern",
+       "happened": true,
+       "pred": "went_to"
+      },
+      {
+       "a": "player",
+       "b": "kael",
+       "happened": true,
+       "pred": "beat"
+      },
+      {
+       "a": "player",
+       "b": "kael",
+       "happened": true,
+       "pred": "spared"
+      },
+      {
+       "a": "odo",
+       "b": "market",
+       "happened": true,
+       "pred": "went_to"
+      }
+     ]
+    },
+    "latency": 1.208,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2817,9 +4654,9 @@
       "b1",
       "e1"
      ],
-     "line": "The relic in the crypt. And don’t mistake this for trust—you insulted me here."
+     "line": "Your concern is sudden. I’m here for the relic in the crypt. Keep your insults to yourself."
     },
-    "latency": 1.197,
+    "latency": 0.998,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2831,9 +4668,9 @@
       "e1",
       "e2"
      ],
-     "line": "You walked from the bridge to the crypt, while Odo walked from the tavern to the market. What waited at either end of those roads remained unrecorded."
+     "line": "You walked from the bridge to the crypt. Odo walked from the tavern to the market—but what awaited you there remained unseen."
     },
-    "latency": 1.234,
+    "latency": 1.131,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2842,12 +4679,11 @@
    {
     "data": {
      "cites": [
-      "b1",
       "e1"
      ],
-     "line": "Kael might’ve mentioned that you insulted him here, but I didn’t hear what he told the Captain."
+     "line": "I heard you insult Kael, but I’ve no word of what he told the Captain. Let’s keep the peace, shall we?"
     },
-    "latency": 1.859,
+    "latency": 1.739,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2859,9 +4695,9 @@
       "b2",
       "e5"
      ],
-     "line": "Robbery’s a serious charge, but I’ve only your word for it; I’ll keep the road orderly while I look into it."
+     "line": "I’ll look into it, but I can’t take your word alone. Keep the road clear while I check; a fine in coin may settle this."
     },
-    "latency": 1.637,
+    "latency": 1.019,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2873,9 +4709,9 @@
       "b1",
       "e1"
      ],
-     "line": "Well, you did insult Kael here at the tavern. I’d rather not guess what he makes of it."
+     "line": "Quietly? I’d rather not stir trouble—though I did hear you insult Kael here at the tavern."
     },
-    "latency": 0.865,
+    "latency": 1.085,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }

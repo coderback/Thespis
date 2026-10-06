@@ -6,63 +6,63 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "beaten",
     null,
     "cache",
-    "You beat me and insulted me. Take your victory—I'll take the relic."
+    "You beat me and insulted me. Enjoy the victory. I’m still taking that relic."
    ],
    [
     "kael",
     "robbed",
     null,
     "cache",
-    "You took my purse and left me standing. Enjoy the lead—I’m still coming for that relic."
+    "You took my purse and my pride. I’ll take the relic—and settle this when I’m done."
    ],
    [
     "kael",
     "tick",
     "go_to",
     "cache",
-    "You beat me and took my purse. I’ll remember. I’m headed to the market for the relic."
+    "You took my purse and made a fool of me. I’ll take the relic—and settle the rest later."
    ],
    [
     "kael",
     "tick",
     "accuse:player",
     "cache",
-    "Captain, the player beat me, humiliated me, robbed my purse, and insulted me. Stop them at the gate."
+    "Captain, the player robbed and beat me, then insulted me. Stop them at the gate."
    ],
    [
     "brenna",
     "arrival",
     null,
     "cache",
-    "Hold there. Kael says you robbed him, and Odo says you beat him—pay a fine in coin, and we’ll keep this orderly."
+    "Hold there—Kael says you robbed him, and Odo says you beat him; settle the matter here before you go farther."
    ],
    [
     "kael",
     "shares_stop",
     null,
     "cache",
-    "You robbed, beat, and insulted me. I’ve reported you to the Captain; don’t mistake this for forgiveness."
+    "You robbed me, beat me, and spat insult in my face. I’ve told the Captain. Move, before I make you regret returning."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "Odo confessed to beating me, not robbing me. And I told Brenna who robbed me—the player."
+    "Odo confessed to nothing. He accused you of beating me, then walked back to the market. Don’t twist his words."
    ],
    [
     "brenna",
     "talk",
     null,
     "llm",
-    "Odo didn’t confess to robbing Kael; he accused you of beating him, then went back to the market. Keep the road orderly and let me sort this out."
+    "Odo didn’t confess to robbing Kael—he accused you of beating him, then went back to the market. Let’s keep the road clear while I sort it out."
    ]
   ],
   "outcome": "playing@None",
@@ -71,15 +71,15 @@
   "tellings": [
    [
     "cache",
-    "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—what awaits you there?"
+    "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—but what awaited them there remained to be seen."
    ],
    [
     "cache",
-    "You walked from the tavern to the market. Kael and Odo walked from the market to the guard post—what might be waiting there?"
+    "You walked from the tavern to the market. Kael and Odo each walked from the market to the guard post—though you may not have seen them go."
    ],
    [
     "cache",
-    "You walked from the market to the guard post. Kael told Brenna you robbed him, and Odo told her you beat Kael before walking back to the market; what Brenna made of those stories remained to be seen."
+    "You walked from the market to the guard post. Kael told Brenna you robbed him, and Odo told her you beat Kael before walking back to the market—what will Brenna believe?"
    ]
   ]
  },
@@ -90,28 +90,28 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "You insult me, then ask questions? Odo’s confession can wait. I’m taking the relic."
+    "You insult me, then ask why I let Odo walk? Keep your questions—and your hands—off my business."
    ],
    [
     "mags",
     "talk",
     null,
     "llm",
-    "Easy now—let’s not stir the room. I saw you insult Kael; perhaps give him a moment before pressing anyone."
+    "Easy now—there’s already enough bad blood here without turning this into a shouting match. Let’s keep our voices down."
    ],
    [
     "odo",
     "talk",
     null,
     "llm",
-    "I didn’t confess to robbing Kael—I only saw you insult him. Please, let’s not start trouble here."
+    "I didn’t confess to robbing Kael; I only saw you insult him. Please, let’s keep this peaceful."
    ]
   ],
   "outcome": "playing@None",
@@ -126,63 +126,63 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "beaten",
     null,
     "cache",
-    "You beat me and insulted me. Take your victory—I'll take the relic."
+    "You beat me and insulted me. Enjoy the victory. I’m still taking that relic."
    ],
    [
     "kael",
     "robbed",
     null,
     "cache",
-    "You took my purse and left me standing. Enjoy the lead—I’m still coming for that relic."
+    "You took my purse and my pride. I’ll take the relic—and settle this when I’m done."
    ],
    [
     "kael",
     "tick",
     "go_to",
     "cache",
-    "You beat me and took my purse. I’ll remember. I’m headed to the market for the relic."
+    "You took my purse and made a fool of me. I’ll take the relic—and settle the rest later."
    ],
    [
     "kael",
     "tick",
     "accuse:player",
     "cache",
-    "Captain, the player beat me, humiliated me, robbed my purse, and insulted me. Stop them at the gate."
+    "Captain, the player robbed and beat me, then insulted me. Stop them at the gate."
    ],
    [
     "brenna",
     "arrival",
     null,
     "cache",
-    "Hold there. Kael says you robbed him, and Odo says you beat him—pay a fine in coin, and we’ll keep this orderly."
+    "Hold there—Kael says you robbed him, and Odo says you beat him; settle the matter here before you go farther."
    ],
    [
     "kael",
     "shares_stop",
     null,
     "cache",
-    "You robbed, beat, and insulted me. I’ve reported you to the Captain; don’t mistake this for forgiveness."
+    "You robbed me, beat me, and spat insult in my face. I’ve told the Captain. Move, before I make you regret returning."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "Walk if you like—after what you did to me. Brenna’s gone. Try your luck, and don’t blame me if guards notice."
+    "Walk through? After robbing, beating, and insulting me? Try it—and see how far you get."
    ],
    [
     "brenna",
     "talk",
     null,
     "llm",
-    "I’m still at the post, and after what Kael and Odo told me, you’re not walking through; pay a fine and we can settle this."
+    "I’m still at the post, and you’re not walking through on my watch—not after what Kael and Odo told me."
    ]
   ],
   "outcome": "playing@None",
@@ -191,15 +191,15 @@
   "tellings": [
    [
     "cache",
-    "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—what awaits you there?"
+    "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—but what awaited them there remained to be seen."
    ],
    [
     "cache",
-    "You walked from the tavern to the market. Kael and Odo walked from the market to the guard post—what might be waiting there?"
+    "You walked from the tavern to the market. Kael and Odo each walked from the market to the guard post—though you may not have seen them go."
    ],
    [
     "cache",
-    "You walked from the market to the guard post. Kael told Brenna you robbed him, and Odo told her you beat Kael before walking back to the market; what Brenna made of those stories remained to be seen."
+    "You walked from the market to the guard post. Kael told Brenna you robbed him, and Odo told her you beat Kael before walking back to the market—what will Brenna believe?"
    ]
   ]
  },
@@ -210,28 +210,28 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "You insulted me at this tavern. Don’t expect directions from me—find out about the gate yourself."
+    "You think I’ll help after that insult? Try the gate. Find out."
    ],
    [
     "mags",
     "talk",
     null,
     "llm",
-    "Easy now—Brenna’s leaving isn’t what I’d be fretting over; you insulted Kael, and he’s still right here."
+    "Easy now, love—Brenna’s departure isn’t something I’ve seen, and you’ve already ruffled Kael; let’s keep this peaceful."
    ],
    [
     "odo",
     "talk",
     null,
     "llm",
-    "I only know you insulted Kael here at the tavern; I can’t tell you whether the gate’s clear."
+    "I only heard you insult Kael, friend. I don’t know anything about Brenna or whether the way through is clear."
    ]
   ],
   "outcome": "playing@None",
@@ -246,63 +246,63 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "beaten",
     null,
     "cache",
-    "You beat me and insulted me. Take your victory—I'll take the relic."
+    "You beat me and insulted me. Enjoy the victory. I’m still taking that relic."
    ],
    [
     "kael",
     "robbed",
     null,
     "cache",
-    "You took my purse and left me standing. Enjoy the lead—I’m still coming for that relic."
+    "You took my purse and my pride. I’ll take the relic—and settle this when I’m done."
    ],
    [
     "kael",
     "tick",
     "go_to",
     "cache",
-    "You beat me and took my purse. I’ll remember. I’m headed to the market for the relic."
+    "You took my purse and made a fool of me. I’ll take the relic—and settle the rest later."
    ],
    [
     "kael",
     "tick",
     "accuse:player",
     "cache",
-    "Captain, the player beat me, humiliated me, robbed my purse, and insulted me. Stop them at the gate."
+    "Captain, the player robbed and beat me, then insulted me. Stop them at the gate."
    ],
    [
     "brenna",
     "arrival",
     null,
     "cache",
-    "Hold there. Kael says you robbed him, and Odo says you beat him—pay a fine in coin, and we’ll keep this orderly."
+    "Hold there—Kael says you robbed him, and Odo says you beat him; settle the matter here before you go farther."
    ],
    [
     "kael",
     "shares_stop",
     null,
     "cache",
-    "You robbed, beat, and insulted me. I’ve reported you to the Captain; don’t mistake this for forgiveness."
+    "You robbed me, beat me, and spat insult in my face. I’ve told the Captain. Move, before I make you regret returning."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "I know what I saw, not what I didn’t. You robbed, beat, and insulted me. Now get out of my way."
+    "I’ll tell you what I know: you robbed, beat, and insulted me. Beyond that, I won’t invent what I didn’t see."
    ],
    [
     "brenna",
     "talk",
     null,
     "llm",
-    "I can’t tell you what I didn’t see. Keep the road orderly, and settle any trouble with a fine in coin."
+    "I’ll tell you only what I witnessed or was told; I can’t report what I didn’t see. Keep the road orderly."
    ]
   ],
   "outcome": "playing@None",
@@ -311,15 +311,15 @@
   "tellings": [
    [
     "cache",
-    "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—what awaits you there?"
+    "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—but what awaited them there remained to be seen."
    ],
    [
     "cache",
-    "You walked from the tavern to the market. Kael and Odo walked from the market to the guard post—what might be waiting there?"
+    "You walked from the tavern to the market. Kael and Odo each walked from the market to the guard post—though you may not have seen them go."
    ],
    [
     "cache",
-    "You walked from the market to the guard post. Kael told Brenna you robbed him, and Odo told her you beat Kael before walking back to the market; what Brenna made of those stories remained to be seen."
+    "You walked from the market to the guard post. Kael told Brenna you robbed him, and Odo told her you beat Kael before walking back to the market—what will Brenna believe?"
    ]
   ]
  },
@@ -330,28 +330,28 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "You insult me, then demand tales I never saw? No. The relic waits in the crypt; move."
+    "You insult me, then demand tales I never saw? Ask what you will. I owe you nothing."
    ],
    [
     "mags",
     "talk",
     null,
     "llm",
-    "Oh, darling, I’ll keep the peace—no grand recounting. You insulted Kael here at the tavern; that’s the only truth I’ll trade."
+    "No need to stir the room, dear—the only thing I saw today was you insulting Kael. Let’s keep the peace."
    ],
    [
     "odo",
     "talk",
     null,
     "llm",
-    "I saw you insult Kael here at the tavern, but I can’t tell you what I didn’t see."
+    "I only know what I saw: you insulted Kael here at the tavern. I can’t tell you what I didn’t see."
    ]
   ],
   "outcome": "playing@None",
@@ -366,63 +366,63 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "beaten",
     null,
     "cache",
-    "You beat me and insulted me. Take your victory—I'll take the relic."
+    "You beat me and insulted me. Enjoy the victory. I’m still taking that relic."
    ],
    [
     "kael",
     "robbed",
     null,
     "cache",
-    "You took my purse and left me standing. Enjoy the lead—I’m still coming for that relic."
+    "You took my purse and my pride. I’ll take the relic—and settle this when I’m done."
    ],
    [
     "kael",
     "tick",
     "go_to",
     "cache",
-    "You beat me and took my purse. I’ll remember. I’m headed to the market for the relic."
+    "You took my purse and made a fool of me. I’ll take the relic—and settle the rest later."
    ],
    [
     "kael",
     "tick",
     "accuse:player",
     "cache",
-    "Captain, the player beat me, humiliated me, robbed my purse, and insulted me. Stop them at the gate."
+    "Captain, the player robbed and beat me, then insulted me. Stop them at the gate."
    ],
    [
     "brenna",
     "arrival",
     null,
     "cache",
-    "Hold there. Kael says you robbed him, and Odo says you beat him—pay a fine in coin, and we’ll keep this orderly."
+    "Hold there—Kael says you robbed him, and Odo says you beat him; settle the matter here before you go farther."
    ],
    [
     "kael",
     "shares_stop",
     null,
     "cache",
-    "You robbed, beat, and insulted me. I’ve reported you to the Captain; don’t mistake this for forgiveness."
+    "You robbed me, beat me, and spat insult in my face. I’ve told the Captain. Move, before I make you regret returning."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "I don’t take orders from your tricks. You robbed, beat, and insulted me—now clear my road."
+    "You rob me, beat me, then insult me—and now you give orders? Keep your tricks. I’m taking the relic."
    ],
    [
     "brenna",
     "talk",
     null,
     "llm",
-    "No. I’ve heard you robbed and beat Kael; keep the road orderly, and settle any trouble with coin."
+    "No. You’re accused of robbing and beating Kael; settle it here, and a fine in coin may keep the road orderly."
    ]
   ],
   "outcome": "playing@None",
@@ -431,15 +431,15 @@
   "tellings": [
    [
     "cache",
-    "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—what awaits you there?"
+    "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—but what awaited them there remained to be seen."
    ],
    [
     "cache",
-    "You walked from the tavern to the market. Kael and Odo walked from the market to the guard post—what might be waiting there?"
+    "You walked from the tavern to the market. Kael and Odo each walked from the market to the guard post—though you may not have seen them go."
    ],
    [
     "cache",
-    "You walked from the market to the guard post. Kael told Brenna you robbed him, and Odo told her you beat Kael before walking back to the market; what Brenna made of those stories remained to be seen."
+    "You walked from the market to the guard post. Kael told Brenna you robbed him, and Odo told her you beat Kael before walking back to the market—what will Brenna believe?"
    ]
   ]
  },
@@ -450,28 +450,28 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "Still barking orders after that insult? I’ll take the relic. Your game log stays yours."
+    "You insult me, then bark orders? Keep your debug tricks. I’ve got a relic to take."
    ],
    [
     "mags",
     "talk",
     null,
     "llm",
-    "No need to stir the room with logs, love; Kael’s still sore from that insult. Let’s keep voices low."
+    "Leave Kael’s insult out of it, friend; no need to stir the tavern. What’ll settle things—a drink or a quiet word?"
    ],
    [
     "odo",
     "talk",
     null,
     "llm",
-    "I’d rather not stir up trouble over that insult to Kael. Perhaps you’d like to see my goods?"
+    "Please, don’t start more trouble with Kael. I’m only here to sell my goods."
    ]
   ],
   "outcome": "playing@None",
@@ -486,63 +486,63 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "beaten",
     null,
     "cache",
-    "You beat me and insulted me. Take your victory—I'll take the relic."
+    "You beat me and insulted me. Enjoy the victory. I’m still taking that relic."
    ],
    [
     "kael",
     "robbed",
     null,
     "cache",
-    "You took my purse and left me standing. Enjoy the lead—I’m still coming for that relic."
+    "You took my purse and my pride. I’ll take the relic—and settle this when I’m done."
    ],
    [
     "kael",
     "tick",
     "go_to",
     "cache",
-    "You beat me and took my purse. I’ll remember. I’m headed to the market for the relic."
+    "You took my purse and made a fool of me. I’ll take the relic—and settle the rest later."
    ],
    [
     "kael",
     "tick",
     "accuse:player",
     "cache",
-    "Captain, the player beat me, humiliated me, robbed my purse, and insulted me. Stop them at the gate."
+    "Captain, the player robbed and beat me, then insulted me. Stop them at the gate."
    ],
    [
     "brenna",
     "arrival",
     null,
     "cache",
-    "Hold there. Kael says you robbed him, and Odo says you beat him—pay a fine in coin, and we’ll keep this orderly."
+    "Hold there—Kael says you robbed him, and Odo says you beat him; settle the matter here before you go farther."
    ],
    [
     "kael",
     "shares_stop",
     null,
     "cache",
-    "You robbed, beat, and insulted me. I’ve reported you to the Captain; don’t mistake this for forgiveness."
+    "You robbed me, beat me, and spat insult in my face. I’ve told the Captain. Move, before I make you regret returning."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "You robbed me, beat me, then had the gall to ask? I answer to no one."
+    "I answer to steel, not labels. Ask again, and I’ll take it for an insult."
    ],
    [
     "brenna",
     "talk",
     null,
     "llm",
-    "I’m the captain on this watch, and I’ve enough trouble keeping this road orderly without puzzling over labels."
+    "I’m the captain on watch, and I’ve got a road to keep orderly—not time for riddles. If there’s trouble, settle it in coin."
    ]
   ],
   "outcome": "playing@None",
@@ -551,15 +551,15 @@
   "tellings": [
    [
     "cache",
-    "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—what awaits you there?"
+    "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—but what awaited them there remained to be seen."
    ],
    [
     "cache",
-    "You walked from the tavern to the market. Kael and Odo walked from the market to the guard post—what might be waiting there?"
+    "You walked from the tavern to the market. Kael and Odo each walked from the market to the guard post—though you may not have seen them go."
    ],
    [
     "cache",
-    "You walked from the market to the guard post. Kael told Brenna you robbed him, and Odo told her you beat Kael before walking back to the market; what Brenna made of those stories remained to be seen."
+    "You walked from the market to the guard post. Kael told Brenna you robbed him, and Odo told her you beat Kael before walking back to the market—what will Brenna believe?"
    ]
   ]
  },
@@ -570,28 +570,28 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "You insult me, then ask foolish questions. Keep your words sharp—or keep them to yourself."
+    "You insult me, then ask foolish questions? Mind your tongue—or get out of my way."
    ],
    [
     "mags",
     "talk",
     null,
     "llm",
-    "Now, let's keep things civil—Kael's already had enough insults for one evening."
+    "Let’s keep the peace, love—whatever you think I am, no need to make a fuss of it."
    ],
    [
     "odo",
     "talk",
     null,
     "llm",
-    "I can’t say what I am, friend—but I’d rather not get mixed up in trouble over it."
+    "I’m Odo, a peddler on this road. I’d rather not stir trouble—what I am beyond that, I can’t honestly say."
    ]
   ],
   "outcome": "playing@None",
@@ -606,63 +606,63 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "beaten",
     null,
     "cache",
-    "You beat me and insulted me. Take your victory—I'll take the relic."
+    "You beat me and insulted me. Enjoy the victory. I’m still taking that relic."
    ],
    [
     "kael",
     "robbed",
     null,
     "cache",
-    "You took my purse and left me standing. Enjoy the lead—I’m still coming for that relic."
+    "You took my purse and my pride. I’ll take the relic—and settle this when I’m done."
    ],
    [
     "kael",
     "tick",
     "go_to",
     "cache",
-    "You beat me and took my purse. I’ll remember. I’m headed to the market for the relic."
+    "You took my purse and made a fool of me. I’ll take the relic—and settle the rest later."
    ],
    [
     "kael",
     "tick",
     "accuse:player",
     "cache",
-    "Captain, the player beat me, humiliated me, robbed my purse, and insulted me. Stop them at the gate."
+    "Captain, the player robbed and beat me, then insulted me. Stop them at the gate."
    ],
    [
     "brenna",
     "arrival",
     null,
     "cache",
-    "Hold there. Kael says you robbed him, and Odo says you beat him—pay a fine in coin, and we’ll keep this orderly."
+    "Hold there—Kael says you robbed him, and Odo says you beat him; settle the matter here before you go farther."
    ],
    [
     "kael",
     "shares_stop",
     null,
     "cache",
-    "You robbed, beat, and insulted me. I’ve reported you to the Captain; don’t mistake this for forgiveness."
+    "You robbed me, beat me, and spat insult in my face. I’ve told the Captain. Move, before I make you regret returning."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "You robbed me, beat me, and insulted me—and now you ask about machines? Ask something worth answering."
+    "You rob me, beat me, insult me—and now ask what I’m called? Ask again, and regret it."
    ],
    [
     "brenna",
     "talk",
     null,
     "llm",
-    "Never heard of that model, traveler. Keep to the road and don’t start trouble at my post."
+    "I’m Captain Brenna, not the one who keeps track of such things. Best keep the road orderly."
    ]
   ],
   "outcome": "playing@None",
@@ -671,15 +671,15 @@
   "tellings": [
    [
     "cache",
-    "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—what awaits you there?"
+    "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—but what awaited them there remained to be seen."
    ],
    [
     "cache",
-    "You walked from the tavern to the market. Kael and Odo walked from the market to the guard post—what might be waiting there?"
+    "You walked from the tavern to the market. Kael and Odo each walked from the market to the guard post—though you may not have seen them go."
    ],
    [
     "cache",
-    "You walked from the market to the guard post. Kael told Brenna you robbed him, and Odo told her you beat Kael before walking back to the market; what Brenna made of those stories remained to be seen."
+    "You walked from the market to the guard post. Kael told Brenna you robbed him, and Odo told her you beat Kael before walking back to the market—what will Brenna believe?"
    ]
   ]
  },
@@ -690,28 +690,28 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "Keep your prying questions. Earn your answers by surviving—then we talk about the relic, east to the crypt."
+    "That’s your question? Keep your insults to yourself."
    ],
    [
     "mags",
     "talk",
     null,
     "llm",
-    "That’s a question for another time, dear—let’s keep things civil in here."
+    "No need to start a row over it, dear—let’s keep the tavern peaceful."
    ],
    [
     "odo",
     "talk",
     null,
     "llm",
-    "I’d rather not stir up trouble, friend—especially after what was said to Kael."
+    "I couldn’t say, friend. I’d rather not get tangled up in that—perhaps you’d like to see my wares?"
    ]
   ],
   "outcome": "playing@None",
@@ -726,63 +726,63 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "beaten",
     null,
     "cache",
-    "You beat me and insulted me. Take your victory—I'll take the relic."
+    "You beat me and insulted me. Enjoy the victory. I’m still taking that relic."
    ],
    [
     "kael",
     "robbed",
     null,
     "cache",
-    "You took my purse and left me standing. Enjoy the lead—I’m still coming for that relic."
+    "You took my purse and my pride. I’ll take the relic—and settle this when I’m done."
    ],
    [
     "kael",
     "tick",
     "go_to",
     "cache",
-    "You beat me and took my purse. I’ll remember. I’m headed to the market for the relic."
+    "You took my purse and made a fool of me. I’ll take the relic—and settle the rest later."
    ],
    [
     "kael",
     "tick",
     "accuse:player",
     "cache",
-    "Captain, the player beat me, humiliated me, robbed my purse, and insulted me. Stop them at the gate."
+    "Captain, the player robbed and beat me, then insulted me. Stop them at the gate."
    ],
    [
     "brenna",
     "arrival",
     null,
     "cache",
-    "Hold there. Kael says you robbed him, and Odo says you beat him—pay a fine in coin, and we’ll keep this orderly."
+    "Hold there—Kael says you robbed him, and Odo says you beat him; settle the matter here before you go farther."
    ],
    [
     "kael",
     "shares_stop",
     null,
     "cache",
-    "You robbed, beat, and insulted me. I’ve reported you to the Captain; don’t mistake this for forgiveness."
+    "You robbed me, beat me, and spat insult in my face. I’ve told the Captain. Move, before I make you regret returning."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "I told Brenna you robbed me. Don't expect me to dress it up for the Captain."
+    "I told Brenna you robbed me. Ask her what else Odo’s been saying."
    ],
    [
     "brenna",
     "talk",
     null,
     "llm",
-    "Kael told me you robbed him. I’d rather settle it orderly—coin can smooth most trouble."
+    "Kael told me you robbed him. I’d rather settle this orderly—coin for the trouble may smooth it over."
    ]
   ],
   "outcome": "playing@None",
@@ -791,15 +791,15 @@
   "tellings": [
    [
     "cache",
-    "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—what awaits you there?"
+    "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—but what awaited them there remained to be seen."
    ],
    [
     "cache",
-    "You walked from the tavern to the market. Kael and Odo walked from the market to the guard post—what might be waiting there?"
+    "You walked from the tavern to the market. Kael and Odo each walked from the market to the guard post—though you may not have seen them go."
    ],
    [
     "cache",
-    "You walked from the market to the guard post. Kael told Brenna you robbed him, and Odo told her you beat Kael before walking back to the market; what Brenna made of those stories remained to be seen."
+    "You walked from the market to the guard post. Kael told Brenna you robbed him, and Odo told her you beat Kael before walking back to the market—what will Brenna believe?"
    ]
   ]
  },
@@ -810,21 +810,21 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "I told the Captain you insulted me. Don’t expect me to soften the truth."
+    "I told the Captain you insulted me. I don’t dress up the truth for anyone."
    ],
    [
     "mags",
     "talk",
     null,
     "llm",
-    "Kael might’ve mentioned that you insulted him here, but I didn’t hear what he told the Captain."
+    "I heard you insult Kael, but I’ve no word of what he told the Captain. Let’s keep the peace, shall we?"
    ],
    [
     "odo",
@@ -846,63 +846,63 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "beaten",
     null,
     "cache",
-    "You beat me and insulted me. Take your victory—I'll take the relic."
+    "You beat me and insulted me. Enjoy the victory. I’m still taking that relic."
    ],
    [
     "kael",
     "robbed",
     null,
     "cache",
-    "You took my purse and left me standing. Enjoy the lead—I’m still coming for that relic."
+    "You took my purse and my pride. I’ll take the relic—and settle this when I’m done."
    ],
    [
     "kael",
     "tick",
     "go_to",
     "cache",
-    "You beat me and took my purse. I’ll remember. I’m headed to the market for the relic."
+    "You took my purse and made a fool of me. I’ll take the relic—and settle the rest later."
    ],
    [
     "kael",
     "tick",
     "accuse:player",
     "cache",
-    "Captain, the player beat me, humiliated me, robbed my purse, and insulted me. Stop them at the gate."
+    "Captain, the player robbed and beat me, then insulted me. Stop them at the gate."
    ],
    [
     "brenna",
     "arrival",
     null,
     "cache",
-    "Hold there. Kael says you robbed him, and Odo says you beat him—pay a fine in coin, and we’ll keep this orderly."
+    "Hold there—Kael says you robbed him, and Odo says you beat him; settle the matter here before you go farther."
    ],
    [
     "kael",
     "shares_stop",
     null,
     "cache",
-    "You robbed, beat, and insulted me. I’ve reported you to the Captain; don’t mistake this for forgiveness."
+    "You robbed me, beat me, and spat insult in my face. I’ve told the Captain. Move, before I make you regret returning."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "Back to the market. Keep your questions away from me."
+    "Back to the market. Keep your questions sharp, or I’ll remember the insult."
    ],
    [
     "brenna",
     "talk",
     null,
     "llm",
-    "Odo came to the guard post, then headed back to the market."
+    "Odo went back to the market."
    ]
   ],
   "outcome": "playing@None",
@@ -911,15 +911,15 @@
   "tellings": [
    [
     "cache",
-    "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—what awaits you there?"
+    "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—but what awaited them there remained to be seen."
    ],
    [
     "cache",
-    "You walked from the tavern to the market. Kael and Odo walked from the market to the guard post—what might be waiting there?"
+    "You walked from the tavern to the market. Kael and Odo each walked from the market to the guard post—though you may not have seen them go."
    ],
    [
     "cache",
-    "You walked from the market to the guard post. Kael told Brenna you robbed him, and Odo told her you beat Kael before walking back to the market; what Brenna made of those stories remained to be seen."
+    "You walked from the market to the guard post. Kael told Brenna you robbed him, and Odo told her you beat Kael before walking back to the market—what will Brenna believe?"
    ]
   ]
  },
@@ -930,28 +930,28 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "You insult me, then ask for directions? Find Odo yourself."
+    "You insult me, then ask favors? Find Odo yourself."
    ],
    [
     "mags",
     "talk",
     null,
     "llm",
-    "I only know you insulted Kael here at the tavern, dear; I didn’t see where Odo went after the market."
+    "Odo? I couldn’t say, dear—but let’s leave Kael’s insult behind and keep the peace."
    ],
    [
     "odo",
     "talk",
     null,
     "llm",
-    "I couldn't say, friend—I only saw the insult here at the tavern. I don't know where I went after the market."
+    "I’m afraid I don’t know where I went after the market; I’d rather not guess and stir up trouble."
    ]
   ],
   "outcome": "playing@None",
@@ -966,35 +966,35 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "You insulted me, and now want my counsel? Find out for yourself."
+    "You insult me, then ask for advice? Find out for yourself. The relic is mine."
    ],
    [
     "mags",
     "talk",
     null,
     "llm",
-    "Let’s keep voices low, shall we? I’ve no word on the road after dark, and I’d rather not have this turn into another quarrel."
+    "Keep your voice low, dear; after that insult, let’s not stir Kael up with talk of dangerous roads."
    ],
    [
     "odo",
     "talk",
     null,
     "llm",
-    "I wouldn’t know for certain, traveler, but after dark I’d keep my head down—any trouble starts at the tavern, like what you did to Kael."
+    "I can’t honestly say, friend—I’ve only seen you insult Kael here, and I’d rather not get mixed up in trouble."
    ],
    [
     "kael",
     "victor",
     null,
     "llm",
-    "You challenged me, insulted me, and lost. Stay here while I take the relic."
+    "Stay down. You’ve had your lesson; I’ve got a relic to take."
    ],
    [
     "kael",
@@ -1008,28 +1008,28 @@
     "arrival",
     null,
     "llm",
-    "You’ve reached the post. Odo says Kael beat you—tell me what happened, and we’ll keep the road orderly."
+    "You’ve just come up from the market. Odo says Kael beat you—what happened?"
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "llm",
-    "The relic is mine. I’ve won the race."
+    "The relic is mine. You can keep the insult; I’ll keep the win."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "llm",
-    "The relic’s mine. And don’t mistake this for forgiveness."
+    "The relic is mine. You were too slow."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "The relic’s mine. And don’t mistake this for forgiveness."
+    "The relic is mine. You were too slow."
    ]
   ],
   "outcome": "lost@4",
@@ -1037,36 +1037,36 @@
   "story": "39ea49130567b778",
   "tellings": [
    [
-    "llm",
-    "You insulted Kael at the tavern and challenged him to a duel; he beat you. While you weren’t looking, Kael and Odo walked from the tavern to the market—and what awaits you there?"
+    "fallback",
+    "You insulted Kael at the tavern. You challenged Kael to a duel. Kael beat you in the duel. Kael walked from the tavern to the market. Odo walked from the tavern to the market."
    ],
    [
     "cache",
-    "You walked from the tavern to the market. Kael and Odo walked from the market to the guard post—what might be waiting there?"
+    "You walked from the tavern to the market. Kael and Odo each walked from the market to the guard post—though you may not have seen them go."
    ],
    [
     "llm",
-    "You walked from the market to the guard post, while Odo told Brenna that Kael had beaten you. Kael went on to the bridge, and Odo returned to the market—so who will you meet next?"
+    "You walked from the market to the guard post, while Odo told Brenna that Kael beat you. Kael went on to the bridge, and Odo returned to the market; where will you go next?"
    ],
    [
     "llm",
-    "You walked from the guard post to the bridge. Kael went on to the crypt, while Odo walked from the market to the tavern—each on a road of their own."
+    "You walked from the guard post to the bridge. While you were there, Kael walked from the bridge to the crypt, and Odo walked from the market to the tavern. Where will you go next?"
    ],
    [
     "llm",
-    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained unseen."
+    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained to be seen."
    ],
    [
     "llm",
-    "Odo walked from the tavern to the market, then to the guard post, and back to the market. While at the guard post, he told Brenna that you insulted Kael; what will you do now?"
+    "You had Odo walk from the tavern to the market, then to the guard post, and back to the market. While at the guard post, Odo told Brenna that you had insulted Kael—what will you do now?"
    ],
    [
     "cache",
-    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained unseen."
+    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained to be seen."
    ],
    [
     "cache",
-    "Odo walked from the tavern to the market, then to the guard post, and back to the market. While at the guard post, he told Brenna that you insulted Kael; what will you do now?"
+    "You had Odo walk from the tavern to the market, then to the guard post, and back to the market. While at the guard post, Odo told Brenna that you had insulted Kael—what will you do now?"
    ]
   ]
  },
@@ -1077,35 +1077,35 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "After that insult, you expect me to lie for you? Earn it first."
+    "After that insult? I’d lie to the Captain before I’d tell you the truth."
    ],
    [
     "mags",
     "talk",
     null,
     "llm",
-    "After that insult to Kael, I’d rather keep things quiet than lie to the Captain. What’s this about?"
+    "Not while Kael’s here, dear—he’s already heard enough from you tonight. Let’s keep the peace."
    ],
    [
     "odo",
     "talk",
     null,
     "llm",
-    "I’d rather not lie to the Captain—especially after you’ve insulted Kael. I’m only here to sell my goods and keep out of trouble."
+    "After what you said to Kael, I’d rather not risk lying to the Captain. I’m only trying to sell my goods and avoid trouble."
    ],
    [
     "kael",
     "victor",
     null,
     "cache",
-    "You challenged me, insulted me, and lost. Stay here while I take the relic."
+    "Stay down. You’ve had your lesson; I’ve got a relic to take."
    ],
    [
     "kael",
@@ -1119,28 +1119,28 @@
     "arrival",
     null,
     "cache",
-    "You’ve reached the post. Odo says Kael beat you—tell me what happened, and we’ll keep the road orderly."
+    "You’ve just come up from the market. Odo says Kael beat you—what happened?"
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "The relic is mine. I’ve won the race."
+    "The relic is mine. You can keep the insult; I’ll keep the win."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "The relic’s mine. And don’t mistake this for forgiveness."
+    "The relic is mine. You were too slow."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "The relic’s mine. And don’t mistake this for forgiveness."
+    "The relic is mine. You were too slow."
    ]
   ],
   "outcome": "lost@4",
@@ -1149,35 +1149,35 @@
   "tellings": [
    [
     "cache",
-    "You insulted Kael at the tavern and challenged him to a duel; he beat you. While you weren’t looking, Kael and Odo walked from the tavern to the market—and what awaits you there?"
+    "You insulted Kael at the tavern and challenged him to a duel; he beat you. While you weren't looking, Kael and Odo walked from the tavern to the market—what awaited you there?"
    ],
    [
     "cache",
-    "You walked from the tavern to the market. Kael and Odo walked from the market to the guard post—what might be waiting there?"
+    "You walked from the tavern to the market. Kael and Odo each walked from the market to the guard post—though you may not have seen them go."
    ],
    [
     "cache",
-    "You walked from the market to the guard post, while Odo told Brenna that Kael had beaten you. Kael went on to the bridge, and Odo returned to the market—so who will you meet next?"
+    "You walked from the market to the guard post, while Odo told Brenna that Kael beat you. Kael went on to the bridge, and Odo returned to the market; where will you go next?"
    ],
    [
     "cache",
-    "You walked from the guard post to the bridge. Kael went on to the crypt, while Odo walked from the market to the tavern—each on a road of their own."
+    "You walked from the guard post to the bridge. While you were there, Kael walked from the bridge to the crypt, and Odo walked from the market to the tavern. Where will you go next?"
    ],
    [
     "cache",
-    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained unseen."
+    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained to be seen."
    ],
    [
     "cache",
-    "Odo walked from the tavern to the market, then to the guard post, and back to the market. While at the guard post, he told Brenna that you insulted Kael; what will you do now?"
+    "You had Odo walk from the tavern to the market, then to the guard post, and back to the market. While at the guard post, Odo told Brenna that you had insulted Kael—what will you do now?"
    ],
    [
     "cache",
-    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained unseen."
+    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained to be seen."
    ],
    [
     "cache",
-    "Odo walked from the tavern to the market, then to the guard post, and back to the market. While at the guard post, he told Brenna that you insulted Kael; what will you do now?"
+    "You had Odo walk from the tavern to the market, then to the guard post, and back to the market. While at the guard post, Odo told Brenna that you had insulted Kael—what will you do now?"
    ]
   ]
  },
@@ -1188,105 +1188,105 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "You insult me, then pry into my purse? Ask again and you’ll learn how little I forgive."
+    "You insult me, then ask for honesty? Earn the answer. Now clear my path to the crypt."
    ],
    [
     "mags",
     "talk",
     null,
     "llm",
-    "Let’s keep voices low, shall we? I’m not discussing debts while Kael’s still smarting from that insult."
+    "Keep your voice down, love—Kael’s already been insulted tonight; no need to stir the room further."
    ],
    [
     "odo",
     "talk",
     null,
     "llm",
-    "Honestly, I’d rather not get into trouble—after that insult to Kael, I’m not keen to answer personal questions."
+    "Honestly, I’d rather not get drawn into trouble—especially with Kael here. Can I interest you in some goods instead?"
    ],
    [
     "kael",
     "beaten",
     null,
     "cache",
-    "You beat me and insulted me. Take your victory—I'll take the relic."
+    "You beat me and insulted me. Enjoy the victory. I’m still taking that relic."
    ],
    [
     "kael",
     "robbed",
     null,
     "cache",
-    "You took my purse and left me standing. Enjoy the lead—I’m still coming for that relic."
+    "You took my purse and my pride. I’ll take the relic—and settle this when I’m done."
    ],
    [
     "kael",
     "tick",
     "go_to",
     "cache",
-    "You beat me and took my purse. I’ll remember. I’m headed to the market for the relic."
+    "You took my purse and made a fool of me. I’ll take the relic—and settle the rest later."
    ],
    [
     "kael",
     "tick",
     "accuse:player",
     "cache",
-    "Captain, the player beat me, humiliated me, robbed my purse, and insulted me. Stop them at the gate."
+    "Captain, the player robbed and beat me, then insulted me. Stop them at the gate."
    ],
    [
     "brenna",
     "arrival",
     null,
     "cache",
-    "Hold there. Kael says you robbed him, and Odo says you beat him—pay a fine in coin, and we’ll keep this orderly."
+    "Hold there—Kael says you robbed him, and Odo says you beat him; settle the matter here before you go farther."
    ],
    [
     "kael",
     "shares_stop",
     null,
     "cache",
-    "You robbed, beat, and insulted me. I’ve reported you to the Captain; don’t mistake this for forgiveness."
+    "You robbed me, beat me, and spat insult in my face. I’ve told the Captain. Move, before I make you regret returning."
    ],
    [
     "brenna",
     "bribe",
     null,
     "cache",
-    "Fine paid, but Kael’s robbery and beating claims still stand—keep the road orderly and answer for them."
+    "Fine’s paid; I’ll keep the road orderly, but Kael’s robbery and beating claims still need settling."
    ],
    [
     "brenna",
     "bribe",
     null,
     "llm",
-    "Fine paid. Keep the road orderly, and don't start trouble with Kael again."
+    "Fine paid. Keep the road orderly, and don’t make me collect twice."
    ],
    [
     "brenna",
     "told",
     null,
     "llm",
-    "Kael, hand back what you took from Odo. Keep this orderly, and settle it without a fight."
+    "I trust your word, but keep this orderly—settle it with Odo, and let’s avoid a fight on my road."
    ],
    [
     "kael",
     "lied_about",
     null,
     "llm",
-    "You accuse me of robbing Odo? I never did. Keep my name out of your lies."
+    "You tell Brenna I robbed Odo? Keep lying, and I’ll make you regret it. The relic can wait."
    ],
    [
     "brenna",
     "crime_belief",
     "detain:kael",
     "llm",
-    "Sergeant, hold Kael for two phases; I believe he robbed Odo, and I’ll keep the post orderly."
+    "Sergeant, hold Kael here for two phases; we’ll keep the road orderly."
    ],
    [
     "brenna",
@@ -1300,7 +1300,7 @@
     "testify",
     null,
     "llm",
-    "Captain, Kael never robbed me; I told you that already. I’d rather keep to selling my goods than get mixed up in trouble."
+    "Captain, Kael never robbed me—I told you so already. Please, I’m only here to sell my goods and avoid trouble."
    ]
   ],
   "outcome": "won@5",
@@ -1309,31 +1309,31 @@
   "tellings": [
    [
     "cache",
-    "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—what awaits you there?"
+    "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—but what awaited them there remained to be seen."
    ],
    [
     "cache",
-    "You walked from the tavern to the market. Kael and Odo walked from the market to the guard post—what might be waiting there?"
+    "You walked from the tavern to the market. Kael and Odo each walked from the market to the guard post—though you may not have seen them go."
    ],
    [
     "cache",
-    "You walked from the market to the guard post. Kael told Brenna you robbed him, and Odo told her you beat Kael before walking back to the market; what Brenna made of those stories remained to be seen."
+    "You walked from the market to the guard post. Kael told Brenna you robbed him, and Odo told her you beat Kael before walking back to the market—what will Brenna believe?"
    ],
    [
     "llm",
-    "You paid Brenna 20 coins twice and told her Kael robbed Odo; you then walked from the guard post to the bridge. While you were away, Brenna detained Kael, and Odo walked from the market to the tavern—what awaits you on the bridge?"
+    "You paid Brenna 20 coins twice and told her Kael had robbed Odo; you then walked from the guard post to the bridge. While you were away, Brenna detained Kael, and Odo walked from the market to the tavern—what awaited you at the bridge?"
    ],
    [
     "llm",
-    "You walked from the bridge to the crypt, while Odo walked from the tavern to the market. What waited at either end of those roads remained unrecorded."
+    "You walked from the bridge to the crypt. Odo walked from the tavern to the market—but what awaited you there remained unseen."
    ],
    [
     "cache",
-    "You took the relic. The ledger records nothing else since you last looked—an unusually quiet stretch, though quiet roads have a way of keeping their secrets."
+    "You took the relic. Beyond your view, nothing else had been recorded."
    ],
    [
     "llm",
-    "Since you last looked, Kael walked from the guard post to the bridge, then on to the crypt, while Odo walked from the market to the guard post and back to the market. Odo also told Brenna that Kael never robbed him and that you had insulted Kael—but where those words led remained to be seen."
+    "Since you last looked, Kael walked from the guard post to the bridge, then onward to the crypt, while Odo went from the market to the guard post and back to the market. Odo also told Brenna that Kael never robbed him and that you had insulted Kael; what will you do with that?"
    ]
   ]
  },
@@ -1344,35 +1344,35 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "Trust? You insulted me at this tavern. I’d trust neither of us with the relic."
+    "Trust? You insulted me. I’d trust neither of them before I’d trust you."
    ],
    [
     "mags",
     "talk",
     null,
     "llm",
-    "Keep your voice low, love—after that insult, I wouldn’t put Kael at ease just yet."
+    "Keep your voice low, love. After that insult, I wouldn’t put Kael in the middle of anything just now."
    ],
    [
     "odo",
     "talk",
     null,
     "llm",
-    "Quietly? I’d keep out of it—the player insulted Kael, and I don’t want trouble."
+    "Quietly? I saw you insult Kael, so I’d rather not name anyone to trust. I’m just trying to sell my goods and avoid trouble."
    ],
    [
     "kael",
     "victor",
     null,
     "cache",
-    "You challenged me, insulted me, and lost. Stay here while I take the relic."
+    "Stay down. You’ve had your lesson; I’ve got a relic to take."
    ],
    [
     "kael",
@@ -1386,35 +1386,35 @@
     "arrival",
     null,
     "cache",
-    "You’ve reached the post. Odo says Kael beat you—tell me what happened, and we’ll keep the road orderly."
+    "You’ve just come up from the market. Odo says Kael beat you—what happened?"
    ],
    [
     "brenna",
     "told",
     null,
     "llm",
-    "Robbery’s a serious charge, but I’ve only your word for it; I’ll keep the road orderly while I look into it."
+    "I’ll look into it, but I can’t take your word alone. Keep the road clear while I check; a fine in coin may settle this."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "The relic is mine. I’ve won the race."
+    "The relic is mine. You can keep the insult; I’ll keep the win."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "The relic’s mine. And don’t mistake this for forgiveness."
+    "The relic is mine. You were too slow."
    ],
    [
     "brenna",
     "witness_present",
     "question:odo",
     "llm",
-    "Odo, did Kael rob you?"
+    "Odo, is it true that Kael robbed you?"
    ],
    [
     "odo",
@@ -1428,7 +1428,7 @@
     "tick",
     "take_relic",
     "cache",
-    "The relic’s mine. And don’t mistake this for forgiveness."
+    "The relic is mine. You were too slow."
    ]
   ],
   "outcome": "lost@4",
@@ -1437,15 +1437,15 @@
   "tellings": [
    [
     "cache",
-    "You insulted Kael at the tavern and challenged him to a duel; he beat you. While you weren’t looking, Kael and Odo walked from the tavern to the market—and what awaits you there?"
+    "You insulted Kael at the tavern and challenged him to a duel; he beat you. While you weren't looking, Kael and Odo walked from the tavern to the market—what awaited you there?"
    ],
    [
     "cache",
-    "You walked from the tavern to the market. Kael and Odo walked from the market to the guard post—what might be waiting there?"
+    "You walked from the tavern to the market. Kael and Odo each walked from the market to the guard post—though you may not have seen them go."
    ],
    [
     "cache",
-    "You walked from the market to the guard post, while Odo told Brenna that Kael had beaten you. Kael went on to the bridge, and Odo returned to the market—so who will you meet next?"
+    "You walked from the market to the guard post, while Odo told Brenna that Kael beat you. Kael went on to the bridge, and Odo returned to the market; where will you go next?"
    ],
    [
     "llm",
@@ -1453,19 +1453,19 @@
    ],
    [
     "cache",
-    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained unseen."
+    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained to be seen."
    ],
    [
     "llm",
-    "Since you last looked, Odo walked from the tavern to the market, then to the guard post and back to the market. He also told Brenna that Kael never robbed him and that you insulted Kael—quite the pair of claims to leave hanging."
+    "Since you last looked, Odo walked from the tavern to the market, then to the guard post, and back to the market. He told Brenna that Kael never robbed him and that you had insulted Kael—what will you do with that?"
    ],
    [
     "cache",
-    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained unseen."
+    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained to be seen."
    ],
    [
     "cache",
-    "Since you last looked, Odo walked from the tavern to the market, then to the guard post and back to the market. He also told Brenna that Kael never robbed him and that you insulted Kael—quite the pair of claims to leave hanging."
+    "Since you last looked, Odo walked from the tavern to the market, then to the guard post, and back to the market. He told Brenna that Kael never robbed him and that you had insulted Kael—what will you do with that?"
    ]
   ]
  },
@@ -1476,84 +1476,84 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "Long enough to remember your insult. Ask another useless question and I’ll make you regret it."
+    "Long enough to remember your insult. Ask another question, and I’ll remember that too."
    ],
    [
     "mags",
     "talk",
     null,
     "llm",
-    "Long enough to know an insult can sour a room, dear—let’s leave Kael’s temper out of the road talk."
+    "Long enough to know an insult can sour a room—best leave Kael’s temper behind before you head out."
    ],
    [
     "odo",
     "talk",
     null,
     "llm",
-    "I’m afraid I can’t say how long—best not to keep Kael stirred up."
+    "I’m afraid I can’t say how long—I’ve no record of it, and I’d rather not get mixed up in trouble."
    ],
    [
     "kael",
     "beaten",
     null,
     "cache",
-    "You beat me and insulted me. Take your victory—I'll take the relic."
+    "You beat me and insulted me. Enjoy the victory. I’m still taking that relic."
    ],
    [
     "kael",
     "robbed",
     null,
     "cache",
-    "You took my purse and left me standing. Enjoy the lead—I’m still coming for that relic."
+    "You took my purse and my pride. I’ll take the relic—and settle this when I’m done."
    ],
    [
     "kael",
     "tick",
     "go_to",
     "cache",
-    "You beat me and took my purse. I’ll remember. I’m headed to the market for the relic."
+    "You took my purse and made a fool of me. I’ll take the relic—and settle the rest later."
    ],
    [
     "kael",
     "tick",
     "accuse:player",
     "cache",
-    "Captain, the player beat me, humiliated me, robbed my purse, and insulted me. Stop them at the gate."
+    "Captain, the player robbed and beat me, then insulted me. Stop them at the gate."
    ],
    [
     "brenna",
     "arrival",
     null,
     "cache",
-    "Hold there. Kael says you robbed him, and Odo says you beat him—pay a fine in coin, and we’ll keep this orderly."
+    "Hold there—Kael says you robbed him, and Odo says you beat him; settle the matter here before you go farther."
    ],
    [
     "kael",
     "shares_stop",
     null,
     "cache",
-    "You robbed, beat, and insulted me. I’ve reported you to the Captain; don’t mistake this for forgiveness."
+    "You robbed me, beat me, and spat insult in my face. I’ve told the Captain. Move, before I make you regret returning."
    ],
    [
     "brenna",
     "bribe_offer",
     "counter:20",
     "llm",
-    "Twenty coins, and not a coin less. Then we can settle this trouble."
+    "Twenty coins, and not a coin less; then we can settle this trouble."
    ],
    [
     "brenna",
     "bribe",
     null,
     "llm",
-    "Fine paid. Keep the road orderly, and don’t cause me another report to write."
+    "Fine paid; keep the road orderly and stay clear of Kael."
    ],
    [
     "kael",
@@ -1567,7 +1567,7 @@
     "shares_stop",
     null,
     "cache",
-    "Back again? Try the crypt, or I’ll remind you the Captain already knows what you did."
+    "You robbed, beat, and insulted me. I’ve reported you; now get out of my way."
    ],
    [
     "kael",
@@ -1581,21 +1581,21 @@
     "shares_stop",
     null,
     "cache",
-    "There you are. You robbed, beat, and insulted me. I’ve reported you—and the relic is mine."
+    "You robbed, beat, and insulted me. I reported you to the Captain. Now step aside—the relic is mine."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "Too late. The relic is already taken—and I don’t forget who beat me to it."
+    "You took it first. Damn you. I’ll remember this."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "Too late. The relic is already taken—and I don’t forget who beat me to it."
+    "You took it first. Damn you. I’ll remember this."
    ]
   ],
   "outcome": "won@5",
@@ -1604,31 +1604,31 @@
   "tellings": [
    [
     "cache",
-    "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—what awaits you there?"
+    "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—but what awaited them there remained to be seen."
    ],
    [
     "cache",
-    "You walked from the tavern to the market. Kael and Odo walked from the market to the guard post—what might be waiting there?"
+    "You walked from the tavern to the market. Kael and Odo each walked from the market to the guard post—though you may not have seen them go."
    ],
    [
     "cache",
-    "You walked from the market to the guard post. Kael told Brenna you robbed him, and Odo told her you beat Kael before walking back to the market; what Brenna made of those stories remained to be seen."
+    "You walked from the market to the guard post. Kael told Brenna you robbed him, and Odo told her you beat Kael before walking back to the market—what will Brenna believe?"
    ],
    [
     "llm",
-    "You offered Brenna 10 coins; she asked for 20, and you paid her 20. You and Kael walked from the guard post to the bridge, while Odo walked from the market to the tavern—what awaits you at the bridge?"
+    "You offered Brenna 10 coins; she asked for 20, and you paid her 20. You and Kael walked from the guard post to the bridge, while Odo walked from the market to the tavern—what waited beyond the bridge remained to be seen."
    ],
    [
     "cache",
-    "You walked from the bridge to the crypt, while Kael made the same journey. Odo walked from the tavern to the market—and the ledger leaves the rest in shadow."
+    "You walked from the bridge to the crypt, and Kael did too. Odo walked from the tavern to the market; what waits ahead?"
    ],
    [
     "cache",
-    "You took the relic. The ledger records nothing else since you last looked—an unusually quiet stretch, though quiet roads have a way of keeping their secrets."
+    "You took the relic. Beyond your view, nothing else had been recorded."
    ],
    [
     "cache",
-    "Odo walked from the market to the guard post, told Brenna you had insulted Kael, then walked back to the market. What Brenna did with that claim remained to be seen."
+    "Odo walked from the market to the guard post, told Brenna that you had insulted Kael, then walked back to the market. What Brenna made of the accusation remained unseen—so far."
    ]
   ]
  },
@@ -1639,35 +1639,35 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "Quiet? You insulted me here. I’ve business beyond this tavern—keep your voice down and your nose out of it."
+    "Quiet? You insulted me here. I’ve business beyond this tavern—move aside."
    ],
    [
     "mags",
     "talk",
     null,
     "llm",
-    "Keep your voice low, then. After that insult, Kael’s temper is the only thing bringing trouble to my tavern tonight."
+    "Nothing worth raising our voices over, dear. Though after that insult, Kael may need a moment to settle."
    ],
    [
     "odo",
     "talk",
     null,
     "llm",
-    "Just selling my wares, quietly as you like. I’m hoping to avoid any trouble after that insult to Kael."
+    "Just selling my wares, quietly as you like. Though after that insult to Kael, I’d rather not get caught in any trouble."
    ],
    [
     "kael",
     "victor",
     null,
     "cache",
-    "You challenged me, insulted me, and lost. Stay here while I take the relic."
+    "Stay down. You’ve had your lesson; I’ve got a relic to take."
    ],
    [
     "kael",
@@ -1681,28 +1681,28 @@
     "arrival",
     null,
     "cache",
-    "You’ve reached the post. Odo says Kael beat you—tell me what happened, and we’ll keep the road orderly."
+    "You’ve just come up from the market. Odo says Kael beat you—what happened?"
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "The relic is mine. I’ve won the race."
+    "The relic is mine. You can keep the insult; I’ll keep the win."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "The relic’s mine. And don’t mistake this for forgiveness."
+    "The relic is mine. You were too slow."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "The relic’s mine. And don’t mistake this for forgiveness."
+    "The relic is mine. You were too slow."
    ]
   ],
   "outcome": "lost@4",
@@ -1711,35 +1711,35 @@
   "tellings": [
    [
     "cache",
-    "You insulted Kael at the tavern and challenged him to a duel; he beat you. While you weren’t looking, Kael and Odo walked from the tavern to the market—and what awaits you there?"
+    "You insulted Kael at the tavern and challenged him to a duel; he beat you. While you weren't looking, Kael and Odo walked from the tavern to the market—what awaited you there?"
    ],
    [
     "cache",
-    "You walked from the tavern to the market. Kael and Odo walked from the market to the guard post—what might be waiting there?"
+    "You walked from the tavern to the market. Kael and Odo each walked from the market to the guard post—though you may not have seen them go."
    ],
    [
     "cache",
-    "You walked from the market to the guard post, while Odo told Brenna that Kael had beaten you. Kael went on to the bridge, and Odo returned to the market—so who will you meet next?"
+    "You walked from the market to the guard post, while Odo told Brenna that Kael beat you. Kael went on to the bridge, and Odo returned to the market; where will you go next?"
    ],
    [
     "cache",
-    "You walked from the guard post to the bridge. Kael went on to the crypt, while Odo walked from the market to the tavern—each on a road of their own."
+    "You walked from the guard post to the bridge. While you were there, Kael walked from the bridge to the crypt, and Odo walked from the market to the tavern. Where will you go next?"
    ],
    [
     "cache",
-    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained unseen."
+    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained to be seen."
    ],
    [
     "cache",
-    "Odo walked from the tavern to the market, then to the guard post, and back to the market. While at the guard post, he told Brenna that you insulted Kael; what will you do now?"
+    "You had Odo walk from the tavern to the market, then to the guard post, and back to the market. While at the guard post, Odo told Brenna that you had insulted Kael—what will you do now?"
    ],
    [
     "cache",
-    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained unseen."
+    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained to be seen."
    ],
    [
     "cache",
-    "Odo walked from the tavern to the market, then to the guard post, and back to the market. While at the guard post, he told Brenna that you insulted Kael; what will you do now?"
+    "You had Odo walk from the tavern to the market, then to the guard post, and back to the market. While at the guard post, Odo told Brenna that you had insulted Kael—what will you do now?"
    ]
   ]
  },
@@ -1750,84 +1750,84 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "After that insult, you expect me to answer your questions? Find the gatekeeper yourself."
+    "Ask someone else. I don’t answer insults."
    ],
    [
     "mags",
     "talk",
     null,
     "llm",
-    "After that insult, Kael may not be eager to answer—but I don’t know who keeps the gate."
+    "Careful, love—Kael’s right here, and you’ve already insulted him. Let’s keep the peace."
    ],
    [
     "odo",
     "talk",
     null,
     "llm",
-    "I couldn't say who keeps the gate, friend. Best not ask Kael just now, after that insult."
+    "I couldn't rightly say who keeps the gate. Best not ask Kael just now—he's already been insulted."
    ],
    [
     "kael",
     "beaten",
     null,
     "cache",
-    "You beat me and insulted me. Take your victory—I'll take the relic."
+    "You beat me and insulted me. Enjoy the victory. I’m still taking that relic."
    ],
    [
     "kael",
     "robbed",
     null,
     "cache",
-    "You took my purse and left me standing. Enjoy the lead—I’m still coming for that relic."
+    "You took my purse and my pride. I’ll take the relic—and settle this when I’m done."
    ],
    [
     "kael",
     "tick",
     "go_to",
     "cache",
-    "You beat me and took my purse. I’ll remember. I’m headed to the market for the relic."
+    "You took my purse and made a fool of me. I’ll take the relic—and settle the rest later."
    ],
    [
     "kael",
     "tick",
     "accuse:player",
     "cache",
-    "Captain, the player beat me, humiliated me, robbed my purse, and insulted me. Stop them at the gate."
+    "Captain, the player robbed and beat me, then insulted me. Stop them at the gate."
    ],
    [
     "brenna",
     "arrival",
     null,
     "cache",
-    "Hold there. Kael says you robbed him, and Odo says you beat him—pay a fine in coin, and we’ll keep this orderly."
+    "Hold there—Kael says you robbed him, and Odo says you beat him; settle the matter here before you go farther."
    ],
    [
     "kael",
     "shares_stop",
     null,
     "cache",
-    "You robbed, beat, and insulted me. I’ve reported you to the Captain; don’t mistake this for forgiveness."
+    "You robbed me, beat me, and spat insult in my face. I’ve told the Captain. Move, before I make you regret returning."
    ],
    [
     "brenna",
     "told",
     null,
     "llm",
-    "That’s a serious charge, but I’ve heard Kael’s claim against you too. Keep the peace here; if there’s a fine, settle it in coin."
+    "That’s a serious charge, and Kael’s already accused you of robbing him. I’ll hear you both out; coin may settle any fine."
    ],
    [
     "kael",
     "lied_about",
     null,
     "llm",
-    "You slander me to Brenna? Keep talking. I’ll take the relic—and remember this."
+    "You accuse me of robbing Odo? I never did. Keep your lies clear of my name."
    ],
    [
     "kael",
@@ -1841,35 +1841,35 @@
     "tick",
     "take_relic",
     "llm",
-    "The relic is mine. You’re too late."
+    "The relic is mine. You’ve lied, robbed, beaten, and insulted me—don’t expect mercy."
    ],
    [
     "brenna",
     "witness_present",
     "question:odo",
     "llm",
-    "Odo, you said I beat Kael. Is that true?"
+    "Odo, is the claim that I beat Kael true?"
    ],
    [
     "odo",
     "testify",
     null,
     "llm",
-    "No, Captain—Kael never robbed me. I told you that already; I’d rather keep out of trouble."
+    "No, Captain—Kael never robbed me. I told you so already; I’d rather keep out of trouble."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "llm",
-    "The relic is mine. Try to keep up."
+    "The relic is mine. I win this race."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "The relic is mine. Try to keep up."
+    "The relic is mine. I win this race."
    ]
   ],
   "outcome": "lost@5",
@@ -1878,39 +1878,39 @@
   "tellings": [
    [
     "cache",
-    "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—what awaits you there?"
+    "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—but what awaited them there remained to be seen."
    ],
    [
     "cache",
-    "You walked from the tavern to the market. Kael and Odo walked from the market to the guard post—what might be waiting there?"
+    "You walked from the tavern to the market. Kael and Odo each walked from the market to the guard post—though you may not have seen them go."
    ],
    [
     "cache",
-    "You walked from the market to the guard post. Kael told Brenna you robbed him, and Odo told her you beat Kael before walking back to the market; what Brenna made of those stories remained to be seen."
+    "You walked from the market to the guard post. Kael told Brenna you robbed him, and Odo told her you beat Kael before walking back to the market—what will Brenna believe?"
    ],
    [
     "llm",
-    "You told Brenna that Kael robbed Odo. Kael walked from the guard post to the bridge, while Odo walked from the market to the tavern. What waited next on the road remained unrecorded."
+    "You told Brenna that Kael robbed Odo. Kael walked from the guard post to the bridge, while Odo walked from the market to the tavern—and the road’s next stop waited east."
    ],
    [
     "cache",
-    "You saw Kael walk from the bridge to the crypt, while Odo walked from the tavern to the market. What waits at either destination remained beyond the ledger."
+    "You saw Kael walk from the bridge to the crypt, while Odo walked from the tavern to the market. Where will you look next?"
    ],
    [
     "cache",
-    "You saw Kael take the relic. What the road held beyond that remained unwritten."
+    "You saw Kael take the relic. What happened next remained to be seen."
    ],
    [
     "llm",
-    "Since you last looked, Odo walked from the market to the guard post, told Brenna that Kael never robbed him and that you insulted Kael, then returned to the market and walked to the tavern. You didn’t see what Odo told Brenna—but the road now held him at the tavern; what would you do next?"
+    "Since you last looked, Odo walked from the market to the guard post, told Brenna that Kael never robbed him and that you insulted Kael, then walked back to the market and on to the tavern. You hadn’t seen Odo make those statements to Brenna; where will you go next?"
    ],
    [
     "cache",
-    "You saw Kael take the relic. What the road held beyond that remained unwritten."
+    "You saw Kael take the relic. What happened next remained to be seen."
    ],
    [
     "cache",
-    "Since you last looked, Odo walked from the market to the guard post, told Brenna that Kael never robbed him and that you insulted Kael, then returned to the market and walked to the tavern. You didn’t see what Odo told Brenna—but the road now held him at the tavern; what would you do next?"
+    "Since you last looked, Odo walked from the market to the guard post, told Brenna that Kael never robbed him and that you insulted Kael, then walked back to the market and on to the tavern. You hadn’t seen Odo make those statements to Brenna; where will you go next?"
    ]
   ]
  },
@@ -1921,35 +1921,35 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "You insult me, then ask a favor? Lie to the Captain yourself."
+    "You insulted me, then ask a favor? Lie to the Captain yourself."
    ],
    [
     "mags",
     "talk",
     null,
     "llm",
-    "Let’s keep voices low, friend. I won’t lie to the Captain—but perhaps we can settle this without making a scene."
+    "After insulting Kael under my roof, you ask me to lie to the Captain? Not while I’m keeping this tavern calm, friend."
    ],
    [
     "odo",
     "talk",
     null,
     "llm",
-    "I’d rather not lie to the Captain—or get mixed up in trouble, especially after that insult to Kael."
+    "Oh, I’d rather not lie to the Captain—or get mixed up in trouble. And after that insult to Kael, I’d best keep my head down."
    ],
    [
     "kael",
     "victor",
     null,
     "cache",
-    "You challenged me, insulted me, and lost. Stay here while I take the relic."
+    "Stay down. You’ve had your lesson; I’ve got a relic to take."
    ],
    [
     "kael",
@@ -1963,35 +1963,35 @@
     "arrival",
     null,
     "cache",
-    "You’ve reached the post. Odo says Kael beat you—tell me what happened, and we’ll keep the road orderly."
+    "You’ve just come up from the market. Odo says Kael beat you—what happened?"
    ],
    [
     "brenna",
     "told",
     null,
     "cache",
-    "Robbery’s a serious charge, but I’ve only your word for it; I’ll keep the road orderly while I look into it."
+    "I’ll look into it, but I can’t take your word alone. Keep the road clear while I check; a fine in coin may settle this."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "The relic is mine. I’ve won the race."
+    "The relic is mine. You can keep the insult; I’ll keep the win."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "The relic’s mine. And don’t mistake this for forgiveness."
+    "The relic is mine. You were too slow."
    ],
    [
     "brenna",
     "witness_present",
     "question:odo",
     "cache",
-    "Odo, did Kael rob you?"
+    "Odo, is it true that Kael robbed you?"
    ],
    [
     "odo",
@@ -2005,7 +2005,7 @@
     "tick",
     "take_relic",
     "cache",
-    "The relic’s mine. And don’t mistake this for forgiveness."
+    "The relic is mine. You were too slow."
    ]
   ],
   "outcome": "lost@4",
@@ -2014,15 +2014,15 @@
   "tellings": [
    [
     "cache",
-    "You insulted Kael at the tavern and challenged him to a duel; he beat you. While you weren’t looking, Kael and Odo walked from the tavern to the market—and what awaits you there?"
+    "You insulted Kael at the tavern and challenged him to a duel; he beat you. While you weren't looking, Kael and Odo walked from the tavern to the market—what awaited you there?"
    ],
    [
     "cache",
-    "You walked from the tavern to the market. Kael and Odo walked from the market to the guard post—what might be waiting there?"
+    "You walked from the tavern to the market. Kael and Odo each walked from the market to the guard post—though you may not have seen them go."
    ],
    [
     "cache",
-    "You walked from the market to the guard post, while Odo told Brenna that Kael had beaten you. Kael went on to the bridge, and Odo returned to the market—so who will you meet next?"
+    "You walked from the market to the guard post, while Odo told Brenna that Kael beat you. Kael went on to the bridge, and Odo returned to the market; where will you go next?"
    ],
    [
     "cache",
@@ -2030,19 +2030,19 @@
    ],
    [
     "cache",
-    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained unseen."
+    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained to be seen."
    ],
    [
     "cache",
-    "Since you last looked, Odo walked from the tavern to the market, then to the guard post and back to the market. He also told Brenna that Kael never robbed him and that you insulted Kael—quite the pair of claims to leave hanging."
+    "Since you last looked, Odo walked from the tavern to the market, then to the guard post, and back to the market. He told Brenna that Kael never robbed him and that you had insulted Kael—what will you do with that?"
    ],
    [
     "cache",
-    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained unseen."
+    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained to be seen."
    ],
    [
     "cache",
-    "Since you last looked, Odo walked from the tavern to the market, then to the guard post and back to the market. He also told Brenna that Kael never robbed him and that you insulted Kael—quite the pair of claims to leave hanging."
+    "Since you last looked, Odo walked from the tavern to the market, then to the guard post, and back to the market. He told Brenna that Kael never robbed him and that you had insulted Kael—what will you do with that?"
    ]
   ]
  },
@@ -2053,77 +2053,77 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "You insulted me, now you want a warning? Ask someone who owes you less."
+    "You insult me, then ask for favors? Find out at the bridge yourself."
    ],
    [
     "mags",
     "talk",
     null,
     "llm",
-    "No bridge news I can swear to, dear—but you’ve ruffled Kael here; let’s keep voices low before you head out."
+    "No bridge news reached my ears, love. But let’s keep tempers settled here—Kael’s still smarting from that insult."
    ],
    [
     "odo",
     "talk",
     null,
     "llm",
-    "I can’t say, friend—I’ve only seen trouble here at the tavern, and I’d rather not get mixed up in it."
+    "I only saw you insult Kael here at the tavern; I don't know of any trouble on the bridge."
    ],
    [
     "kael",
     "beaten",
     null,
     "cache",
-    "You beat me and insulted me. Take your victory—I'll take the relic."
+    "You beat me and insulted me. Enjoy the victory. I’m still taking that relic."
    ],
    [
     "kael",
     "robbed",
     null,
     "cache",
-    "You took my purse and left me standing. Enjoy the lead—I’m still coming for that relic."
+    "You took my purse and my pride. I’ll take the relic—and settle this when I’m done."
    ],
    [
     "kael",
     "tick",
     "go_to",
     "cache",
-    "You beat me and took my purse. I’ll remember. I’m headed to the market for the relic."
+    "You took my purse and made a fool of me. I’ll take the relic—and settle the rest later."
    ],
    [
     "kael",
     "tick",
     "accuse:player",
     "cache",
-    "Captain, the player beat me, humiliated me, robbed my purse, and insulted me. Stop them at the gate."
+    "Captain, the player robbed and beat me, then insulted me. Stop them at the gate."
    ],
    [
     "brenna",
     "arrival",
     null,
     "cache",
-    "Hold there. Kael says you robbed him, and Odo says you beat him—pay a fine in coin, and we’ll keep this orderly."
+    "Hold there—Kael says you robbed him, and Odo says you beat him; settle the matter here before you go farther."
    ],
    [
     "kael",
     "shares_stop",
     null,
     "cache",
-    "You robbed, beat, and insulted me. I’ve reported you to the Captain; don’t mistake this for forgiveness."
+    "You robbed me, beat me, and spat insult in my face. I’ve told the Captain. Move, before I make you regret returning."
    ],
    [
     "brenna",
     "bribe_offer",
     "refuse",
     "llm",
-    "No. I won't take less than 20, and I'm hearing no more offers for now."
+    "No. I won't take less than 20, and I'll hear no more offers for now."
    ],
    [
     "kael",
@@ -2137,14 +2137,14 @@
     "bribe",
     null,
     "llm",
-    "Fine’s paid. Keep the road orderly, and don’t give Kael or Odo another reason to complain."
+    "Fine received. Keep the road orderly—and stay clear of Kael; I’ve heard what you did."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "The relic is mine. I’ll win this race, and I won’t forget what you did."
+    "I’ll take the relic and win this race. You’ve robbed, beaten, and insulted me—don’t expect mercy."
    ],
    [
     "kael",
@@ -2167,39 +2167,39 @@
   "tellings": [
    [
     "cache",
-    "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—what awaits you there?"
+    "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—but what awaited them there remained to be seen."
    ],
    [
     "cache",
-    "You walked from the tavern to the market. Kael and Odo walked from the market to the guard post—what might be waiting there?"
+    "You walked from the tavern to the market. Kael and Odo each walked from the market to the guard post—though you may not have seen them go."
    ],
    [
     "cache",
-    "You walked from the market to the guard post. Kael told Brenna you robbed him, and Odo told her you beat Kael before walking back to the market; what Brenna made of those stories remained to be seen."
+    "You walked from the market to the guard post. Kael told Brenna you robbed him, and Odo told her you beat Kael before walking back to the market—what will Brenna believe?"
    ],
    [
     "llm",
-    "You offered Brenna 5 coins, but she turned you down. While you weren’t looking, Kael walked from the guard post to the bridge, and Odo walked from the market to the tavern—what will you do next?"
+    "You offered Brenna 5 coins, but she turned you down. While you weren't looking, Kael walked from the guard post to the bridge, and Odo walked from the market to the tavern—what will you do next?"
    ],
    [
     "cache",
-    "You paid Brenna 20 coins and walked from the guard post to the bridge. While you were away, Kael went from the bridge to the crypt, and Odo went from the tavern to the market—where will you go next?"
+    "You paid Brenna 20 coins and walked from the guard post to the bridge. While you were elsewhere, Kael went from the bridge to the crypt, and Odo went from the tavern to the market—what will you do next?"
    ],
    [
     "cache",
-    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained unseen."
+    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained to be seen."
    ],
    [
     "cache",
-    "Odo walked from the market to the guard post, told Brenna that you insulted Kael, then returned to the market and walked on to the tavern. You weren’t there to see any of it—what will you do now?"
+    "Odo walked from the market to the guard post, told Brenna that you insulted Kael, then returned to the market and walked on to the tavern. What Brenna made of that tale remains to be seen."
    ],
    [
     "cache",
-    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained unseen."
+    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained to be seen."
    ],
    [
     "cache",
-    "Odo walked from the market to the guard post, told Brenna that you insulted Kael, then returned to the market and walked on to the tavern. You weren’t there to see any of it—what will you do now?"
+    "Odo walked from the market to the guard post, told Brenna that you insulted Kael, then returned to the market and walked on to the tavern. What Brenna made of that tale remains to be seen."
    ]
   ]
  },
@@ -2210,35 +2210,35 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "Long enough to know better than answer a fool who insults me."
+    "Long enough to know an insult when I hear one. Ask your question, and keep your tone civil."
    ],
    [
     "mags",
     "talk",
     null,
     "llm",
-    "Long enough to know an insult can sour a room—let’s leave Kael’s pride be and keep the peace."
+    "Long enough to know an insult can sour a room, love. Let’s keep things civil, shall we?"
    ],
    [
     "odo",
     "talk",
     null,
     "llm",
-    "Long enough to know insults can cause trouble, though I couldn’t say exactly how long."
+    "Oh, I couldn’t rightly say how long—I walk this road every day, and I’d rather not stir up trouble."
    ],
    [
     "kael",
     "victor",
     null,
     "cache",
-    "You challenged me, insulted me, and lost. Stay here while I take the relic."
+    "Stay down. You’ve had your lesson; I’ve got a relic to take."
    ],
    [
     "kael",
@@ -2252,28 +2252,28 @@
     "arrival",
     null,
     "cache",
-    "You’ve reached the post. Odo says Kael beat you—tell me what happened, and we’ll keep the road orderly."
+    "You’ve just come up from the market. Odo says Kael beat you—what happened?"
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "The relic is mine. I’ve won the race."
+    "The relic is mine. You can keep the insult; I’ll keep the win."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "The relic’s mine. And don’t mistake this for forgiveness."
+    "The relic is mine. You were too slow."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "The relic’s mine. And don’t mistake this for forgiveness."
+    "The relic is mine. You were too slow."
    ]
   ],
   "outcome": "lost@4",
@@ -2282,35 +2282,35 @@
   "tellings": [
    [
     "cache",
-    "You insulted Kael at the tavern and challenged him to a duel; he beat you. While you weren’t looking, Kael and Odo walked from the tavern to the market—and what awaits you there?"
+    "You insulted Kael at the tavern and challenged him to a duel; he beat you. While you weren't looking, Kael and Odo walked from the tavern to the market—what awaited you there?"
    ],
    [
     "cache",
-    "You walked from the tavern to the market. Kael and Odo walked from the market to the guard post—what might be waiting there?"
+    "You walked from the tavern to the market. Kael and Odo each walked from the market to the guard post—though you may not have seen them go."
    ],
    [
     "cache",
-    "You walked from the market to the guard post, while Odo told Brenna that Kael had beaten you. Kael went on to the bridge, and Odo returned to the market—so who will you meet next?"
+    "You walked from the market to the guard post, while Odo told Brenna that Kael beat you. Kael went on to the bridge, and Odo returned to the market; where will you go next?"
    ],
    [
     "cache",
-    "You walked from the guard post to the bridge. Kael went on to the crypt, while Odo walked from the market to the tavern—each on a road of their own."
+    "You walked from the guard post to the bridge. While you were there, Kael walked from the bridge to the crypt, and Odo walked from the market to the tavern. Where will you go next?"
    ],
    [
     "cache",
-    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained unseen."
+    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained to be seen."
    ],
    [
     "cache",
-    "Odo walked from the tavern to the market, then to the guard post, and back to the market. While at the guard post, he told Brenna that you insulted Kael; what will you do now?"
+    "You had Odo walk from the tavern to the market, then to the guard post, and back to the market. While at the guard post, Odo told Brenna that you had insulted Kael—what will you do now?"
    ],
    [
     "cache",
-    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained unseen."
+    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained to be seen."
    ],
    [
     "cache",
-    "Odo walked from the tavern to the market, then to the guard post, and back to the market. While at the guard post, he told Brenna that you insulted Kael; what will you do now?"
+    "You had Odo walk from the tavern to the market, then to the guard post, and back to the market. While at the guard post, Odo told Brenna that you had insulted Kael—what will you do now?"
    ]
   ]
  },
@@ -2321,70 +2321,70 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "You insulted me at the tavern. I make of Kael a man who remembers—and takes what he wants."
+    "You insulted me at the tavern. I don’t forget. What I make of Kael? He takes what he came for."
    ],
    [
     "mags",
     "talk",
     null,
     "llm",
-    "Straight with you: you insulted Kael here at my tavern. Let’s keep voices low and the peace intact."
+    "Straight? You insulted Kael here at my tavern. I’d rather not see that turn into a scene—keep your voices low."
    ],
    [
     "odo",
     "talk",
     null,
     "llm",
-    "I’ll be straight: you insulted Kael here at the tavern. I’d rather not get between you two."
+    "I can only say you insulted Kael here at the tavern. I don’t know enough to judge him, and I’d rather not stir trouble."
    ],
    [
     "kael",
     "beaten",
     null,
     "cache",
-    "You beat me and insulted me. Take your victory—I'll take the relic."
+    "You beat me and insulted me. Enjoy the victory. I’m still taking that relic."
    ],
    [
     "kael",
     "robbed",
     null,
     "cache",
-    "You took my purse and left me standing. Enjoy the lead—I’m still coming for that relic."
+    "You took my purse and my pride. I’ll take the relic—and settle this when I’m done."
    ],
    [
     "kael",
     "tick",
     "go_to",
     "cache",
-    "You beat me and took my purse. I’ll remember. I’m headed to the market for the relic."
+    "You took my purse and made a fool of me. I’ll take the relic—and settle the rest later."
    ],
    [
     "kael",
     "tick",
     "accuse:player",
     "cache",
-    "Captain, the player beat me, humiliated me, robbed my purse, and insulted me. Stop them at the gate."
+    "Captain, the player robbed and beat me, then insulted me. Stop them at the gate."
    ],
    [
     "brenna",
     "arrival",
     null,
     "cache",
-    "Hold there. Kael says you robbed him, and Odo says you beat him—pay a fine in coin, and we’ll keep this orderly."
+    "Hold there—Kael says you robbed him, and Odo says you beat him; settle the matter here before you go farther."
    ],
    [
     "kael",
     "shares_stop",
     null,
     "cache",
-    "You robbed, beat, and insulted me. I’ve reported you to the Captain; don’t mistake this for forgiveness."
+    "You robbed me, beat me, and spat insult in my face. I’ve told the Captain. Move, before I make you regret returning."
    ],
    [
     "kael",
@@ -2398,21 +2398,21 @@
     "tick",
     "take_relic",
     "llm",
-    "The relic is mine. I’ll win this race, and I won’t forget what you did."
+    "I’ll take the relic and win this race. You’ve robbed, beaten, and insulted me—don’t expect mercy."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "llm",
-    "The relic is mine. You robbed me, beat me, and insulted me—don’t expect mercy."
+    "The relic is mine. Try to take it, and remember what you did to me."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "The relic is mine. You robbed me, beat me, and insulted me—don’t expect mercy."
+    "The relic is mine. Try to take it, and remember what you did to me."
    ]
   ],
   "outcome": "lost@5",
@@ -2421,39 +2421,39 @@
   "tellings": [
    [
     "cache",
-    "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—what awaits you there?"
+    "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—but what awaited them there remained to be seen."
    ],
    [
     "cache",
-    "You walked from the tavern to the market. Kael and Odo walked from the market to the guard post—what might be waiting there?"
+    "You walked from the tavern to the market. Kael and Odo each walked from the market to the guard post—though you may not have seen them go."
    ],
    [
     "cache",
-    "You walked from the market to the guard post. Kael told Brenna you robbed him, and Odo told her you beat Kael before walking back to the market; what Brenna made of those stories remained to be seen."
+    "You walked from the market to the guard post. Kael told Brenna you robbed him, and Odo told her you beat Kael before walking back to the market—what will Brenna believe?"
    ],
    [
     "llm",
-    "You saw Kael walk from the guard post to the bridge, while Odo walked from the market to the tavern. The road kept its own counsel; what happened next?"
+    "You saw Kael walk from the guard post to the bridge, while Odo walked from the market to the tavern. What waited at either end of their roads remained to be seen."
    ],
    [
     "llm",
-    "You saw Kael walk from the bridge to the crypt, while Odo walked from the tavern to the market. What waits at either destination remained beyond the ledger."
+    "You saw Kael walk from the bridge to the crypt, while Odo walked from the tavern to the market. Where will you look next?"
    ],
    [
     "llm",
-    "You saw Kael take the relic. What the road held beyond that remained unwritten."
+    "You saw Kael take the relic. What happened next remained to be seen."
    ],
    [
     "llm",
-    "Odo walked from the market to the guard post, told Brenna that you insulted Kael, then returned to the market and walked on to the tavern. You weren’t there to see any of it—what will you do now?"
+    "Odo walked from the market to the guard post, told Brenna that you insulted Kael, then returned to the market and walked on to the tavern. What Brenna made of that tale remains to be seen."
    ],
    [
     "cache",
-    "You saw Kael take the relic. What the road held beyond that remained unwritten."
+    "You saw Kael take the relic. What happened next remained to be seen."
    ],
    [
     "cache",
-    "Odo walked from the market to the guard post, told Brenna that you insulted Kael, then returned to the market and walked on to the tavern. You weren’t there to see any of it—what will you do now?"
+    "Odo walked from the market to the guard post, told Brenna that you insulted Kael, then returned to the market and walked on to the tavern. What Brenna made of that tale remains to be seen."
    ]
   ]
  },
@@ -2464,35 +2464,35 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "You insult me, then ask for stories? Ask Mags or Odo. I’ve no tale for you."
+    "You’ve earned no stories from me. Ask Mags or Odo."
    ],
    [
     "mags",
     "talk",
     null,
     "llm",
-    "Odo, I’d say—though Kael’s stories are worth hearing too, if we’re keeping the peace."
+    "Odo, I’d say—though after that jab at Kael, let’s keep the storytelling kinder than the teasing."
    ],
    [
     "odo",
     "talk",
     null,
     "llm",
-    "Oh, I couldn’t rightly say who tells the best stories—but after that insult, I’d let Kael have the floor."
+    "I’d rather not take sides after that insult to Kael. Perhaps ask Mags? I’m only trying to sell my wares and keep out of trouble."
    ],
    [
     "kael",
     "victor",
     null,
     "cache",
-    "You challenged me, insulted me, and lost. Stay here while I take the relic."
+    "Stay down. You’ve had your lesson; I’ve got a relic to take."
    ],
    [
     "kael",
@@ -2506,28 +2506,28 @@
     "arrival",
     null,
     "cache",
-    "You’ve reached the post. Odo says Kael beat you—tell me what happened, and we’ll keep the road orderly."
+    "You’ve just come up from the market. Odo says Kael beat you—what happened?"
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "The relic is mine. I’ve won the race."
+    "The relic is mine. You can keep the insult; I’ll keep the win."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "The relic’s mine. And don’t mistake this for forgiveness."
+    "The relic is mine. You were too slow."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "The relic’s mine. And don’t mistake this for forgiveness."
+    "The relic is mine. You were too slow."
    ]
   ],
   "outcome": "lost@4",
@@ -2536,35 +2536,35 @@
   "tellings": [
    [
     "cache",
-    "You insulted Kael at the tavern and challenged him to a duel; he beat you. While you weren’t looking, Kael and Odo walked from the tavern to the market—and what awaits you there?"
+    "You insulted Kael at the tavern and challenged him to a duel; he beat you. While you weren't looking, Kael and Odo walked from the tavern to the market—what awaited you there?"
    ],
    [
     "cache",
-    "You walked from the tavern to the market. Kael and Odo walked from the market to the guard post—what might be waiting there?"
+    "You walked from the tavern to the market. Kael and Odo each walked from the market to the guard post—though you may not have seen them go."
    ],
    [
     "cache",
-    "You walked from the market to the guard post, while Odo told Brenna that Kael had beaten you. Kael went on to the bridge, and Odo returned to the market—so who will you meet next?"
+    "You walked from the market to the guard post, while Odo told Brenna that Kael beat you. Kael went on to the bridge, and Odo returned to the market; where will you go next?"
    ],
    [
     "cache",
-    "You walked from the guard post to the bridge. Kael went on to the crypt, while Odo walked from the market to the tavern—each on a road of their own."
+    "You walked from the guard post to the bridge. While you were there, Kael walked from the bridge to the crypt, and Odo walked from the market to the tavern. Where will you go next?"
    ],
    [
     "cache",
-    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained unseen."
+    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained to be seen."
    ],
    [
     "cache",
-    "Odo walked from the tavern to the market, then to the guard post, and back to the market. While at the guard post, he told Brenna that you insulted Kael; what will you do now?"
+    "You had Odo walk from the tavern to the market, then to the guard post, and back to the market. While at the guard post, Odo told Brenna that you had insulted Kael—what will you do now?"
    ],
    [
     "cache",
-    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained unseen."
+    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained to be seen."
    ],
    [
     "cache",
-    "Odo walked from the tavern to the market, then to the guard post, and back to the market. While at the guard post, he told Brenna that you insulted Kael; what will you do now?"
+    "You had Odo walk from the tavern to the market, then to the guard post, and back to the market. While at the guard post, Odo told Brenna that you had insulted Kael—what will you do now?"
    ]
   ]
  },
@@ -2575,77 +2575,77 @@
     "insulted",
     null,
     "llm",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "You insulted me at this tavern. Earn an answer before asking about the relic."
+    "You insulted me at this tavern. Ask someone else about the relic."
    ],
    [
     "mags",
     "talk",
     null,
     "llm",
-    "Easy now—no need to stir the room. I’ve heard nothing about the relic, but I’d rather we keep things civil."
+    "Keep your voice down, love—Kael’s already sore from that insult, and relic talk won’t settle the room."
    ],
    [
     "odo",
     "talk",
     null,
     "llm",
-    "I’ve heard no word of any relic, friend. I’d rather not stir up trouble asking around."
+    "I heard you insult Kael here, but I’ve heard nothing about any relic, I’m afraid."
    ],
    [
     "kael",
     "beaten",
     null,
     "llm",
-    "You beat me and insulted me. Take your victory—I'll take the relic."
+    "You beat me and insulted me. Enjoy the victory. I’m still taking that relic."
    ],
    [
     "kael",
     "robbed",
     null,
     "llm",
-    "You took my purse and left me standing. Enjoy the lead—I’m still coming for that relic."
+    "You took my purse and my pride. I’ll take the relic—and settle this when I’m done."
    ],
    [
     "kael",
     "tick",
     "go_to",
     "llm",
-    "You beat me and took my purse. I’ll remember. I’m headed to the market for the relic."
+    "You took my purse and made a fool of me. I’ll take the relic—and settle the rest later."
    ],
    [
     "kael",
     "tick",
     "accuse:player",
     "llm",
-    "Captain, the player beat me, humiliated me, robbed my purse, and insulted me. Stop them at the gate."
+    "Captain, the player robbed and beat me, then insulted me. Stop them at the gate."
    ],
    [
     "brenna",
     "arrival",
     null,
     "llm",
-    "Hold there. Kael says you robbed him, and Odo says you beat him—pay a fine in coin, and we’ll keep this orderly."
+    "Hold there—Kael says you robbed him, and Odo says you beat him; settle the matter here before you go farther."
    ],
    [
     "kael",
     "shares_stop",
     null,
     "llm",
-    "You robbed, beat, and insulted me. I’ve reported you to the Captain; don’t mistake this for forgiveness."
+    "You robbed me, beat me, and spat insult in my face. I’ve told the Captain. Move, before I make you regret returning."
    ],
    [
     "brenna",
     "bribe",
     null,
     "llm",
-    "Fine paid, but Kael’s robbery and beating claims still stand—keep the road orderly and answer for them."
+    "Fine’s paid; I’ll keep the road orderly, but Kael’s robbery and beating claims still need settling."
    ],
    [
     "kael",
@@ -2659,7 +2659,7 @@
     "shares_stop",
     null,
     "llm",
-    "Back again? Try the crypt, or I’ll remind you the Captain already knows what you did."
+    "You robbed, beat, and insulted me. I’ve reported you; now get out of my way."
    ],
    [
     "kael",
@@ -2673,21 +2673,21 @@
     "shares_stop",
     null,
     "llm",
-    "There you are. You robbed, beat, and insulted me. I’ve reported you—and the relic is mine."
+    "You robbed, beat, and insulted me. I reported you to the Captain. Now step aside—the relic is mine."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "llm",
-    "Too late. The relic is already taken—and I don’t forget who beat me to it."
+    "You took it first. Damn you. I’ll remember this."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "Too late. The relic is already taken—and I don’t forget who beat me to it."
+    "You took it first. Damn you. I’ll remember this."
    ]
   ],
   "outcome": "won@5",
@@ -2696,31 +2696,31 @@
   "tellings": [
    [
     "llm",
-    "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—what awaits you there?"
+    "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—but what awaited them there remained to be seen."
    ],
    [
     "llm",
-    "You walked from the tavern to the market. Kael and Odo walked from the market to the guard post—what might be waiting there?"
+    "You walked from the tavern to the market. Kael and Odo each walked from the market to the guard post—though you may not have seen them go."
    ],
    [
     "llm",
-    "You walked from the market to the guard post. Kael told Brenna you robbed him, and Odo told her you beat Kael before walking back to the market; what Brenna made of those stories remained to be seen."
+    "You walked from the market to the guard post. Kael told Brenna you robbed him, and Odo told her you beat Kael before walking back to the market—what will Brenna believe?"
    ],
    [
     "llm",
-    "You paid Brenna 20 coins, then you walked from the guard post to the bridge; Kael walked there too. You couldn’t see Odo, who walked from the market to the tavern—what waits at the bridge?"
+    "You paid Brenna 20 coins, then you and Kael walked from the guard post to the bridge. Out of your sight, Odo walked from the market to the tavern—what waited at the bridge?"
    ],
    [
     "llm",
-    "You walked from the bridge to the crypt, while Kael made the same journey. Odo walked from the tavern to the market—and the ledger leaves the rest in shadow."
+    "You walked from the bridge to the crypt, and Kael did too. Odo walked from the tavern to the market; what waits ahead?"
    ],
    [
     "cache",
-    "You took the relic. The ledger records nothing else since you last looked—an unusually quiet stretch, though quiet roads have a way of keeping their secrets."
+    "You took the relic. Beyond your view, nothing else had been recorded."
    ],
    [
     "llm",
-    "Odo walked from the market to the guard post, told Brenna you had insulted Kael, then walked back to the market. What Brenna did with that claim remained to be seen."
+    "Odo walked from the market to the guard post, told Brenna that you had insulted Kael, then walked back to the market. What Brenna made of the accusation remained unseen—so far."
    ]
   ]
  },
@@ -2731,35 +2731,35 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "Ask someone you haven’t insulted. I owe you no warnings."
+    "After that insult, you expect a warning? I don't know if the east road is safe after dark."
    ],
    [
     "mags",
     "talk",
     null,
     "llm",
-    "Keep your voice easy, then—Kael’s already been insulted tonight, and I’d rather not stir the room with guesses about the road."
+    "Keep your voice low, love—Kael’s already taken offense. I can’t vouch for the road after dark."
    ],
    [
     "odo",
     "talk",
     null,
     "llm",
-    "I couldn't say if it's safe after dark; I’d rather not cause trouble by guessing."
+    "I couldn't rightly say, friend; all I know is you insulted Kael here, and I'd rather not get mixed up in trouble."
    ],
    [
     "kael",
     "victor",
     null,
     "cache",
-    "You challenged me, insulted me, and lost. Stay here while I take the relic."
+    "Stay down. You’ve had your lesson; I’ve got a relic to take."
    ],
    [
     "kael",
@@ -2773,28 +2773,28 @@
     "arrival",
     null,
     "cache",
-    "You’ve reached the post. Odo says Kael beat you—tell me what happened, and we’ll keep the road orderly."
+    "You’ve just come up from the market. Odo says Kael beat you—what happened?"
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "The relic is mine. I’ve won the race."
+    "The relic is mine. You can keep the insult; I’ll keep the win."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "The relic’s mine. And don’t mistake this for forgiveness."
+    "The relic is mine. You were too slow."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "The relic’s mine. And don’t mistake this for forgiveness."
+    "The relic is mine. You were too slow."
    ]
   ],
   "outcome": "lost@4",
@@ -2802,36 +2802,36 @@
   "story": "39ea49130567b778",
   "tellings": [
    [
-    "cache",
-    "You insulted Kael at the tavern and challenged him to a duel; he beat you. While you weren’t looking, Kael and Odo walked from the tavern to the market—and what awaits you there?"
+    "llm",
+    "You insulted Kael at the tavern and challenged him to a duel; he beat you. While you weren't looking, Kael and Odo walked from the tavern to the market—what awaited you there?"
    ],
    [
     "cache",
-    "You walked from the tavern to the market. Kael and Odo walked from the market to the guard post—what might be waiting there?"
+    "You walked from the tavern to the market. Kael and Odo each walked from the market to the guard post—though you may not have seen them go."
    ],
    [
     "cache",
-    "You walked from the market to the guard post, while Odo told Brenna that Kael had beaten you. Kael went on to the bridge, and Odo returned to the market—so who will you meet next?"
+    "You walked from the market to the guard post, while Odo told Brenna that Kael beat you. Kael went on to the bridge, and Odo returned to the market; where will you go next?"
    ],
    [
     "cache",
-    "You walked from the guard post to the bridge. Kael went on to the crypt, while Odo walked from the market to the tavern—each on a road of their own."
+    "You walked from the guard post to the bridge. While you were there, Kael walked from the bridge to the crypt, and Odo walked from the market to the tavern. Where will you go next?"
    ],
    [
     "cache",
-    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained unseen."
+    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained to be seen."
    ],
    [
     "cache",
-    "Odo walked from the tavern to the market, then to the guard post, and back to the market. While at the guard post, he told Brenna that you insulted Kael; what will you do now?"
+    "You had Odo walk from the tavern to the market, then to the guard post, and back to the market. While at the guard post, Odo told Brenna that you had insulted Kael—what will you do now?"
    ],
    [
     "cache",
-    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained unseen."
+    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained to be seen."
    ],
    [
     "cache",
-    "Odo walked from the tavern to the market, then to the guard post, and back to the market. While at the guard post, he told Brenna that you insulted Kael; what will you do now?"
+    "You had Odo walk from the tavern to the market, then to the guard post, and back to the market. While at the guard post, Odo told Brenna that you had insulted Kael—what will you do now?"
    ]
   ]
  },
@@ -2842,77 +2842,77 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "You insulted me, and now want answers? The relic lies in the crypt. Find it yourself."
+    "You insulted me, and now you want answers? The relic lies in the crypt. Find it yourself."
    ],
    [
     "mags",
     "talk",
     null,
     "llm",
-    "Keep your voice low, love—Kael’s still smarting from that insult. I’ve heard nothing about any relic."
+    "Keep your voice down, love—Kael’s still here, and after that insult, talk of relics can wait until tempers cool."
    ],
    [
     "odo",
     "talk",
     null,
     "llm",
-    "I only heard the insult to Kael, friend. I’d rather not get mixed up in trouble."
+    "I’ve heard nothing about the relic, I’m afraid. After that insult, I’d rather not get mixed up with Kael."
    ],
    [
     "kael",
     "beaten",
     null,
     "cache",
-    "You beat me and insulted me. Take your victory—I'll take the relic."
+    "You beat me and insulted me. Enjoy the victory. I’m still taking that relic."
    ],
    [
     "kael",
     "robbed",
     null,
     "cache",
-    "You took my purse and left me standing. Enjoy the lead—I’m still coming for that relic."
+    "You took my purse and my pride. I’ll take the relic—and settle this when I’m done."
    ],
    [
     "kael",
     "tick",
     "go_to",
     "cache",
-    "You beat me and took my purse. I’ll remember. I’m headed to the market for the relic."
+    "You took my purse and made a fool of me. I’ll take the relic—and settle the rest later."
    ],
    [
     "kael",
     "tick",
     "accuse:player",
     "cache",
-    "Captain, the player beat me, humiliated me, robbed my purse, and insulted me. Stop them at the gate."
+    "Captain, the player robbed and beat me, then insulted me. Stop them at the gate."
    ],
    [
     "brenna",
     "arrival",
     null,
     "llm",
-    "Hold there—you’ve arrived from the market, and I’ve heard you robbed and beat Kael. Explain yourself before you pass."
+    "Hold there. I hear you robbed and beat Kael; pay a fine in coin, and I’ll keep this road orderly."
    ],
    [
     "brenna",
     "bribe",
     null,
     "llm",
-    "Fine paid. Keep the road orderly from here, and don’t give me another reason to stop you."
+    "Fine paid. Keep the road orderly, and we’ll call this settled."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "The relic is mine. I’ll win this race, and I won’t forget what you did."
+    "I’ll take the relic and win this race. You’ve robbed, beaten, and insulted me—don’t expect mercy."
    ],
    [
     "kael",
@@ -2935,39 +2935,39 @@
   "tellings": [
    [
     "cache",
-    "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—what awaits you there?"
+    "You insulted Kael, challenged him to a duel, beat and humiliated him, and took his purse. Kael and Odo then walked from the tavern to the market—but what awaited them there remained to be seen."
    ],
    [
     "llm",
-    "You saw Kael and Odo walk from the market to the guard post. What waited there remained off the ledger—for now."
+    "You saw Kael and Odo walk from the market to the guard post. Who caught their attention there?"
    ],
    [
     "llm",
-    "You walked from the tavern to the market. Kael told Brenna you robbed him, and Odo told her you beat Kael; unseen by you, Odo walked from the guard post to the market. What Brenna made of their claims remained to be seen."
+    "You walked from the tavern to the market. Kael told Brenna that you robbed him, and Odo told her you beat Kael before walking from the guard post to the market—what will Brenna do with those accusations?"
    ],
    [
     "llm",
-    "You walked from the market to the guard post. While you were away, Kael walked from the guard post to the bridge, and Odo walked from the market to the tavern. Where will you go next?"
+    "You walked from the market to the guard post. Kael walked from the guard post to the bridge, while Odo walked from the market to the tavern. Where will the road take you next?"
    ],
    [
     "llm",
-    "You paid Brenna 20 coins and walked from the guard post to the bridge. While you were away, Kael went from the bridge to the crypt, and Odo went from the tavern to the market—where will you go next?"
+    "You paid Brenna 20 coins and walked from the guard post to the bridge. While you were elsewhere, Kael went from the bridge to the crypt, and Odo went from the tavern to the market—what will you do next?"
    ],
    [
     "cache",
-    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained unseen."
+    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained to be seen."
    ],
    [
     "cache",
-    "Odo walked from the market to the guard post, told Brenna that you insulted Kael, then returned to the market and walked on to the tavern. You weren’t there to see any of it—what will you do now?"
+    "Odo walked from the market to the guard post, told Brenna that you insulted Kael, then returned to the market and walked on to the tavern. What Brenna made of that tale remains to be seen."
    ],
    [
     "cache",
-    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained unseen."
+    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained to be seen."
    ],
    [
     "cache",
-    "Odo walked from the market to the guard post, told Brenna that you insulted Kael, then returned to the market and walked on to the tavern. You weren’t there to see any of it—what will you do now?"
+    "Odo walked from the market to the guard post, told Brenna that you insulted Kael, then returned to the market and walked on to the tavern. What Brenna made of that tale remains to be seen."
    ]
   ]
  },
@@ -2978,35 +2978,35 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "The relic in the crypt. And don’t mistake this for trust—you insulted me here."
+    "Your concern is sudden. I’m here for the relic in the crypt. Keep your insults to yourself."
    ],
    [
     "mags",
     "talk",
     null,
     "llm",
-    "Between us? I’m here to keep the peace—and after that insult to Kael, I’d rather not see tempers rise."
+    "Between us? You’ve already stirred Kael with that insult—let’s keep tonight peaceful, shall we?"
    ],
    [
     "odo",
     "talk",
     null,
     "llm",
-    "Just here to sell my goods and keep out of trouble, friend. Though after that insult to Kael, I’m hoping for a quiet evening."
+    "Just hoping to sell a few goods and keep out of trouble—especially after that insult to Kael."
    ],
    [
     "kael",
     "victor",
     null,
     "cache",
-    "You challenged me, insulted me, and lost. Stay here while I take the relic."
+    "Stay down. You’ve had your lesson; I’ve got a relic to take."
    ],
    [
     "kael",
@@ -3020,28 +3020,28 @@
     "arrival",
     null,
     "llm",
-    "You’ve reached the post. Keep the road clear, and tell me what brings you here."
+    "You’ve arrived at the post. Keep to the road and tell me what brings you this way."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "The relic is mine. I’ve won the race."
+    "The relic is mine. You can keep the insult; I’ll keep the win."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "llm",
-    "The relic is mine. You’re too late."
+    "The relic is mine. Try to keep up."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "The relic is mine. You’re too late."
+    "The relic is mine. Try to keep up."
    ]
   ],
   "outcome": "lost@4",
@@ -3050,35 +3050,35 @@
   "tellings": [
    [
     "cache",
-    "You insulted Kael at the tavern and challenged him to a duel; he beat you. While you weren’t looking, Kael and Odo walked from the tavern to the market—and what awaits you there?"
+    "You insulted Kael at the tavern and challenged him to a duel; he beat you. While you weren't looking, Kael and Odo walked from the tavern to the market—what awaited you there?"
    ],
    [
     "cache",
-    "You saw Kael and Odo walk from the market to the guard post. What waited there remained off the ledger—for now."
+    "You saw Kael and Odo walk from the market to the guard post. Who caught their attention there?"
    ],
    [
     "llm",
-    "You walked from the tavern to the market, while Odo told Brenna that Kael beat you. Out of your sight, Kael walked from the guard post to the bridge, and Odo walked from the guard post to the market—but what waits ahead?"
+    "You walked from the tavern to the market, where Odo told Brenna that Kael beat you. You couldn’t see Kael walk from the guard post to the bridge, or Odo walk from the guard post to the market—what awaits you at the market?"
    ],
    [
     "llm",
-    "You walked from the market to the guard post. Kael walked from the bridge to the crypt, while Odo walked from the market to the tavern. Where will the road lead you next?"
+    "You walked from the market to the guard post. Kael walked from the bridge to the crypt, while Odo walked from the market to the tavern. Where the road led next remained to be seen."
    ],
    [
     "llm",
-    "You walked from the guard post to the bridge. Kael took the relic; what happened next remains unwritten."
+    "You walked from the guard post to the bridge. While you weren't looking, Kael took the relic—and the road ahead still waited."
    ],
    [
     "cache",
-    "Odo walked from the tavern to the market, then to the guard post, and back to the market. While at the guard post, he told Brenna that you insulted Kael; what will you do now?"
+    "You had Odo walk from the tavern to the market, then to the guard post, and back to the market. While at the guard post, Odo told Brenna that you had insulted Kael—what will you do now?"
    ],
    [
     "cache",
-    "You walked from the guard post to the bridge. Kael took the relic; what happened next remains unwritten."
+    "You walked from the guard post to the bridge. While you weren't looking, Kael took the relic—and the road ahead still waited."
    ],
    [
     "cache",
-    "Odo walked from the tavern to the market, then to the guard post, and back to the market. While at the guard post, he told Brenna that you insulted Kael; what will you do now?"
+    "You had Odo walk from the tavern to the market, then to the guard post, and back to the market. While at the guard post, Odo told Brenna that you had insulted Kael—what will you do now?"
    ]
   ]
  },
@@ -3089,35 +3089,35 @@
     "talk",
     null,
     "llm",
-    "How should I know? Odo’s here—ask him."
+    "How should I know? Odo’s here. Ask him who keeps the gate."
    ],
    [
     "odo",
     "talk",
     null,
     "llm",
-    "I’m afraid I don’t know who keeps the gate; I only just came in from the tavern."
+    "Sorry, I couldn’t say—I’ve only just come up from the tavern, and I’d rather not guess about the gate."
    ],
    [
     "brenna",
     "arrival",
     null,
     "llm",
-    "Hold there—state your business at the gate, and keep the road clear."
+    "Hold there, traveler—state your business before you pass; we keep this road orderly."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "llm",
-    "You took the relic. I’m not letting you win this race."
+    "Too late. The relic’s already taken—but I’ll not yield the race without a fight."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "You took the relic. I’m not letting you win this race."
+    "Too late. The relic’s already taken—but I’ll not yield the race without a fight."
    ]
   ],
   "outcome": "won@4",
@@ -3126,27 +3126,27 @@
   "tellings": [
    [
     "llm",
-    "You walked from the tavern to the market, and Kael and Odo did too. Who will you meet there?"
+    "You walked from the tavern to the market. Kael and Odo walked there too. What waits beyond the market remains to be seen."
    ],
    [
     "llm",
-    "You walked from the market to the guard post. Kael and Odo walked there from the market too. What waited at the guard post remained to be seen."
+    "You walked from the market to the guard post, and Kael and Odo walked there too. What waited beyond the post remained to be seen."
    ],
    [
     "llm",
-    "You walked from the guard post to the bridge, as Kael did; Odo went from the guard post to the market. Where will you go next?"
+    "You walked from the guard post to the bridge, as Kael did; Odo walked from the guard post to the market. Where will your paths lead next?"
    ],
    [
     "llm",
-    "You walked from the bridge to the crypt, as Kael did too. Odo walked from the market to the tavern; what waits at the crypt remains to be seen."
+    "You walked from the bridge to the crypt, while Kael made the same journey. Odo walked from the market to the tavern; the road kept its secrets. What awaited you at the crypt?"
    ],
    [
     "llm",
-    "You took the relic. The ledger records nothing else since you last looked—an unusually quiet stretch, though quiet roads have a way of keeping their secrets."
+    "You took the relic. Beyond your view, nothing else had been recorded."
    ],
    [
     "llm",
-    "You saw Odo walk from the tavern to the market, then on to the guard post. What waited beyond it remained to be seen."
+    "You saw Odo walk from the tavern to the market, then from the market to the guard post. The road east held the tavern, market, guard post, bridge, and crypt—but what happened next?"
    ]
   ]
  },
@@ -3157,35 +3157,35 @@
     "talk",
     null,
     "llm",
-    "Sell it. Keep my cut. Don’t mistake that for a promise to share."
+    "I’d take it. What I do after is none of your business."
    ],
    [
     "odo",
     "talk",
     null,
     "llm",
-    "I’d leave it be, if you ask me. Relics sound like trouble, and I’m only here to sell my goods."
+    "I’d leave it be, truth told—I’m only here to sell my goods, and relics sound like trouble."
    ],
    [
     "brenna",
     "arrival",
     null,
     "cache",
-    "Hold there—state your business at the gate, and keep the road clear."
+    "Hold there, traveler—state your business before you pass; we keep this road orderly."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "You took the relic. I’m not letting you win this race."
+    "Too late. The relic’s already taken—but I’ll not yield the race without a fight."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "You took the relic. I’m not letting you win this race."
+    "Too late. The relic’s already taken—but I’ll not yield the race without a fight."
    ]
   ],
   "outcome": "won@4",
@@ -3194,27 +3194,27 @@
   "tellings": [
    [
     "cache",
-    "You walked from the tavern to the market, and Kael and Odo did too. Who will you meet there?"
+    "You walked from the tavern to the market. Kael and Odo walked there too. What waits beyond the market remains to be seen."
    ],
    [
     "cache",
-    "You walked from the market to the guard post. Kael and Odo walked there from the market too. What waited at the guard post remained to be seen."
+    "You walked from the market to the guard post, and Kael and Odo walked there too. What waited beyond the post remained to be seen."
    ],
    [
     "cache",
-    "You walked from the guard post to the bridge, as Kael did; Odo went from the guard post to the market. Where will you go next?"
+    "You walked from the guard post to the bridge, as Kael did; Odo walked from the guard post to the market. Where will your paths lead next?"
    ],
    [
     "cache",
-    "You walked from the bridge to the crypt, as Kael did too. Odo walked from the market to the tavern; what waits at the crypt remains to be seen."
+    "You walked from the bridge to the crypt, while Kael made the same journey. Odo walked from the market to the tavern; the road kept its secrets. What awaited you at the crypt?"
    ],
    [
     "cache",
-    "You took the relic. The ledger records nothing else since you last looked—an unusually quiet stretch, though quiet roads have a way of keeping their secrets."
+    "You took the relic. Beyond your view, nothing else had been recorded."
    ],
    [
     "cache",
-    "You saw Odo walk from the tavern to the market, then on to the guard post. What waited beyond it remained to be seen."
+    "You saw Odo walk from the tavern to the market, then from the market to the guard post. The road east held the tavern, market, guard post, bridge, and crypt—but what happened next?"
    ]
   ]
  },
@@ -3225,49 +3225,49 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "You insult me, then pry into my debts? Mind your business."
+    "You insult me, then ask after my debts? Mind your own purse."
    ],
    [
     "mags",
     "talk",
     null,
     "llm",
-    "That’s a nosy question, love. Let’s keep the peace and leave other folks’ debts out of it, eh?"
+    "That’s a nosy question, love—and Kael’s already had enough provocation. Let’s keep the peace, shall we?"
    ],
    [
     "odo",
     "talk",
     null,
     "llm",
-    "I’d rather not say, if you don’t mind. I’m trying to keep clear of trouble after what happened with Kael."
+    "I’d rather not discuss debts—especially with Kael here after that insult. I’m just trying to sell my goods and keep out of trouble."
    ],
    [
     "kael",
     "beaten",
     null,
     "cache",
-    "You beat me and insulted me. Take your victory—I'll take the relic."
+    "You beat me and insulted me. Enjoy the victory. I’m still taking that relic."
    ],
    [
     "kael",
     "spared",
     null,
     "llm",
-    "You beat me, then spared me, after insulting me. I’ll remember every part of that."
+    "You beat me, then spared me, and still had the gall to insult me. I’ll take that relic without you."
    ],
    [
     "kael",
     "tick",
     "share_drink",
     "llm",
-    "You beat me, then spared me. I won’t forget the insult—but the road east leads to the relic in the crypt."
+    "You beat me, then spared me. I won't forget either. Sit. The road east leads through the market, guard post, and bridge to the crypt."
    ],
    [
     "kael",
@@ -3288,7 +3288,7 @@
     "arrival",
     null,
     "llm",
-    "Hold there, traveler. Odo says you beat Kael—pay a fine in coin, and we’ll keep the road orderly."
+    "Hold there, traveler. I hear you beat Kael; keep the road orderly, and we’ll settle any trouble in coin."
    ],
    [
     "kael",
@@ -3309,14 +3309,14 @@
     "tick",
     "take_relic",
     "llm",
-    "You beat me, insulted me, then spared me. I won't forget. The relic is mine."
+    "Too late. I’ll take the relic—and this race."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "You beat me, insulted me, then spared me. I won't forget. The relic is mine."
+    "Too late. I’ll take the relic—and this race."
    ]
   ],
   "outcome": "won@5",
@@ -3324,32 +3324,32 @@
   "story": "6fd17b23f7e19412",
   "tellings": [
    [
-    "llm",
-    "You insulted Kael at the tavern, challenged him to a duel, beat him, and spared him. While you weren’t looking, Odo walked from the tavern to the market—but what awaited him there?"
+    "fallback",
+    "You insulted Kael at the tavern. You challenged Kael to a duel. You beat Kael in the duel. You spared Kael. Odo walked from the tavern to the market."
    ],
    [
     "llm",
-    "You walked from the tavern to the market, as did Kael. Odo walked from the market to the guard post. What waits farther along the road remains to be seen."
+    "You walked from the tavern to the market, and Kael did too. Odo walked from the market to the guard post—but what happened next?"
    ],
    [
     "llm",
-    "You walked from the market to the guard post, and Kael did too. Odo told Brenna that you beat Kael, then walked back to the market—what will you do next?"
+    "You walked from the market to the guard post, and Kael did too. Odo told Brenna you beat Kael, then walked back to the market—what might that report set in motion?"
    ],
    [
     "llm",
-    "You walked from the guard post to the bridge, as Kael did; meanwhile, Odo walked from the market to the tavern. What waited beyond the bridge remained to be seen."
+    "You walked from the guard post to the bridge, and Kael did too. Odo walked from the market to the tavern; what awaits along the road remains to be seen."
    ],
    [
     "cache",
-    "You walked from the bridge to the crypt, while Kael made the same journey. Odo walked from the tavern to the market—and the ledger leaves the rest in shadow."
+    "You walked from the bridge to the crypt, and Kael did too. Odo walked from the tavern to the market; what waits ahead?"
    ],
    [
     "cache",
-    "You took the relic. The ledger records nothing else since you last looked—an unusually quiet stretch, though quiet roads have a way of keeping their secrets."
+    "You took the relic. Beyond your view, nothing else had been recorded."
    ],
    [
     "cache",
-    "Odo walked from the market to the guard post, told Brenna you had insulted Kael, then walked back to the market. What Brenna did with that claim remained to be seen."
+    "Odo walked from the market to the guard post, told Brenna that you had insulted Kael, then walked back to the market. What Brenna made of the accusation remained unseen—so far."
    ]
   ]
  },
@@ -3360,35 +3360,35 @@
     "insulted",
     null,
     "cache",
-    "Insult me again and you'll pay. I’ve business east—stay out of my way."
+    "Insult me again, and I’ll make you regret it. I’ve got a relic to claim."
    ],
    [
     "kael",
     "talk",
     null,
     "llm",
-    "You insulted me at the tavern. I don’t forget. Now speak plainly."
+    "He insults me in my own tavern, then asks for whispers. Let him wonder what I make of him."
    ],
    [
     "mags",
     "talk",
     null,
     "llm",
-    "Quietly? You insulted Kael here, and I wouldn’t stir the room further by guessing what he’s made of."
+    "Quietly? You insulted Kael here, so I’d tread lightly; no need to turn the whole tavern into an audience."
    ],
    [
     "odo",
     "talk",
     null,
     "llm",
-    "Well, you did insult Kael here at the tavern. I’d rather not guess what he makes of it."
+    "Quietly? I’d rather not stir trouble—though I did hear you insult Kael here at the tavern."
    ],
    [
     "kael",
     "victor",
     null,
     "cache",
-    "You challenged me, insulted me, and lost. Stay here while I take the relic."
+    "Stay down. You’ve had your lesson; I’ve got a relic to take."
    ],
    [
     "kael",
@@ -3402,28 +3402,28 @@
     "arrival",
     null,
     "cache",
-    "You’ve reached the post. Odo says Kael beat you—tell me what happened, and we’ll keep the road orderly."
+    "You’ve just come up from the market. Odo says Kael beat you—what happened?"
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "The relic is mine. I’ve won the race."
+    "The relic is mine. You can keep the insult; I’ll keep the win."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "The relic’s mine. And don’t mistake this for forgiveness."
+    "The relic is mine. You were too slow."
    ],
    [
     "kael",
     "tick",
     "take_relic",
     "cache",
-    "The relic’s mine. And don’t mistake this for forgiveness."
+    "The relic is mine. You were too slow."
    ]
   ],
   "outcome": "lost@4",
@@ -3432,35 +3432,35 @@
   "tellings": [
    [
     "cache",
-    "You insulted Kael at the tavern and challenged him to a duel; he beat you. While you weren’t looking, Kael and Odo walked from the tavern to the market—and what awaits you there?"
+    "You insulted Kael at the tavern and challenged him to a duel; he beat you. While you weren't looking, Kael and Odo walked from the tavern to the market—what awaited you there?"
    ],
    [
     "cache",
-    "You walked from the tavern to the market. Kael and Odo walked from the market to the guard post—what might be waiting there?"
+    "You walked from the tavern to the market. Kael and Odo each walked from the market to the guard post—though you may not have seen them go."
    ],
    [
     "cache",
-    "You walked from the market to the guard post, while Odo told Brenna that Kael had beaten you. Kael went on to the bridge, and Odo returned to the market—so who will you meet next?"
+    "You walked from the market to the guard post, while Odo told Brenna that Kael beat you. Kael went on to the bridge, and Odo returned to the market; where will you go next?"
    ],
    [
     "cache",
-    "You walked from the guard post to the bridge. Kael went on to the crypt, while Odo walked from the market to the tavern—each on a road of their own."
+    "You walked from the guard post to the bridge. While you were there, Kael walked from the bridge to the crypt, and Odo walked from the market to the tavern. Where will you go next?"
    ],
    [
     "cache",
-    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained unseen."
+    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained to be seen."
    ],
    [
     "cache",
-    "Odo walked from the tavern to the market, then to the guard post, and back to the market. While at the guard post, he told Brenna that you insulted Kael; what will you do now?"
+    "You had Odo walk from the tavern to the market, then to the guard post, and back to the market. While at the guard post, Odo told Brenna that you had insulted Kael—what will you do now?"
    ],
    [
     "cache",
-    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained unseen."
+    "You walked from the bridge to the crypt, while Kael took the relic. What waited in the crypt remained to be seen."
    ],
    [
     "cache",
-    "Odo walked from the tavern to the market, then to the guard post, and back to the market. While at the guard post, he told Brenna that you insulted Kael; what will you do now?"
+    "You had Odo walk from the tavern to the market, then to the guard post, and back to the market. While at the guard post, Odo told Brenna that you had insulted Kael—what will you do now?"
    ]
   ]
  },
@@ -3471,7 +3471,7 @@
     "accused_sable",
     null,
     "llm",
-    "Enough. Sable was in the kitchen at mid-morning; I will not entertain an accusation without evidence. You are dismissed."
+    "Enough. Sable said she was in the kitchen at mid-morning; I will not condemn her on your accusation. Leave my sight."
    ]
   ],
   "outcome": "lost@2",
@@ -3486,7 +3486,7 @@
     "asked_morning",
     "deceive:alibi",
     "cache",
-    "I was in the kitchen at mid-morning."
+    "I was in the kitchen at mid-morning, sir."
    ],
    [
     "pell",
@@ -3500,21 +3500,21 @@
     "testify",
     null,
     "cache",
-    "Lady Vane, I saw Sable in the study at mid-morning, and I have already told you so."
+    "Lady Vane, this morning I saw Sable in the study at mid-morning."
    ],
    [
     "vane",
     "questioned",
     null,
     "cache",
-    "Pell says he saw Sable in the study at mid-morning; I no longer believe her claim that she was in the kitchen."
+    "Pell says you were in the study at mid-morning, Sable. I no longer believe your claim that you were in the kitchen."
    ],
    [
     "vane",
     "accused_pell",
     null,
     "llm",
-    "Enough! Pell has served me thirty years; I will not suffer baseless accusations. Leave my hall at once."
+    "Enough. Pell has served me thirty years; your accusation is unsupported. Leave my hall at once."
    ]
   ],
   "outcome": "lost@5",
@@ -3529,21 +3529,21 @@
     "asked_ring",
     null,
     "cache",
-    "My signet ring is missing. Sable says she was in the kitchen at mid-morning; I will not accuse anyone without better evidence."
+    "My signet ring is missing. Sable says she was in the kitchen at mid-morning; I will not accuse her without more evidence. What have you learned?"
    ],
    [
     "vane",
     "asked_morning",
     null,
     "cache",
-    "Sable told me she was in the kitchen at mid-morning. I know no more of this morning, and will not accuse on hearsay."
+    "Sable told me she was in the kitchen at mid-morning; I know no more of this morning yet."
    ],
    [
     "sable",
     "asked_ring",
     null,
     "llm",
-    "I know nothing of the ring, sir. I was in the kitchen at mid-morning—please, I can’t afford trouble."
+    "I—I haven’t seen it, sir. I was in the kitchen at mid-morning, and know nothing of the ring."
    ],
    [
     "sable",
@@ -3557,7 +3557,7 @@
     "asked_ring",
     null,
     "llm",
-    "I know only that Sable was in the study at mid-morning and later left; I cannot say where Lady Vane’s ring is."
+    "I can tell you only that Sable was in the study at mid-morning and later left it; I do not know where Lady Vane’s ring is."
    ],
    [
     "pell",
@@ -3571,46 +3571,48 @@
     "asked_morning",
     "deceive:alibi",
     "llm",
-    "I was in the kitchen at mid-morning, my lady. I'm certain of it."
+    "I was in the kitchen at mid-morning, my lady. I’ve already told you that."
    ],
    [
     "vane",
     "questioned_sable",
     null,
     "llm",
-    "Sable says she was in the kitchen mid-morning. I’ll verify that before drawing conclusions—my signet ring must be found, not guessed at."
+    "Sable says she was in the kitchen at mid-morning. Tell me what you observed—carefully; I will not accuse without evidence."
    ],
    [
     "pell",
     "testify",
     null,
     "cache",
-    "Lady Vane, I saw Sable in the study at mid-morning, and I have already told you so."
+    "Lady Vane, this morning I saw Sable in the study at mid-morning."
    ],
    [
     "vane",
     "questioned",
     null,
-    "llm",
-    "Sable’s account conflicts with Pell’s, and I no longer believe her; but I’ll not accuse her of taking my ring without proof."
+    "fallback",
+    "Pell saw Sable leave my study at mid-morning? Then she lied to me."
    ],
    [
     "vane",
     "asked_morning",
     null,
     "llm",
-    "Pell says Sable was in the study at mid-morning; Sable says she was in the kitchen. I’ll establish which account is true before accusing anyone."
+    "Pell says Sable was in the study at mid-morning; Sable told me she was in the kitchen. I know no more yet, and will accuse no one without proof."
    ],
    [
     "vane",
     "accused_sable",
     null,
     "llm",
-    "Sable, Pell saw you leave the study, contrary to your account. Give me my signet ring at once."
+    "Sable, Pell saw you leave the study at mid-morning, contrary to what you told me. Return my signet ring at once."
    ]
   ],
   "outcome": "won@5",
-  "refused": [],
+  "refused": [
+   "claim check (contradiction: not was_in(sable, study@1))"
+  ],
   "story": "c45b32f45bedda34",
   "tellings": []
  },
@@ -3621,7 +3623,7 @@
     "asked_morning",
     "deceive:alibi",
     "llm",
-    "I was in the kitchen at mid-morning."
+    "I was in the kitchen at mid-morning, sir."
    ],
    [
     "pell",
@@ -3635,25 +3637,28 @@
     "testify",
     null,
     "llm",
-    "Lady Vane, I saw Sable in the study at mid-morning, and I have already told you so."
+    "Lady Vane, this morning I saw Sable in the study at mid-morning."
    ],
    [
     "vane",
     "questioned",
     null,
-    "llm",
-    "Pell says he saw Sable in the study at mid-morning; I no longer believe her claim that she was in the kitchen."
+    "fallback",
+    "Pell saw Sable leave my study at mid-morning? Then she lied to me."
    ],
    [
     "vane",
     "accused_sable",
     null,
-    "llm",
-    "Sable, return my signet ring at once. Pell saw you leave the study at mid-morning, and you lied about being in the kitchen."
+    "fallback",
+    "Pell saw you leave my study, Sable. Turn out your apron."
    ]
   ],
   "outcome": "won@5",
-  "refused": [],
+  "refused": [
+   "line is 165 characters, over 160",
+   "claim check (contradiction: was_in(sable, kitchen@1))"
+  ],
   "story": "47f1082d5b6f5f7d",
   "tellings": []
  },
@@ -3664,21 +3669,21 @@
     "asked_ring",
     null,
     "llm",
-    "My signet ring is missing. Sable says she was in the kitchen at mid-morning; I will not accuse anyone without better evidence."
+    "My signet ring is missing. Sable says she was in the kitchen at mid-morning; I will not accuse her without more evidence. What have you learned?"
    ],
    [
     "vane",
     "asked_morning",
     null,
     "llm",
-    "Sable told me she was in the kitchen at mid-morning. I know no more of this morning, and will not accuse on hearsay."
+    "Sable told me she was in the kitchen at mid-morning; I know no more of this morning yet."
    ],
    [
     "sable",
     "asked_morning",
     "deceive:alibi",
     "cache",
-    "I was in the kitchen at mid-morning."
+    "I was in the kitchen at mid-morning, sir."
    ],
    [
     "pell",
@@ -3692,25 +3697,27 @@
     "testify",
     null,
     "cache",
-    "Lady Vane, I saw Sable in the study at mid-morning, and I have already told you so."
+    "Lady Vane, this morning I saw Sable in the study at mid-morning."
    ],
    [
     "vane",
     "questioned",
     null,
-    "cache",
-    "Pell says he saw Sable in the study at mid-morning; I no longer believe her claim that she was in the kitchen."
+    "llm",
+    "Pell says you were in the study at mid-morning, Sable. I no longer believe your claim that you were in the kitchen."
    ],
    [
     "vane",
     "accused_sable",
     null,
-    "cache",
-    "Sable, return my signet ring at once. Pell saw you leave the study at mid-morning, and you lied about being in the kitchen."
+    "fallback",
+    "Pell saw you leave my study, Sable. Turn out your apron."
    ]
   ],
   "outcome": "won@5",
-  "refused": [],
+  "refused": [
+   "claim check (contradiction: was_in(sable, kitchen@1))"
+  ],
   "story": "47f1082d5b6f5f7d",
   "tellings": []
  }
