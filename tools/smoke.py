@@ -128,7 +128,7 @@ def run(client, when: str) -> list[tuple[str, bool, str]]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    parser = argparse.ArgumentParser(description=(__doc__ or "").split("\n")[0])
     parser.add_argument("host")
     args = parser.parse_args(argv)
     when = datetime.now(UTC).strftime("%H:%M UTC")

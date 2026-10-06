@@ -197,7 +197,8 @@ class Mind:
         return self._speak("react", items)
 
     def _speak(self, kind: str, items: list[tuple[StatePack, Utterance]]) -> list[Utterance]:
-        if not self.active:
+        gateway = self.gateway
+        if gateway is None:
             return [fallback for _, fallback in items]
         spoken: list = [self._cached(pack, kind, fallback) for pack, fallback in items]
         self._moderate_hits(items, spoken)
@@ -216,7 +217,7 @@ class Mind:
             return spoken
         calls = [(kind, items[i][0].messages(kind)) for i in missing]
         self.asked += len(calls)
-        replies = [self.gateway.complete(*calls[0])] if len(calls) == 1 else self.gateway.complete_many(calls)
+        replies = [gateway.complete(*calls[0])] if len(calls) == 1 else gateway.complete_many(calls)
         for i, reply in zip(missing, replies):
             spoken[i] = self._accept(reply, *items[i], kind)
         self._keep(kind, items, list(zip(missing, replies)), spoken)

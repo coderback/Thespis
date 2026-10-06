@@ -39,4 +39,4 @@ def narrate(mind: Mind | None, events: list[Event]) -> tuple[str, list[str], str
         names={x for x in names if x and x != "player"},
         setting="The road runs east: " + ", ".join(C.STOP_NAMES[s] for s in C.STOPS) + ".")
     u = mind.narrate(pack, Utterance(None, text, ids, "fallback"))
-    return u.line, u.cites, u.source
+    return u.line or text, u.cites, u.source

@@ -27,7 +27,7 @@ load_dotenv(ROOT / ".env")
 ledger, beliefs = Ledger(), BeliefStore()
 theft = ledger.append(phase=0, verb="steal", actor="player", target="tamsin", loc="forge",
                       claim=Claim("stole", "player", "tamsin"))
-saw, _ = beliefs.add_evidence("tamsin", theft.claim, 1.0, "self", theft.id, phase=0)
+saw, _ = beliefs.add_evidence("tamsin", theft.claimed, 1.0, "self", theft.id, phase=0)
 
 # 2. Code decides what she may do, and how strongly her drives pull her towards each option.
 options = {"report:player": 4.0, "stay_quiet": 3.0}

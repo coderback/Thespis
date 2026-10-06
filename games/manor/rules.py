@@ -10,11 +10,13 @@ Pell (his testimony breaks the alibi), then accuse Sable before evening.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 
 from games.manor import content as C
 from games.manor import voice, words
 from games.manor.voice import Speech
+from thespis.beliefs import Belief
 from thespis.brain import UtilityBrain
 from thespis.deception import SAID, log_statement
 from thespis.decisions import DECIDE
@@ -97,7 +99,9 @@ def act(w: World, verb: str, target: str | None = None, topic: str | None = None
         raise NotAllowed("Ask about this morning or the ring")
     mind = Mind(gateway if w.brain_mode == "model" else None, voice.VALIDATOR, cache, replay, budget, moderator)
     start = len(w.ledger)
+    assert target is not None  # every manor verb names someone or somewhere, and _check found it
     if verb == "ask":
+        assert topic is not None
         replies = _ask(w, mind, target, topic)
     elif verb == "request_questioning":
         replies = _question(w, mind, target)
@@ -122,7 +126,7 @@ def _ask(w: World, mind: Mind, npc: str, topic: str) -> list[dict]:
     if npc == C.BUTLER:
         if topic == "morning":
             told, _ = log_statement(w, "tell", C.BUTLER, "player", w.npcs[C.BUTLER].loc, C.THE_TRUTH, [])
-            saw = w.beliefs.get(C.BUTLER, C.THE_TRUTH)
+            saw = _held(w, C.BUTLER, C.THE_TRUTH)
             said = voice.line(C.BUTLER, "morning", [told.id, saw.id])
             return voice.deliver(w, mind, [Speech(C.BUTLER, "asked_morning", said,
                                                   "The player asks what you saw this morning. You always tell the "
@@ -135,11 +139,11 @@ def _ask(w: World, mind: Mind, npc: str, topic: str) -> list[dict]:
         return voice.deliver(w, mind, [Speech(C.OWNER, "asked_ring", said,
                                               "The player, who has come to find your missing signet ring, asks you "
                                               "about it.")])
-    alibi, truth = w.beliefs.get(C.OWNER, C.THE_ALIBI), w.beliefs.get(C.OWNER, C.THE_TRUTH)
+    alibi = _held(w, C.OWNER, C.THE_ALIBI)
     if alibi.active:
         said = voice.line(C.OWNER, "morning", [alibi.id])
     else:
-        said = voice.line(C.OWNER, "morning_doubt", [truth.id])
+        said = voice.line(C.OWNER, "morning_doubt", [_held(w, C.OWNER, C.THE_TRUTH).id])  # what broke the alibi
     return voice.deliver(w, mind, [Speech(C.OWNER, "asked_morning", said,
                                           "The player asks what you know of this morning.")])
 
@@ -147,7 +151,7 @@ def _ask(w: World, mind: Mind, npc: str, topic: str) -> list[dict]:
 def _sable_answers(w: World, mind: Mind, listener: str, loc: str) -> dict:
     """Asked where she was at mid-morning, Sable lies or deflects. A lie is a validated action, logged false."""
     sable = w.npcs[C.MAID]
-    knows = w.beliefs.get(C.MAID, C.THE_TRUTH)  # she knows where she really was
+    knows = _held(w, C.MAID, C.THE_TRUTH)  # she knows where she really was
     options = {"deflect": 3}
     if sable.drives.get("fear", 0) >= C.FEAR_TO_LIE:
         options = {"deceive:alibi": sable.drives["fear"] + 2, "deflect": 3}
@@ -161,6 +165,7 @@ def _sable_answers(w: World, mind: Mind, listener: str, loc: str) -> dict:
 
     u = _decide(w, mind, C.MAID, options, line_for, situation,
                 {"deceive:alibi": words.claim_text(C.THE_ALIBI, about=True)})
+    assert u.action is not None  # a decision always carries one of the options
     reason = f"{u.action} pulls {options[u.action]}" + (f"; {u.note}" if u.note else "")
     if u.action == "deceive:alibi":
         told, cites = log_statement(w, "tell", C.MAID, listener, loc, C.THE_ALIBI, u.cites)
@@ -174,13 +179,21 @@ def _sable_answers(w: World, mind: Mind, listener: str, loc: str) -> dict:
     return voice.reply(d)
 
 
-def _decide(w: World, mind: Mind, npc: str, options: dict[str, float], line_for, situation: str,
+def _held(w: World, npc: str, claim) -> Belief:
+    """A belief the case is built on. new_world gives each of these people theirs, so it is always there."""
+    belief = w.beliefs.get(npc, claim)
+    if belief is None:
+        raise LookupError(f"{npc} has no belief about {claim}")
+    return belief
+
+
+def _decide(w: World, mind: Mind, npc: str, options: Mapping[str, float], line_for, situation: str,
             asserts: dict[str, str]) -> Utterance:
     """The utility brain's choice and template line, unless the model picks among the strongest pulls and its reply
     passes the validator."""
     choice = UtilityBrain().choose(npc, options)
-    said = line_for(choice)
-    fallback = Utterance(choice, *(said or (None, [])), "fallback")
+    line, cites = line_for(choice) or (None, [])
+    fallback = Utterance(choice, line, cites, "fallback")
     best = max(options.values())
     offered = {a: u for a, u in options.items() if u >= best - DRIVE_MARGIN}
     return mind.decide(voice.pack_for(w, npc, situation, offered, asserts), fallback) if mind.active else fallback
@@ -192,7 +205,7 @@ def _question(w: World, mind: Mind, npc: str) -> list[dict]:
     if npc == C.BUTLER:
         testified, _ = log_statement(w, "testify", C.BUTLER, C.OWNER, "hall", C.THE_TRUTH, [])
         _hear(w, C.OWNER, C.THE_TRUTH, C.BUTLER, testified)
-        saw, heard = w.beliefs.get(C.BUTLER, C.THE_TRUTH), w.beliefs.get(C.OWNER, C.THE_TRUTH)
+        saw, heard = _held(w, C.BUTLER, C.THE_TRUTH), _held(w, C.OWNER, C.THE_TRUTH)
         return voice.deliver(w, mind, [
             Speech(C.BUTLER, "testify", voice.line(C.BUTLER, "testify", [testified.id, saw.id]),
                    "Lady Vane asks you, in front of the player, what you saw this morning. You always tell the truth."),
@@ -247,11 +260,11 @@ def _reconcile(w: World, npc: str, claim: Claim) -> list:
 def _accuse(w: World, mind: Mind, npc: str) -> list[dict]:
     """The verdict: won only if Lady Vane believes Pell's account and has dropped Sable's alibi."""
     accused = w.ledger.append(w.phase, "accuse", "player", npc, w.player["loc"])
-    truth, alibi = w.beliefs.get(C.OWNER, C.THE_TRUTH), w.beliefs.get(C.OWNER, C.THE_ALIBI)
+    alibi = _held(w, C.OWNER, C.THE_ALIBI)
     solved = npc == C.MAID and w.beliefs.conf(C.OWNER, C.THE_TRUTH) >= C.BELIEVED and not alibi.active
     w.status, w.ended_at = (WON if solved else LOST), w.phase
     if solved:
-        key, cites = "won", [truth.id, accused.id]
+        key, cites = "won", [_held(w, C.OWNER, C.THE_TRUTH).id, accused.id]  # solved means she believes it
         situation = ("The player accuses Sable of taking your ring. Pell saw her leave the study at mid-morning, so "
                      "she lied to you about the kitchen. You accept the accusation: order Sable to give back your "
                      "ring.")

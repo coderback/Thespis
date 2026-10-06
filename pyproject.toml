@@ -20,3 +20,8 @@ select = ["E4", "E7", "E9", "F", "I"]
 
 [tool.ruff.lint.per-file-ignores]
 "tools/crypt_road_sim.py" = ["E701", "E702"]
+
+[tool.pyright]
+include = ["thespis", "games", "tools", "examples"]
+pythonVersion = "3.12"
+typeCheckingMode = "basic"

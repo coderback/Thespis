@@ -62,7 +62,7 @@ def collect(gateway, lines: int, seeds=(1, 4)) -> list[Sample]:
 
     def recording(self, reply, pack, fallback, kind):
         u = original(self, reply, pack, fallback, kind)
-        if u.source == "llm":
+        if u.source == "llm" and u.line is not None:
             samples.append(Sample(kind, pack, u.action if kind == "decide" else None, u.line, u.cites))
         return u
 
@@ -119,7 +119,7 @@ def judge(gateway, samples: list[Sample]) -> list[dict | None]:
     verdicts = []
     for r in replies:
         ok = r is not None and isinstance(r.data.get("consistent"), bool) and isinstance(r.data.get("in_character"), bool)
-        verdicts.append(r.data if ok else None)
+        verdicts.append(r.data if r is not None and ok else None)
     return verdicts
 
 
@@ -177,7 +177,7 @@ def judge_provider(p: Provider) -> Provider:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    parser = argparse.ArgumentParser(description=(__doc__ or "").split("\n")[0])
     parser.add_argument("--lines", type=int, default=50)
     parser.add_argument("--out", default=str(ROOT / "results.md"))
     args = parser.parse_args(argv)

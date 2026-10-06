@@ -46,7 +46,7 @@ def sentence(e: Event, player: tuple[str, str] = TO_PLAYER) -> str:
             if e.target == "player":
                 purse = "your" if player == TO_PLAYER else "the player's"
             else:
-                purse = PRONOUNS.get(e.target, ("", "his"))[1].replace("him", "his")
+                purse = PRONOUNS.get(e.target or "", ("", "his"))[1].replace("him", "his")
             return f"{a} humiliated {t} and took {purse} purse."
         case "spare":
             return f"{a} spared {t}."
@@ -59,7 +59,7 @@ def sentence(e: Event, player: tuple[str, str] = TO_PLAYER) -> str:
         case "refuse":
             return f"{a} turned down {'your' if t == 'you' else t + chr(39) + 's'} offer."
         case "move":
-            return f"{a} walked from {where} to {C.STOP_NAMES.get(e.target, e.target)}."
+            return f"{a} walked from {where} to {C.STOP_NAMES.get(e.target or '', e.target)}."
         case "block":
             return f"{who(C.GUARD, start=True)} turned {who(e.actor, player=player)} back at the gate."
         case "detain":
@@ -67,7 +67,7 @@ def sentence(e: Event, player: tuple[str, str] = TO_PLAYER) -> str:
         case "release":
             return f"{a} released {t}."
         case "testify":
-            return f"{a} told {t} that {claim_text(e.claim, e.actor, negate=True, player=player)}."
+            return f"{a} told {t} that {claim_text(e.claimed, e.actor, negate=True, player=player)}."
         case "take_relic":
             return f"{a} took the relic."
         case _ if e.claim is not None:  # tell_claim, accuse, gossip

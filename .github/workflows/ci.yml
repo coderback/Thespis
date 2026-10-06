@@ -30,6 +30,8 @@ jobs:
           git diff --exit-code requirements.txt requirements-dev.txt
       - name: Lint
         run: ruff check .
+      - name: Types
+        run: pyright
       - name: Test
         run: pytest -q
 

@@ -8,6 +8,7 @@ all of a moment's lines at once, keeps only the replies that pass the validator,
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
 from games.crypt_road import content as C
@@ -108,12 +109,12 @@ def belief_cites(b: Belief | None) -> list[str]:
     return [b.id, best.event]
 
 
-def line(npc: str, key: str, cites: list[str], **fmt) -> tuple[str, list[str]] | None:
+def line(npc: str, key: str, cites: Sequence[str | None], **fmt) -> tuple[str, list[str]] | None:
     """Fill a template, or None when there is no template or nothing to cite: no line without a source."""
-    text = template(npc, key)
-    if text is None or not cites:
+    text, known = template(npc, key), [c for c in cites if c]
+    if text is None or not known:
         return None
-    return text.format(**fmt), list(dict.fromkeys(cites))
+    return text.format(**fmt), list(dict.fromkeys(known))
 
 
 def _top(w: World, npc: str, about: tuple[str, ...]) -> Belief | None:
@@ -158,7 +159,7 @@ def describe(option: str, w: World, npc: str) -> str:
     }.get(kind, option.replace("_", " "))
 
 
-def pack_for(w: World, npc_id: str, situation: str, options: dict[str, float] | None = None,
+def pack_for(w: World, npc_id: str, situation: str, options: Mapping[str, float] | None = None,
              view: View | None = None, untrusted: tuple[str, ...] = ()) -> StatePack:
     """Everything the model may know when it speaks for this NPC, and nothing more. Never whether a belief is true.
     `untrusted` is what the player wrote that the situation quotes; a persona the player edited counts too."""
@@ -197,8 +198,9 @@ def pack_for(w: World, npc_id: str, situation: str, options: dict[str, float] | 
 
 def deliver(w: World, mind: Mind, speeches: list[Speech]) -> list[dict]:
     """Voice a moment's lines, all model calls in parallel, and record each as a react decision."""
-    speeches = [s for s in speeches if s.said]
-    fallbacks = [Utterance(None, s.said[0], s.said[1], "fallback") for s in speeches]
+    voiced = [(s, s.said) for s in speeches if s.said]
+    speeches = [s for s, _ in voiced]
+    fallbacks = [Utterance(None, said[0], said[1], "fallback") for _, said in voiced]
     if mind.active:
         spoken = mind.react_many([(pack_for(w, s.npc, s.situation, untrusted=s.untrusted), f)
                                   for s, f in zip(speeches, fallbacks)])
@@ -220,6 +222,7 @@ def react(w: World, mind: Mind, verb: str, target: str | None, events: list[Even
     last = events[-1].id if events else None
     speeches: list[Speech] = []
     if verb == "insult":
+        assert target is not None  # the rules found someone here to insult
         speeches.append(Speech(target, "insulted", line(target, "insulted", [last]), "The player just insulted you."))
     elif verb == "challenge":
         won = w.pending == "duel_won"
@@ -236,9 +239,11 @@ def react(w: World, mind: Mind, verb: str, target: str | None, events: list[Even
         speeches.append(Speech(C.GUARD, "bribe", line(C.GUARD, "bribe", [last], amount=paid),
                                f"The player just paid you a {paid}-coin fine."))
     elif verb == "talk":
+        assert target is not None
         speeches.append(Speech(target, "talk", _talk(w, target), f'The player says to you: "{text or ""}"',
                                (text,) if text else ()))
     elif verb == "tell_claim":
+        assert target is not None and claim is not None
         speeches.extend(_told(w, target, claim, events))
     return deliver(w, mind, speeches)
 

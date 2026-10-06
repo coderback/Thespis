@@ -56,7 +56,7 @@ def calls(client: httpx.Client) -> int:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser = argparse.ArgumentParser(description=(__doc__ or "").splitlines()[0])
     parser.add_argument("host")
     args = parser.parse_args()
     client = httpx.Client(base_url=args.host.rstrip("/"), timeout=120, headers=admin_headers())

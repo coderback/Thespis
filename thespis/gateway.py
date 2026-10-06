@@ -90,7 +90,10 @@ class CallRecord:
 
 
 class ModelGateway(Protocol):
-    models: tuple[str, ...]  # the configured models, primary first: what a cached reply is keyed under
+    @property
+    def models(self) -> tuple[str, ...]:
+        """The configured models, primary first: what a cached reply is keyed under."""
+        ...
 
     def complete(self, call_type: str, messages: list[dict]) -> ModelReply | None:
         """Return the model's parsed JSON reply, or None to make the caller use its fallback."""

@@ -42,7 +42,7 @@ def decision_view(w: World, d) -> dict:
     """A decision; one that stated a claim also lists what the speaker believed against it, so a lie shows as one."""
     out = d.to_json()
     if d.asserted:
-        said = w.ledger.get(d.asserted).claim
+        said = w.ledger.get(d.asserted).claimed
         out["knew"] = [b.id for b in w.beliefs.for_npc(d.npc) if b.active and C.contradicts(b.claim, said)]
     return out
 

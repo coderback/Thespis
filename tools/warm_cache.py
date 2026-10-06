@@ -90,7 +90,7 @@ def play(client) -> dict:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    parser = argparse.ArgumentParser(description=(__doc__ or "").split("\n")[0])
     parser.add_argument("host")
     parser.add_argument("--runs", type=int, default=2)
     args = parser.parse_args(argv)

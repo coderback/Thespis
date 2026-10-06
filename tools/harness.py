@@ -304,7 +304,7 @@ def report(results: dict, host: str, commit: str) -> str:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    parser = argparse.ArgumentParser(description=(__doc__ or "").split("\n")[0])
     parser.add_argument("host")
     parser.add_argument("--seeds", type=int, nargs="+", default=[1, 4])
     parser.add_argument("--out", default=str(ROOT / "results.md"), help="where to write the report; - to print it")
