@@ -20,7 +20,7 @@ jobs:
           python-version: "3.13"
       - name: Install
         run: pip install -r requirements-dev.txt
-      - uses: astral-sh/setup-uv@v10
+      - uses: astral-sh/setup-uv@v10.2.0
         with:
           version: "0.11.14"
       - name: Lock files match their inputs
