@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import math
 import threading
-from collections import defaultdict
 from pathlib import Path
 from typing import Literal
 
@@ -16,7 +15,7 @@ from fastapi import APIRouter, Header, Request
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from pydantic import BaseModel
 
-from games.hosting import ApiError, budget, client_ip, db_path
+from games.hosting import ApiError, SessionLocks, budget, client_ip, db_path
 from games.manor import rules, views
 from games.manor.content import new_world
 from thespis.store import SessionNotFound, Store
@@ -27,7 +26,7 @@ UNBUILT = ("<!doctype html><meta charset='utf-8'><title>The Manor Mystery</title
            "background:#120e15;color:#efe6f5;padding:40px'><h1>The Manor Mystery</h1><p>Build the client to play: "
            "<code>cd client &amp;&amp; npm run build</code>. The API is under <code>/manor</code>; see docs/manor.md.</p>")
 router = APIRouter(prefix="/manor", tags=["manor"])
-_locks: defaultdict[str, threading.Lock] = defaultdict(threading.Lock)  # one request at a time per session
+LOCKS = SessionLocks()  # one request at a time per session
 _open = threading.Lock()
 
 
@@ -99,7 +98,7 @@ def get_allowed(request: Request, x_session: str | None = Header(default=None)):
 @router.post("/act")
 def post_act(body: ActBody, request: Request, x_session: str | None = Header(default=None)):
     store, session, state = _sessions(request), _session(x_session), request.app.state
-    with _locks[session]:
+    with LOCKS.hold(session):
         world = _load(store, session)
         try:
             result = rules.act(world, body.verb, body.target, body.topic, gateway=state.gateway, cache=state.store,
@@ -115,7 +114,7 @@ def post_act(body: ActBody, request: Request, x_session: str | None = Header(def
 @router.post("/reset")
 def post_reset(request: Request, x_session: str | None = Header(default=None)):
     store, session = _sessions(request), _session(x_session)
-    with _locks[session]:
+    with LOCKS.hold(session):
         _load(store, session)
         world = new_world()
         store.reset(session, world)
@@ -132,7 +131,7 @@ def post_reload(request: Request, x_session: str | None = Header(default=None)):
 def post_brain(body: BrainBody, request: Request, x_session: str | None = Header(default=None)):
     """The dev panel's brain switch: "fallback" plays with no model calls at all."""
     store, session = _sessions(request), _session(x_session)
-    with _locks[session]:
+    with LOCKS.hold(session):
         world = _load(store, session)
         world.brain_mode = body.mode
         store.save(session, world)

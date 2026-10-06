@@ -90,3 +90,42 @@ def test_a_small_body_without_a_length_still_arrives(client):
         yield b'"target": "kael"}'
     r = client.post("/act", content=chunks(), headers={"Content-Type": "application/json", "X-Session": session})
     assert r.status_code == 200 and r.json()["events"][0]["verb"] == "insult"
+
+
+def test_session_locks_are_freed_once_no_request_holds_them(client):
+    from games.manor import api as manor_api
+
+    headers = {"X-Session": client.post("/session", json={}).json()["session"]}
+    client.post("/act", json={"verb": "insult", "target": "kael"}, headers=headers)
+    client.post("/reset", headers=headers)
+    manor = {"X-Session": client.post("/manor/session").json()["session"]}
+    client.post("/manor/act", json={"verb": "ask", "target": "vane", "topic": "ring"}, headers=manor)
+    assert len(app_module.LOCKS) == 0 and len(manor_api.LOCKS) == 0
+
+
+def test_session_locks_still_serialise_a_session():
+    import threading
+    import time
+
+    locks, order = hosting.SessionLocks(), []
+    inside = threading.Event()
+
+    def first():
+        with locks.hold("s"):
+            inside.set()
+            time.sleep(0.05)
+            order.append("first done")
+
+    def second():
+        inside.wait()
+        with locks.hold("s"):
+            order.append("second in")
+
+    threads = [threading.Thread(target=first), threading.Thread(target=second)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    assert order == ["first done", "second in"] and len(locks) == 0
+    with locks.hold("a"), locks.hold("b"):  # different sessions never wait on each other
+        assert len(locks) == 2

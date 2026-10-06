@@ -6,8 +6,6 @@ Each request loads its session from SQLite and saves it back, so a restart loses
 
 import math
 import os
-import threading
-from collections import defaultdict
 from contextlib import asynccontextmanager
 from dataclasses import asdict
 from pathlib import Path
@@ -26,6 +24,7 @@ from games.hosting import (
     ApiError,
     Guard,
     SessionLimiter,
+    SessionLocks,
     client_ip,
     cors_origins,
     db_path,
@@ -43,7 +42,7 @@ from thespis.store import SessionNotFound, Store
 ROOT = Path(__file__).resolve().parents[2]
 CLIENT_DIST = ROOT / "client" / "dist"
 
-_locks: defaultdict[str, threading.Lock] = defaultdict(threading.Lock)  # one request at a time per session
+LOCKS = SessionLocks()  # one request at a time per session
 
 
 @asynccontextmanager
@@ -167,7 +166,7 @@ def get_allowed(request: Request, x_session: str | None = Header(default=None)):
 @app.post("/act")
 def post_act(body: ActBody, request: Request, x_session: str | None = Header(default=None)):
     store, session = _store(request), _session(x_session)
-    with _locks[session]:
+    with LOCKS.hold(session):
         world = _load(store, session)
         try:
             result = rules.act(world, body.verb, body.target, body.claim.model_dump() if body.claim else None,
@@ -185,7 +184,7 @@ def post_act(body: ActBody, request: Request, x_session: str | None = Header(def
 def get_digest(request: Request, since: int = 0, x_session: str | None = Header(default=None)):
     """The Dungeon Master's telling. With the brain on it may call the model, so it counts against the caps."""
     store, session, state = _store(request), _session(x_session), request.app.state
-    with _locks[session]:
+    with LOCKS.hold(session):
         world = _load(store, session)
         mind = Mind(state.gateway if world.brain_mode == "model" else None, voice.VALIDATOR, store, state.replay,
                     _budget(state, store, world))
@@ -200,7 +199,7 @@ def get_digest(request: Request, since: int = 0, x_session: str | None = Header(
 @app.post("/reset")
 def post_reset(request: Request, x_session: str | None = Header(default=None)):
     store, session = _store(request), _session(x_session)
-    with _locks[session]:
+    with LOCKS.hold(session):
         _load(store, session)
         world = new_world(store.seed_of(session))
         store.reset(session, world)
@@ -216,7 +215,7 @@ def post_reload(request: Request, x_session: str | None = Header(default=None)):
 @app.post("/dev/brain")
 def post_brain(body: BrainBody, request: Request, x_session: str | None = Header(default=None)):
     store, session = _store(request), _session(x_session)
-    with _locks[session]:
+    with LOCKS.hold(session):
         world = _load(store, session)
         world.brain_mode = body.mode
         store.save(session, world)
@@ -239,7 +238,7 @@ def post_persona(body: PersonaBody, request: Request, x_session: str | None = He
     """Live persona editing (#39): this session's NPC speaks with the new persona from its next model line. Other
     sessions, and the cache for the default personas, are untouched; an edited persona is a new cache key."""
     store, session = _store(request), _session(x_session)
-    with _locks[session]:
+    with LOCKS.hold(session):
         world = _load(store, session)
         if body.npc not in world.npcs:
             raise ApiError(400, "bad_request", f"There's no one called {body.npc!r} to edit")

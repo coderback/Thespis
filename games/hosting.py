@@ -12,6 +12,7 @@ import secrets
 import threading
 import time
 from collections import defaultdict, deque
+from contextlib import contextmanager
 from pathlib import Path
 
 from fastapi import Request
@@ -120,6 +121,32 @@ def _replay(body: bytes):
         sent = True
         return {"type": "http.request", "body": body, "more_body": False}
     return receive
+
+
+class SessionLocks:
+    """One request at a time per session. A session's lock exists only while a request holds it or waits for it, so
+    the registry stays the size of the traffic in flight, not of every session ever played."""
+
+    def __init__(self):
+        self._held: dict[str, list] = {}  # session -> [its lock, how many requests hold it or wait for it]
+        self._guard = threading.Lock()
+
+    @contextmanager
+    def hold(self, session: str):
+        with self._guard:
+            entry = self._held.setdefault(session, [threading.Lock(), 0])
+            entry[1] += 1
+        try:
+            with entry[0]:
+                yield
+        finally:
+            with self._guard:
+                entry[1] -= 1
+                if not entry[1]:
+                    del self._held[session]
+
+    def __len__(self) -> int:
+        return len(self._held)
 
 
 class SessionLimiter:
