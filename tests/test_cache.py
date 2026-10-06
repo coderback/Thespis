@@ -57,8 +57,8 @@ def test_key_covers_model_prompts_call_type_and_pack(monkeypatch):
 def test_the_prompts_hash_covers_the_prompts_and_schemas():
     assert len(expression.PROMPT_HASH) == 12
     assert expression.PROMPT_HASH == expression.hashlib.sha256(expression.json.dumps(
-        {"prompts": expression.PROMPTS, "schemas": [expression.SCHEMA, expression.SAID_SCHEMA],
-         "limits": expression.LIMITS}, sort_keys=True).encode("utf-8")).hexdigest()[:12]
+        {"prompts": expression.PROMPTS, "schema": expression.schema_for(["<ref>"]), "limits": expression.LIMITS},
+        sort_keys=True).encode("utf-8")).hexdigest()[:12]
 
 
 def test_a_second_play_makes_no_model_calls(cache):

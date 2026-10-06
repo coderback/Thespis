@@ -123,10 +123,13 @@ def test_a_clear_grudge_is_acted_on_and_voiced():
     assert accuse["situation"] == "You are at the guard post."
 
 
-def test_every_call_comes_with_its_fixed_schema():
+def test_every_call_may_cite_exactly_its_packs_references():
     model = FakeModel()
     play_demo(model)
-    assert model.schemas and all(s == expression.SCHEMA for s in model.schemas)
+    assert model.schemas
+    for (_, pack), schema in zip(model.calls, model.schemas):
+        refs = [b["id"] for b in pack["beliefs"]] + [e["id"] for e in pack["events"]]
+        assert schema == expression.schema_for(refs)
 
 
 @pytest.mark.parametrize("bad,why", [

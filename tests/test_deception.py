@@ -45,6 +45,7 @@ def test_a_lie_always_cites_the_claim_it_asserts():
     """The action, which code chose, states the claim, so its line cites it whether the model did or not."""
     lie = pack(asserting({"id": "lie", "does": "say you baked it"}, "Bo baked the pie"))
     assert SAID in lie.ids and lie.payload()["DOING"] == {"does": "say you baked it", "says": "Bo baked the pie"}
+    assert lie.schema()["properties"]["cites"]["items"]["enum"] == ["e1", SAID]
     fallback = Utterance("lie", "Me. I baked it.", [SAID], "fallback")
     for model in (Says("e1"), Says("e1", SAID)):
         u = Mind(model, Validator({})).act(lie, fallback)

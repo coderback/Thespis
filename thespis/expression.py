@@ -8,9 +8,10 @@ code decided (`act`), a line in reply to something (`react`), or the narrator's 
 The state pack is the only thing the model sees: persona, goal, drives and trust, the five strongest beliefs and
 the last five events the NPC knows, who is here, what just happened and, for an action, what the NPC is doing.
 Whether a belief is true is never included. Beliefs and events appear under short references in pack order (b1, b2,
-... e1, e2, ...), which the model cites and the Mind maps back to belief and ledger ids. Every call type has one
-JSON schema that never changes, so a provider that constrains its output to it (structured outputs) can't cite
-anything but a reference, and never sees a schema it has to compile first.
+... e1, e2, ...), which the model cites and the Mind maps back to belief and ledger ids. Each call's JSON schema
+lists exactly the references its pack holds, so a provider that constrains its output to it (structured outputs)
+can't cite anything else. Schemas differ only in how many beliefs and events a pack shows; measured on Azure, a
+schema the provider hadn't seen cost no more than one it had (docs/cast-review.md).
 
 The validator rejects a reply, and the NPC falls back to its code line, when any of these fail:
   - the line is a non-empty string, no longer than the call type allows;
@@ -46,17 +47,15 @@ from thespis.moderation import Moderator, NoModeration
 log = logging.getLogger("thespis.moderation")
 
 LINE_MAX = 160
-MAX_BELIEFS, MAX_EVENTS = 8, 12  # the most a pack may show: the references the schemas allow
-REFS = tuple(f"b{i}" for i in range(1, MAX_BELIEFS + 1)) + tuple(f"e{i}" for i in range(1, MAX_EVENTS + 1))
 
 _RULES = ("You know only what is listed below. Never state a fact that is not listed.\n"
           "In \"cites\", list the ids of the beliefs or events your line relies on. Always cite at least one: if none "
           "bears on what you say, cite the most recent event you know.\n")
 _REPLY = 'Reply with JSON only: {{"cites": ["..."], "line": "..."}}'  # the evidence first, then the words
 ACT_PROMPT = ("You are {name}. {persona}\n" + _RULES +
-              "DOING is what you are doing now: you have already decided. Say one line of dialogue as you do it, at "
-              "most 25 words, in character. If DOING says something, your line says it, and cites \"said\".\n" +
-              _REPLY)
+              "DOING is what you have decided to do. Say one line of dialogue to go with it, at most 25 words, in "
+              "character: what you say, not a description of what you do. If DOING says something, your line says "
+              "it, and cites \"said\".\n" + _REPLY)
 REACT_PROMPT = ("You are {name}. {persona}\n" + _RULES +
                 "Say one line of dialogue in reply to what just happened, at most 25 words, in character.\n" + _REPLY)
 NARRATE_PROMPT = ("You are {name}. {persona}\n" + _RULES +
@@ -66,17 +65,16 @@ PROMPTS = {"act": ACT_PROMPT, "react": REACT_PROMPT, "narrate": NARRATE_PROMPT}
 LIMITS = {"act": LINE_MAX, "react": LINE_MAX, "narrate": 400}  # characters per line, by call type
 
 
-def _schema(refs: list[str]) -> dict:
-    """A reply's JSON schema, in the subset strict structured outputs accept (no minItems, no maxLength)."""
+def schema_for(refs: list[str]) -> dict:
+    """A reply's JSON schema: cites from `refs`, then the line. In the subset strict structured outputs accept, which
+    has no minItems or maxLength, so the validator still checks that it cites something and how long the line is."""
     return {"type": "object", "additionalProperties": False, "required": ["cites", "line"],
             "properties": {"cites": {"type": "array", "items": {"type": "string", "enum": refs}},
                            "line": {"type": "string"}}}
 
 
-SCHEMA = _schema(list(REFS))
-SAID_SCHEMA = _schema([*REFS, SAID])  # for an action that states a claim
-# Part of every cache key (#18): any change to the prompts, the schemas or the limits gives new keys.
-PROMPT_HASH = hashlib.sha256(json.dumps({"prompts": PROMPTS, "schemas": [SCHEMA, SAID_SCHEMA], "limits": LIMITS},
+# Part of every cache key (#18): any change to the prompts, the schemas' shape or the limits gives new keys.
+PROMPT_HASH = hashlib.sha256(json.dumps({"prompts": PROMPTS, "schema": schema_for(["<ref>"]), "limits": LIMITS},
                                         sort_keys=True).encode("utf-8")).hexdigest()[:12]
 
 
@@ -96,10 +94,6 @@ class StatePack:
     names: set[str] = field(default_factory=set)  # every character and place the pack mentions, as game ids
     setting: str = ""  # where the NPC is and the lie of the land, as the game describes it
     untrusted: list[str] = field(default_factory=list)  # text a player wrote that the pack carries, for moderation
-
-    def __post_init__(self):
-        if len(self.beliefs) > MAX_BELIEFS or len(self.events) > MAX_EVENTS:
-            raise ValueError(f"a pack shows at most {MAX_BELIEFS} beliefs and {MAX_EVENTS} events")
 
     @property
     def asserts(self) -> bool:
@@ -135,7 +129,8 @@ class StatePack:
                 {"role": "user", "content": json.dumps(self.payload(), ensure_ascii=False)}]
 
     def schema(self) -> dict:
-        return SAID_SCHEMA if self.asserts else SCHEMA
+        """The reply's JSON schema: it may cite exactly the references this pack holds."""
+        return schema_for(list(self.refs))
 
     def cache_key(self, model: str, kind: str) -> str:
         """sha256 of the model, the prompts' hash, the call type and everything the model is shown, canonically."""

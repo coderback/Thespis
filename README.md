@@ -66,8 +66,8 @@ flowchart LR
   writes the line. Offered a choice, it took the strongest pull 86 times in 86 ([docs/cast-review.md](docs/cast-review.md)),
   so with the model on, every route ends exactly as with it off.
 - **State pack and validator** (`thespis/expression.py`): the model sees only what the NPC knows, never whether it's
-  true, with its beliefs and events under short references (b1, e1, ...). Each call type has one fixed JSON schema,
-  which a model with structured outputs can't step outside. A reply is rejected unless the line is 1 to 160
+  true, with its beliefs and events under short references (b1, e1, ...). Each call's JSON schema lists exactly the
+  references its pack holds, and a model with structured outputs can't step outside it. A reply is rejected unless the line is 1 to 160
   characters, it cites at least one reference, every one is in the pack, and it names no one the NPC doesn't know
   about. A rejected reply, a timeout or no model at all falls back to a template line.
 - **Model gateway** (`thespis/gateway.py`): any OpenAI-compatible endpoint, including Azure. A primary, then a backup,
