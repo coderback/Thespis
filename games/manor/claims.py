@@ -4,7 +4,9 @@
 from __future__ import annotations
 
 from games.manor import content as C
-from thespis.claims import ClaimVocabulary, EventPred, Facts
+from thespis.claims import ClaimCheck, ClaimChecking, ClaimVocabulary, EventPred, Facts
+from thespis.expression import StatePack
+from thespis.gateway import ModelGateway
 from thespis.world import World
 
 VOCABULARY = ClaimVocabulary(
@@ -37,3 +39,11 @@ def facts(w: World, speaker: str) -> Facts:
 
     return Facts(w, speaker, lambda world, claim: world.ledger.happened(claim),
                  lambda event_id: voice.knows(w, speaker, event_id))
+
+
+def check(w: World, checking: ClaimChecking, gateway: ModelGateway) -> ClaimCheck:
+    """The claim check for lines said in `w`, through the checking's own gateway or the one the lines came from."""
+    def facts_for(pack: StatePack) -> Facts:
+        return facts(w, pack.npc)
+
+    return ClaimCheck(checking.gateway or gateway, VOCABULARY, facts_for, every=checking.mode == "all")

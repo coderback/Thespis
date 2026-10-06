@@ -70,6 +70,12 @@ flowchart LR
   references its pack holds, and a model with structured outputs can't step outside it. A reply is rejected unless the line is 1 to 160
   characters, it cites at least one reference, every one is in the pack, and it names no one the NPC doesn't know
   about. A rejected reply, a timeout or no model at all falls back to a template line.
+- **Claim check** (`thespis/claims.py`, off by default for now; see Deploy): the validator checks form; this checks
+  meaning. A line with consequences (an accusation, an arrest, testimony, a deal, Sable's answer, Lady Vane on the
+  case, the narrator) has its claims extracted by a model in the game's own vocabulary, and code checks each one
+  against the ledger and what the speaker could know. A line that leaks, hallucinates or contradicts its speaker
+  falls back, as does a lie that doesn't state the claim its action asserts. If the extractor doesn't answer, the
+  line falls back too.
 - **Model gateway** (`thespis/gateway.py`): any OpenAI-compatible endpoint, including Azure. A primary, then a backup,
   then the fallback, within 4 seconds each, with no retries.
 - **Cache and replay:** every reply that passes is cached, keyed by the model, the prompt version, the call type and
@@ -278,6 +284,16 @@ which rebuilds and redeploys every merge to `main`.
   service is down, NPCs use their code lines. It sends at most `CONTENT_SAFETY_RPS` requests a second (4, under the
   free tier's 5; set 100 on the standard tier), one text per request, since joined texts hid a harmful line in tests. A game can also list words in `[moderation] blocklist` in its
   `cast.toml`. The boot log says which moderation is active.
+- **Claim check:** off by default for now. `CLAIM_CHECK=consequential` checks the lines with consequences, and `all`
+  checks every model line. Each check is one more model call, counted against the caps, through the model that
+  spoke unless `LLM_CHECK_*` names another. The boot log says which.
+
+  Why off: in three rehearsals the check refused 9 lines that the extractor (gpt-6-luna) had misread, and no line it
+  should have refused. Marking whom each claim is credited to (`attributed_to`) stopped it refusing Lady Vane's
+  verdict, which repeats Sable's alibi, but extraction slowed to 1.5 s, and act p95 rose to 3.3 s from 2.3 s without
+  the check. gpt-5.4-nano thinking a little was slower still: 19 calls timed out. With so few lines actually wrong,
+  the check needs extraction both more accurate and faster than either. The reports are
+  `rehearsal/reports/claim-check-*.md`.
 - **Edges:** no CORS unless `CORS_ORIGINS` lists origins; no generated API docs unless `API_DOCS=1`; bodies over
   64 KiB refused. After a deploy, `python tools/exposure.py <host>` should pass every check.
 - **Logs:** JSON lines (`LOG_FORMAT=json`, set by the image) with `message`, `level` and fields such as `path`,

@@ -18,9 +18,12 @@ def azure_like(bad_every: int = 0):
     def answer(request):
         count["n"] += 1
         pack = json.loads(json.loads(request.content)["messages"][1]["content"])
-        data = FakeModel.good("act" if "DOING" in pack else "react", pack)
-        if bad_every and count["n"] % bad_every == 0:
-            data["cites"] = ["e9999"]
+        if "beliefs" not in pack:  # the claim check asking what a line claims: nothing
+            data = {"claims": []}
+        else:
+            data = FakeModel.good("act" if "DOING" in pack else "react", pack)
+            if bad_every and count["n"] % bad_every == 0:
+                data["cites"] = ["e9999"]
         return httpx.Response(200, json={"choices": [{"message": {"content": json.dumps(data)}}],
                                          "usage": {"prompt_tokens": 900, "completion_tokens": 30}})
     return httpx.MockTransport(answer)

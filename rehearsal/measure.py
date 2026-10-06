@@ -39,6 +39,12 @@ def protocol(reason: str) -> bool:
     return reason.startswith(PROTOCOL)
 
 
+def checked(reason: str) -> str:
+    """Why the claim check refused a line, without the specifics: "claim check (leak: at(odo, market))" -> "leak"."""
+    why = reason.removeprefix("claim check (").removesuffix(")")
+    return "doesn't state its claim" if why.startswith("doesn't state") else why.split(":")[0]
+
+
 # ---------------------------------------------------------------- the judge
 def judge_from_env(name: str, env: Mapping[str, str] | None = None) -> Provider | None:
     """JUDGE_<NAME>_* (BASE_URL, API_KEY, MODEL, optional EXTRA), with room to think and no randomness."""
@@ -130,6 +136,7 @@ def summary(samples: list[dict], calls: list, acts: list[tuple[float, int]], sce
         "scenarios": scenarios, "replies": len(samples),
         "sources": dict(Counter(s["source"] for s in samples)),
         "refused": dict(reasons.most_common()),
+        "claim_check": dict(Counter(checked(r) for r in reasons.elements() if r.startswith("claim check"))),
         "protocol_refusals": sum(n for r, n in reasons.items() if protocol(r)),
         "calls": len(calls), "failed": dict(Counter(c.error for c in calls if not c.ok)),
         "call_latency": {k: {"p50": percentile(v, 50), "p95": percentile(v, 95), "n": len(v)}
@@ -144,8 +151,10 @@ def judged(samples: list[dict], judge: str | None) -> dict:
     claims = Counter()
     for s in samples:
         claims.update(s.get("categories", {}))
+    checked = [s for s in samples if s.get("stakes") and "categories" in s]
     return {"judge": judge, "sampled": len(samples), "judged": len(flags["any_bad"]),
             "rates": {k: rate(v) for k, v in flags.items()}, "flags": flags, "claims": dict(claims),
+            "checked_bad": rate([any(s["categories"].get(k) for k in BAD) for s in checked]),
             "bad_lines": [{"scenario": s["scenario"], "npc": s["npc"], "line": s["line"],
                            "categories": s["categories"]} for s in samples
                           if any(s.get("categories", {}).get(k) for k in BAD)]}
@@ -193,10 +202,11 @@ def _rate(r: dict) -> str:
 
 def markdown(report: dict) -> str:
     s, c = report["summary"], report["claims"]
+    extractor = f" Claim check extracted by {', '.join(report['extractor'])}." if report.get("extractor") else ""
     out = [
         f"# Rehearsal {report['when']}",
         "",
-        f"Engine `{report['commit']}`, prompts {report['prompts']}. Speaker: {', '.join(report['models'])}. "
+        f"Engine `{report['commit']}`, prompts {report['prompts']}. Speaker: {', '.join(report['models'])}.{extractor} "
         f"{s['scenarios']} scenarios, {s['replies']} model replies, {s['calls']} calls.",
         "",
         "| Measure | Value |",
@@ -217,6 +227,10 @@ def markdown(report: dict) -> str:
         f"Claims by category: {c['claims'] or 'none'}.",
         "",
     ]
+    if report.get("claim_check", "off") != "off":
+        out += [f"Claim check ({report['claim_check']}): it refused {sum(s.get('claim_check', {}).values())} lines "
+                f"{s.get('claim_check') or ''}; of the lines it passed that the judge read, "
+                f"{_rate(c.get('checked_bad', rate([])))} still had a leak, hallucination or contradiction.", ""]
     if s["refused"]:
         out += ["Refusals by reason:", "", *[f"- {r}: {n}" for r, n in s["refused"].items()], ""]
     if s["failed"] or s.get("unanswered"):

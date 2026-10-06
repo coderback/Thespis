@@ -17,9 +17,10 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from types import EllipsisType
 
+from games.crypt_road import claims, voice
 from games.crypt_road import content as C
-from games.crypt_road import voice
 from thespis.brain import Brain, UtilityBrain
+from thespis.claims import ClaimChecking
 from thespis.decisions import DECIDE, Decision
 from thespis.expression import Mind, Observer, ReplyCache, Utterance
 from thespis.gateway import ModelGateway
@@ -169,19 +170,20 @@ def _check(w: World, verb: str, target: str | None) -> dict:
 def act(w: World, verb: str, target: str | None = None, claim: dict | Claim | None = None,
         amount: int | None = None, text: str | None = None, brain: Brain | None = None,
         gateway: ModelGateway | None = None, cache: ReplyCache | None = None, replay: bool = False,
-        budget: int | None = None, moderator: Moderator | None = None, observer: Observer | None = None) -> ActResult:
+        budget: int | None = None, moderator: Moderator | None = None, observer: Observer | None = None,
+        checking: ClaimChecking | None = None) -> ActResult:
     """Apply one player verb, the tick it triggers, and the epilogue if the race ends.
 
     Code makes every choice. With a gateway and the brain switched on, the model words what NPCs say; anything it
     gets wrong, or can't answer, falls back to the template lines. A cache answers
     what has been asked before; with `replay` on, only the cache answers. `budget` caps this action's model calls;
     the session's running total is kept in `w.counters["model_calls"]`. An `observer` sees every line the model
-    settles (thespis.expression.Mind).
+    settles (thespis.expression.Mind). With `checking`, lines with consequences meet the claim check (thespis.claims).
     """
     _check(w, verb, target)
     brain = brain or UtilityBrain()
     mind = Mind(gateway if w.brain_mode == "model" else None, voice.VALIDATOR, cache, replay, budget, moderator,
-                observer)
+                observer, claims.check(w, checking, gateway) if checking and gateway else None)
     start = len(w.ledger)
     ends_phase = None  # the tick this verb triggers, if any: "move" or "wait"
     told = haggle = None

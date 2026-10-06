@@ -4,7 +4,9 @@ each claim is checked against."""
 from __future__ import annotations
 
 from games.crypt_road import content as C
-from thespis.claims import ClaimVocabulary, EventPred, Facts
+from thespis.claims import ClaimCheck, ClaimChecking, ClaimVocabulary, EventPred, Facts
+from thespis.expression import StatePack
+from thespis.gateway import ModelGateway
 from thespis.world import World
 
 VOCABULARY = ClaimVocabulary(
@@ -37,3 +39,19 @@ def facts(w: World, speaker: str) -> Facts:
     from games.crypt_road import rules, voice  # rules will use this module, so not at import
 
     return Facts(w, speaker, rules.happened, lambda event_id: voice.knows(w, speaker, event_id))
+
+
+def narrator_facts(w: World) -> Facts:
+    """The narrator holds no beliefs and may tell anything that happened, seen or not: it can't leak, only get things
+    wrong. (Rehearsal's measure still holds it to the events it was given, as the paper did.)"""
+    from games.crypt_road import rules
+
+    return Facts(w, "narrator", rules.happened, lambda event_id: True)
+
+
+def check(w: World, checking: ClaimChecking, gateway: ModelGateway) -> ClaimCheck:
+    """The claim check for lines said in `w`, through the checking's own gateway or the one the lines came from."""
+    def facts_for(pack: StatePack) -> Facts:
+        return narrator_facts(w) if pack.npc == "narrator" else facts(w, pack.npc)
+
+    return ClaimCheck(checking.gateway or gateway, VOCABULARY, facts_for, every=checking.mode == "all")

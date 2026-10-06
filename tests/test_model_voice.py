@@ -16,13 +16,15 @@ LIE = {"pred": "robbed", "a": "kael", "b": "odo"}
 
 class FakeModel:
     """A scripted model. By default it says a short line citing the first reference in its state pack, which is what
-    a well-behaved model does."""
+    a well-behaved model does. Asked to extract a line's claims (thespis.claims), it answers `extract(request)`:
+    by default, that the line claims nothing."""
 
     providers = ("fake/model",)
     models = ("model",)
 
-    def __init__(self, reply=None):
+    def __init__(self, reply=None, extract=None):
         self.reply = reply or self.good
+        self.extract = extract or (lambda request: {"claims": []})
         self.calls = []  # (call_type, state pack as sent)
         self.schemas = []
 
@@ -35,7 +37,7 @@ class FakeModel:
         pack = json.loads(messages[1]["content"])
         self.calls.append((call_type, pack))
         self.schemas.append(schema)
-        data = self.reply(call_type, pack)
+        data = self.extract(pack) if call_type == "extract" else self.reply(call_type, pack)
         return None if data is None else ModelReply(data, "fake/model", "model", 0.01)
 
     def complete_many(self, calls):
