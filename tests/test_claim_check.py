@@ -96,9 +96,34 @@ def test_checking_asks_for_what_the_speaker_vouches_for():
     """Measuring counts a reported fact as asserted, as the paper did; checking counts only that it was reported."""
     assert EXTRACT_PROMPT != CHECK_PROMPT
     assert EXTRACT_PROMPT.replace("asserts both that the teller told the speaker", "") != EXTRACT_PROMPT
-    assert "Leave out the fact reported" in CHECK_PROMPT and "Leave out the fact reported" not in EXTRACT_PROMPT
-    schema = claims.extraction_schema(cr_claims.VOCABULARY)
-    assert schema["properties"]["claims"]["items"]["properties"]["pred"]["enum"][-1] == "other"
+    assert "attributed_to" in CHECK_PROMPT and "attributed_to" not in EXTRACT_PROMPT
+    measuring = claims.extraction_schema(cr_claims.VOCABULARY)["properties"]["claims"]["items"]
+    checking = claims.extraction_schema(cr_claims.VOCABULARY, attributed=True)["properties"]["claims"]["items"]
+    assert measuring["properties"]["pred"]["enum"][-1] == "other" and "attributed_to" not in measuring["properties"]
+    assert list(checking["properties"])[0] == "attributed_to" and checking["required"][0] == "attributed_to"
+    assert checking["properties"]["attributed_to"]["enum"] == ["", *cr_claims.VOCABULARY.characters]
+
+
+def test_a_claim_the_speaker_credits_to_someone_else_isnt_held_against_it():
+    """Lady Vane rejecting Sable's alibi repeats it; that is Sable's claim, not hers."""
+    w = manor_world()
+    for verb, target, topic in [("move", "study", None), ("ask", "pell", "morning"), ("move", "hall", None),
+                                ("request_questioning", "pell", None)]:
+        mn_rules.act(w, verb, target, topic)
+    alibi = {"pred": "was_in", "a": "sable", "b": "kitchen@1", "happened": True}
+    told = {"pred": "told", "a": "sable", "b": "vane", "happened": True}
+
+    def verdict(*found):
+        c = ClaimCheck(Extractor(lambda m: {"claims": list(found)}), mn_rules.claims.VOCABULARY,
+                       lambda p: mn_rules.claims.facts(w, p.npc))
+        return c.problems([(pack("vane"), "You told me you were in the kitchen; I no longer believe it.")])[0]
+
+    assert verdict({**alibi, "attributed_to": ""}) == "contradiction: was_in(sable, kitchen@1)"  # as if she said it
+    assert verdict({**alibi, "attributed_to": "sable"}, {**told, "attributed_to": ""}) is None
+    lie = {"pred": "told", "a": "pell", "b": "vane", "happened": True, "attributed_to": ""}
+    assert verdict({**alibi, "attributed_to": "sable"}, lie) is None  # Pell testified to her: true
+    made_up = {"pred": "told", "a": "sable", "b": "pell", "happened": True, "attributed_to": ""}
+    assert verdict({**alibi, "attributed_to": "sable"}, made_up).startswith(("leak", "hallucination"))
 
 
 # ---------------------------------------------------------------- in the Mind
@@ -111,7 +136,8 @@ def test_only_lines_with_stakes_are_checked():
     play_demo(model, checking=CHECKING)
     checked = [p["speaker"] for c, p in model.calls if c == "extract"]
     assert sorted(set(checked)) == ["brenna", "kael", "odo"]  # the accusation, the arrest, questioning, testimony
-    assert all(s == claims.extraction_schema(cr_claims.VOCABULARY) for (c, _), s in zip(model.calls, model.schemas)
+    assert all(s == claims.extraction_schema(cr_claims.VOCABULARY, attributed=True)
+               for (c, _), s in zip(model.calls, model.schemas)
                if c == "extract")
 
 

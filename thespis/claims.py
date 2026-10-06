@@ -17,8 +17,9 @@ into the core so Rehearsal can measure every line offline, and ClaimCheck can ch
 anyone hears it.
 
 The two differ on reported speech. Measuring, "Kael says you robbed him" asserts both that Kael told the speaker and
-that the player robbed him, as the paper counted it. Checking, it asserts only that Kael told the speaker: a character
-may truthfully repeat what it was told, even what it no longer believes, and the teller is the one who vouched for it.
+that the player robbed him, as the paper counted it. Checking, the extractor marks each claim with whom the speaker
+attributes it to (`attributed_to`), and only the speaker's own claims are checked: a character may truthfully repeat
+what it was told, even what it no longer believes, and the teller is the one who vouched for it.
 """
 
 from __future__ import annotations
@@ -86,13 +87,21 @@ _TAIL = (
 EXTRACT_PROMPT = _HEAD + (  # measuring: the paper's rule
     "- Reported speech (\"Kael says you robbed him\", said by brenna) asserts both that the teller told the speaker "
     "(told(kael, brenna)) and the fact reported (robbed(player, kael)).\n") + _TAIL
-CHECK_PROMPT = _HEAD + (  # checking: the speaker vouches only for having been told
-    "- Reported speech (\"Kael says you robbed him\", said by brenna) asserts only that the teller told the speaker: "
-    "told(kael, brenna). Leave out the fact reported: the teller vouched for it, not the speaker.\n"
+CHECK_PROMPT = _HEAD + (  # checking: each claim says whose it is, and only the speaker's own are checked
+    "- Reported speech (\"Kael says you robbed him\", said by brenna) asserts that the teller told the speaker, "
+    "told(kael, brenna), which is the speaker's own claim, and repeats the fact reported, robbed(player, kael), which "
+    "is Kael's.\n"
     # Two misreadings the first live rehearsal of the check found:
     "- When the situation says someone other than the player is speaking to the speaker or asking it something "
     "(\"Captain Brenna asks you\"), \"you\" in the line is them.\n"
-    "- A journey \"from A to B\" asserts that they went to B; it doesn't say they went to A.\n") + _TAIL
+    "- A journey \"from A to B\" asserts that they went to B; it doesn't say they went to A.\n"
+    "- a and b are ids from the lists above, nothing else. Set happened to false when the line says it did not "
+    "happen.\n"
+    "- attributed_to is the id of whoever the speaker credits the claim to: someone it quotes or reports (\"Kael "
+    "says\", \"you told me\", \"your account\", \"Pell saw\"), even when the speaker rejects what they said. It is "
+    "\"\" when the speaker says it is so itself.\n"
+    'Reply with JSON only: {{"claims": [{{"attributed_to": "", "pred": "...", "a": "...", "b": "...", '
+    '"happened": true}}]}}')
 
 
 def extraction_messages(vocab: ClaimVocabulary, speaker: str, name: str, situation: str, here: list[str],
@@ -102,12 +111,15 @@ def extraction_messages(vocab: ClaimVocabulary, speaker: str, name: str, situati
                                                     "here": here, "line": line}, ensure_ascii=False)}]
 
 
-def extraction_schema(vocab: ClaimVocabulary) -> dict:
-    """The extractor's reply as a strict JSON schema: one per game, so it never changes between calls."""
-    claim = {"type": "object", "additionalProperties": False, "required": ["pred", "a", "b", "happened"],
-             "properties": {"pred": {"type": "string", "enum": [*vocab.preds, OTHER]},
-                            "a": {"type": "string", "enum": list(vocab.characters)},
-                            "b": {"type": "string"}, "happened": {"type": "boolean"}}}
+def extraction_schema(vocab: ClaimVocabulary, attributed: bool = False) -> dict:
+    """The extractor's reply as a strict JSON schema: one per game, so it never changes between calls. Checking, each
+    claim first says whom the speaker credits it to (`attributed`)."""
+    fields = {"pred": {"type": "string", "enum": [*vocab.preds, OTHER]},
+              "a": {"type": "string", "enum": list(vocab.characters)},
+              "b": {"type": "string"}, "happened": {"type": "boolean"}}
+    if attributed:
+        fields = {"attributed_to": {"type": "string", "enum": ["", *vocab.characters]}, **fields}
+    claim = {"type": "object", "additionalProperties": False, "required": list(fields), "properties": fields}
     return {"type": "object", "additionalProperties": False, "required": ["claims"],
             "properties": {"claims": {"type": "array", "items": claim}}}
 
@@ -247,7 +259,8 @@ class ClaimCheck:
     """The claim check on lines with consequences (docs/cast-review.md, Phase 2), for thespis.expression.Mind.
 
     Before a line is heard, a model extracts the claims it makes (CHECK_PROMPT, with the game's schema), and code
-    checks each against what its speaker could know (`facts`, the game's rule). A line is refused when:
+    checks each of the speaker's own (not ones it attributes to someone else) against what it could know (`facts`,
+    the game's rule). A line is refused when:
       - a claim leaks, hallucinates or contradicts what the speaker holds;
       - the line goes with an action that states a claim (thespis.deception) and doesn't state it, so the ledger and
         the words would disagree. That claim may be false: the game chose the lie.
@@ -259,7 +272,7 @@ class ClaimCheck:
     def __init__(self, gateway: ModelGateway, vocab: ClaimVocabulary, facts: Callable[[StatePack], Facts],
                  every: bool = False):
         self.gateway, self.vocab, self.facts, self.every = gateway, vocab, facts, every
-        self.schema = extraction_schema(vocab)
+        self.schema = extraction_schema(vocab, attributed=True)
 
     def wants(self, pack: StatePack) -> bool:
         return self.every or pack.stakes
@@ -281,6 +294,8 @@ class ClaimCheck:
             if pack.asserted is not None and _states(n, pack.asserted):
                 stated = True  # the claim its action states, which code chose, true or not
                 continue
+            if claim.get("attributed_to"):
+                continue  # someone else's, repeated: the speaker vouches only for having heard it
             category = categorize(self.vocab, claim, facts)
             if category in BAD:
                 return f"{category}: {label(n)}"
