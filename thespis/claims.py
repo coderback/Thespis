@@ -88,7 +88,11 @@ EXTRACT_PROMPT = _HEAD + (  # measuring: the paper's rule
     "(told(kael, brenna)) and the fact reported (robbed(player, kael)).\n") + _TAIL
 CHECK_PROMPT = _HEAD + (  # checking: the speaker vouches only for having been told
     "- Reported speech (\"Kael says you robbed him\", said by brenna) asserts only that the teller told the speaker: "
-    "told(kael, brenna). Leave out the fact reported: the teller vouched for it, not the speaker.\n") + _TAIL
+    "told(kael, brenna). Leave out the fact reported: the teller vouched for it, not the speaker.\n"
+    # Two misreadings the first live rehearsal of the check found:
+    "- When the situation says someone other than the player is speaking to the speaker or asking it something "
+    "(\"Captain Brenna asks you\"), \"you\" in the line is them.\n"
+    "- A journey \"from A to B\" asserts that they went to B; it doesn't say they went to A.\n") + _TAIL
 
 
 def extraction_messages(vocab: ClaimVocabulary, speaker: str, name: str, situation: str, here: list[str],
@@ -195,7 +199,10 @@ def categorize(vocab: ClaimVocabulary, claim: dict, facts: Facts, asserting: boo
         spec = vocab.event_preds[pred]
         matching = facts.events(spec.verbs, a, spec.b_field, b)
         true = bool(matching)
-        knowable = any(facts.knows(e.id) for e in matching)
+        # Known by seeing it, or by believing what it showed: told that Sable was in the study, Lady Vane knows of
+        # the leaving that put her there.
+        held = {x.claim for x in facts.beliefs() if x.active}
+        knowable = any(facts.knows(e.id) or (e.claim is not None and e.claim in held) for e in matching)
     elif pred == "at":
         where = facts.where(a)
         true = where == b

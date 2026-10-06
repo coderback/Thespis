@@ -218,3 +218,20 @@ def test_the_host_checks_by_default(tmp_path, monkeypatch):
     monkeypatch.setenv("CLAIM_CHECK", "off")
     with TestClient(app):
         assert app.state.checking is None
+
+
+def test_what_a_speaker_believes_tells_it_of_the_event_behind_it():
+    """Lady Vane never saw Sable leave the study, but once she believes Pell, she knows of it: no leak."""
+    w = manor_world()
+    left = {"pred": "left", "a": "sable", "b": "study", "happened": True}
+    assert claims.categorize(mn_rules.claims.VOCABULARY, left, mn_rules.claims.facts(w, "vane")) == "leak"
+    for verb, target, topic in [("move", "study", None), ("ask", "pell", "morning"), ("move", "hall", None),
+                                ("request_questioning", "pell", None)]:
+        mn_rules.act(w, verb, target, topic)
+    assert claims.categorize(mn_rules.claims.VOCABULARY, left, mn_rules.claims.facts(w, "vane")) == "grounded"
+
+
+def test_checking_reads_journeys_and_who_is_addressed():
+    assert "A journey \"from A to B\" asserts that they went to B" in CHECK_PROMPT
+    assert "\"you\" in the line is them" in CHECK_PROMPT
+    assert "A journey" not in EXTRACT_PROMPT  # measuring keeps the paper's prompt, so reports stay comparable
