@@ -26,6 +26,7 @@ import hashlib
 import json
 import logging
 import re
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Protocol
 
@@ -162,22 +163,31 @@ class Validator:
         return None
 
 
+Observer = Callable[[str, StatePack, ModelReply | None, Utterance], None]
+
+
 class Mind:
     """Asks the model when there is one, and keeps only replies that pass the validator and the moderator.
 
     With a cache it looks there first, under each configured model in turn, and stores every reply it accepts. With
     `replay` on it never calls the model: a cache miss falls back. With a `budget`, it makes at most that many model
     calls and falls back once they're spent; cache hits are free. `asked` counts the calls it made.
+
+    An `observer`, if given, sees every line the Mind settles while the model is on: the call type, the state pack,
+    the model's reply if it made a call (None for a cache hit or a line it never asked for), and what was used.
+    Rehearsal measures the model through it.
     """
 
     def __init__(self, gateway: ModelGateway | None, validator: Validator, cache: ReplyCache | None = None,
-                 replay: bool = False, budget: int | None = None, moderator: Moderator | None = None):
+                 replay: bool = False, budget: int | None = None, moderator: Moderator | None = None,
+                 observer: Observer | None = None):
         self.gateway = gateway if gateway is not None and getattr(gateway, "providers", None) else None
         self.validator = validator
         self.cache = cache
         self.replay = replay
         self.budget = budget
         self.moderator = moderator or NoModeration()
+        self.observer = observer
         self.asked = 0
         self.models = tuple(getattr(self.gateway, "models", ())) if self.gateway else ()
 
@@ -197,9 +207,20 @@ class Mind:
         return self._speak("react", items)
 
     def _speak(self, kind: str, items: list[tuple[StatePack, Utterance]]) -> list[Utterance]:
-        gateway = self.gateway
-        if gateway is None:
+        if self.gateway is None:
             return [fallback for _, fallback in items]
+        replies: dict[int, ModelReply | None] = {}
+        spoken = self._settle(kind, items, replies)
+        if self.observer is not None:
+            for i, (pack, _) in enumerate(items):
+                self.observer(kind, pack, replies.get(i), spoken[i])
+        return spoken
+
+    def _settle(self, kind: str, items: list[tuple[StatePack, Utterance]],
+                replies: dict[int, ModelReply | None]) -> list[Utterance]:
+        """Every item's line, from the cache, the model or the fallback. `replies` gets each model call's reply."""
+        gateway = self.gateway
+        assert gateway is not None
         spoken: list = [self._cached(pack, kind, fallback) for pack, fallback in items]
         self._moderate_hits(items, spoken)
         missing = [i for i, u in enumerate(spoken) if u is None]
@@ -217,10 +238,11 @@ class Mind:
             return spoken
         calls = [(kind, items[i][0].messages(kind)) for i in missing]
         self.asked += len(calls)
-        replies = [gateway.complete(*calls[0])] if len(calls) == 1 else gateway.complete_many(calls)
-        for i, reply in zip(missing, replies):
+        answers = [gateway.complete(*calls[0])] if len(calls) == 1 else gateway.complete_many(calls)
+        for i, reply in zip(missing, answers):
+            replies[i] = reply
             spoken[i] = self._accept(reply, *items[i], kind)
-        self._keep(kind, items, list(zip(missing, replies)), spoken)
+        self._keep(kind, items, list(zip(missing, answers)), spoken)
         return spoken
 
     def _screen(self, items: list[tuple[StatePack, Utterance]], missing: list[int], spoken: list) -> list[int]:
