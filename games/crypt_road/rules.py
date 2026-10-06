@@ -21,7 +21,7 @@ from games.crypt_road import content as C
 from games.crypt_road import voice
 from thespis.brain import Brain, UtilityBrain
 from thespis.decisions import DECIDE, Decision
-from thespis.expression import Mind, ReplyCache, Utterance
+from thespis.expression import Mind, Observer, ReplyCache, Utterance
 from thespis.gateway import ModelGateway
 from thespis.ledger import Claim, Event
 from thespis.moderation import Moderator
@@ -170,17 +170,19 @@ def _check(w: World, verb: str, target: str | None) -> dict:
 def act(w: World, verb: str, target: str | None = None, claim: dict | Claim | None = None,
         amount: int | None = None, text: str | None = None, brain: Brain | None = None,
         gateway: ModelGateway | None = None, cache: ReplyCache | None = None, replay: bool = False,
-        budget: int | None = None, moderator: Moderator | None = None) -> ActResult:
+        budget: int | None = None, moderator: Moderator | None = None, observer: Observer | None = None) -> ActResult:
     """Apply one player verb, the tick it triggers, and the epilogue if the race ends.
 
     With a gateway and the brain switched on, NPCs speak and make their real choices through the model; anything
     the model gets wrong, or can't answer, falls back to the utility brain and template lines. A cache answers
     what has been asked before; with `replay` on, only the cache answers. `budget` caps this action's model calls;
-    the session's running total is kept in `w.counters["model_calls"]`.
+    the session's running total is kept in `w.counters["model_calls"]`. An `observer` sees every line the model
+    settles (thespis.expression.Mind).
     """
     _check(w, verb, target)
     brain = brain or UtilityBrain()
-    mind = Mind(gateway if w.brain_mode == "model" else None, voice.VALIDATOR, cache, replay, budget, moderator)
+    mind = Mind(gateway if w.brain_mode == "model" else None, voice.VALIDATOR, cache, replay, budget, moderator,
+                observer)
     start = len(w.ledger)
     ends_phase = None  # the tick this verb triggers, if any: "move" or "wait"
     told = haggle = None

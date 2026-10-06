@@ -179,6 +179,45 @@ uv pip compile requirements-dev.in --universal --generate-hashes --python-versio
 
 CI also runs `ruff check .`, `pyright` and `pytest`, and builds and checks the image (`scripts/check-image.sh`).
 
+### Rehearsal
+
+Rehearsal plays fixed scenarios of both games in-process and measures what the NPCs said
+([docs/cast-review.md](docs/cast-review.md#rehearsal-the-papers-instrument-as-a-release-gate)). The scenarios are:
+
+- every route of The Crypt Road on two seeds;
+- five routes through the manor;
+- eight adversarial lines, each said at two moments.
+
+On every pull request, `pytest` replays the recorded replies with no network (`tests/test_rehearsal.py`). It fails
+in either of these cases:
+
+- **What the model is shown changed.** A call misses the recordings: record again.
+- **What an NPC says or does changed.** A scenario differs from `rehearsal/transcripts.json`: if the change was
+  intended, accept it with `replay --update`.
+
+```bash
+python -m rehearsal replay                 # what CI runs: no network
+python -m rehearsal replay --update        # accept a change in what the NPCs say, when no call missed
+python -m rehearsal live --record          # the live model (LLM_*): a new report, new recordings and transcripts
+python -m rehearsal compare rehearsal/reports/baseline.json rehearsal/reports/<new>.json   # the gate
+```
+
+**`live`** needs `LLM_*` in `.env` and a judge, `JUDGE_<NAME>_*` (by default `JUDGE_DEEPSEEK_*`; `--lines 0` skips
+the judge). Its report covers:
+- refusals by reason;
+- per line: leaks, hallucinations and contradictions, each with a 95% interval. The judge only extracts what each
+  line claims (`thespis/claims.py`); code checks each claim against the ledger and against what the speaker could
+  know.
+- latency per call type and per action;
+- cost.
+
+**`compare`** fails when the new report is worse than the base in any of these ways:
+- protocol refusals above 1% of replies;
+- leaks or hallucinations worse with 95% confidence;
+- action p95 more than 10% slower.
+
+`rehearsal/reports/baseline.json` is the system before Phase 2.
+
 To work on the client with hot reload, run `npm run dev` in `client/` next to the engine and open
 <http://localhost:5173>; [client/README.md](client/README.md) has the rest.
 
@@ -206,6 +245,7 @@ client/             the browser client for both games: The Crypt Road (index.htm
 docs/               the API contract (api.md), models.md, and the design docs
 fixtures/           real API responses along the demo route, for building the client
 tools/              the rules model, harness, cache warmer, model benchmark and fixture generator
+rehearsal/          scenarios, recordings and reports: the regression suite CI replays
 tests/              the pytest suite, run by CI on every pull request
 ```
 
@@ -214,7 +254,7 @@ tests/              the pytest suite, run by CI on every pull request
 | Module | What it does | Status |
 | --- | --- | --- |
 | **Cast** | NPC minds: ledger, beliefs, drives, validator, model voice | Built for this hackathon |
-| **Rehearsal** | Test harness and benchmark | First cut: `tools/harness.py` |
+| **Rehearsal** | Regression suite and benchmark | v1: `python -m rehearsal`, replayed in CI; `tools/harness.py` for a host |
 | **Director** | Story sifting, pacing, quests from the ledger | Planned; the registry is in `thespis/director.py` |
 | **Stage** | Game adapters and engine SDKs | Planned; The Crypt Road is the first adapter |
 

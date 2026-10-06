@@ -10,6 +10,7 @@ from __future__ import annotations
 import os
 import time
 from pathlib import Path
+from typing import Protocol
 
 from games.crypt_road import content as C
 
@@ -72,6 +73,16 @@ def fresh_session(client, seed: int) -> str:
     return _pool[key]
 
 
+class Player(Protocol):
+    """What a route needs of a session: Session over HTTP, or Rehearsal's in-process one."""
+
+    def act(self, verb: str, target: str | None = None, **fields) -> dict: ...
+
+    def state(self) -> dict: ...
+
+    def allowed(self) -> dict: ...
+
+
 class Session:
     """One session over an httpx.Client or a TestClient. Every /act's round-trip time is kept in `timings`."""
 
@@ -126,13 +137,13 @@ def npc(state: dict, npc_id: str) -> dict:
     return next(n for n in state["npcs"] if n["id"] == npc_id)
 
 
-def provoke(s: Session) -> None:
+def provoke(s: Player) -> None:
     s.act("insult", "kael")
     if s.act("challenge", "kael")["state"]["pending"] == "duel_won":
         s.act("humiliate", "kael")
 
 
-def advance(s: Session) -> dict:
+def advance(s: Player) -> dict:
     """Head for the crypt: take the relic on arrival, move when the gate allows, otherwise wait."""
     for _ in range(20):
         state = s.state()
@@ -146,7 +157,7 @@ def advance(s: Session) -> dict:
     return s.state()
 
 
-def haggle(s: Session, offer: int) -> None:
+def haggle(s: Player, offer: int) -> None:
     """Offer Brenna too little, then pay her price: at once if she counters, a phase later if she refuses."""
     st = s.state()
     if npc(st, "brenna")["trust_in"]["player"] >= 0 or st["player"]["coins"] < offer:
@@ -158,7 +169,7 @@ def haggle(s: Session, offer: int) -> None:
         s.act("bribe", "brenna", amount=C.asking_price(npc(st, "brenna")["trust_in"]["player"]))
 
 
-def play(s: Session, name: str) -> dict:
+def play(s: Player, name: str) -> dict:
     """Play a started session along a route to the end of the race, and return the final state."""
     for step in ROUTES[name]:
         if step == "provoke":
