@@ -10,7 +10,7 @@ from tests.test_model_voice import FakeModel, play_demo
 from thespis import expression
 from thespis.store import Store
 
-KAEL_DECIDES = "You are at The Tavern. Decide what to do now."
+KAEL_ACTS = "You are at the tavern."
 
 
 class Offline(FakeModel):
@@ -37,20 +37,28 @@ def without_decisions(w):
     return data
 
 
-def test_key_covers_model_prompt_version_call_type_and_pack(monkeypatch):
+def test_key_covers_model_prompts_call_type_and_pack(monkeypatch):
     w = new_world(1)
-    pack = voice.pack_for(w, "kael", KAEL_DECIDES, {"go_to": 3.0, "wait": 1.0})
-    key = pack.cache_key("gpt-6-luna", "decide")
+    pack = voice.pack_for(w, "kael", KAEL_ACTS, "go_to")
+    key = pack.cache_key("gpt-6-luna", "act")
     assert len(key) == 64
-    assert voice.pack_for(w, "kael", KAEL_DECIDES, {"go_to": 3.0, "wait": 1.0}).cache_key("gpt-6-luna", "decide") == key
+    assert voice.pack_for(w, "kael", KAEL_ACTS, "go_to").cache_key("gpt-6-luna", "act") == key
     reordered = dataclasses.replace(pack, drives=dict(reversed(pack.drives.items())))
-    assert reordered.cache_key("gpt-6-luna", "decide") == key  # canonical: key order inside the pack doesn't matter
-    others = [pack.cache_key("gpt-5.4-nano", "decide"), pack.cache_key("gpt-6-luna", "react"),
-              dataclasses.replace(pack, persona="A gentle soul.").cache_key("gpt-6-luna", "decide"),
-              dataclasses.replace(pack, situation="It is raining.").cache_key("gpt-6-luna", "decide")]
-    monkeypatch.setattr(expression, "PROMPT_VERSION", expression.PROMPT_VERSION + 1)
-    others.append(pack.cache_key("gpt-6-luna", "decide"))
+    assert reordered.cache_key("gpt-6-luna", "act") == key  # canonical: key order inside the pack doesn't matter
+    others = [pack.cache_key("gpt-5.4-nano", "act"), pack.cache_key("gpt-6-luna", "react"),
+              voice.pack_for(w, "kael", KAEL_ACTS, "wait").cache_key("gpt-6-luna", "act"),
+              dataclasses.replace(pack, persona="A gentle soul.").cache_key("gpt-6-luna", "act"),
+              dataclasses.replace(pack, situation="It is raining.").cache_key("gpt-6-luna", "act")]
+    monkeypatch.setattr(expression, "PROMPT_HASH", "another")
+    others.append(pack.cache_key("gpt-6-luna", "act"))
     assert key not in others and len(set(others)) == len(others)
+
+
+def test_the_prompts_hash_covers_the_prompts_and_schemas():
+    assert len(expression.PROMPT_HASH) == 12
+    assert expression.PROMPT_HASH == expression.hashlib.sha256(expression.json.dumps(
+        {"prompts": expression.PROMPTS, "schema": expression.schema_for(["<ref>"]), "limits": expression.LIMITS},
+        sort_keys=True).encode("utf-8")).hexdigest()[:12]
 
 
 def test_a_second_play_makes_no_model_calls(cache):

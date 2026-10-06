@@ -28,7 +28,6 @@ from thespis.moderation import Moderator
 from thespis.world import LOST, PLAYING, WON, World
 
 TALK_MAX = 200
-DRIVE_MARGIN = 2  # the model may choose only among actions within this many utility points of the best one
 EPILOGUE_PHASES = 2
 DUEL_WON = "duel_won"
 
@@ -173,8 +172,8 @@ def act(w: World, verb: str, target: str | None = None, claim: dict | Claim | No
         budget: int | None = None, moderator: Moderator | None = None, observer: Observer | None = None) -> ActResult:
     """Apply one player verb, the tick it triggers, and the epilogue if the race ends.
 
-    With a gateway and the brain switched on, NPCs speak and make their real choices through the model; anything
-    the model gets wrong, or can't answer, falls back to the utility brain and template lines. A cache answers
+    Code makes every choice. With a gateway and the brain switched on, the model words what NPCs say; anything it
+    gets wrong, or can't answer, falls back to the template lines. A cache answers
     what has been asked before; with `replay` on, only the cache answers. `budget` caps this action's model calls;
     the session's running total is kept in `w.counters["model_calls"]`. An `observer` sees every line the model
     settles (thespis.expression.Mind).
@@ -239,7 +238,7 @@ def _offered_amount(w: World, amount: int | None) -> int:
 
 def _offer(w: World, mind: Mind, brain: Brain, amount: int) -> dict | None:
     """The player offers Brenna `amount` coins (#36). At or above her price she takes it and trusts them more; below
-    it she counters at her price or refuses, and the model chooses which. She never takes less than her price.
+    it she refuses a lowball (under half her price) and counters anything else at her price. She never takes less.
 
     Returns her reply to a haggle, in the replies shape, or None when she took the money (voice.react voices that).
     """
@@ -392,12 +391,11 @@ def end_phase(w: World, action: str, brain: Brain | None = None, mind: Mind | No
         if d["respect"] >= 4 and kael.loc == view.player_at and not kael.flags.get("drink"):
             options["share_drink"] = d["respect"] + 3
         grievance = robbed if w.beliefs.conf(C.RIVAL, robbed) else beaten
-        # Ask the model only for a real choice: an option beyond the default walk, or a drive past a threshold.
+        # Voice the choice only when it matters: an option beyond the default walk, or a drive past a threshold.
         ask = voice.crossed_threshold(w, C.RIVAL) or len(options) > 2
         chosen = _decide(w, mind, brain, C.RIVAL, "tick", options, None,
                          lambda ch: voice.decision_line(w, C.RIVAL, ch, grievance, view),
-                         f"You are at {C.STOP_NAMES[kael.loc]}. Decide what to do now.", ask,
-                         view)
+                         f"You are at {C.STOP_NAMES[kael.loc]}.", ask, view)
         if chosen == "take_relic":
             if w.status == PLAYING:
                 w.status, w.ended_at = LOST, p
@@ -455,29 +453,16 @@ def end_phase(w: World, action: str, brain: Brain | None = None, mind: Mind | No
 
 def _decide(w: World, mind: Mind, brain: Brain, npc: str, trigger: str, options: Mapping[str, float],
             reason: str | None, line_for, situation: str, ask: bool = True, view: voice.View | None = None) -> str:
-    """Choose an action and its line: the model's if it is asked and its reply passes, else the utility brain's.
-
-    Returns the chosen action id, which is always one of `options`.
-    """
+    """Choose an action, by code, and its line: the model's words for it if asked and its reply passes, else the
+    template's. Returns the chosen action id, which is always one of `options`."""
     choice = brain.choose(npc, options)
     line, cites = line_for(choice) or (None, [])
     fallback = Utterance(choice, line, cites, "fallback")
-    # Drives decide what is on the table: the model only chooses between actions they rate about as highly as the
-    # best, so a clear grudge always acts on it. It still words every line and settles near-ties.
-    offered = _offered(options)
-    u = mind.decide(voice.pack_for(w, npc, situation, offered, view), fallback) if ask and mind.active else fallback
-    assert u.action is not None  # a decision always carries one of the options
-    base = reason or f"{u.action} scores {options[u.action]}"  # without a reason given, the utility explains it
-    if u.source != "fallback" and len(offered) < len(options):
-        base += f"; drives offered {', '.join(offered)}"
-    w.decisions.record(DECIDE, npc, w.phase, trigger, allowed=list(options), chosen=u.action, line=u.line,
+    u = mind.act(voice.pack_for(w, npc, situation, choice, view), fallback) if ask and mind.active else fallback
+    base = reason or f"{choice} scores {options[choice]}"  # without a reason given, the utility explains it
+    w.decisions.record(DECIDE, npc, w.phase, trigger, allowed=list(options), chosen=choice, line=u.line,
                        cites=u.cites, reason=f"{base}; {u.note}" if u.note else base, source=u.source)
-    return u.action
-
-
-def _offered(options: Mapping[str, float]) -> dict[str, float]:
-    best = max(options.values())
-    return {a: u for a, u in options.items() if u >= best - DRIVE_MARGIN}
+    return choice
 
 
 def run_epilogue(w: World, brain: Brain | None = None, mind: Mind | None = None) -> list[Tick]:

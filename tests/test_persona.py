@@ -49,9 +49,9 @@ def test_the_next_line_is_voiced_with_the_new_persona(app_client):
     prompts = []
     original = model.complete
 
-    def capture(call_type, messages):
+    def capture(call_type, messages, schema=None):
         prompts.append(messages[0]["content"])
-        return original(call_type, messages)
+        return original(call_type, messages, schema)
 
     model.complete = capture
     headers = new_session(client)

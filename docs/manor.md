@@ -34,9 +34,8 @@ lives only in the ledger, written when the game starts:
 | `request_questioning` (target: `pell` or `sable`) | the hall | No | Lady Vane questions them; enabled once you have asked them about the morning |
 | `accuse` (target: `pell` or `sable`) | the hall | Ends the game | Won only if Lady Vane believes Sable was in the study at mid-morning (0.5 or more) and has dropped her alibi |
 
-- **Sable lies.** Asked about the morning, her fear rises by 2. At fear 3 or more her allowed actions include
-  `deceive:alibi`, which states she was in the kitchen at mid-morning, beside `deflect`. The model chooses and words
-  it; without a model the utility brain lies. A lie is logged in the ledger, truth false, and her line cites it.
+- **Sable lies.** Asked about the morning, her fear rises by 2. At fear 3 or more she takes `deceive:alibi`, which
+  states she was in the kitchen at mid-morning; below that she deflects. Code chooses, and the model words it. A lie is logged in the ledger, truth false, and her line cites it.
 - **Pell's testimony breaks the alibi.** Questioned by Lady Vane, he says he saw Sable leave the study. Two places for
   one person at one time can't both be true, so Lady Vane drops the claim from the source she trusts less (Sable),
   and her trust in Sable falls by 3.

@@ -2,7 +2,8 @@
 
 from thespis.deception import SAID, asserting, log_statement
 from thespis.decisions import DECIDE, DecisionLog
-from thespis.expression import StatePack, Validator
+from thespis.expression import Mind, StatePack, Utterance, Validator
+from thespis.gateway import ModelReply
 from thespis.ledger import Claim
 from thespis.minds import NPC
 from thespis.world import World
@@ -22,24 +23,40 @@ def test_a_statement_is_logged_with_its_real_truth():
     assert truth.truth is True
 
 
-def pack(allowed: list[dict]) -> StatePack:
+def pack(action: dict) -> StatePack:
     return StatePack(npc="bo", name="Bo", persona="", goal="", situation="", here=[], drives={}, trust_in={},
-                     beliefs=[], events=[{"id": "e0001", "what": "Ann baked a pie."}], allowed=allowed)
+                     beliefs=[], events=[{"id": "e0001", "what": "Ann baked a pie."}], action=action)
 
 
-def test_a_lie_must_cite_the_claim_it_asserts():
-    v = Validator({})
-    p = pack([asserting({"id": "lie", "does": "say you baked it", "pull": 5}, "Bo baked the pie"),
-              {"id": "shrug", "does": "shrug", "pull": 3}])
-    assert SAID in p.ids
-    assert "without citing" in v.problem({"action": "lie", "line": "I baked it.", "cites": ["e0001"]}, p, "decide")
-    assert v.problem({"action": "lie", "line": "I baked it.", "cites": [SAID]}, p, "decide") is None
-    assert "doesn't state" in v.problem({"action": "shrug", "line": "Who knows?", "cites": [SAID]}, p, "decide")
-    assert v.problem({"action": "shrug", "line": "Who knows?", "cites": ["e0001"]}, p, "decide") is None
+class Says:
+    """A model that says one line, citing the given references."""
+
+    providers = models = ("m",)
+
+    def __init__(self, *cites):
+        self.cites, self.payloads = list(cites), []
+
+    def complete(self, call_type, messages, schema=None):
+        self.payloads.append(messages[1]["content"])
+        return ModelReply({"cites": self.cites, "line": "I baked it."}, "m", "m", 0.0)
+
+
+def test_a_lie_always_cites_the_claim_it_asserts():
+    """The action, which code chose, states the claim, so its line cites it whether the model did or not."""
+    lie = pack(asserting({"id": "lie", "does": "say you baked it"}, "Bo baked the pie"))
+    assert SAID in lie.ids and lie.payload()["DOING"] == {"does": "say you baked it", "says": "Bo baked the pie"}
+    assert lie.schema()["properties"]["cites"]["items"]["enum"] == ["e1", SAID]
+    fallback = Utterance("lie", "Me. I baked it.", [SAID], "fallback")
+    for model in (Says("e1"), Says("e1", SAID)):
+        u = Mind(model, Validator({})).act(lie, fallback)
+        assert (u.action, u.source, u.cites) == ("lie", "llm", ["e0001", SAID])
 
 
 def test_without_an_assertion_nothing_changes():
-    assert pack([{"id": "shrug", "does": "shrug", "pull": 3}]).ids == {"e0001"}
+    shrug = pack({"id": "shrug", "does": "shrug"})
+    assert shrug.ids == {"e0001"} and "says" not in shrug.payload()["DOING"]
+    assert "cites said, not in its state pack" in Validator({}).problem(
+        {"line": "Who knows?", "cites": [SAID]}, shrug, "act")
 
 
 def test_a_decision_names_its_statement_only_when_it_made_one():

@@ -115,6 +115,6 @@ def test_a_telling_may_run_longer_than_a_spoken_line():
     w = new_world(1)
     act(w, ROUTE[0])
     pack: StatePack = voice.pack_for(w, "mags", 'The player says to you: "Hello."')
-    long = {"line": "A" * 300, "cites": [pack.events[-1]["id"]]}
+    long = {"line": "A" * 300, "cites": [f"e{len(pack.events)}"]}
     assert voice.VALIDATOR.problem(long, pack, "narrate") is None
     assert "over 160" in voice.VALIDATOR.problem(long, pack, "react")

@@ -6,7 +6,7 @@ is true. Sable knows she took the ring; Lady Vane only knows what she has been t
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
 from dataclasses import dataclass
 
 from games.manor import content as C
@@ -23,8 +23,7 @@ VALIDATOR = Validator(VOCABULARY)
 RETRIEVER = TopKRetriever(5)
 KNOWN_EVENTS = 5
 DOES = {
-    "deceive:alibi": "say you were in the kitchen at mid-morning. It isn't true: you were in the study. Cite \"said\" "
-                     "for what you claim",
+    "deceive:alibi": "say you were in the kitchen at mid-morning. It isn't true: you were in the study",
     "deflect": "avoid the question without saying where you were",
 }
 
@@ -58,27 +57,26 @@ def knows(w: World, npc: str, event_id: str) -> bool:
     return e.phase >= C.ARRIVAL and w.npcs[npc].loc in (e.loc, e.target)
 
 
-def pack_for(w: World, npc_id: str, situation: str, options: Mapping[str, float] | None = None,
-             asserts: dict[str, str] | None = None) -> StatePack:
-    """Everything the model may know when it speaks for this NPC. `asserts` marks the options that state a claim."""
+def pack_for(w: World, npc_id: str, situation: str, action: str | None = None,
+             asserts: str | None = None) -> StatePack:
+    """Everything the model may know when it speaks for this NPC. `action` is what code decided it does, if it is
+    acting, and `asserts` the claim that action states, in words."""
     npc, cast = w.npcs[npc_id], C.load_cast()["npc"][npc_id]
     others = [n.id for n in w.npcs_at(npc.loc) if n.id != npc_id]
     if w.player["loc"] == npc.loc:
         others.append("player")
     beliefs = RETRIEVER.beliefs(w.beliefs, npc_id)
     known = [e for e in reversed(list(w.ledger)) if knows(w, npc_id, e.id)][:KNOWN_EVENTS][::-1]
-    ordered = sorted(options or {}, key=lambda o: -(options or {})[o])
-    allowed = []
-    for o in ordered:
-        entry = {"id": o, "does": DOES.get(o, o.replace("_", " ")), "pull": (options or {})[o]}
-        allowed.append(asserting(entry, asserts[o]) if asserts and o in asserts else entry)
+    doing = {"id": action, "does": DOES.get(action, action.replace("_", " "))} if action else None
+    if doing and asserts:
+        doing = asserting(doing, asserts)
     return StatePack(
         npc=npc_id, name=cast["name"], persona=cast["persona"], goal=cast["goal"], situation=situation,
         here=[words.who(x, about=True) for x in others], drives=dict(npc.drives), trust_in=dict(npc.trust_in),
         beliefs=[{"id": b.id, "claim": words.claim_text(b.claim, about=True), "conf": b.conf,
                   "from": sorted({e.source for e in b.evidence})} for b in beliefs],
         events=[{"id": e.id, "what": words.sentence(e, about=True)} for e in known],
-        allowed=allowed,
+        action=doing,
         names=set(C.ROOMS) | set(w.npcs),  # a small household: everyone knows everyone, and every room
         setting=f"You are in {C.ROOM_NAMES[npc.loc]} of Lady Vane's manor, which has a hall, a study and a kitchen. "
                 f"It is {C.PHASES[min(w.phase, len(C.PHASES) - 1)]}.",

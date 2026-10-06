@@ -73,33 +73,37 @@ def test_questioning_needs_a_lead_and_the_rules_hold():
             rules.act(w, verb, target, topic)
 
 
-def liar(line, action="deceive:alibi", cite_said=True):
-    """A model that answers Sable's question with `action` and `line`, and everything else as a good model would."""
+def liar(line, cite_said=True):
+    """A model that words Sable's answer with `line`, and everything else as a good model would."""
     def reply(call_type, pack):
-        if call_type == "decide":
-            return {"action": action, "line": line, "cites": [SAID] if cite_said else [pack["events"][-1]["id"]]}
+        if call_type == "act":
+            return {"cites": [SAID] if cite_said else [pack["events"][-1]["id"]], "line": line}
         return FakeModel.good(call_type, pack)
     return FakeModel(reply)
 
 
-def asked_sable(model):
+def asked_sable(model, fear=None):
     w = new_world()
+    if fear is not None:
+        w.npcs["sable"].drives["fear"] = fear
     rules.act(w, "move", "kitchen")
     rules.act(w, "ask", "sable", "morning", gateway=model)
     return w, last(w, "sable")
 
 
-def test_the_model_tells_the_lie_and_must_cite_it():
-    w, d = asked_sable(liar("The kitchen, all morning. I swear it."))
-    assert (d.source, d.line) == ("llm", "The kitchen, all morning. I swear it.")
+def test_code_chooses_the_lie_and_the_model_words_it():
+    model = liar("The kitchen, all morning. I swear it.")
+    w, d = asked_sable(model)
+    assert (d.chosen, d.source, d.line) == ("deceive:alibi", "llm", "The kitchen, all morning. I swear it.")
     assert w.ledger.get(d.asserted).truth is False and d.cites == [d.asserted]
+    doing = next(p for c, p in model.calls if c == "act")["DOING"]
+    assert doing["says"] == "Sable was in the kitchen at mid-morning" and "pull" not in str(doing)
     w, d = asked_sable(liar("The kitchen, all morning.", cite_said=False))
-    assert d.source == "fallback" and "without citing" in d.reason
-    assert w.ledger.get(d.asserted).truth is False  # the utility brain still lies; the template line cites it
+    assert d.source == "llm" and d.cites[-1] == d.asserted  # the lie is cited whether the model did or not
 
 
-def test_the_model_may_deflect_instead():
-    w, d = asked_sable(liar("Busy day. I couldn't say.", action="deflect", cite_said=False))
+def test_before_she_is_frightened_enough_she_deflects():
+    w, d = asked_sable(liar("Busy day. I couldn't say.", cite_said=False), fear=0)
     assert (d.chosen, d.source, d.asserted) == ("deflect", "llm", None)
     assert not any(e.verb == "tell" and e.actor == "sable" and e.phase > 1 for e in w.ledger)
 

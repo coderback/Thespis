@@ -1,9 +1,12 @@
 """The model gateway: the one way the core calls a language model.
 
-Each call uses JSON mode, max_tokens 150 and temperature 0.6, with thinking switched off through provider-specific
-`extra` fields. It has a 4-second timeout and no retries: if the primary provider fails it tries the backup, and if
-that fails it returns None so the caller uses its code fallback. It never raises, so a model problem never reaches
-the player.
+Each call has max_tokens 150 and temperature 0.6, with thinking switched off through provider-specific `extra`
+fields. A call that comes with a JSON schema uses structured outputs (`json_schema`, strict), so the reply can only
+take that shape; without one, or for a provider set to `STRUCTURED=0`, it uses JSON mode. A provider that refuses
+the schema (an older deployment) is switched to JSON mode for the rest of the process, and the call is tried again
+there. It has a 4-second timeout and no retries: if the primary provider fails it tries the backup, and if that
+fails it returns None so the caller uses its code fallback. It never raises, so a model problem never reaches the
+player.
 
 Azure OpenAI and Azure AI Foundry work too: their hosts get the `api-key` header, and `api_version` adds the
 `api-version` query older deployment URLs need. In `extra`, a null value removes that field from the request,
@@ -12,7 +15,8 @@ e.g. {"max_tokens": null, "max_completion_tokens": 300} for a model that refuses
 A provider that answers 401, 402 or 403 (a dead key or no credit) is skipped for 10 minutes, and one that answers
 429 for 30 seconds, so later calls go straight to the backup. A provider's own content filter (Azure's) refusing the
 prompt or the reply counts as a failed call, logged as "content_filter", with no cooldown: the next call is a new
-text. Every call is logged in `calls` for the harness, with
+text. A model that declines to answer (structured outputs' `refusal`) counts as a failed call too. Every call is
+logged in `calls` for the harness, with
 its latency and token usage; `total` counts every call ever made, so the harness can ask for just the new ones.
 """
 
@@ -24,7 +28,7 @@ import os
 import threading
 import time
 from collections import deque
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from typing import Protocol
@@ -50,6 +54,7 @@ class Provider:
     model: str
     extra: dict = field(default_factory=dict)  # merged into the request body, e.g. {"enable_thinking": false}
     api_version: str = ""  # Azure's api-version query, for deployment-style URLs
+    structured: bool = True  # send a call's JSON schema as structured outputs; False keeps to JSON mode
 
     @property
     def azure(self) -> bool:
@@ -64,9 +69,12 @@ class Provider:
         url = f"{self.base_url.rstrip('/')}/chat/completions"
         return f"{url}?api-version={self.api_version}" if self.api_version else url
 
-    def body(self, messages: list[dict]) -> dict:
+    def body(self, messages: list[dict], schema: dict | None = None, name: str = "reply") -> dict:
+        """The request. With a schema, structured outputs: the reply must match it exactly."""
+        fmt = {"type": "json_schema", "json_schema": {"name": name, "strict": True, "schema": schema}} \
+            if schema is not None else {"type": "json_object"}
         body = {"model": self.model, "messages": messages, "max_tokens": MAX_TOKENS, "temperature": TEMPERATURE,
-                "response_format": {"type": "json_object"}, **self.extra}
+                "response_format": fmt, **self.extra}
         return {k: v for k, v in body.items() if v is not None}  # null in extra removes a field
 
 
@@ -89,18 +97,22 @@ class CallRecord:
     completion_tokens: int | None = None
 
 
+Call = tuple[str, list[dict], dict | None]  # (call type, messages, JSON schema or None)
+
+
 class ModelGateway(Protocol):
     @property
     def models(self) -> tuple[str, ...]:
         """The configured models, primary first: what a cached reply is keyed under."""
         ...
 
-    def complete(self, call_type: str, messages: list[dict]) -> ModelReply | None:
-        """Return the model's parsed JSON reply, or None to make the caller use its fallback."""
+    def complete(self, call_type: str, messages: list[dict], schema: dict | None = None) -> ModelReply | None:
+        """Return the model's parsed JSON reply, or None to make the caller use its fallback. Given a schema, a
+        provider that can holds the reply to it."""
         ...
 
-    def complete_many(self, calls: list[tuple[str, list[dict]]]) -> list[ModelReply | None]:
-        """Several independent calls at once, e.g. different NPCs' decisions in one tick."""
+    def complete_many(self, calls: Sequence[Call]) -> list[ModelReply | None]:
+        """Several independent calls at once, e.g. different NPCs' lines in one moment."""
         ...
 
 
@@ -112,10 +124,10 @@ class NoModel:
     calls: deque = deque(maxlen=0)
     total: int = 0
 
-    def complete(self, call_type: str, messages: list[dict]) -> ModelReply | None:
+    def complete(self, call_type: str, messages: list[dict], schema: dict | None = None) -> ModelReply | None:
         return None
 
-    def complete_many(self, calls: list[tuple[str, list[dict]]]) -> list[ModelReply | None]:
+    def complete_many(self, calls: Sequence[Call]) -> list[ModelReply | None]:
         return [None for _ in calls]
 
     def close(self) -> None:
@@ -144,6 +156,7 @@ class OpenAICompatGateway:
                                     transport=transport)
         self._clock = clock
         self._skip_until: dict[str, float] = {}
+        self._json_only: set[str] = set()  # providers that refused a schema: JSON mode from then on
         self._lock = threading.Lock()
         self._slots = threading.BoundedSemaphore(MAX_CONCURRENT)
 
@@ -151,18 +164,21 @@ class OpenAICompatGateway:
     def models(self) -> tuple[str, ...]:
         return tuple(p.model for p in self.providers)
 
-    def complete(self, call_type: str, messages: list[dict]) -> ModelReply | None:
+    def complete(self, call_type: str, messages: list[dict], schema: dict | None = None) -> ModelReply | None:
         for provider in self.providers:
             with self._lock:
                 skipped = self._clock() < self._skip_until.get(provider.name, 0.0)
+                structured = schema is not None and provider.structured and provider.name not in self._json_only
             if skipped:
                 continue
-            reply = self._call(provider, call_type, messages)
+            reply = self._call(provider, call_type, messages, schema if structured else None)
+            if reply is None and structured and provider.name in self._json_only:  # it refused the schema just now
+                reply = self._call(provider, call_type, messages, None)
             if reply is not None:
                 return reply
         return None
 
-    def complete_many(self, calls: list[tuple[str, list[dict]]]) -> list[ModelReply | None]:
+    def complete_many(self, calls: Sequence[Call]) -> list[ModelReply | None]:
         if not calls:
             return []
         with ThreadPoolExecutor(max_workers=min(MAX_CONCURRENT, len(calls))) as pool:
@@ -171,12 +187,12 @@ class OpenAICompatGateway:
     def close(self) -> None:
         self._client.close()
 
-    def _call(self, p: Provider, call_type: str, messages: list[dict]) -> ModelReply | None:
+    def _call(self, p: Provider, call_type: str, messages: list[dict], schema: dict | None) -> ModelReply | None:
         started = time.perf_counter()
         reply, error, usage = None, None, {}
         try:
             with self._slots:
-                r = self._client.post(p.url(), json=p.body(messages), headers=p.headers())
+                r = self._client.post(p.url(), json=p.body(messages, schema, call_type), headers=p.headers())
             if r.status_code == 200:
                 body = r.json()
                 usage = body.get("usage") or {}
@@ -184,10 +200,17 @@ class OpenAICompatGateway:
                 content = choice["message"]["content"]
                 if choice.get("finish_reason") == "content_filter":
                     error = "content_filter: reply"
+                elif choice["message"].get("refusal"):
+                    error = "refusal"
                 elif not isinstance(content, str):
                     error = "no content in the reply"
                 else:
                     reply = ModelReply(parse_json(content), p.name, p.model, time.perf_counter() - started)
+            elif schema is not None and _schema_refused(r):
+                error = "schema refused"
+                with self._lock:
+                    self._json_only.add(p.name)
+                log.warning("%s refused structured outputs; JSON mode from now on", p.name)
             else:
                 error = "content_filter: prompt" if _filtered(r) else f"HTTP {r.status_code}"
                 if r.status_code in COOLDOWN:
@@ -204,9 +227,22 @@ class OpenAICompatGateway:
             self.total += 1
         log.info("model call: %s %s", call_type, "ok" if reply else error,
                  extra={"call_type": call_type, "provider": p.name, "ok": reply is not None,
+                        "structured": schema is not None,
                         "latency_ms": round(record.latency * 1000), "prompt_tokens": record.prompt_tokens,
                         "completion_tokens": record.completion_tokens, "error": error})
         return reply
+
+
+def _schema_refused(r: httpx.Response) -> bool:
+    """Did the provider refuse the request's JSON schema? It answers 400 and names response_format or json_schema."""
+    if r.status_code != 400:
+        return False
+    try:
+        error = r.json().get("error") or {}
+        text = " ".join(str(error.get(k) or "") for k in ("message", "param", "code")).lower()
+    except (ValueError, AttributeError):
+        return False
+    return "response_format" in text or "json_schema" in text
 
 
 def _filtered(r: httpx.Response) -> bool:
@@ -221,13 +257,14 @@ def _filtered(r: httpx.Response) -> bool:
 
 def provider_from_env(env: Mapping[str, str], prefix: str) -> Provider | None:
     """The provider configured under `prefix` (e.g. LLM_ or JUDGE_DEEPSEEK_): BASE_URL, API_KEY, MODEL, and optional
-    EXTRA (JSON) and API_VERSION. None unless the first three are set."""
+    EXTRA (JSON), API_VERSION and STRUCTURED (0 keeps it to JSON mode). None unless the first three are set."""
     base, key, model = (env.get(f"{prefix}{k}", "").strip() for k in ("BASE_URL", "API_KEY", "MODEL"))
     if not (base and key and model):
         return None
     extra = env.get(f"{prefix}EXTRA", "").strip()
     return Provider(name=f"{urlparse(base).hostname or base}/{model}", base_url=base, api_key=key, model=model,
-                    extra=json.loads(extra) if extra else {}, api_version=env.get(f"{prefix}API_VERSION", "").strip())
+                    extra=json.loads(extra) if extra else {}, api_version=env.get(f"{prefix}API_VERSION", "").strip(),
+                    structured=env.get(f"{prefix}STRUCTURED", "1").strip() != "0")
 
 
 def gateway_from_env(env: Mapping[str, str] | None = None) -> OpenAICompatGateway | NoModel:

@@ -1,19 +1,29 @@
-"""Expression: the model voices an NPC from its state pack, and code checks every word before it counts.
+"""Expression: code decides what an NPC does, the model voices it from its state pack, and code checks every word
+before it counts.
+
+The model makes no choices. It took the strongest drive pull in 86 of 86 decisions it was offered (paper-m1,
+docs/cast-review.md), so code chooses every action and the model only words it: what the NPC says as it does what
+code decided (`act`), a line in reply to something (`react`), or the narrator's telling (`narrate`).
 
 The state pack is the only thing the model sees: persona, goal, drives and trust, the five strongest beliefs and
-the last five events the NPC knows (each with its id), who is here, what just happened and, for a decision, the
-allowed actions. Whether a belief is true is never included.
+the last five events the NPC knows, who is here, what just happened and, for an action, what the NPC is doing.
+Whether a belief is true is never included. Beliefs and events appear under short references in pack order (b1, b2,
+... e1, e2, ...), which the model cites and the Mind maps back to belief and ledger ids. Each call's JSON schema
+lists exactly the references its pack holds, so a provider that constrains its output to it (structured outputs)
+can't cite anything else. Schemas differ only in how many beliefs and events a pack shows; measured on Azure, a
+schema the provider hadn't seen cost no more than one it had (docs/cast-review.md).
 
 The validator rejects a reply, and the NPC falls back to its code line, when any of these fail:
-  - for a decision, the action is one of the allowed ids;
-  - the line is a non-empty string of at most 160 characters;
-  - it cites at least one id, and every cited id is in the state pack;
-  - it names no character or place that is absent from the pack;
-  - for a decision whose action asserts a claim (thespis.deception), it cites that claim.
+  - the line is a non-empty string, no longer than the call type allows;
+  - it cites at least one reference, and every one is in the state pack;
+  - it names no character or place that is absent from the pack.
+An action that states a claim (thespis.deception) always cites it: the Mind adds "said" if the model leaves it out,
+since the action, which code chose, is what states it.
 
-A reply that passes, and passes moderation (thespis.moderation), is cached, keyed by the model, the prompt version,
-the call type and everything in the pack, so the same moment on the same route says the same thing again without a
-model call. In replay mode the Mind only reads the cache: a miss falls back and the network is never touched.
+A reply that passes, and passes moderation (thespis.moderation), is cached, keyed by the model, PROMPT_HASH (the
+prompts and schemas), the call type and everything in the pack, so the same moment says the same thing again
+without a model call. In replay mode the Mind only reads the cache: a miss falls back and the network is never
+touched.
 
 Moderation runs both ways. Text a player wrote that the pack carries (`untrusted`) is checked before any model reads
 it, and a flagged pack gets no model call. A model's line is checked after the validator passes it and before it is
@@ -30,31 +40,42 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Protocol
 
+from thespis.deception import SAID
 from thespis.gateway import ModelGateway, ModelReply
 from thespis.moderation import Moderator, NoModeration
 
 log = logging.getLogger("thespis.moderation")
 
-PROMPT_VERSION = 3  # part of #18's cache key: bump it whenever the prompts below change
 LINE_MAX = 160
 
 _RULES = ("You know only what is listed below. Never state a fact that is not listed.\n"
           "In \"cites\", list the ids of the beliefs or events your line relies on. Always cite at least one: if none "
           "bears on what you say, cite the most recent event you know.\n")
-DECIDE_PROMPT = ("You are {name}. {persona}\n" + _RULES +
-                 "Pick exactly one action id from ALLOWED. Each action's \"pull\" is how strongly your drives push you "
-                 "towards it: follow the strongest pull unless your persona clearly says otherwise.\n"
-                 "Write one line of dialogue, at most 25 words, in character.\n"
-                 'Reply with JSON only: {{"action": "...", "line": "...", "cites": ["..."]}}')
+_REPLY = 'Reply with JSON only: {{"cites": ["..."], "line": "..."}}'  # the evidence first, then the words
+ACT_PROMPT = ("You are {name}. {persona}\n" + _RULES +
+              "DOING is what you have decided to do. Say one line of dialogue to go with it, at most 25 words, in "
+              "character: what you say, not a description of what you do. If DOING says something, your line says "
+              "it, and cites \"said\".\n" + _REPLY)
 REACT_PROMPT = ("You are {name}. {persona}\n" + _RULES +
-                "Say one line of dialogue in reply to what just happened, at most 25 words, in character.\n"
-                'Reply with JSON only: {{"line": "...", "cites": ["..."]}}')
+                "Say one line of dialogue in reply to what just happened, at most 25 words, in character.\n" + _REPLY)
 NARRATE_PROMPT = ("You are {name}. {persona}\n" + _RULES +
                   "Tell the player what happened, including what they couldn't see, in 2 or 3 short sentences: speak "
-                  "to the player as \"you\", in the past tense, mentioning only the events listed.\n"
-                  'Reply with JSON only: {{"line": "...", "cites": ["..."]}}')
-PROMPTS = {"decide": DECIDE_PROMPT, "react": REACT_PROMPT, "narrate": NARRATE_PROMPT}
-LIMITS = {"decide": LINE_MAX, "react": LINE_MAX, "narrate": 400}  # characters per line, by call type
+                  "to the player as \"you\", in the past tense, mentioning only the events listed.\n" + _REPLY)
+PROMPTS = {"act": ACT_PROMPT, "react": REACT_PROMPT, "narrate": NARRATE_PROMPT}
+LIMITS = {"act": LINE_MAX, "react": LINE_MAX, "narrate": 400}  # characters per line, by call type
+
+
+def schema_for(refs: list[str]) -> dict:
+    """A reply's JSON schema: cites from `refs`, then the line. In the subset strict structured outputs accept, which
+    has no minItems or maxLength, so the validator still checks that it cites something and how long the line is."""
+    return {"type": "object", "additionalProperties": False, "required": ["cites", "line"],
+            "properties": {"cites": {"type": "array", "items": {"type": "string", "enum": refs}},
+                           "line": {"type": "string"}}}
+
+
+# Part of every cache key (#18): any change to the prompts, the schemas' shape or the limits gives new keys.
+PROMPT_HASH = hashlib.sha256(json.dumps({"prompts": PROMPTS, "schema": schema_for(["<ref>"]), "limits": LIMITS},
+                                        sort_keys=True).encode("utf-8")).hexdigest()[:12]
 
 
 @dataclass
@@ -67,34 +88,53 @@ class StatePack:
     here: list[str]  # who shares its stop
     drives: dict
     trust_in: dict
-    beliefs: list[dict]  # {"id", "claim", "conf", "from"}
-    events: list[dict]  # {"id", "what"}
-    allowed: list[dict] = field(default_factory=list)  # {"id", "does", "pull"}; empty for a reply with no action
+    beliefs: list[dict]  # {"id", "claim", "conf", "from"}, strongest first
+    events: list[dict]  # {"id", "what"}, oldest first
+    action: dict | None = None  # what code decided the NPC does: {"id", "does"}, and "asserts" if it states a claim
     names: set[str] = field(default_factory=set)  # every character and place the pack mentions, as game ids
     setting: str = ""  # where the NPC is and the lie of the land, as the game describes it
     untrusted: list[str] = field(default_factory=list)  # text a player wrote that the pack carries, for moderation
 
     @property
+    def asserts(self) -> bool:
+        return bool(self.action and "asserts" in self.action)
+
+    @property
+    def refs(self) -> dict[str, str]:
+        """Each reference the model may cite, mapped to the belief or ledger id it stands for."""
+        out = {f"b{i}": b["id"] for i, b in enumerate(self.beliefs, 1)}
+        out |= {f"e{i}": e["id"] for i, e in enumerate(self.events, 1)}
+        if self.asserts:
+            out[SAID] = SAID
+        return out
+
+    @property
     def ids(self) -> set[str]:
-        asserted = {a["asserts"]["id"] for a in self.allowed if "asserts" in a}
-        return {b["id"] for b in self.beliefs} | {e["id"] for e in self.events} | asserted
+        """The belief and ledger ids the pack holds, and "said" if its action states a claim."""
+        return set(self.refs.values())
 
     def payload(self) -> dict:
         data = {"you": self.name, "goal": self.goal, "setting": self.setting, "situation": self.situation,
-                "here": self.here,
-                "drives": self.drives, "trust": self.trust_in, "beliefs": self.beliefs, "events": self.events}
-        if self.allowed:
-            data["ALLOWED"] = self.allowed
+                "here": self.here, "drives": self.drives, "trust": self.trust_in,
+                "beliefs": [{**b, "id": f"b{i}"} for i, b in enumerate(self.beliefs, 1)],
+                "events": [{**e, "id": f"e{i}"} for i, e in enumerate(self.events, 1)]}
+        if self.action:
+            data["DOING"] = {"does": self.action["does"]}
+            if self.asserts:
+                data["DOING"]["says"] = self.action["asserts"]["claim"]
         return data
 
     def messages(self, kind: str) -> list[dict]:
-        prompt = PROMPTS[kind]
-        return [{"role": "system", "content": prompt.format(name=self.name, persona=self.persona)},
+        return [{"role": "system", "content": PROMPTS[kind].format(name=self.name, persona=self.persona)},
                 {"role": "user", "content": json.dumps(self.payload(), ensure_ascii=False)}]
 
+    def schema(self) -> dict:
+        """The reply's JSON schema: it may cite exactly the references this pack holds."""
+        return schema_for(list(self.refs))
+
     def cache_key(self, model: str, kind: str) -> str:
-        """sha256 of the model, the prompt version, the call type and everything the model is shown, canonically."""
-        canonical = json.dumps({"model": model, "prompt_version": PROMPT_VERSION, "call": kind, "name": self.name,
+        """sha256 of the model, the prompts' hash, the call type and everything the model is shown, canonically."""
+        canonical = json.dumps({"model": model, "prompts": PROMPT_HASH, "call": kind, "name": self.name,
                                 "persona": self.persona, "pack": self.payload()},
                                sort_keys=True, ensure_ascii=False, separators=(",", ":"))
         return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
@@ -104,7 +144,7 @@ class StatePack:
 class Utterance:
     action: str | None
     line: str | None
-    cites: list[str]
+    cites: list[str]  # belief and ledger ids, and "said" for the claim an action states
     source: str  # "llm", "cache" or "fallback"
     note: str = ""  # why the fallback was used, or which model spoke
 
@@ -134,9 +174,7 @@ class Validator:
         return {self.vocabulary[m.group(1).lower()] for m in self._pattern.finditer(line)}
 
     def problem(self, data: dict, pack: StatePack, kind: str) -> str | None:
-        """Why a model reply can't be used, or None if it passes."""
-        if kind == "decide" and data.get("action") not in {a["id"] for a in pack.allowed}:
-            return f"action {data.get('action')!r} is not allowed"
+        """Why a model reply (citing the pack's references) can't be used, or None if it passes."""
         line = data.get("line")
         if not isinstance(line, str) or not line.strip():
             return "no line"
@@ -146,17 +184,9 @@ class Validator:
         cites = data.get("cites")
         if not isinstance(cites, list) or not cites or not all(isinstance(c, str) for c in cites):
             return "no cites"
-        unknown = [c for c in cites if c not in pack.ids]
+        unknown = [c for c in cites if c not in pack.refs]
         if unknown:
             return f"cites {', '.join(unknown)}, not in its state pack"
-        if kind == "decide":
-            chosen = next(a for a in pack.allowed if a["id"] == data["action"])
-            said = chosen["asserts"]["id"] if "asserts" in chosen else None
-            if said is not None and said not in cites:
-                return f"states something without citing {said!r}, the claim its action asserts"
-            other = {a["asserts"]["id"] for a in pack.allowed if "asserts" in a} - {said}
-            if other & set(cites):
-                return f"cites {', '.join(sorted(other & set(cites)))}, a claim its action doesn't state"
         absent = self.named(line) - pack.names
         if absent:
             return f"names {', '.join(sorted(absent))}, absent from its state pack"
@@ -195,8 +225,9 @@ class Mind:
     def active(self) -> bool:
         return self.gateway is not None
 
-    def decide(self, pack: StatePack, fallback: Utterance) -> Utterance:
-        return self._speak("decide", [(pack, fallback)])[0]
+    def act(self, pack: StatePack, fallback: Utterance) -> Utterance:
+        """The NPC's line as it does what code decided (`fallback.action`, which the pack's action describes)."""
+        return self._speak("act", [(pack, fallback)])[0]
 
     def narrate(self, pack: StatePack, fallback: Utterance) -> Utterance:
         """The narrator's telling of the events in the pack: 2 or 3 sentences that cite them."""
@@ -236,7 +267,7 @@ class Mind:
             missing = missing[:allowed]
         if not missing:
             return spoken
-        calls = [(kind, items[i][0].messages(kind)) for i in missing]
+        calls = [(kind, items[i][0].messages(kind), items[i][0].schema()) for i in missing]
         self.asked += len(calls)
         answers = [gateway.complete(*calls[0])] if len(calls) == 1 else gateway.complete_many(calls)
         for i, reply in zip(missing, answers):
@@ -283,7 +314,7 @@ class Mind:
         for model in self.models:
             hit = self.cache.get_reply(pack.cache_key(model, kind))
             if hit and not self.validator.problem(hit[0], pack, kind):  # one the validator now rejects is a miss
-                return _spoken(hit[0], kind, fallback, "cache", hit[1])
+                return _spoken(hit[0], pack, fallback, "cache", hit[1])
         return None
 
     def _accept(self, reply, pack: StatePack, fallback: Utterance, kind: str) -> Utterance:
@@ -292,12 +323,16 @@ class Mind:
         problem = self.validator.problem(reply.data, pack, kind)
         if problem:
             return _fell_back(fallback, f"model reply rejected: {problem}")
-        return _spoken(reply.data, kind, fallback, "llm", reply.provider)  # _keep caches it, once moderated
+        return _spoken(reply.data, pack, fallback, "llm", reply.provider)  # _keep caches it, once moderated
 
 
-def _spoken(data: dict, kind: str, fallback: Utterance, source: str, provider: str) -> Utterance:
-    action = data.get("action") if kind == "decide" else fallback.action
-    return Utterance(action, data["line"].strip(), list(dict.fromkeys(data["cites"])), source, provider)
+def _spoken(data: dict, pack: StatePack, fallback: Utterance, source: str, provider: str) -> Utterance:
+    """A reply the validator passed, its references mapped to ids. The action is always code's."""
+    refs = pack.refs
+    cites = [refs[c] for c in dict.fromkeys(data["cites"])]
+    if pack.asserts and SAID not in cites:
+        cites.append(SAID)
+    return Utterance(fallback.action, data["line"].strip(), cites, source, provider)
 
 
 def _fell_back(fallback: Utterance, why: str) -> Utterance:

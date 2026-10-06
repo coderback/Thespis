@@ -69,7 +69,7 @@ def extract(gateway, samples: list[dict], progress=print) -> None:
     for start in range(0, len(samples), batch):
         chunk = samples[start:start + batch]
         calls = [("extract", extraction_messages(vocabulary(s["game"]), s["npc"], s["name"], s["situation"],
-                                                 s["here"], s["line"])) for s in chunk]
+                                                 s["here"], s["line"]), None) for s in chunk]
         for s, reply in zip(chunk, gateway.complete_many(calls)):
             s["claims"] = parse_claims(reply.data) if reply is not None else None
         progress(f"  judged {min(start + batch, len(samples))} of {len(samples)} lines")

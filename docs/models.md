@@ -16,7 +16,7 @@ Both deployments are on Tobi's own Azure subscription, pay as you go. **The hack
 
 Set as Railway variables, never in the repo: `LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL` and `LLM_EXTRA`, and the same with `LLM_BACKUP_`. Both point at the resource's OpenAI v1 endpoint (`https://<resource>.services.ai.azure.com/openai/v1`); the gateway sends the key as `api-key`, as Azure requires.
 
-Every call: JSON mode, a 4-second budget (1 s to connect), no retries, then the backup, then the code fallback. Both deployments use the same `LLM_EXTRA`:
+Every call: the call type's fixed JSON schema as structured outputs (or JSON mode with `LLM_STRUCTURED=0`), a 4-second budget (1 s to connect), no retries, then the backup, then the code fallback. Both deployments use the same `LLM_EXTRA`:
 
 ```json
 {"reasoning_effort": "none", "max_tokens": null, "max_completion_tokens": 300, "temperature": null}

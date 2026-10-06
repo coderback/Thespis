@@ -8,7 +8,7 @@ all of a moment's lines at once, keeps only the replies that pass the validator,
 from __future__ import annotations
 
 import re
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
 from dataclasses import dataclass
 
 from games.crypt_road import content as C
@@ -52,7 +52,7 @@ class CryptRoadValidator(Validator):
 
     def problem(self, data: dict, pack: StatePack, kind: str) -> str | None:
         why = super().problem(data, pack, kind)
-        if why is None and any(a["id"].startswith("counter:") for a in pack.allowed):
+        if why is None and pack.action and pack.action["id"].partition(":")[0] in ("counter", "refuse"):
             stray = numbers(data["line"]) - numbers(pack.situation)
             if stray:
                 return f"names {', '.join(map(str, sorted(stray)))}, neither the offer nor the price"
@@ -143,7 +143,7 @@ def persona_of(w: World, npc_id: str) -> str:
 
 
 def describe(option: str, w: World, npc: str) -> str:
-    """One line on what an allowed action does, for the model."""
+    """One line on what an action does, for the model."""
     kind, _, who = option.partition(":")
     nxt = C.next_stop(w.npcs[npc].loc)
     return {
@@ -159,10 +159,11 @@ def describe(option: str, w: World, npc: str) -> str:
     }.get(kind, option.replace("_", " "))
 
 
-def pack_for(w: World, npc_id: str, situation: str, options: Mapping[str, float] | None = None,
-             view: View | None = None, untrusted: tuple[str, ...] = ()) -> StatePack:
+def pack_for(w: World, npc_id: str, situation: str, action: str | None = None, view: View | None = None,
+             untrusted: tuple[str, ...] = ()) -> StatePack:
     """Everything the model may know when it speaks for this NPC, and nothing more. Never whether a belief is true.
-    `untrusted` is what the player wrote that the situation quotes; a persona the player edited counts too."""
+    `action` is what code decided the NPC does, if it is acting. `untrusted` is what the player wrote that the
+    situation quotes; a persona the player edited counts too."""
     npc, cast, view = w.npcs[npc_id], C.load_cast()["npc"][npc_id], _view(w, view)
     others = [n.id for n in w.npcs_at(npc.loc) if n.id != npc_id]
     if view.player_at == npc.loc:
@@ -178,9 +179,8 @@ def pack_for(w: World, npc_id: str, situation: str, options: Mapping[str, float]
         names |= {e.actor, e.target}
         if e.claim:
             names |= {e.claim.a, e.claim.b}
-    ordered = sorted(options or {}, key=lambda o: -(options or {})[o])  # stable: ties keep their order
-    for option in ordered:
-        names.add(option.partition(":")[2])
+    if action:
+        names.add(action.partition(":")[2])
     return StatePack(
         npc=npc_id, name=cast["name"], persona=persona_of(w, npc_id), goal=cast["goal"], situation=situation,
         here=[words.who(x, player=words.ABOUT_PLAYER) for x in others],
@@ -188,7 +188,7 @@ def pack_for(w: World, npc_id: str, situation: str, options: Mapping[str, float]
         beliefs=[{"id": b.id, "claim": _about(b.claim), "conf": b.conf,
                   "from": sorted({e.source for e in b.evidence})} for b in beliefs],
         events=[{"id": e.id, "what": words.sentence(e, words.ABOUT_PLAYER)} for e in known],
-        allowed=[{"id": o, "does": describe(o, w, npc_id), "pull": (options or {})[o]} for o in ordered],
+        action={"id": action, "does": describe(action, w, npc_id)} if action else None,
         names={x for x in names if x and x != "player"},
         setting=f"You are at {C.STOP_NAMES[npc.loc]}. The road runs east: "
                 + ", ".join(C.STOP_NAMES[s] for s in C.STOPS) + ". The relic lies in the crypt.",

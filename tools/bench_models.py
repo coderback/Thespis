@@ -38,7 +38,7 @@ class Recorder:
     def __init__(self):
         self.packs: list[tuple[str, StatePack]] = []
 
-    def complete(self, call_type, messages) -> ModelReply | None:
+    def complete(self, call_type, messages, schema=None) -> ModelReply | None:
         return None
 
     def complete_many(self, calls) -> list[ModelReply | None]:
@@ -52,7 +52,7 @@ def demo_packs() -> list[tuple[str, StatePack]]:
 
     def recording(*args, **kwargs):
         pack = original(*args, **kwargs)
-        packs.append(("decide" if pack.allowed else "react", pack))
+        packs.append(("act" if pack.action else "react", pack))
         return pack
 
     voice.pack_for = recording
@@ -72,7 +72,7 @@ def bench(provider, packs, calls: int, transport=None) -> dict:
     try:
         for i in range(calls):
             kind, pack = packs[i % len(packs)]
-            reply = gateway.complete(kind, pack.messages(kind))
+            reply = gateway.complete(kind, pack.messages(kind), pack.schema())
             problem = "no reply" if reply is None else voice.VALIDATOR.problem(reply.data, pack, kind)
             if problem is None:
                 valid += 1
@@ -84,7 +84,7 @@ def bench(provider, packs, calls: int, transport=None) -> dict:
     ok = [c.latency for c in gateway.calls if c.ok]
     return {"model": provider.model, "calls": calls, "answered": len(ok), "valid": valid, "problems": problems,
             "p50": percentile(ok, 50), "p95": percentile(ok, 95), "max": max(ok, default=None),
-            "decides": sum(k == "decide" for k, _ in (packs[i % len(packs)] for i in range(calls)))}
+            "acts": sum(k == "act" for k, _ in (packs[i % len(packs)] for i in range(calls)))}
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -97,13 +97,13 @@ def main(argv: list[str] | None = None) -> int:
         print("No models configured: set LLM_* (and LLM_BACKUP_*) in .env")
         return 1
     packs = demo_packs()
-    print(f"{len(packs)} state packs from the demo route ({sum(k == 'decide' for k, _ in packs)} decisions)\n")
-    print("| Model | Calls (decisions) | Answered | Valid picks | p50 | p95 | Max | Rejections |")
+    print(f"{len(packs)} state packs from the demo route ({sum(k == 'act' for k, _ in packs)} of them actions)\n")
+    print("| Model | Calls (actions) | Answered | Valid lines | p50 | p95 | Max | Rejections |")
     print("| --- | --- | --- | --- | --- | --- | --- | --- |")
     for p in providers:
         r = bench(p, packs, args.calls)
         ms = lambda s: "n/a" if s is None else f"{s * 1000:.0f} ms"  # noqa: E731
-        print(f"| {r['model']} | {r['calls']} ({r['decides']}) | {r['answered']} | {r['valid'] / r['calls']:.0%} | "
+        print(f"| {r['model']} | {r['calls']} ({r['acts']}) | {r['answered']} | {r['valid'] / r['calls']:.0%} | "
               f"{ms(r['p50'])} | {ms(r['p95'])} | {ms(r['max'])} | {r['problems'] or 'none'} |")
     return 0
 

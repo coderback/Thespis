@@ -38,7 +38,7 @@ from games.hosting import budget as _budget
 from games.hosting import env_int as _env_int
 from games.manor import api as manor
 from games.manor.content import load_cast as manor_cast
-from thespis.expression import Mind
+from thespis.expression import PROMPT_HASH, Mind
 from thespis.gateway import gateway_from_env
 from thespis.moderation import Layered, content_safety_from_env
 from thespis.store import SessionNotFound, Store
@@ -59,10 +59,10 @@ async def lifespan(app: FastAPI):
     log.info("boot #%d, database at %s", app.state.store.record_boot(), path.resolve())
     gateway = app.state.gateway = gateway_from_env()
     app.state.replay = os.environ.get("REPLAY", "0").strip() == "1"  # the cache and fallback only, never the network
-    names = [p.name for p in gateway.providers]
+    names = [f"{p.name} ({'structured' if p.structured else 'JSON mode'})" for p in gateway.providers]
     log.info("models: %s%s", " then ".join(names) + " then fallback" if names else "none configured, fallback only",
                 "; REPLAY=1, so only cached replies, no model calls" if app.state.replay else "")
-    log.info("model cache: %d replies", app.state.store.cached_replies())
+    log.info("prompts: %s; model cache: %d replies", PROMPT_HASH, app.state.store.cached_replies())
     # #24: caps on model calls (0 = none; cache hits are free) and on new sessions per IP
     app.state.session_cap = _env_int("SESSION_CALL_CAP", 60)
     app.state.global_cap = _env_int("GLOBAL_CALL_CAP", 0)
