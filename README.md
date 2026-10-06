@@ -288,9 +288,12 @@ which rebuilds and redeploys every merge to `main`.
   checks every model line. Each check is one more model call, counted against the caps, through the model that
   spoke unless `LLM_CHECK_*` names another. The boot log says which.
 
-  Why off: in Rehearsal every line the check refused was a misreading by the extractor, and two of them were Lady
-  Vane's verdict. The model that spoke (gpt-6-luna) added 0.2 s at p95; gpt-5.4-nano thinking a little read no
-  better and took too long, so 19 calls timed out. The reports are `rehearsal/reports/claim-check-*.md`.
+  Why off: in three rehearsals the check refused 9 lines that the extractor (gpt-6-luna) had misread, and no line it
+  should have refused. Marking whom each claim is credited to (`attributed_to`) stopped it refusing Lady Vane's
+  verdict, which repeats Sable's alibi, but extraction slowed to 1.5 s, and act p95 rose to 3.3 s from 2.3 s without
+  the check. gpt-5.4-nano thinking a little was slower still: 19 calls timed out. With so few lines actually wrong,
+  the check needs extraction both more accurate and faster than either. The reports are
+  `rehearsal/reports/claim-check-*.md`.
 - **Edges:** no CORS unless `CORS_ORIGINS` lists origins; no generated API docs unless `API_DOCS=1`; bodies over
   64 KiB refused. After a deploy, `python tools/exposure.py <host>` should pass every check.
 - **Logs:** JSON lines (`LOG_FORMAT=json`, set by the image) with `message`, `level` and fields such as `path`,
