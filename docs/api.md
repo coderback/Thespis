@@ -18,12 +18,21 @@ Changing anything here? Update `fixtures/` in the same PR and get the other pers
 | `POST /reset` | `{state}` | Wipes this session, keeps the seed |
 | `POST /reload` | `{state}` | Rebuilds this session from disk (dev panel) |
 | `POST /dev/brain` `{mode: "model" or "fallback"}` | `{mode}` | The "brain off" toggle |
-| `POST /dev/persona` `{npc, persona}` | `{npc, persona, default}` | Live persona editing (#39): this session's NPC speaks with `persona` (up to 300 characters) from its next model line. An empty or `null` persona goes back to the default. Other sessions are untouched |
-| `GET /dev/calls?since=<total>` | `{total, calls: [{call_type, provider, ok, latency, error, prompt_tokens, completion_tokens}]}` | The model calls made since an earlier `total`, across all sessions. For the harness (#25); the client doesn't need it |
+| `POST /dev/persona` `{npc, persona}` | `{npc, persona, default}` | Live persona editing (#39): this session's NPC speaks with `persona` (up to 300 characters) from its next model line. An empty or `null` persona goes back to the default. Other sessions are untouched. A persona moderation flags gets `400` with a reason to show the player |
+| `GET /dev/calls?since=<total>` | `{total, calls: [{call_type, provider, ok, latency, error, prompt_tokens, completion_tokens}]}` | The model calls made since an earlier `total`, across all sessions. For the harness (#25); the client doesn't need it. **Admin only:** send `Authorization: Bearer <ADMIN_TOKEN>`. Without the right token it returns `401`, and on a server with no token set, `404` |
 | `GET /health` | `{ok: true}` | For the host |
 
 Errors: a malformed body returns `400`, and a verb that `/allowed` lists as disabled (or doesn't list) returns `409`.
-A hit rate limit returns `429`. All three carry `{error, reason}`, with `reason` readable by a player.
+A hit rate limit returns `429`, and a body over 64 KiB returns `413`. All of them carry `{error, reason}`, with
+`reason` readable by a player.
+
+The `/reload` and `/dev/*` endpoints other than `/dev/calls` stay open: the dev panel and the Minds tab use them, and
+each touches only the caller's own session. The server sends no CORS headers unless `CORS_ORIGINS` names an origin:
+the client is served from the same URL, and in dev Vite proxies the API.
+
+Moderation runs on what a player writes (the text of `talk`, an edited persona) before a model reads it, and on every
+model line before the player sees it. A flagged line is replaced by the NPC's code line, with `source: "fallback"`,
+so the response shape never changes.
 
 ## Verbs
 
