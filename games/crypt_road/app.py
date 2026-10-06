@@ -27,6 +27,7 @@ from games.hosting import (
     SessionLocks,
     blocklist,
     client_ip,
+    configure_logging,
     cors_origins,
     db_path,
     docs_settings,
@@ -50,29 +51,30 @@ LOCKS = SessionLocks()  # one request at a time per session
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    configure_logging()
     path = db_path()
     app.state.store = Store(path)
     app.state.admin_token = os.environ.get("ADMIN_TOKEN", "").strip()  # unset: the admin endpoints don't exist
     # On the host, a count that keeps rising across redeploys proves the volume persists.
-    log.warning("boot #%d, database at %s", app.state.store.record_boot(), path.resolve())
+    log.info("boot #%d, database at %s", app.state.store.record_boot(), path.resolve())
     gateway = app.state.gateway = gateway_from_env()
     app.state.replay = os.environ.get("REPLAY", "0").strip() == "1"  # the cache and fallback only, never the network
     names = [p.name for p in gateway.providers]
-    log.warning("models: %s%s", " then ".join(names) + " then fallback" if names else "none configured, fallback only",
+    log.info("models: %s%s", " then ".join(names) + " then fallback" if names else "none configured, fallback only",
                 "; REPLAY=1, so only cached replies, no model calls" if app.state.replay else "")
-    log.warning("model cache: %d replies", app.state.store.cached_replies())
+    log.info("model cache: %d replies", app.state.store.cached_replies())
     # #24: caps on model calls (0 = none; cache hits are free) and on new sessions per IP
     app.state.session_cap = _env_int("SESSION_CALL_CAP", 60)
     app.state.global_cap = _env_int("GLOBAL_CALL_CAP", 0)
     app.state.limiter = SessionLimiter(_env_int("SESSIONS_PER_IP_HOUR", 30))
-    log.warning("caps: %s model calls per session, %s in all (%d made so far), %s new sessions per IP per hour",
+    log.info("caps: %s model calls per session, %s in all (%d made so far), %s new sessions per IP per hour",
                 app.state.session_cap or "no cap on", app.state.global_cap or "no cap on",
                 app.state.store.calls_made(), app.state.limiter.per_hour or "no limit on")
     # Moderation, both ways, for both games: Content Safety when configured, after each game's own blocklist.
     remote = content_safety_from_env()
     app.state.moderator = Layered(blocklist(load_cast()), remote)
     app.state.manor_moderator = Layered(blocklist(manor_cast()), remote)
-    log.warning("moderation: %s; the manor: %s", app.state.moderator, app.state.manor_moderator)
+    log.info("moderation: %s; the manor: %s", app.state.moderator, app.state.manor_moderator)
     yield
     gateway.close()  # the one this app opened, even if a test swapped app.state.gateway
     if remote is not None:

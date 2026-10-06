@@ -19,6 +19,7 @@ its latency and token usage; `total` counts every call ever made, so the harness
 from __future__ import annotations
 
 import json
+import logging
 import os
 import threading
 import time
@@ -30,6 +31,8 @@ from typing import Protocol
 from urllib.parse import urlparse
 
 import httpx
+
+log = logging.getLogger("thespis.gateway")
 
 TIMEOUT = 4.0  # the whole call's budget. httpx times each phase separately, so it is split:
 CONNECT_TIMEOUT = 1.0  # 1 s to connect, and the rest to send the request and read the reply
@@ -196,6 +199,10 @@ class OpenAICompatGateway:
         with self._lock:
             self.calls.append(record)
             self.total += 1
+        log.info("model call: %s %s", call_type, "ok" if reply else error,
+                 extra={"call_type": call_type, "provider": p.name, "ok": reply is not None,
+                        "latency_ms": round(record.latency * 1000), "prompt_tokens": record.prompt_tokens,
+                        "completion_tokens": record.completion_tokens, "error": error})
         return reply
 
 

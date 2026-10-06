@@ -1,18 +1,21 @@
 """What any game hosted on this server shares: errors, the per-IP session limit, the database path, the model call
-caps, and what keeps the server's edges shut: the admin token, CORS, API docs, body size and security headers. The
-Crypt Road's app hosts the server; the manor mystery (#35) mounts its routes on it and uses these too.
+caps, the logs, and what keeps the server's edges shut: the admin token, CORS, API docs, body size and security
+headers. The Crypt Road's app hosts the server; the manor mystery (#35) mounts its routes on it and uses these too.
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import os
 import secrets
+import sys
 import threading
 import time
 from collections import defaultdict, deque
 from contextlib import contextmanager
+from datetime import UTC, datetime
 from pathlib import Path
 
 from fastapi import Request
@@ -22,6 +25,7 @@ from thespis.store import Store
 from thespis.world import World
 
 log = logging.getLogger("thespis")
+http_log = logging.getLogger("thespis.http")
 
 MAX_BODY = 64 * 1024  # bytes in a request body; the largest real one, a persona edit, is well under 1 KB
 SECURITY_HEADERS = [(b"x-content-type-options", b"nosniff"), (b"referrer-policy", b"strict-origin-when-cross-origin")]
@@ -35,6 +39,51 @@ class ApiError(Exception):
 def env_int(name: str, default: int) -> int:
     value = os.environ.get(name, "").strip()
     return int(value) if value else default
+
+
+# ---------------------------------------------------------------- logs
+_LEVELS = {"DEBUG": "debug", "INFO": "info", "WARNING": "warn", "ERROR": "error", "CRITICAL": "error"}
+_RECORD_FIELDS = set(vars(logging.makeLogRecord({}))) | {"message", "asctime", "taskName", "color_message"}
+_HANDLER = "thespis"
+
+
+class JsonFormatter(logging.Formatter):
+    """One JSON object per line, as Railway reads them: `message`, `level` (debug, info, warn or error), and every
+    `extra` field beside them, which Railway lets you filter on as @name:value."""
+
+    def format(self, record: logging.LogRecord) -> str:
+        out = {"message": record.getMessage(), "level": _LEVELS.get(record.levelname, "info"), "logger": record.name,
+               "time": datetime.fromtimestamp(record.created, UTC).isoformat(timespec="milliseconds")}
+        out.update({k: v for k, v in vars(record).items() if k not in _RECORD_FIELDS and not k.startswith("_")})
+        if record.exc_info:
+            out["exception"] = self.formatException(record.exc_info)
+        return json.dumps(out, default=str, ensure_ascii=False)
+
+
+def configure_logging(fmt: str | None = None) -> None:
+    """Log at INFO to stdout: JSON lines with LOG_FORMAT=json, which the image sets, else plain text. Calling it again
+    replaces only its own handler. With JSON, uvicorn's own logs come through the same handler, except its access log:
+    the Guard logs every request already."""
+    fmt = (fmt if fmt is not None else os.environ.get("LOG_FORMAT", "")).strip().lower()
+    root = logging.getLogger()
+    root.handlers = [h for h in root.handlers if h.get_name() != _HANDLER]
+    handler = logging.StreamHandler(sys.stdout)
+    handler.set_name(_HANDLER)
+    handler.setFormatter(JsonFormatter() if fmt == "json" else
+                         logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
+    root.addHandler(handler)
+    root.setLevel(logging.INFO)
+    if fmt == "json":
+        for name in ("uvicorn", "uvicorn.error"):
+            logger = logging.getLogger(name)
+            logger.handlers, logger.propagate = [], True
+        access = logging.getLogger("uvicorn.access")
+        access.handlers, access.propagate = [], False
+
+
+def session_tag(session: str | bytes) -> str:
+    """A short, stable stand-in for a session id in the logs: the id itself is the session's only credential."""
+    return hashlib.sha256(session if isinstance(session, bytes) else session.encode()).hexdigest()[:10]
 
 
 # ---------------------------------------------------------------- the server's edges
@@ -62,7 +111,8 @@ def cors_origins() -> list[str]:
 
 
 class Guard:
-    """ASGI middleware on every request: refuse a body over MAX_BODY with 413, and add the security headers."""
+    """ASGI middleware on every request: refuse a body over MAX_BODY with 413, add the security headers, and log one
+    line: method, path, status and time, with the session as a tag, never its id. Static assets aren't logged."""
 
     def __init__(self, app):
         self.app = app
@@ -70,29 +120,40 @@ class Guard:
     async def __call__(self, scope, receive, send):
         if scope["type"] != "http":
             return await self.app(scope, receive, send)
+        started, status = time.perf_counter(), 500
         headers = dict(scope["headers"])
-        length = headers.get(b"content-length")
-        if length is not None and (not length.isdigit() or int(length) > MAX_BODY):
-            return await _too_large(send)
-        if length is None and b"chunked" in headers.get(b"transfer-encoding", b""):
-            body = await _read_body(receive)  # no length given: read it here, up to the limit, then hand it on
-            if body is None:
-                return await _too_large(send)
-            receive = _replay(body)
 
         async def secured(message):
+            nonlocal status
             if message["type"] == "http.response.start":
+                status = message["status"]
                 message["headers"] = [*message.get("headers", []), *SECURITY_HEADERS]
             await send(message)
 
-        await self.app(scope, receive, secured)
+        try:
+            length = headers.get(b"content-length")
+            if length is not None and (not length.isdigit() or int(length) > MAX_BODY):
+                return await _too_large(secured)
+            if length is None and b"chunked" in headers.get(b"transfer-encoding", b""):
+                body = await _read_body(receive)  # no length given: read it here, up to the limit, then hand it on
+                if body is None:
+                    return await _too_large(secured)
+                receive = _replay(body)
+            await self.app(scope, receive, secured)
+        finally:
+            path = scope.get("path", "")
+            if not path.startswith("/assets/"):
+                fields = {"method": scope.get("method"), "path": path, "status": status,
+                          "ms": round((time.perf_counter() - started) * 1000)}
+                if b"x-session" in headers:
+                    fields["session"] = session_tag(headers[b"x-session"])
+                http_log.info("%s %s %d", fields["method"], path, status, extra=fields)
 
 
 async def _too_large(send) -> None:
     body = json.dumps({"error": "too_large", "reason": f"Request bodies are limited to {MAX_BODY} bytes"}).encode()
     await send({"type": "http.response.start", "status": 413,
-                "headers": [(b"content-type", b"application/json"), (b"content-length", str(len(body)).encode()),
-                            *SECURITY_HEADERS]})
+                "headers": [(b"content-type", b"application/json"), (b"content-length", str(len(body)).encode())]})
     await send({"type": "http.response.body", "body": body})
 
 
