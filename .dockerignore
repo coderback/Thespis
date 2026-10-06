@@ -19,3 +19,4 @@ client/node_modules
 client/dist
 docs
 tests
+backups

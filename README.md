@@ -248,10 +248,19 @@ which rebuilds and redeploys every merge to `main`.
   prompt, a persona or the state pack. `REPLAY=1` then plays from the cache and the fallback alone. The boot log
   shows `model cache: N replies`.
 - **Persistence check:** redeploy the service, and the log's `boot #N` should go up by one.
-- **Backups:** turn on Railway's volume backups in the service's volume settings: Daily (kept 6 days) and Weekly
-  (kept 27 days). They cover both games' databases. Take a manual one before any risky deploy. To restore, pick a backup by date and press Restore; Railway
-  stages a new volume to review before deploying it. Wiping a volume deletes its backups too, so these aren't an
-  off-site copy.
+- **Backups:** Railway's scheduled volume backups need the Pro plan, so on Hobby copy the volume down with the
+  [Railway CLI](https://docs.railway.com/cli/volume) before any risky deploy. It holds both games' databases and
+  their WAL files:
+
+  ```bash
+  railway login && railway link                      # once, in this folder
+  railway volume list                                # the volume's name
+  railway volume files --volume <name> download / ./backups/$(date +%F)
+  python -c "import sqlite3, sys; print(sqlite3.connect(sys.argv[1]).execute('PRAGMA integrity_check').fetchone()[0])" ./backups/$(date +%F)/thespis.sqlite
+  ```
+
+  The last line should print `ok`. To restore, upload the files back (`railway volume files --volume <name> upload
+  <folder> / --overwrite`) while the service is stopped. Keep `backups/` out of git; it's ignored.
 
 Test the image locally:
 
