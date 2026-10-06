@@ -219,7 +219,9 @@ def _filtered(r: httpx.Response) -> bool:
         return False
 
 
-def _provider(env: Mapping[str, str], prefix: str) -> Provider | None:
+def provider_from_env(env: Mapping[str, str], prefix: str) -> Provider | None:
+    """The provider configured under `prefix` (e.g. LLM_ or JUDGE_DEEPSEEK_): BASE_URL, API_KEY, MODEL, and optional
+    EXTRA (JSON) and API_VERSION. None unless the first three are set."""
     base, key, model = (env.get(f"{prefix}{k}", "").strip() for k in ("BASE_URL", "API_KEY", "MODEL"))
     if not (base and key and model):
         return None
@@ -231,5 +233,5 @@ def _provider(env: Mapping[str, str], prefix: str) -> Provider | None:
 def gateway_from_env(env: Mapping[str, str] | None = None) -> OpenAICompatGateway | NoModel:
     """The primary (LLM_*) and backup (LLM_BACKUP_*) providers from the environment, or NoModel if neither is set."""
     env = os.environ if env is None else env
-    providers = [p for p in (_provider(env, "LLM_"), _provider(env, "LLM_BACKUP_")) if p]
+    providers = [p for p in (provider_from_env(env, "LLM_"), provider_from_env(env, "LLM_BACKUP_")) if p]
     return OpenAICompatGateway(providers) if providers else NoModel()
