@@ -157,18 +157,18 @@ def test_the_budget_covers_the_check():
     assert mind.asked == 2
 
 
-def test_the_narrators_telling_is_checked_against_its_window():
+def test_the_narrator_can_tell_anything_that_happened_but_nothing_that_didnt():
     from games.crypt_road import narrator
 
     w = new_world(1)
     rules.act(w, "insult", "kael")
-    events = list(w.ledger)
-    window = {e.id for e in events}
-    c = ClaimCheck(Extractor(says(("robbed", "player", "kael"))), cr_claims.VOCABULARY,
-                   lambda p: cr_claims.narrator_facts(w, p.ids))
-    mind = Mind(FakeModel(), Validator({}), checker=c)
-    text, cites, source = narrator.narrate(mind, events)
-    assert source == "fallback" and set(cites) <= window  # it told a robbery that never happened: the code telling
+    rules.act(w, "wait")
+    window = [e for e in w.ledger if e.phase == 0 and e.verb == "move"]  # it is told only the moves
+    told = []
+    for found in [("insulted", "player", "kael"), ("robbed", "player", "kael")]:
+        c = ClaimCheck(Extractor(says(found)), cr_claims.VOCABULARY, lambda p: cr_claims.narrator_facts(w))
+        told.append(narrator.narrate(Mind(FakeModel(), Validator({}), checker=c), window)[2])
+    assert told == ["llm", "fallback"]  # the insult happened, outside its window; the robbery never did
 
 
 def test_the_manors_lie_is_checked():

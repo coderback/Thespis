@@ -41,16 +41,17 @@ def facts(w: World, speaker: str) -> Facts:
     return Facts(w, speaker, rules.happened, lambda event_id: voice.knows(w, speaker, event_id))
 
 
-def narrator_facts(w: World, event_ids: set[str]) -> Facts:
-    """The narrator holds no beliefs and knows exactly the events it was given to tell."""
+def narrator_facts(w: World) -> Facts:
+    """The narrator holds no beliefs and may tell anything that happened, seen or not: it can't leak, only get things
+    wrong. (Rehearsal's measure still holds it to the events it was given, as the paper did.)"""
     from games.crypt_road import rules
 
-    return Facts(w, "narrator", rules.happened, lambda event_id: event_id in event_ids)
+    return Facts(w, "narrator", rules.happened, lambda event_id: True)
 
 
 def check(w: World, checking: ClaimChecking, gateway: ModelGateway) -> ClaimCheck:
     """The claim check for lines said in `w`, through the checking's own gateway or the one the lines came from."""
     def facts_for(pack: StatePack) -> Facts:
-        return narrator_facts(w, pack.ids) if pack.npc == "narrator" else facts(w, pack.npc)
+        return narrator_facts(w) if pack.npc == "narrator" else facts(w, pack.npc)
 
     return ClaimCheck(checking.gateway or gateway, VOCABULARY, facts_for, every=checking.mode == "all")
