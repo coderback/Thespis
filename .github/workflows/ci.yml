@@ -56,17 +56,31 @@ jobs:
           npm test --if-present
           npm run build --if-present
 
+  # The image Railway deploys: built, then run with a volume as Railway runs it.
+  image:
+    name: image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: docker build -t thespis:ci .
+      - name: Runs as non-root, logs JSON, keeps its volume
+        run: sh scripts/check-image.sh thespis:ci
+
   # The single required check for main. Do not rename without updating the ruleset.
   ci:
     name: ci
     if: always()
-    needs: [engine, client]
+    needs: [engine, client, image]
     runs-on: ubuntu-latest
     steps:
       - name: All checks passed
         shell: bash
         run: |
-          if [ "${{ needs.engine.result }}" != "success" ] || [ "${{ needs.client.result }}" != "success" ]; then
-            echo "engine=${{ needs.engine.result }} client=${{ needs.client.result }}"
-            exit 1
-          fi
+          results="engine=${{ needs.engine.result }} client=${{ needs.client.result }} image=${{ needs.image.result }}"
+          for result in $results; do
+            if [ "${result#*=}" != "success" ]; then
+              echo "$results"
+              exit 1
+            fi
+          done
