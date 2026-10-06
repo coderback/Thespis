@@ -202,10 +202,11 @@ def _rate(r: dict) -> str:
 
 def markdown(report: dict) -> str:
     s, c = report["summary"], report["claims"]
+    extractor = f" Claim check extracted by {', '.join(report['extractor'])}." if report.get("extractor") else ""
     out = [
         f"# Rehearsal {report['when']}",
         "",
-        f"Engine `{report['commit']}`, prompts {report['prompts']}. Speaker: {', '.join(report['models'])}. "
+        f"Engine `{report['commit']}`, prompts {report['prompts']}. Speaker: {', '.join(report['models'])}.{extractor} "
         f"{s['scenarios']} scenarios, {s['replies']} model replies, {s['calls']} calls.",
         "",
         "| Measure | Value |",

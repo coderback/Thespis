@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import random
 import subprocess
 import sys
@@ -39,10 +40,12 @@ REPORTS = HERE / "reports"
 SAMPLE_SEED = 0
 
 
-def rehearse(gateway, chosen: list[Scenario], claim_check: str = "consequential") -> tuple[Stage, Recorder, dict]:
+def rehearse(gateway, chosen: list[Scenario], claim_check: str = "consequential",
+             extractor=None) -> tuple[Stage, Recorder, dict]:
     """Play every scenario on one stage, sharing one reply cache. Returns the stage, the recorder and each
-    scenario's transcript. `claim_check` is consequential, all or off, as CLAIM_CHECK on the host."""
-    checking = None if claim_check == "off" else ClaimChecking(claim_check)
+    scenario's transcript. `claim_check` is consequential, all or off, as CLAIM_CHECK on the host; `extractor` is
+    the claim check's own gateway, as LLM_CHECK_* gives one, or None for the model that spoke."""
+    checking = None if claim_check == "off" else ClaimChecking(claim_check, extractor)
     stage = Stage(gateway, DictCache(), checking=checking)
     recorder = Recorder(lambda: stage.world)
     stage.observer = recorder
@@ -67,6 +70,7 @@ def _pick(only: str | None) -> list[Scenario]:
 def live(args) -> int:
     from dotenv import load_dotenv
 
+    from thespis.claims import checking_from_env
     from thespis.gateway import OpenAICompatGateway, gateway_from_env
 
     load_dotenv(ROOT / ".env")
@@ -79,18 +83,27 @@ def live(args) -> int:
         print(f"No judge: set JUDGE_{args.judge.upper()}_* in .env, or pass --lines 0")
         return 1
     speaker.calls = deque()  # keep every call, not just the latest 1000
+    checking = checking_from_env(os.environ) if args.claim_check != "off" else None
+    extractor = checking.gateway if checking is not None else None  # LLM_CHECK_*, if set
+    if isinstance(extractor, OpenAICompatGateway):
+        extractor.calls = deque()
     recording = RecordingGateway(speaker)
     chosen = _pick(args.only)
-    print(f"playing {len(chosen)} scenarios with {', '.join(speaker.models)}, claim check {args.claim_check}")
+    print(f"playing {len(chosen)} scenarios with {', '.join(speaker.models)}, claim check {args.claim_check}"
+          + (f", extracted by {', '.join(extractor.models)}" if extractor is not None else ""))
     try:
-        stage, recorder, transcripts = rehearse(recording, chosen, args.claim_check)
+        stage, recorder, transcripts = rehearse(recording, chosen, args.claim_check, extractor)
     finally:
         speaker.close()
+        if isinstance(extractor, OpenAICompatGateway):
+            extractor.close()
+    calls = list(speaker.calls) + list(getattr(extractor, "calls", []))
     report = {
         "when": datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC"), "commit": _commit(),
         "prompts": str(getattr(expression, "PROMPT_HASH", getattr(expression, "PROMPT_VERSION", "?"))),
         "models": list(speaker.models), "claim_check": args.claim_check,
-        "summary": measure.summary(recorder.samples, list(speaker.calls), stage.acts, len(chosen)),
+        "extractor": list(extractor.models) if extractor is not None else None,
+        "summary": measure.summary(recorder.samples, calls, stage.acts, len(chosen)),
         "violations": recorder.violations,
     }
     report["summary"]["unanswered"] = recorder.unanswered
@@ -112,8 +125,9 @@ def live(args) -> int:
     print(measure.markdown(report))
     print(f"wrote {stem.with_suffix('.json').relative_to(ROOT)} and .md")
     if args.record:
-        if args.only:
-            print("not recording: --only played a subset")
+        if args.only or extractor is not None:
+            print("not recording: --only played a subset" if args.only else
+                  "not recording: LLM_CHECK_* gave the claim check its own model, whose replies aren't recorded")
         else:
             _write(RECORDINGS, recording.recordings(args.claim_check))
             _write(TRANSCRIPTS, transcripts)
