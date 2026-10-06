@@ -6,8 +6,6 @@ Each request loads its session from SQLite and saves it back, so a restart loses
 
 import math
 import os
-import threading
-from collections import defaultdict
 from contextlib import asynccontextmanager
 from dataclasses import asdict
 from pathlib import Path
@@ -21,47 +19,74 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from games.crypt_road import rules, views, voice
-from games.crypt_road.content import DEMO_SEED, new_world
-from games.hosting import ApiError, SessionLimiter, client_ip, db_path, log
+from games.crypt_road.content import DEMO_SEED, load_cast, new_world
+from games.hosting import (
+    ApiError,
+    Guard,
+    SessionLimiter,
+    SessionLocks,
+    blocklist,
+    client_ip,
+    configure_logging,
+    cors_origins,
+    db_path,
+    docs_settings,
+    log,
+    require_admin,
+)
 from games.hosting import budget as _budget
 from games.hosting import env_int as _env_int
 from games.manor import api as manor
+from games.manor.content import load_cast as manor_cast
 from thespis.expression import Mind
 from thespis.gateway import gateway_from_env
+from thespis.moderation import Layered, content_safety_from_env
 from thespis.store import SessionNotFound, Store
 
 ROOT = Path(__file__).resolve().parents[2]
 CLIENT_DIST = ROOT / "client" / "dist"
 
-_locks: defaultdict[str, threading.Lock] = defaultdict(threading.Lock)  # one request at a time per session
+LOCKS = SessionLocks()  # one request at a time per session
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    configure_logging()
     path = db_path()
     app.state.store = Store(path)
+    app.state.admin_token = os.environ.get("ADMIN_TOKEN", "").strip()  # unset: the admin endpoints don't exist
     # On the host, a count that keeps rising across redeploys proves the volume persists.
-    log.warning("boot #%d, database at %s", app.state.store.record_boot(), path.resolve())
+    log.info("boot #%d, database at %s", app.state.store.record_boot(), path.resolve())
     gateway = app.state.gateway = gateway_from_env()
     app.state.replay = os.environ.get("REPLAY", "0").strip() == "1"  # the cache and fallback only, never the network
     names = [p.name for p in gateway.providers]
-    log.warning("models: %s%s", " then ".join(names) + " then fallback" if names else "none configured, fallback only",
+    log.info("models: %s%s", " then ".join(names) + " then fallback" if names else "none configured, fallback only",
                 "; REPLAY=1, so only cached replies, no model calls" if app.state.replay else "")
-    log.warning("model cache: %d replies", app.state.store.cached_replies())
+    log.info("model cache: %d replies", app.state.store.cached_replies())
     # #24: caps on model calls (0 = none; cache hits are free) and on new sessions per IP
     app.state.session_cap = _env_int("SESSION_CALL_CAP", 60)
     app.state.global_cap = _env_int("GLOBAL_CALL_CAP", 0)
     app.state.limiter = SessionLimiter(_env_int("SESSIONS_PER_IP_HOUR", 30))
-    log.warning("caps: %s model calls per session, %s in all (%d made so far), %s new sessions per IP per hour",
+    log.info("caps: %s model calls per session, %s in all (%d made so far), %s new sessions per IP per hour",
                 app.state.session_cap or "no cap on", app.state.global_cap or "no cap on",
                 app.state.store.calls_made(), app.state.limiter.per_hour or "no limit on")
+    # Moderation, both ways, for both games: Content Safety when configured, after each game's own blocklist.
+    remote = content_safety_from_env()
+    app.state.moderator = Layered(blocklist(load_cast()), remote)
+    app.state.manor_moderator = Layered(blocklist(manor_cast()), remote)
+    log.info("moderation: %s; the manor: %s", app.state.moderator, app.state.manor_moderator)
     yield
     gateway.close()  # the one this app opened, even if a test swapped app.state.gateway
+    if remote is not None:
+        remote.close()
 
 
-app = FastAPI(title="Thespis: The Crypt Road", lifespan=lifespan)
-# The client's dev server runs on another port; in production it is served from this app.
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+app = FastAPI(title="Thespis: The Crypt Road", lifespan=lifespan, **docs_settings())
+# The client is served from this app, and in dev Vite proxies the API, so other origins are let in only by name.
+if cors_origins():
+    app.add_middleware(CORSMiddleware, allow_origins=cors_origins(), allow_methods=["GET", "POST"],
+                       allow_headers=["Content-Type", "X-Session"])
+app.add_middleware(Guard)  # outermost: body size and security headers, for both games
 
 
 @app.exception_handler(ApiError)
@@ -153,12 +178,13 @@ def get_allowed(request: Request, x_session: str | None = Header(default=None)):
 @app.post("/act")
 def post_act(body: ActBody, request: Request, x_session: str | None = Header(default=None)):
     store, session = _store(request), _session(x_session)
-    with _locks[session]:
+    with LOCKS.hold(session):
         world = _load(store, session)
         try:
             result = rules.act(world, body.verb, body.target, body.claim.model_dump() if body.claim else None,
                                body.amount, body.text, gateway=request.app.state.gateway, cache=store,
-                               replay=request.app.state.replay, budget=_budget(request.app.state, store, world))
+                               replay=request.app.state.replay, budget=_budget(request.app.state, store, world),
+                               moderator=request.app.state.moderator)
         except rules.NotAllowed as e:
             raise ApiError(409, "not_allowed", e.reason) from None
         store.save(session, world)
@@ -171,10 +197,10 @@ def post_act(body: ActBody, request: Request, x_session: str | None = Header(def
 def get_digest(request: Request, since: int = 0, x_session: str | None = Header(default=None)):
     """The Dungeon Master's telling. With the brain on it may call the model, so it counts against the caps."""
     store, session, state = _store(request), _session(x_session), request.app.state
-    with _locks[session]:
+    with LOCKS.hold(session):
         world = _load(store, session)
         mind = Mind(state.gateway if world.brain_mode == "model" else None, voice.VALIDATOR, store, state.replay,
-                    _budget(state, store, world))
+                    _budget(state, store, world), state.moderator)
         digest = views.digest_view(world, since, mind)
         if mind.asked:
             world.counters["model_calls"] = world.counters.get("model_calls", 0) + mind.asked
@@ -186,7 +212,7 @@ def get_digest(request: Request, since: int = 0, x_session: str | None = Header(
 @app.post("/reset")
 def post_reset(request: Request, x_session: str | None = Header(default=None)):
     store, session = _store(request), _session(x_session)
-    with _locks[session]:
+    with LOCKS.hold(session):
         _load(store, session)
         world = new_world(store.seed_of(session))
         store.reset(session, world)
@@ -202,7 +228,7 @@ def post_reload(request: Request, x_session: str | None = Header(default=None)):
 @app.post("/dev/brain")
 def post_brain(body: BrainBody, request: Request, x_session: str | None = Header(default=None)):
     store, session = _store(request), _session(x_session)
-    with _locks[session]:
+    with LOCKS.hold(session):
         world = _load(store, session)
         world.brain_mode = body.mode
         store.save(session, world)
@@ -212,7 +238,8 @@ def post_brain(body: BrainBody, request: Request, x_session: str | None = Header
 @app.get("/dev/calls")
 def get_calls(request: Request, since: int = 0):
     """The model calls made since `since` (the `total` of an earlier answer), with latency and tokens, for the harness.
-    Across every session, and at most the latest 1000."""
+    Across every session, and at most the latest 1000, so it answers only to the admin token."""
+    require_admin(request)
     gateway = request.app.state.gateway
     total = getattr(gateway, "total", 0)
     calls = list(getattr(gateway, "calls", ()))[-(total - since):] if total > since else []
@@ -224,13 +251,16 @@ def post_persona(body: PersonaBody, request: Request, x_session: str | None = He
     """Live persona editing (#39): this session's NPC speaks with the new persona from its next model line. Other
     sessions, and the cache for the default personas, are untouched; an edited persona is a new cache key."""
     store, session = _store(request), _session(x_session)
-    with _locks[session]:
+    with LOCKS.hold(session):
         world = _load(store, session)
         if body.npc not in world.npcs:
             raise ApiError(400, "bad_request", f"There's no one called {body.npc!r} to edit")
         text = (body.persona or "").strip()
         if len(text) > voice.PERSONA_MAX:
             raise ApiError(400, "bad_request", f"Keep the persona to {voice.PERSONA_MAX} characters")
+        if text and (verdict := request.app.state.moderator.check([text])[0]).flagged:
+            log.info("persona flagged", extra={"stage": "in", "npc": body.npc, "why": verdict.why})
+            raise ApiError(400, "bad_request", "That persona can't be used; try another")
         flags = world.npcs[body.npc].flags
         if text:
             flags["persona"] = text

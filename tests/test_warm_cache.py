@@ -35,7 +35,8 @@ def test_a_warm_run_makes_no_model_calls(tmp_path, monkeypatch):
 
     from games.crypt_road.app import app
     monkeypatch.setenv("DB_PATH", str(tmp_path / "t.sqlite"))
-    with TestClient(app) as client:
+    monkeypatch.setenv("ADMIN_TOKEN", "test-admin")  # the warmer reads the host's call log
+    with TestClient(app, headers={"Authorization": "Bearer test-admin"}) as client:
         app.state.gateway = model = FakeModel()
         first = warm_cache.play(client)
         calls = len(model.calls)
@@ -53,7 +54,8 @@ def test_an_empty_cache_under_replay_is_not_warm(tmp_path, monkeypatch):
     from tests.test_cache import Offline
     monkeypatch.setenv("DB_PATH", str(tmp_path / "t.sqlite"))
     monkeypatch.setenv("REPLAY", "1")
-    with TestClient(app) as client:
+    monkeypatch.setenv("ADMIN_TOKEN", "test-admin")
+    with TestClient(app, headers={"Authorization": "Bearer test-admin"}) as client:
         app.state.gateway = Offline()
         run = warm_cache.play(client)
     assert run["calls"] == 0 and run["misses"] > 0

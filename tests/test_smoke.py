@@ -12,7 +12,8 @@ def client(tmp_path, monkeypatch):
 
     from games.crypt_road.app import app
     monkeypatch.setenv("DB_PATH", str(tmp_path / "t.sqlite"))
-    with TestClient(app) as c:
+    monkeypatch.setenv("ADMIN_TOKEN", "test-admin")  # the tools read the host's call log, which needs it
+    with TestClient(app, headers={"Authorization": "Bearer test-admin"}) as c:
         app.state.gateway = FakeModel()
         yield c
 

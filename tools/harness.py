@@ -35,7 +35,7 @@ import httpx
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from games.crypt_road.content import DEMO_SEED  # noqa: E402
-from tools.routes import EXPECTED, ROUTES, ApiError, Session, outcome, play, seed_for  # noqa: E402
+from tools.routes import EXPECTED, ROUTES, ApiError, Session, admin_headers, outcome, play, seed_for  # noqa: E402
 
 QUESTIONS = [  # with OPENERS, a fresh question per model run, so its lines are new to the cache even on a rerun
     "What brings you to the tavern tonight?", "Have you heard anything about the relic?", "Who here would you trust?",
@@ -304,13 +304,13 @@ def report(results: dict, host: str, commit: str) -> str:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    parser = argparse.ArgumentParser(description=(__doc__ or "").split("\n")[0])
     parser.add_argument("host")
     parser.add_argument("--seeds", type=int, nargs="+", default=[1, 4])
     parser.add_argument("--out", default=str(ROOT / "results.md"), help="where to write the report; - to print it")
     args = parser.parse_args(argv)
     commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True, cwd=ROOT).stdout.strip()
-    with httpx.Client(base_url=args.host, timeout=60) as client:
+    with httpx.Client(base_url=args.host, timeout=60, headers=admin_headers()) as client:
         results = measure(client, args.seeds)
     text = report(results, args.host, commit)
     if args.out == "-":

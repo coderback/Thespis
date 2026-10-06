@@ -7,11 +7,24 @@ rules model (tools/crypt_road_sim.py) predicts.
 
 from __future__ import annotations
 
+import os
 import time
+from pathlib import Path
 
 from games.crypt_road import content as C
 
 LIE = {"pred": "robbed", "a": "kael", "b": "odo"}
+
+
+def admin_headers() -> dict:
+    """The admin token GET /dev/calls needs, as a header: ADMIN_TOKEN from the environment, else from .env. Nothing
+    else is read from .env. Without a token the host answers /dev/calls with 404 or 401."""
+    token = os.environ.get("ADMIN_TOKEN", "").strip()
+    if not token:
+        from dotenv import dotenv_values  # comes with uvicorn[standard]
+
+        token = (dotenv_values(Path(__file__).resolve().parents[1] / ".env").get("ADMIN_TOKEN") or "").strip()
+    return {"Authorization": f"Bearer {token}"} if token else {}
 
 ROUTES = {
     "rush": [],

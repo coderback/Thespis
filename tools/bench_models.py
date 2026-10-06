@@ -41,7 +41,7 @@ class Recorder:
     def complete(self, call_type, messages) -> ModelReply | None:
         return None
 
-    def complete_many(self, calls):
+    def complete_many(self, calls) -> list[ModelReply | None]:
         return [None for _ in calls]
 
 
@@ -88,7 +88,7 @@ def bench(provider, packs, calls: int, transport=None) -> dict:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    parser = argparse.ArgumentParser(description=(__doc__ or "").split("\n")[0])
     parser.add_argument("--calls", type=int, default=20)
     args = parser.parse_args(argv)
     load_dotenv(ROOT / ".env")

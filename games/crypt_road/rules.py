@@ -13,7 +13,9 @@ When the race ends the world runs two more phases (the epilogue), so it visibly 
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
+from types import EllipsisType
 
 from games.crypt_road import content as C
 from games.crypt_road import voice
@@ -22,6 +24,7 @@ from thespis.decisions import DECIDE, Decision
 from thespis.expression import Mind, ReplyCache, Utterance
 from thespis.gateway import ModelGateway
 from thespis.ledger import Claim, Event
+from thespis.moderation import Moderator
 from thespis.world import LOST, PLAYING, WON, World
 
 TALK_MAX = 200
@@ -118,7 +121,7 @@ def allowed(w: World) -> list[dict]:
     lock = "The race is over" if ended else ("Choose: humiliate or spare" if w.pending == DUEL_WON else None)
     out: list[dict] = []
 
-    def add(verb, target, label, args, ends_phase, ok=True, why=None, reason=...):
+    def add(verb, target, label, args, ends_phase, ok=True, why=None, reason: str | None | EllipsisType = ...):
         if reason is ...:
             reason = lock or (None if ok else why)
         out.append({"verb": verb, "target": target, "label": label, "args": args, "ends_phase": ends_phase,
@@ -167,7 +170,7 @@ def _check(w: World, verb: str, target: str | None) -> dict:
 def act(w: World, verb: str, target: str | None = None, claim: dict | Claim | None = None,
         amount: int | None = None, text: str | None = None, brain: Brain | None = None,
         gateway: ModelGateway | None = None, cache: ReplyCache | None = None, replay: bool = False,
-        budget: int | None = None) -> ActResult:
+        budget: int | None = None, moderator: Moderator | None = None) -> ActResult:
     """Apply one player verb, the tick it triggers, and the epilogue if the race ends.
 
     With a gateway and the brain switched on, NPCs speak and make their real choices through the model; anything
@@ -177,7 +180,7 @@ def act(w: World, verb: str, target: str | None = None, claim: dict | Claim | No
     """
     _check(w, verb, target)
     brain = brain or UtilityBrain()
-    mind = Mind(gateway if w.brain_mode == "model" else None, voice.VALIDATOR, cache, replay, budget)
+    mind = Mind(gateway if w.brain_mode == "model" else None, voice.VALIDATOR, cache, replay, budget, moderator)
     start = len(w.ledger)
     ends_phase = None  # the tick this verb triggers, if any: "move" or "wait"
     told = haggle = None
@@ -186,6 +189,7 @@ def act(w: World, verb: str, target: str | None = None, claim: dict | Claim | No
         if not text or len(text) > TALK_MAX:
             raise NotAllowed(f"Say something, in {TALK_MAX} characters or fewer")
     elif verb == "insult":
+        assert target is not None  # _check found someone here to insult
         if target == C.RIVAL:
             w.npcs[C.RIVAL].drives["grudge"] += 1
         c = Claim("insulted", "player", target)
@@ -197,6 +201,7 @@ def act(w: World, verb: str, target: str | None = None, claim: dict | Claim | No
         _settle_duel(w, verb)
         ends_phase = "wait"
     elif verb == "tell_claim":
+        assert target is not None  # _check found someone here to tell
         told = _as_claim(claim)
         _tell(w, target, told)
     elif verb == "bribe":
@@ -372,7 +377,7 @@ def end_phase(w: World, action: str, brain: Brain | None = None, mind: Mind | No
                 _event(w, "release", C.GUARD, C.RIVAL, guard.loc)
 
     # 2b. The rival decides.
-    kael_moves = False
+    kael_to: str | None = None  # where the rival walks this phase, if he does
     if not kael.frozen(p):
         d = kael.drives
         options = {"go_to": d["ambition"], "wait": 0}
@@ -405,8 +410,8 @@ def end_phase(w: World, action: str, brain: Brain | None = None, mind: Mind | No
         elif chosen == "go_to":
             if _gate_blocks(w, C.RIVAL, kael.loc):
                 _event(w, "block", C.RIVAL, C.GUARD, kael.loc)
-            elif C.next_stop(kael.loc):
-                kael_moves = True
+            elif nxt := C.next_stop(kael.loc):
+                kael_to = nxt
 
     # 3. Gossip, on the positions before anyone moves.
     for g in C.GOSSIPS:
@@ -425,8 +430,8 @@ def end_phase(w: World, action: str, brain: Brain | None = None, mind: Mind | No
                     break
 
     # 4. Moves: the rival, then everyone on a fixed walk.
-    if kael_moves:
-        frm, kael.loc = kael.loc, C.next_stop(kael.loc)
+    if kael_to:
+        frm, kael.loc = kael.loc, kael_to
         _event(w, "move", C.RIVAL, kael.loc, frm)
         tick.moves.append({"who": C.RIVAL, "from": frm, "to": kael.loc})
     for npc in w.npcs.values():
@@ -446,19 +451,20 @@ def end_phase(w: World, action: str, brain: Brain | None = None, mind: Mind | No
     return tick
 
 
-def _decide(w: World, mind: Mind, brain: Brain, npc: str, trigger: str, options: dict[str, float],
+def _decide(w: World, mind: Mind, brain: Brain, npc: str, trigger: str, options: Mapping[str, float],
             reason: str | None, line_for, situation: str, ask: bool = True, view: voice.View | None = None) -> str:
     """Choose an action and its line: the model's if it is asked and its reply passes, else the utility brain's.
 
     Returns the chosen action id, which is always one of `options`.
     """
     choice = brain.choose(npc, options)
-    said = line_for(choice)
-    fallback = Utterance(choice, *(said or (None, [])), "fallback")
+    line, cites = line_for(choice) or (None, [])
+    fallback = Utterance(choice, line, cites, "fallback")
     # Drives decide what is on the table: the model only chooses between actions they rate about as highly as the
     # best, so a clear grudge always acts on it. It still words every line and settles near-ties.
     offered = _offered(options)
     u = mind.decide(voice.pack_for(w, npc, situation, offered, view), fallback) if ask and mind.active else fallback
+    assert u.action is not None  # a decision always carries one of the options
     base = reason or f"{u.action} scores {options[u.action]}"  # without a reason given, the utility explains it
     if u.source != "fallback" and len(offered) < len(options):
         base += f"; drives offered {', '.join(offered)}"
@@ -467,7 +473,7 @@ def _decide(w: World, mind: Mind, brain: Brain, npc: str, trigger: str, options:
     return u.action
 
 
-def _offered(options: dict[str, float]) -> dict[str, float]:
+def _offered(options: Mapping[str, float]) -> dict[str, float]:
     best = max(options.values())
     return {a: u for a, u in options.items() if u >= best - DRIVE_MARGIN}
 

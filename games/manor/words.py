@@ -43,11 +43,11 @@ def sentence(e: Event, about: bool = False) -> str:
         case "leave":
             return f"{a} left {room}."
         case "tell" | "testify":
-            return f"{a} told {t} that {claim_text(e.claim, about, speaker=e.actor, start=False)}."
+            return f"{a} told {t} that {claim_text(e.claimed, about, speaker=e.actor, start=False)}."
         case "arrive":
             return f"{a} arrived at the manor."
         case "move":
-            return f"{a} walked from {room} to {C.ROOM_NAMES.get(e.target, e.target)}."
+            return f"{a} walked from {room} to {C.ROOM_NAMES.get(e.target or '', e.target)}."
         case "question":
             return f"{a} questioned {t} in {room}."
         case "accuse":

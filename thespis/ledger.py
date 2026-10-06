@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+from typing import overload
 
 SCHEMA_VERSION = 1
 
@@ -24,6 +25,14 @@ class Claim:
     def to_json(self) -> dict:
         return {"pred": self.pred, "a": self.a, "b": self.b}
 
+    @overload
+    @classmethod
+    def from_json(cls, d: dict) -> Claim: ...
+
+    @overload
+    @classmethod
+    def from_json(cls, d: None) -> None: ...
+
     @classmethod
     def from_json(cls, d: dict | None) -> Claim | None:
         return None if d is None else cls(d["pred"], d["a"], d["b"])
@@ -41,6 +50,13 @@ class Event:
     truth: bool = True
     schema_version: int = SCHEMA_VERSION
     amount: int | None = None  # a quantity the event moved, such as coins paid; the game decides what it counts
+
+    @property
+    def claimed(self) -> Claim:
+        """The claim this event carries, for a verb that always carries one, such as a theft or a statement."""
+        if self.claim is None:
+            raise ValueError(f"{self.id} ({self.verb}) carries no claim")
+        return self.claim
 
     def to_json(self) -> dict:
         d = asdict(self)

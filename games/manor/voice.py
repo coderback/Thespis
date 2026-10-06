@@ -6,6 +6,7 @@ is true. Sable knows she took the ring; Lady Vane only knows what she has been t
 
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
 from games.manor import content as C
@@ -40,10 +41,10 @@ def template(npc: str, key: str) -> str | None:
     return C.load_cast()["npc"][npc].get("lines", {}).get(key)
 
 
-def line(npc: str, key: str, cites: list[str]) -> tuple[str, list[str]] | None:
+def line(npc: str, key: str, cites: Sequence[str | None]) -> tuple[str, list[str]] | None:
     """A template line and what it cites, or None when there is no template or nothing to cite."""
-    text, cites = template(npc, key), [c for c in cites if c]
-    return (text, list(dict.fromkeys(cites))) if text and cites else None
+    text, known = template(npc, key), [c for c in cites if c]
+    return (text, list(dict.fromkeys(known))) if text and known else None
 
 
 def knows(w: World, npc: str, event_id: str) -> bool:
@@ -57,7 +58,7 @@ def knows(w: World, npc: str, event_id: str) -> bool:
     return e.phase >= C.ARRIVAL and w.npcs[npc].loc in (e.loc, e.target)
 
 
-def pack_for(w: World, npc_id: str, situation: str, options: dict[str, float] | None = None,
+def pack_for(w: World, npc_id: str, situation: str, options: Mapping[str, float] | None = None,
              asserts: dict[str, str] | None = None) -> StatePack:
     """Everything the model may know when it speaks for this NPC. `asserts` marks the options that state a claim."""
     npc, cast = w.npcs[npc_id], C.load_cast()["npc"][npc_id]
@@ -86,8 +87,9 @@ def pack_for(w: World, npc_id: str, situation: str, options: dict[str, float] | 
 
 def deliver(w: World, mind: Mind, speeches: list[Speech]) -> list[dict]:
     """Voice a moment's lines, the model calls in parallel, and record each as a react decision."""
-    speeches = [s for s in speeches if s.said]
-    fallbacks = [Utterance(None, s.said[0], s.said[1], "fallback") for s in speeches]
+    voiced = [(s, s.said) for s in speeches if s.said]
+    speeches = [s for s, _ in voiced]
+    fallbacks = [Utterance(None, said[0], said[1], "fallback") for _, said in voiced]
     if mind.active:
         spoken = mind.react_many([(pack_for(w, s.npc, s.situation), f) for s, f in zip(speeches, fallbacks)])
     else:

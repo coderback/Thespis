@@ -36,7 +36,7 @@ def lie_told(w: World) -> Hook | None:
     if not lies:
         return None
     lie = lies[-1]
-    return Hook("lie_told", f"A lie is loose: you told {who(lie.target)} that {claim_text(lie.claim)}, and it never "
+    return Hook("lie_told", f"A lie is loose: you told {who(lie.target)} that {claim_text(lie.claimed)}, and it never "
                             "happened.", (lie.id,))
 
 
@@ -45,7 +45,7 @@ def lie_exposed(w: World) -> Hook | None:
     lies = {e.claim: e for e in _lies(w)}
     for e in w.ledger:
         if e.verb == "testify" and e.claim in lies:
-            told = claim_text(e.claim, speaker=e.actor, negate=True)
+            told = claim_text(e.claimed, speaker=e.actor, negate=True)
             return Hook("lie_exposed", f"The lie is out: {who(e.actor, start=True)} told {who(e.target)} that "
                                        f"{told}.", (lies[e.claim].id, e.id))
     return None

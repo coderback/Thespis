@@ -165,6 +165,20 @@ That runs with no model at all: every NPC uses its code choice and template line
 hear the model, copy `.env.example` to `.env`, fill in an OpenAI-compatible endpoint, key and model (Azure works;
 see [docs/models.md](docs/models.md)), and start the engine with `--env-file .env`. Never commit `.env`.
 
+The tools that read the host's call log (`harness`, `smoke`, `warm_cache`, `manor_solve`) need the host's
+`ADMIN_TOKEN`; they read it from the environment or `.env`.
+
+**Dependencies** are pinned with hashes in `requirements.txt` and `requirements-dev.txt`, compiled by
+[uv](https://docs.astral.sh/uv/) from `requirements.in` and `requirements-dev.in`. To add or upgrade one, edit the
+`.in` file and recompile both (CI fails if they drift):
+
+```bash
+uv pip compile requirements.in --universal --generate-hashes --python-version 3.12 -o requirements.txt
+uv pip compile requirements-dev.in --universal --generate-hashes --python-version 3.12 -o requirements-dev.txt
+```
+
+CI also runs `ruff check .`, `pyright` and `pytest`, and builds and checks the image (`scripts/check-image.sh`).
+
 To work on the client with hot reload, run `npm run dev` in `client/` next to the engine and open
 <http://localhost:5173>; [client/README.md](client/README.md) has the rest.
 
@@ -179,6 +193,7 @@ To work on the client with hot reload, run `npm run dev` in `client/` next to th
 | `python tools/bench_models.py` | Each configured model alone on real state packs: latency and valid picks |
 | `python tools/make_fixtures.py` | Regenerates `fixtures/` from the real API |
 | `python tools/manor_solve.py <host>` | Solves the manor mystery by script, and checks two wrong turns lose |
+| `python tools/exposure.py <host>` | Checks the host keeps its edges shut against a stranger: no call log, API docs or CORS, a body limit, security headers |
 | `DEMO_HOST=<host> pytest tests/demo_test.py` | The demo script's checks, beat by beat, against a live host |
 
 ## Repository layout
@@ -212,6 +227,21 @@ which rebuilds and redeploys every merge to `main`.
 - **Volume:** mounted at `/data`. The database is `/data/thespis.sqlite`, set by the image. Don't set `DB_PATH` on
   Railway: with a volume attached, the app ignores any path off it and logs a warning.
 - **Model keys:** Railway variables, never in the repo.
+- **Admin token:** `ADMIN_TOKEN` opens `GET /dev/calls`, the call log across every session, which the harness and
+  smoke test read. Unset, the endpoint doesn't exist. Generate it yourself, e.g.
+  `python -c "import secrets; print(secrets.token_urlsafe(32))"`, and keep it out of the repo.
+- **Moderation:** with `CONTENT_SAFETY_ENDPOINT` and `CONTENT_SAFETY_KEY` set, Azure AI Content Safety checks what
+  players write before a model reads it and every model line before a player hears it. Thresholds per category:
+  Hate, Sexual and SelfHarm at 4, Violence at 6, overridden by `MODERATION_THRESHOLDS` (JSON). It fails closed: if the
+  service is down, NPCs use their code lines. It sends at most `CONTENT_SAFETY_RPS` requests a second (4, under the
+  free tier's 5; set 100 on the standard tier), one text per request, since joined texts hid a harmful line in tests. A game can also list words in `[moderation] blocklist` in its
+  `cast.toml`. The boot log says which moderation is active.
+- **Edges:** no CORS unless `CORS_ORIGINS` lists origins; no generated API docs unless `API_DOCS=1`; bodies over
+  64 KiB refused. After a deploy, `python tools/exposure.py <host>` should pass every check.
+- **Logs:** JSON lines (`LOG_FORMAT=json`, set by the image) with `message`, `level` and fields such as `path`,
+  `status`, `ms` and `call_type`, which Railway can filter by (`@status:500`). Sessions appear as a short hash, never
+  their id, and moderation logs why it flagged something, never the text.
+- **User:** the app runs as uid 10001, not root. The entrypoint gives it `/data` and then drops root.
 - **Caps:** `SESSION_CALL_CAP` (default 60) and `GLOBAL_CALL_CAP` (default 0, no cap) bound model calls; cache
   hits are free, and past a cap NPCs fall back to code and the game plays on. `SESSIONS_PER_IP_HOUR` (default
   30) limits new games per IP. The boot log shows the caps and the calls made so far.
@@ -219,12 +249,26 @@ which rebuilds and redeploys every merge to `main`.
   prompt, a persona or the state pack. `REPLAY=1` then plays from the cache and the fallback alone. The boot log
   shows `model cache: N replies`.
 - **Persistence check:** redeploy the service, and the log's `boot #N` should go up by one.
+- **Backups:** Railway's scheduled volume backups need the Pro plan, so on Hobby copy the volume down with the
+  [Railway CLI](https://docs.railway.com/cli/volume) before any risky deploy. It holds both games' databases and
+  their WAL files:
+
+  ```bash
+  railway login && railway link                      # once, in this folder
+  railway volume list                                # the volume's name
+  railway volume files --volume <name> download / ./backups/$(date +%F)
+  python -c "import sqlite3, sys; print(sqlite3.connect(sys.argv[1]).execute('PRAGMA integrity_check').fetchone()[0])" ./backups/$(date +%F)/thespis.sqlite
+  ```
+
+  The last line should print `ok`. To restore, upload the files back (`railway volume files --volume <name> upload
+  <folder> / --overwrite`) while the service is stopped. Keep `backups/` out of git; it's ignored.
 
 Test the image locally:
 
 ```bash
 docker build -t thespis:dev .
 docker run --rm -p 8000:8000 -v thespis-data:/data thespis:dev
+sh scripts/check-image.sh thespis:dev       # what CI checks: non-root, JSON logs, the volume persists
 ```
 
 ## Credits

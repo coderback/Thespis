@@ -30,6 +30,7 @@ env/
 *.sqlite3
 *.db
 data/
+backups/
 recordings/
 
 # Client
