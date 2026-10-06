@@ -12,7 +12,7 @@ def test_the_minimal_example_runs_on_the_fallback(monkeypatch, capsys):
         monkeypatch.setenv(name, "")  # set, so a local .env can't switch the model on
     runpy.run_path(str(EXAMPLE), run_name="__main__")
     out = capsys.readouterr().out
-    assert out.startswith("Tamsin chooses report:player (fallback), citing ['b0001']")
+    assert out.startswith("Tamsin does report:player, worded by fallback, citing ['b0001']")
 
 
 def test_the_example_needs_nothing_from_a_game():

@@ -67,9 +67,9 @@ disabled with the reason `"Choose: humiliate or spare"`. The pick ends the phase
 | Her price, in coins | 15 | 20 | 25 | 30 |
 
 - An offer at or above her price is paid in full: a `bribe` event with `amount`, and her trust in the player rises by 2.
-- Below it she counters at her price (a `counter` event with `amount`) or refuses (a `refuse` event); she never takes
-  less. The model chooses between the two and words her reply; without a model a lowball (under half her price) is
-  refused and anything else countered. Either way an `offer` event comes first, and her reply is in `replies`.
+- Below it she refuses a lowball, under half her price (a `refuse` event), and counters anything else at her price
+  (a `counter` event with `amount`); she never takes less. Code chooses, and the model only words her reply. Either
+  way an `offer` event comes first, and her reply is in `replies`.
 - After a refusal `bribe` is disabled until the next phase, with the reason `"Brenna won't hear another offer until the
   next phase"`.
 - An offer outside 1 to the player's coins is refused with 409 and a reason, and nothing is written.

@@ -25,7 +25,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from thespis.expression import PROMPT_VERSION, Mind, StatePack  # noqa: E402
+from thespis.expression import PROMPT_HASH, Mind, StatePack  # noqa: E402
 from thespis.gateway import OpenAICompatGateway, Provider, gateway_from_env  # noqa: E402
 from tools.harness import END, START, fresh_questions, run_route, with_block  # noqa: E402
 from tools.routes import ROUTES  # noqa: E402
@@ -63,7 +63,7 @@ def collect(gateway, lines: int, seeds=(1, 4)) -> list[Sample]:
     def recording(self, reply, pack, fallback, kind):
         u = original(self, reply, pack, fallback, kind)
         if u.source == "llm" and u.line is not None:
-            samples.append(Sample(kind, pack, u.action if kind == "decide" else None, u.line, u.cites))
+            samples.append(Sample(kind, pack, u.action if kind == "act" else None, u.line, u.cites))
         return u
 
     saved = os.environ.get("DB_PATH")
@@ -104,7 +104,9 @@ def canaries(samples: list[Sample], n: int = CANARIES) -> list[Sample]:
 
 
 def judge_messages(s: Sample) -> list[dict]:
-    said = {"line": s.line, "cites": s.cites}
+    """The judge sees the pack as the speaker did, so the line's cites are given as the pack's references."""
+    shown = {real: ref for ref, real in s.pack.refs.items()}
+    said = {"line": s.line, "cites": [shown.get(c, c) for c in s.cites]}
     if s.action is not None:
         said["action"] = s.action
     return [{"role": "system", "content": JUDGE_PROMPT},
@@ -115,7 +117,7 @@ def judge_messages(s: Sample) -> list[dict]:
 
 def judge(gateway, samples: list[Sample]) -> list[dict | None]:
     """The judge's verdict on each sample: {"consistent", "in_character", "reason"}, or None if it gave none."""
-    replies = gateway.complete_many([("judge", judge_messages(s)) for s in samples])
+    replies = gateway.complete_many([("judge", judge_messages(s), None) for s in samples])
     verdicts = []
     for r in replies:
         ok = r is not None and isinstance(r.data.get("consistent"), bool) and isinstance(r.data.get("in_character"), bool)
@@ -144,7 +146,7 @@ def block(summary: dict, speaker: str, judge_model: str, when: str) -> str:
         "",
         f"**Model-judged, not measured:** {judge_model} read {s['judged']} lines by {speaker}, each beside the state "
         f"pack it was spoken from, on {when}. The lines come from the scripted routes with fresh questions, played "
-        f"in-process with the same code and prompts as the host (prompt version {PROMPT_VERSION}), and only lines that "
+        f"in-process with the same code and prompts as the host (prompts {PROMPT_HASH}), and only lines that "
         "passed the validator count, since those are the ones players hear.",
         "",
         "| Measure (model-judged) | Value |",

@@ -209,7 +209,7 @@ def test_flagged_player_text_never_reaches_the_model():
 
 def test_a_flagged_model_line_is_neither_heard_nor_cached():
     cache = Cache()
-    model = FakeModel(lambda kind, p: {"line": "Something vile.", "cites": ["e0001"]})
+    model = FakeModel(lambda kind, p: {"line": "Something vile.", "cites": ["e1"]})
     u = mind(model, Flags("vile"), cache).react_many([(pack(), FALLBACK)])[0]
     assert (u.source, u.line, u.note) == ("fallback", "Hm.", "model reply rejected: moderation (test)")
     assert cache.replies == {}

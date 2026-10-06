@@ -288,8 +288,8 @@ def report(results: dict, host: str, commit: str) -> str:
         *[f"| {r['route']} | {EXPECTED[r['route']]} | {r['outcome']} {'✓' if r['outcome'] == EXPECTED[r['route']] else '✗'}"
           f"{' (' + r['error'] + ')' if r['error'] else ''} |" for r in results["rules"]],
         "",
-        "Model pass: the brain on. The model chooses among the actions the NPC's drives rate close to the best, so an "
-        "outcome can differ from the rules model's. On other seeds the duel dice differ too.",
+        "Model pass: the brain on. Code makes every choice and the model only words it, so on the demo seed each "
+        "outcome matches the rules pass. On other seeds the duel dice differ.",
         "",
         "| Route | Seed | Outcome | Model calls | Lines: model / cache / template | Blocked | `/act` p50 |",
         "| --- | --- | --- | --- | --- | --- | --- |",

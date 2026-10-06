@@ -26,7 +26,7 @@ def test_lines_are_collected_with_the_packs_they_were_spoken_from(tmp_path, monk
     samples = judge.collect(FakeModel(), 12)
     assert len(samples) == 12
     assert all(s.line and set(s.cites) <= s.pack.ids for s in samples)
-    assert {s.kind for s in samples} == {"decide", "react"}
+    assert {s.kind for s in samples} == {"act", "react"}
 
 
 def test_a_fair_judge_passes_real_lines_and_flags_every_canary(tmp_path, monkeypatch):

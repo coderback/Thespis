@@ -14,8 +14,8 @@ looking.
 
 The game owns the truth. Every event goes into an append-only ledger. Each NPC builds beliefs from evidence, with a
 source and a confidence, and a belief can be wrong and later retracted. Numeric drives and trust decide what an NPC
-wants to do. A language model only chooses among actions the code has already allowed, and voices them, and every
-line it says must cite the ledger events and beliefs behind it, checked by code before anyone hears it.
+does. A language model only voices it, and every line it says must cite the ledger events and beliefs behind it,
+checked by code before anyone hears it.
 
 - **Play it:** <https://thespis-production.up.railway.app>. Press **Watch the 60-second story**, or play it yourself.
 - **A second game on the same core:** <https://thespis-production.up.railway.app/manor/>, The Manor Mystery, a
@@ -62,12 +62,14 @@ flowchart LR
 - **Beliefs:** each NPC's evidence for a claim, with its source and confidence (`thespis/beliefs.py`). Truth is never
   stored with a belief; it's derived from the ledger, so a belief can be false, and testimony can retract it.
 - **Drives decide, the model words it:** the utility brain scores every allowed action from the NPC's drives and
-  trust. The model may only choose among the actions within 2 points of the best, so a clear grudge is always acted
-  on; it settles near-ties and writes the line.
+  trust, and takes the best. The model is told only what the NPC is doing, with no other options and no scores, and
+  writes the line. Offered a choice, it took the strongest pull 86 times in 86 ([docs/cast-review.md](docs/cast-review.md)),
+  so with the model on, every route ends exactly as with it off.
 - **State pack and validator** (`thespis/expression.py`): the model sees only what the NPC knows, never whether it's
-  true. A reply is rejected unless the action is allowed, the line is 1 to 160 characters, it cites at least one id,
-  every cited id is in the pack, and it names no one the NPC doesn't know about. A rejected reply, a timeout or no
-  model at all falls back to the code's choice and a template line.
+  true, with its beliefs and events under short references (b1, e1, ...). Each call type has one fixed JSON schema,
+  which a model with structured outputs can't step outside. A reply is rejected unless the line is 1 to 160
+  characters, it cites at least one reference, every one is in the pack, and it names no one the NPC doesn't know
+  about. A rejected reply, a timeout or no model at all falls back to a template line.
 - **Model gateway** (`thespis/gateway.py`): any OpenAI-compatible endpoint, including Azure. A primary, then a backup,
   then the fallback, within 4 seconds each, with no retries.
 - **Cache and replay:** every reply that passes is cached, keyed by the model, the prompt version, the call type and
@@ -85,7 +87,7 @@ flowchart LR
 - **Live persona editing:** in the inspector's Minds tab, change an NPC's persona and its next line follows it. The
   edit belongs to that game, so other players and the demo cache are untouched.
 - **Haggling:** offer Brenna any bribe. Code sets her price from her trust in you (15 to 30 coins, never under 20
-  while she distrusts you); under it, the model chooses whether she counters or refuses, and words it.
+  while she distrusts you); under it she refuses a lowball (under half her price) and counters anything else, and the model words it.
 
 ## Numbers
 
@@ -111,8 +113,8 @@ Which models and why: [docs/models.md](docs/models.md).
 [The Manor Mystery](https://thespis-production.up.railway.app/manor/) is a three-room detective scene on the same
 core, with its own adapter (`games/manor/`) and none of the Crypt Road's code. Lady Vane's signet ring went
 missing before you arrived; the ledger knows Sable took it and that Pell saw her leave the study. Ask Sable where she
-was and she lies. Her lie is an action the rules offer once she's frightened enough: the model chooses whether to lie
-or deflect, the line must cite the claim it states, and the ledger logs it false, so the inspector marks it. Ask Pell,
+was and she lies. Her lie is an action the rules choose once she's frightened enough: the model words it, the line
+cites the claim it states, and the ledger logs it false, so the inspector marks it. Ask Pell,
 have Lady Vane question him, and his testimony breaks the alibi. Accuse Sable before evening to win.
 
 [![The manor mystery: Sable's lie in the why-chain, beside the house with the hall in darkness](docs/images/manor-lie-why-chain.jpg)](https://thespis-production.up.railway.app/manor/)

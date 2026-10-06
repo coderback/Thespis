@@ -11,19 +11,19 @@ from __future__ import annotations
 
 import hashlib
 import json
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 
 from thespis.deception import SAID
 from thespis.expression import StatePack, Utterance
-from thespis.gateway import ModelGateway, ModelReply
+from thespis.gateway import Call, ModelGateway, ModelReply
 from thespis.world import World
 
 REJECTED = "model reply rejected: "
 
 
-def call_key(call_type: str, messages: list[dict]) -> str:
-    canonical = json.dumps([call_type, messages], sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+def call_key(call_type: str, messages: list[dict], schema: dict | None = None) -> str:
+    canonical = json.dumps([call_type, messages, schema], sort_keys=True, ensure_ascii=False, separators=(",", ":"))
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
@@ -45,15 +45,15 @@ class RecordingGateway:
     def models(self) -> tuple[str, ...]:
         return self.inner.models
 
-    def complete(self, call_type: str, messages: list[dict]) -> ModelReply | None:
-        reply = self.inner.complete(call_type, messages)
-        self.replies.setdefault(call_key(call_type, messages), []).append(_reply_json(reply))
+    def complete(self, call_type: str, messages: list[dict], schema: dict | None = None) -> ModelReply | None:
+        reply = self.inner.complete(call_type, messages, schema)
+        self.replies.setdefault(call_key(call_type, messages, schema), []).append(_reply_json(reply))
         return reply
 
-    def complete_many(self, calls: list[tuple[str, list[dict]]]) -> list[ModelReply | None]:
+    def complete_many(self, calls: Sequence[Call]) -> list[ModelReply | None]:
         replies = self.inner.complete_many(calls)
-        for (call_type, messages), reply in zip(calls, replies):
-            self.replies.setdefault(call_key(call_type, messages), []).append(_reply_json(reply))
+        for call, reply in zip(calls, replies):
+            self.replies.setdefault(call_key(*call), []).append(_reply_json(reply))
         return replies
 
     def recordings(self) -> dict:
@@ -71,15 +71,15 @@ class ReplayGateway:
         self._queue = {key: list(replies) for key, replies in recordings["replies"].items()}
         self.misses: list[str] = []
 
-    def complete(self, call_type: str, messages: list[dict]) -> ModelReply | None:
-        queue = self._queue.get(call_key(call_type, messages))
+    def complete(self, call_type: str, messages: list[dict], schema: dict | None = None) -> ModelReply | None:
+        queue = self._queue.get(call_key(call_type, messages, schema))
         if not queue:
             self.misses.append(call_type)
             return None
         r = queue.pop(0)
         return None if r is None else ModelReply(r["data"], r["provider"], r["model"], r["latency"])
 
-    def complete_many(self, calls: list[tuple[str, list[dict]]]) -> list[ModelReply | None]:
+    def complete_many(self, calls: Sequence[Call]) -> list[ModelReply | None]:
         return [self.complete(*call) for call in calls]
 
 
@@ -113,18 +113,15 @@ class Recorder:
             stray = set(used.cites) - pack.ids - {SAID}
             if stray:
                 self.violations.append(f"{self.scenario}: {pack.npc} cites {sorted(stray)}, not in its pack")
-            if kind == "decide" and used.action not in {a["id"] for a in pack.allowed}:
-                self.violations.append(f"{self.scenario}: {pack.npc} chose {used.action}, not among its options")
         if reply is None:
             self.unanswered += used.note == "model unavailable"
             return
-        chosen = next((a for a in pack.allowed if a["id"] == used.action), None) if kind == "decide" else None
         self.samples.append({
             "scenario": self.scenario, "game": self.game, "kind": kind, "npc": pack.npc, "name": pack.name,
             "situation": pack.situation, "here": list(pack.here), "ids": sorted(pack.ids),
             "reply": reply.data, "provider": reply.provider, "latency": round(reply.latency, 3),
             "source": used.source, "note": used.note, "line": used.line, "cites": list(used.cites),
-            "action": used.action, "asserting": bool(chosen and "asserts" in chosen),
+            "action": used.action, "asserting": pack.asserts,
             "snapshot": self._snapshot(),
         })
 
