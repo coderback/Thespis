@@ -4,7 +4,9 @@ player hears it. The Mind runs it (thespis.expression); the host chooses the mod
   - Blocklist: words and phrases a game rules out, matched whole and checked offline.
   - ContentSafety: Azure AI Content Safety's text analysis. A text is flagged when any category's severity (0, 2, 4
     or 6) reaches its threshold. It fails closed: if the service errs or times out, the text counts as flagged, and
-    the NPC falls back to its code line, which is always available.
+    the NPC falls back to its code line, which is always available. It spaces its requests to stay under the
+    service's rate limit (the free tier allows 5 a second) and retries once when told to slow down. Each text is its own request: joined
+    texts can hide a harmful one, which tests against the live service showed.
   - Layered: several at once; the first to flag a text decides.
 
 Every moderator also has a `local()` part, the layers that need no network. Cache hits and replay use only that, so
@@ -19,8 +21,9 @@ import logging
 import os
 import re
 import threading
+import time
 from collections import OrderedDict
-from collections.abc import Iterable, Mapping
+from collections.abc import Callable, Iterable, Mapping
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from typing import Protocol
@@ -34,7 +37,32 @@ CATEGORIES = ("Hate", "SelfHarm", "Sexual", "Violence")
 # Medium severity and up, except violence, where a duel or a threat at swordpoint is the game: only high.
 THRESHOLDS = {"Hate": 4, "SelfHarm": 4, "Sexual": 4, "Violence": 6}
 MAX_TEXT = 10_000  # characters per request, the service's limit; no line or persona comes near it
+# Requests a second. The free tier allows 5, but requests spaced exactly 0.2 s apart still drew 429s when tested
+# against it, and at 0.25 s none did. The standard tier allows 100: set CONTENT_SAFETY_RPS.
+RATE = 4.0
 UNAVAILABLE = "moderation unavailable"
+
+
+class Pace:
+    """Requests spaced at least 1/`rate` seconds apart, across every thread. `take` waits for the next turn, unless
+    that would take longer than `budget` seconds."""
+
+    def __init__(self, rate: float, clock: Callable[[], float] = time.monotonic,
+                 sleep: Callable[[float], None] = time.sleep):
+        self.rate, self._clock, self._sleep = rate, clock, sleep
+        self._next = 0.0  # the earliest the next request may go
+        self._lock = threading.Lock()
+
+    def take(self, budget: float) -> bool:
+        with self._lock:
+            now = self._clock()
+            turn = max(now, self._next)
+            if turn - now > budget:
+                return False
+            self._next = turn + 1 / self.rate
+        if turn > now:
+            self._sleep(turn - now)
+        return True
 
 
 @dataclass(frozen=True)
@@ -85,11 +113,15 @@ class Blocklist:
 
 class ContentSafety:
     def __init__(self, endpoint: str, key: str, thresholds: Mapping[str, int] | None = None, *, timeout: float = 2.0,
-                 transport: httpx.BaseTransport | None = None, memo: int = 4096):
+                 transport: httpx.BaseTransport | None = None, memo: int = 4096, rate: float = RATE,
+                 wait: float = 2.0, clock: Callable[[], float] = time.monotonic,
+                 sleep: Callable[[float], None] = time.sleep):
         self.url = f"{endpoint.rstrip('/')}/contentsafety/text:analyze?api-version={API_VERSION}"
         self._key = key
         self.thresholds = {**THRESHOLDS, **(thresholds or {})}
         self._client = httpx.Client(timeout=timeout, transport=transport)
+        self._pace = Pace(rate, clock, sleep)
+        self._wait, self._sleep = wait, sleep  # the longest a text waits for its turn, or for a retry
         self._memo: OrderedDict[str, Verdict] = OrderedDict()  # verdicts by the text's hash, latest last
         self._memo_size = memo
         self._lock = threading.Lock()
@@ -102,6 +134,13 @@ class ContentSafety:
 
     def local(self) -> Moderator:
         return NoModeration()
+
+    def _post(self, text: str) -> httpx.Response | None:
+        """One request, when the pace allows it within the wait; None if it doesn't."""
+        if not self._pace.take(self._wait):
+            return None
+        return self._client.post(self.url, headers={"Ocp-Apim-Subscription-Key": self._key},
+                                 json={"text": text[:MAX_TEXT], "categories": list(CATEGORIES)})
 
     def close(self) -> None:
         self._client.close()
@@ -125,8 +164,15 @@ class ContentSafety:
 
     def _ask(self, text: str) -> Verdict:
         try:
-            r = self._client.post(self.url, headers={"Ocp-Apim-Subscription-Key": self._key},
-                                  json={"text": text[:MAX_TEXT], "categories": list(CATEGORIES)})
+            r = self._post(text)
+            if r is None:
+                log.warning("content safety is busy: no turn within %.1f s", self._wait, extra={"status": "paced"})
+                return Verdict(True, UNAVAILABLE)
+            if r.status_code == 429:  # told to slow down: once, if the wait it asks for fits
+                after = _seconds(r.headers.get("retry-after"), default=1.0)
+                if after <= self._wait:
+                    self._sleep(after)
+                    r = self._post(text) or r
             if r.status_code != 200:
                 log.warning("content safety answered HTTP %d", r.status_code, extra={"status": r.status_code})
                 return Verdict(True, UNAVAILABLE)
@@ -160,12 +206,21 @@ class Layered:
         return " and ".join(str(m) for m in self.layers) or "none"
 
 
+def _seconds(value: str | None, default: float) -> float:
+    try:
+        return max(0.0, float(value)) if value else default
+    except ValueError:
+        return default
+
+
 def content_safety_from_env(env: Mapping[str, str] | None = None) -> ContentSafety | None:
     """CONTENT_SAFETY_ENDPOINT and CONTENT_SAFETY_KEY, with MODERATION_THRESHOLDS (JSON, by category) to override the
-    defaults; None when either is unset."""
+    defaults and CONTENT_SAFETY_RPS for the requests a second it may send (4, safely under the free tier's 5, by
+    default); None when the endpoint or key is unset."""
     env = os.environ if env is None else env
     endpoint, key = (env.get(f"CONTENT_SAFETY_{k}", "").strip() for k in ("ENDPOINT", "KEY"))
     if not (endpoint and key):
         return None
     thresholds = env.get("MODERATION_THRESHOLDS", "").strip()
-    return ContentSafety(endpoint, key, json.loads(thresholds) if thresholds else None)
+    rate = env.get("CONTENT_SAFETY_RPS", "").strip()
+    return ContentSafety(endpoint, key, json.loads(thresholds) if thresholds else None, rate=float(rate) if rate else RATE)

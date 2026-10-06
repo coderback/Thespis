@@ -233,7 +233,8 @@ which rebuilds and redeploys every merge to `main`.
 - **Moderation:** with `CONTENT_SAFETY_ENDPOINT` and `CONTENT_SAFETY_KEY` set, Azure AI Content Safety checks what
   players write before a model reads it and every model line before a player hears it. Thresholds per category:
   Hate, Sexual and SelfHarm at 4, Violence at 6, overridden by `MODERATION_THRESHOLDS` (JSON). It fails closed: if the
-  service is down, NPCs use their code lines. A game can also list words in `[moderation] blocklist` in its
+  service is down, NPCs use their code lines. It sends at most `CONTENT_SAFETY_RPS` requests a second (4, under the
+  free tier's 5; set 100 on the standard tier), one text per request, since joined texts hid a harmful line in tests. A game can also list words in `[moderation] blocklist` in its
   `cast.toml`. The boot log says which moderation is active.
 - **Edges:** no CORS unless `CORS_ORIGINS` lists origins; no generated API docs unless `API_DOCS=1`; bodies over
   64 KiB refused. After a deploy, `python tools/exposure.py <host>` should pass every check.

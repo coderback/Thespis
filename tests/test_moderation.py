@@ -14,6 +14,7 @@ from thespis.moderation import (
     ContentSafety,
     Layered,
     NoModeration,
+    Pace,
     Verdict,
     content_safety_from_env,
 )
@@ -99,6 +100,57 @@ def test_verdicts_are_remembered():
     for text in ("a", "b", "a", "a"):
         cs.check([text])
     assert [json.loads(r.content)["text"] for r in seen] == ["a", "b"]
+
+
+class Clock:
+    """Time that moves only when something sleeps."""
+
+    def __init__(self):
+        self.now, self.slept = 0.0, []
+
+    def __call__(self):
+        return self.now
+
+    def sleep(self, seconds):
+        self.slept.append(round(seconds, 3))
+        self.now += seconds
+
+
+def test_the_pace_spaces_requests_out():
+    clock = Clock()
+    pace = Pace(4, clock, clock.sleep)
+    assert all(pace.take(2.0) for _ in range(3))
+    assert clock.slept == [0.25, 0.25]  # the first goes at once, then one every quarter of a second
+    clock.now += 5.0  # after a quiet spell the next goes at once
+    assert pace.take(0.0) and clock.slept == [0.25, 0.25]
+    assert not pace.take(0.1)  # a turn further off than the budget isn't waited for
+
+
+def test_a_429_is_retried_once_after_the_wait_it_asks_for():
+    clock, answers = Clock(), iter([httpx.Response(429, headers={"Retry-After": "1"}), severities()])
+    cs, seen = safety(lambda text: next(answers), clock=clock, sleep=clock.sleep)
+    assert cs.check(["hello"]) == [PASS] and len(seen) == 2 and 1.0 in clock.slept
+
+
+def test_a_second_429_or_a_long_one_fails_closed():
+    clock = Clock()
+    cs, seen = safety(lambda text: httpx.Response(429, headers={"Retry-After": "1"}), clock=clock, sleep=clock.sleep)
+    assert cs.check(["hello"]) == [Verdict(True, UNAVAILABLE)] and len(seen) == 2
+    cs, seen = safety(lambda text: httpx.Response(429, headers={"Retry-After": "30"}), clock=clock, sleep=clock.sleep)
+    assert cs.check(["hello"]) == [Verdict(True, UNAVAILABLE)] and len(seen) == 1  # 30 s is past the wait
+
+
+def test_a_busy_service_fails_closed_rather_than_stalling_the_game():
+    clock = Clock()
+    cs, seen = safety(lambda text: severities(), rate=1, wait=0.5, clock=clock, sleep=clock.sleep)
+    assert cs.check(["one"]) == [PASS]
+    assert cs.check(["two"]) == [Verdict(True, UNAVAILABLE)] and len(seen) == 1  # its turn is a second off
+
+
+def test_the_rate_comes_from_the_environment():
+    env = {"CONTENT_SAFETY_ENDPOINT": ENDPOINT, "CONTENT_SAFETY_KEY": "k"}
+    assert content_safety_from_env(env)._pace.rate == 4
+    assert content_safety_from_env({**env, "CONTENT_SAFETY_RPS": "100"})._pace.rate == 100
 
 
 def test_content_safety_has_no_offline_part():
