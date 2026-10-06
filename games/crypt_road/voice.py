@@ -63,6 +63,10 @@ VALIDATOR = CryptRoadValidator(VOCABULARY)
 RETRIEVER = TopKRetriever(5)
 KNOWN_EVENTS = 5
 THRESHOLDS = {"grudge": (4, 5), "respect": (4,), "fear": (4,)}  # crossing one makes the rival stop and think
+# Lines with consequences, which meet the claim check (thespis.claims): accusations, arrests, questioning, deals,
+# and testimony. The narrator's tellings are checked too (narrator.py).
+STAKES_ACTIONS = ("accuse", "detain", "question", "counter", "refuse")
+STAKES_TRIGGERS = ("testify",)
 
 
 @dataclass(frozen=True)
@@ -160,7 +164,7 @@ def describe(option: str, w: World, npc: str) -> str:
 
 
 def pack_for(w: World, npc_id: str, situation: str, action: str | None = None, view: View | None = None,
-             untrusted: tuple[str, ...] = ()) -> StatePack:
+             untrusted: tuple[str, ...] = (), stakes: bool = False) -> StatePack:
     """Everything the model may know when it speaks for this NPC, and nothing more. Never whether a belief is true.
     `action` is what code decided the NPC does, if it is acting. `untrusted` is what the player wrote that the
     situation quotes; a persona the player edited counts too."""
@@ -193,6 +197,7 @@ def pack_for(w: World, npc_id: str, situation: str, action: str | None = None, v
         setting=f"You are at {C.STOP_NAMES[npc.loc]}. The road runs east: "
                 + ", ".join(C.STOP_NAMES[s] for s in C.STOPS) + ". The relic lies in the crypt.",
         untrusted=[t for t in (npc.flags.get("persona"), *untrusted) if t],
+        stakes=stakes or bool(action and action.partition(":")[0] in STAKES_ACTIONS),
     )
 
 
@@ -202,7 +207,8 @@ def deliver(w: World, mind: Mind, speeches: list[Speech]) -> list[dict]:
     speeches = [s for s, _ in voiced]
     fallbacks = [Utterance(None, said[0], said[1], "fallback") for _, said in voiced]
     if mind.active:
-        spoken = mind.react_many([(pack_for(w, s.npc, s.situation, untrusted=s.untrusted), f)
+        spoken = mind.react_many([(pack_for(w, s.npc, s.situation, untrusted=s.untrusted,
+                                            stakes=s.trigger in STAKES_TRIGGERS), f)
                                   for s, f in zip(speeches, fallbacks)])
     else:
         spoken = fallbacks

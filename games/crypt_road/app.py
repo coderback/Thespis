@@ -18,7 +18,7 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from games.crypt_road import rules, views, voice
+from games.crypt_road import claims, rules, views, voice
 from games.crypt_road.content import DEMO_SEED, load_cast, new_world
 from games.hosting import (
     ApiError,
@@ -38,8 +38,9 @@ from games.hosting import budget as _budget
 from games.hosting import env_int as _env_int
 from games.manor import api as manor
 from games.manor.content import load_cast as manor_cast
+from thespis.claims import checking_from_env
 from thespis.expression import PROMPT_HASH, Mind
-from thespis.gateway import gateway_from_env
+from thespis.gateway import OpenAICompatGateway, gateway_from_env
 from thespis.moderation import Layered, content_safety_from_env
 from thespis.store import SessionNotFound, Store
 
@@ -75,8 +76,15 @@ async def lifespan(app: FastAPI):
     app.state.moderator = Layered(blocklist(load_cast()), remote)
     app.state.manor_moderator = Layered(blocklist(manor_cast()), remote)
     log.info("moderation: %s; the manor: %s", app.state.moderator, app.state.manor_moderator)
+    checking = app.state.checking = checking_from_env(os.environ)
+    log.info("claim check: %s", "off" if checking is None else
+             f"{'every line' if checking.mode == 'all' else 'lines with consequences'}, extracted by "
+             + (" then ".join(p.name for p in getattr(checking.gateway, "providers", ())) if checking.gateway
+                else "the model that spoke"))
     yield
     gateway.close()  # the one this app opened, even if a test swapped app.state.gateway
+    if checking is not None and isinstance(checking.gateway, OpenAICompatGateway):
+        checking.gateway.close()
     if remote is not None:
         remote.close()
 
@@ -184,7 +192,7 @@ def post_act(body: ActBody, request: Request, x_session: str | None = Header(def
             result = rules.act(world, body.verb, body.target, body.claim.model_dump() if body.claim else None,
                                body.amount, body.text, gateway=request.app.state.gateway, cache=store,
                                replay=request.app.state.replay, budget=_budget(request.app.state, store, world),
-                               moderator=request.app.state.moderator)
+                               moderator=request.app.state.moderator, checking=request.app.state.checking)
         except rules.NotAllowed as e:
             raise ApiError(409, "not_allowed", e.reason) from None
         store.save(session, world)
@@ -199,8 +207,10 @@ def get_digest(request: Request, since: int = 0, x_session: str | None = Header(
     store, session, state = _store(request), _session(x_session), request.app.state
     with LOCKS.hold(session):
         world = _load(store, session)
-        mind = Mind(state.gateway if world.brain_mode == "model" else None, voice.VALIDATOR, store, state.replay,
-                    _budget(state, store, world), state.moderator)
+        gateway = state.gateway if world.brain_mode == "model" else None
+        checker = claims.check(world, state.checking, gateway) if state.checking and gateway else None
+        mind = Mind(gateway, voice.VALIDATOR, store, state.replay, _budget(state, store, world), state.moderator,
+                    checker=checker)
         digest = views.digest_view(world, since, mind)
         if mind.asked:
             world.counters["model_calls"] = world.counters.get("model_calls", 0) + mind.asked

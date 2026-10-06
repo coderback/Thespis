@@ -23,12 +23,14 @@ from pathlib import Path
 
 import yaml
 
+from games.crypt_road import claims as cr_claims
 from games.crypt_road import rules as cr_rules
 from games.crypt_road import views as cr_views
 from games.crypt_road import voice as cr_voice
 from games.crypt_road.content import new_world as cr_world
 from games.manor import rules as mn_rules
 from games.manor.content import new_world as mn_world
+from thespis.claims import ClaimChecking
 from thespis.expression import Mind, Observer, ReplyCache
 from thespis.gateway import ModelGateway
 from thespis.world import PLAYING, World
@@ -58,13 +60,15 @@ class Stage:
     """Where scenarios play: in-process, sharing one gateway and one reply cache, as the host does.
 
     `world` is the world being played, so an observer can see it as each line is said. `acts` keeps each action's
-    time and how many model calls it made; `tellings` keeps each digest's source and text.
+    time and how many model calls it made; `tellings` keeps each digest's source and text. With `checking`, lines
+    with consequences meet the claim check, as on the host.
     """
 
     gateway: ModelGateway | None
     cache: ReplyCache | None = None
     observer: Observer | None = None
     brain: str = "model"
+    checking: ClaimChecking | None = None
     world: World | None = None
     acts: list[tuple[float, int]] = field(default_factory=list)
     tellings: list[tuple[str, str]] = field(default_factory=list)
@@ -89,7 +93,8 @@ class CryptRoad:
         phase, started = self.w.phase, time.perf_counter()
         try:
             result = cr_rules.act(self.w, verb, target, fields.get("claim"), fields.get("amount"), fields.get("text"),
-                                  gateway=self.stage.gateway, cache=self.stage.cache, observer=self.stage.observer)
+                                  gateway=self.stage.gateway, cache=self.stage.cache, observer=self.stage.observer,
+                                  checking=self.stage.checking)
         except cr_rules.NotAllowed as e:
             raise ApiError(f"{verb} {target}: {e.reason}") from None
         self.stage.acts.append((time.perf_counter() - started, result.model_calls))
@@ -106,7 +111,9 @@ class CryptRoad:
     def digest(self, since: int) -> None:
         """The Dungeon Master's telling, as GET /digest gives it."""
         gateway = self.stage.gateway if self.w.brain_mode == "model" else None
-        mind = Mind(gateway, cr_voice.VALIDATOR, self.stage.cache, observer=self.stage.observer)
+        checking = self.stage.checking
+        checker = cr_claims.check(self.w, checking, gateway) if checking and gateway else None
+        mind = Mind(gateway, cr_voice.VALIDATOR, self.stage.cache, observer=self.stage.observer, checker=checker)
         d = cr_views.digest_view(self.w, since, mind)
         self.stage.tellings.append((d["source"], d["text"]))
         if d["epilogue"] is not None:
@@ -132,7 +139,7 @@ class Manor:
         started = time.perf_counter()
         try:
             result = mn_rules.act(self.w, verb, target, topic, gateway=self.stage.gateway, cache=self.stage.cache,
-                                  observer=self.stage.observer)
+                                  observer=self.stage.observer, checking=self.stage.checking)
         except mn_rules.NotAllowed:
             return
         self.stage.acts.append((time.perf_counter() - started, result.model_calls))

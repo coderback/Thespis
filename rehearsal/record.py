@@ -56,8 +56,8 @@ class RecordingGateway:
             self.replies.setdefault(call_key(*call), []).append(_reply_json(reply))
         return replies
 
-    def recordings(self) -> dict:
-        return {"models": list(self.models), "replies": dict(sorted(self.replies.items()))}
+    def recordings(self, claim_check: str = "consequential") -> dict:
+        return {"models": list(self.models), "claim_check": claim_check, "replies": dict(sorted(self.replies.items()))}
 
 
 class ReplayGateway:
@@ -68,6 +68,7 @@ class ReplayGateway:
 
     def __init__(self, recordings: dict):
         self.models = tuple(recordings["models"])
+        self.claim_check = recordings.get("claim_check", "off")  # how the recorded rehearsal checked claims
         self._queue = {key: list(replies) for key, replies in recordings["replies"].items()}
         self.misses: list[str] = []
 
@@ -121,7 +122,7 @@ class Recorder:
             "situation": pack.situation, "here": list(pack.here), "ids": sorted(pack.ids),
             "reply": reply.data, "provider": reply.provider, "latency": round(reply.latency, 3),
             "source": used.source, "note": used.note, "line": used.line, "cites": list(used.cites),
-            "action": used.action, "asserting": pack.asserts,
+            "action": used.action, "asserting": pack.asserts, "stakes": pack.stakes,
             "snapshot": self._snapshot(),
         })
 

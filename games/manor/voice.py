@@ -14,6 +14,7 @@ from games.manor import words
 from thespis.deception import asserting
 from thespis.decisions import REACT
 from thespis.expression import Mind, StatePack, Utterance, Validator
+from thespis.ledger import Claim
 from thespis.retriever import TopKRetriever
 from thespis.world import World
 
@@ -22,6 +23,10 @@ VOCABULARY = {"lady vane": C.OWNER, "vane": C.OWNER, "her ladyship": C.OWNER, "p
 VALIDATOR = Validator(VOCABULARY)
 RETRIEVER = TopKRetriever(5)
 KNOWN_EVENTS = 5
+# Lines with consequences, which meet the claim check (thespis.claims): Sable's answer about the morning, Pell's
+# account of it, and what Lady Vane says of the case.
+STAKES_ACTIONS = ("deceive:alibi", "deflect")
+STAKES_TRIGGERS = ("asked_morning", "testify", "questioned", "questioned_sable", "accused_pell", "accused_sable")
 DOES = {
     "deceive:alibi": "say you were in the kitchen at mid-morning. It isn't true: you were in the study",
     "deflect": "avoid the question without saying where you were",
@@ -58,9 +63,9 @@ def knows(w: World, npc: str, event_id: str) -> bool:
 
 
 def pack_for(w: World, npc_id: str, situation: str, action: str | None = None,
-             asserts: str | None = None) -> StatePack:
+             asserts: Claim | None = None, stakes: bool = False) -> StatePack:
     """Everything the model may know when it speaks for this NPC. `action` is what code decided it does, if it is
-    acting, and `asserts` the claim that action states, in words."""
+    acting, and `asserts` the claim that action states."""
     npc, cast = w.npcs[npc_id], C.load_cast()["npc"][npc_id]
     others = [n.id for n in w.npcs_at(npc.loc) if n.id != npc_id]
     if w.player["loc"] == npc.loc:
@@ -69,14 +74,14 @@ def pack_for(w: World, npc_id: str, situation: str, action: str | None = None,
     known = [e for e in reversed(list(w.ledger)) if knows(w, npc_id, e.id)][:KNOWN_EVENTS][::-1]
     doing = {"id": action, "does": DOES.get(action, action.replace("_", " "))} if action else None
     if doing and asserts:
-        doing = asserting(doing, asserts)
+        doing = asserting(doing, words.claim_text(asserts, about=True))
     return StatePack(
         npc=npc_id, name=cast["name"], persona=cast["persona"], goal=cast["goal"], situation=situation,
         here=[words.who(x, about=True) for x in others], drives=dict(npc.drives), trust_in=dict(npc.trust_in),
         beliefs=[{"id": b.id, "claim": words.claim_text(b.claim, about=True), "conf": b.conf,
                   "from": sorted({e.source for e in b.evidence})} for b in beliefs],
         events=[{"id": e.id, "what": words.sentence(e, about=True)} for e in known],
-        action=doing,
+        action=doing, asserted=asserts, stakes=stakes or action in STAKES_ACTIONS,
         names=set(C.ROOMS) | set(w.npcs),  # a small household: everyone knows everyone, and every room
         setting=f"You are in {C.ROOM_NAMES[npc.loc]} of Lady Vane's manor, which has a hall, a study and a kitchen. "
                 f"It is {C.PHASES[min(w.phase, len(C.PHASES) - 1)]}.",
@@ -89,7 +94,8 @@ def deliver(w: World, mind: Mind, speeches: list[Speech]) -> list[dict]:
     speeches = [s for s, _ in voiced]
     fallbacks = [Utterance(None, said[0], said[1], "fallback") for _, said in voiced]
     if mind.active:
-        spoken = mind.react_many([(pack_for(w, s.npc, s.situation), f) for s, f in zip(speeches, fallbacks)])
+        spoken = mind.react_many([(pack_for(w, s.npc, s.situation, stakes=s.trigger in STAKES_TRIGGERS), f)
+                                  for s, f in zip(speeches, fallbacks)])
     else:
         spoken = fallbacks
     replies = []

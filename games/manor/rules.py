@@ -13,11 +13,12 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 
+from games.manor import claims, voice
 from games.manor import content as C
-from games.manor import voice, words
 from games.manor.voice import Speech
 from thespis.beliefs import Belief
 from thespis.brain import UtilityBrain
+from thespis.claims import ClaimChecking
 from thespis.deception import SAID, log_statement
 from thespis.decisions import DECIDE
 from thespis.expression import Mind, Observer, ReplyCache, Utterance
@@ -90,14 +91,15 @@ def _check(w: World, verb: str, target: str | None) -> None:
 # ---------------------------------------------------------------- acting
 def act(w: World, verb: str, target: str | None = None, topic: str | None = None,
         gateway: ModelGateway | None = None, cache: ReplyCache | None = None, replay: bool = False,
-        budget: int | None = None, moderator: Moderator | None = None, observer: Observer | None = None) -> ActResult:
+        budget: int | None = None, moderator: Moderator | None = None, observer: Observer | None = None,
+        checking: ClaimChecking | None = None) -> ActResult:
     """Apply one player verb. Code makes every choice; with a gateway and the brain on, the model words what the people
     say, and anything it gets wrong, or can't answer, falls back to the template lines."""
     _check(w, verb, target)
     if verb == "ask" and topic not in C.TOPICS:
         raise NotAllowed("Ask about this morning or the ring")
     mind = Mind(gateway if w.brain_mode == "model" else None, voice.VALIDATOR, cache, replay, budget, moderator,
-                observer)
+                observer, claims.check(w, checking, gateway) if checking and gateway else None)
     start = len(w.ledger)
     assert target is not None  # every manor verb names someone or somewhere, and _check found it
     if verb == "ask":
@@ -164,8 +166,7 @@ def _sable_answers(w: World, mind: Mind, listener: str, loc: str) -> dict:
             return voice.line(C.MAID, "deceive", [SAID, knows.id])
         return voice.line(C.MAID, "deflect", [knows.id])
 
-    u = _decide(w, mind, C.MAID, options, line_for, situation,
-                {"deceive:alibi": words.claim_text(C.THE_ALIBI, about=True)})
+    u = _decide(w, mind, C.MAID, options, line_for, situation, {"deceive:alibi": C.THE_ALIBI})
     assert u.action is not None  # a decision always carries one of the options
     reason = f"{u.action} pulls {options[u.action]}" + (f"; {u.note}" if u.note else "")
     if u.action == "deceive:alibi":
@@ -189,7 +190,7 @@ def _held(w: World, npc: str, claim) -> Belief:
 
 
 def _decide(w: World, mind: Mind, npc: str, options: Mapping[str, float], line_for, situation: str,
-            asserts: dict[str, str]) -> Utterance:
+            asserts: dict[str, Claim]) -> Utterance:
     """The utility brain's choice, voiced by the model if its reply passes, else by the template line."""
     choice = UtilityBrain().choose(npc, options)
     line, cites = line_for(choice) or (None, [])
