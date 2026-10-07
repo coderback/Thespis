@@ -271,7 +271,11 @@ tests/              the pytest suite, run by CI on every pull request
 One Docker image serves the engine API and the built client from one URL (`Dockerfile`). It's hosted on Railway,
 which rebuilds and redeploys every merge to `main`.
 
-- **Settings:** `railway.toml` sets the Dockerfile build, a `/health` check and one replica.
+- **Settings:** `.railway/railway.py` declares the service: the Dockerfile build, a `/health` check, one replica,
+  the volume, and the names of its variables. Railway doesn't read it on deploy. A change reaches the live service
+  only through `railway config plan` and then `railway config apply`, which need `railway-sdk` (a dev dependency).
+  Apply removes whatever the file leaves out, so add a new variable's name there before setting it in the
+  dashboard, and read the plan before every apply.
 - **Volume:** mounted at `/data`. The database is `/data/thespis.sqlite`, set by the image. Don't set `DB_PATH` on
   Railway: with a volume attached, the app ignores any path off it and logs a warning.
 - **Model keys:** Railway variables, never in the repo.

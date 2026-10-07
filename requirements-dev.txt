@@ -370,6 +370,10 @@ pyyaml==6.0.3 \
     # via
     #   -c requirements.txt
     #   uvicorn
+railway-sdk==0.4.0 \
+    --hash=sha256:06be84b5eb3854ee15c6e1a604e814f8a9afd783fa4b31db78d637a4813e8502 \
+    --hash=sha256:4622f6caca7e2cdb2648dff6551489e267caff065286840c90d25f4ca204f40d
+    # via -r requirements-dev.in
 ruff==0.16.10 \
     --hash=sha256:1dfc6f0088149fb6a362c1c446bcbb3fd2157b3852fe2fa68409276eab9ad9b3 \
     --hash=sha256:25a65fe998c4e6861ec079ada5826a2fc605e6cbccbe9dcd7fac1f54e791621b \
