@@ -63,7 +63,8 @@ class JsonFormatter(logging.Formatter):
 def configure_logging(fmt: str | None = None) -> None:
     """Log at INFO to stdout: JSON lines with LOG_FORMAT=json, which the image sets, else plain text. Calling it again
     replaces only its own handler. With JSON, uvicorn's own logs come through the same handler, except its access log:
-    the Guard logs every request already."""
+    the Guard logs every request already. httpx logs only warnings: the gateway logs every model call itself, and
+    httpx's line for each request would print the provider's URL."""
     fmt = (fmt if fmt is not None else os.environ.get("LOG_FORMAT", "")).strip().lower()
     root = logging.getLogger()
     root.handlers = [h for h in root.handlers if h.get_name() != _HANDLER]
@@ -73,6 +74,8 @@ def configure_logging(fmt: str | None = None) -> None:
                          logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
     root.addHandler(handler)
     root.setLevel(logging.INFO)
+    for name in ("httpx", "httpcore"):
+        logging.getLogger(name).setLevel(logging.WARNING)
     if fmt == "json":
         for name in ("uvicorn", "uvicorn.error"):
             logger = logging.getLogger(name)
