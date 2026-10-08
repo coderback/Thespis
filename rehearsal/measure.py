@@ -18,12 +18,14 @@ import math
 import os
 import random
 from collections import Counter
-from collections.abc import Mapping
+from collections.abc import Iterator, Mapping
+from contextlib import contextmanager
 from importlib import import_module
 
 from rehearsal.record import refusal
 from thespis.claims import BAD, ClaimVocabulary, Facts, extraction_messages, parse_claims, score
 from thespis.gateway import OpenAICompatGateway, Provider, provider_from_env
+from thespis.profiles import PROFILES
 from thespis.world import World
 from tools.harness import PRICES, percentile
 
@@ -33,6 +35,7 @@ PROTOCOL = ("action ", "no line", "line is ", "no cites", "cites ", "states some
 # Each judge reasons a little: DeepSeek V4 Pro missed the leak this metric exists to catch without thinking (paper-m1).
 JUDGE_EXTRA = {"deepseek-v4-pro": {"reasoning_effort": "low", "max_tokens": 4000}}
 GAMES = {"crypt_road": "games.crypt_road.claims", "manor": "games.manor.claims"}
+REFERENCE_JUDGES = frozenset({"DeepSeek-V4-Pro"})  # the judge others are calibrated against (rehearsal/calibrate.py)
 
 
 def protocol(reason: str) -> bool:
@@ -54,6 +57,20 @@ def judge_from_env(name: str, env: Mapping[str, str] | None = None) -> Provider 
     base = p.base_url.rstrip("/").removesuffix("/chat/completions")  # the full endpoint pasted as the base URL
     extra = {"max_tokens": 800, "temperature": 0, **JUDGE_EXTRA.get(p.model.lower(), {}), **p.extra}
     return dataclasses.replace(p, base_url=base, extra=extra)
+
+
+@contextmanager
+def judging(name: str, env: Mapping[str, str] | None = None) -> Iterator[Provider | None]:
+    """The judge, for as long as it's needed. `local:<model>` starts that registry model on this machine
+    (thespis.runtime) and stops it afterwards, so a rehearsal can be judged with the network off; any other name is
+    JUDGE_<NAME>_* from the environment."""
+    if not name.startswith("local:"):
+        yield judge_from_env(name, env)
+        return
+    from thespis.runtime.local import LocalModel
+    with LocalModel(name.split(":", 1)[1]) as lm:
+        yield Provider(f"local/{lm.model.id}", lm.url, "", lm.model.id, profile=PROFILES["llamacpp"],
+                       extra={"temperature": 0, "max_tokens": 800})
 
 
 def vocabulary(game: str) -> ClaimVocabulary:
@@ -200,6 +217,11 @@ def _rate(r: dict) -> str:
     return "n/a" if not r["n"] else f"{_pct(r['p'])} [{_pct(r['lo'])}, {_pct(r['hi'])}] (n={r['n']})"
 
 
+def calibrate_describe(result: dict) -> str:
+    from rehearsal.calibrate import describe
+    return describe(result)
+
+
 def markdown(report: dict) -> str:
     s, c = report["summary"], report["claims"]
     extractor = f" Claim check extracted by {', '.join(report['extractor'])}." if report.get("extractor") else ""
@@ -227,6 +249,11 @@ def markdown(report: dict) -> str:
         f"Claims by category: {c['claims'] or 'none'}.",
         "",
     ]
+    if c.get("judge") and c["judge"] not in REFERENCE_JUDGES:  # a stand-in judge: say how far to trust it
+        cal = c.get("calibration")
+        out += [f"Judge calibration: {calibrate_describe(cal)}." if cal else
+                "Judge calibration: none. This judge hasn't been measured against the reference "
+                "(python -m rehearsal calibrate), so its rates can't be compared with a reference-judged report.", ""]
     if report.get("claim_check", "off") != "off":
         out += [f"Claim check ({report['claim_check']}): it refused {sum(s.get('claim_check', {}).values())} lines "
                 f"{s.get('claim_check') or ''}; of the lines it passed that the judge read, "

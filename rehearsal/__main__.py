@@ -5,9 +5,13 @@
     python -m rehearsal replay                 # what CI runs: the recordings answer, no network
     python -m rehearsal replay --update        # accept a change in what the NPCs say, when no call missed
     python -m rehearsal compare rehearsal/reports/baseline.json rehearsal/reports/<new>.json
+    python -m rehearsal live --local gemma4-e4b --judge local:qwen3.5-4b   # offline: a local speaker and judge
+    python -m rehearsal calibrate rehearsal/reports/<run>.lines.json.gz --judge local:qwen3.5-4b
 
-`live` reads LLM_* (the speaker, as on the host) and JUDGE_<NAME>_* (the judge) from .env. Its report goes to
-rehearsal/reports/<date>-<commit>.json and .md. `replay` exits 1 if a call missed the recordings (what the model is
+`live` reads LLM_* (the speaker, as on the host) and JUDGE_<NAME>_* (the judge) from .env. With `--local <model>` the
+speaker is that model on this machine instead, and no cloud model speaks; `--judge local:<model>` judges with a local
+model, started once the speaker has stopped. Its report goes to rehearsal/reports/<date>-<commit>.json and .md, with
+the judged lines kept beside it (.lines.json.gz) for calibrating other judges (rehearsal/calibrate.py). `replay` exits 1 if a call missed the recordings (what the model is
 shown has changed: record again), if a line cites what its pack didn't hold, or if any scenario went differently
 from transcripts.json. `compare` exits 1 if the new report fails the gate against the base.
 """
@@ -15,6 +19,7 @@ from transcripts.json. `compare` exits 1 if the new report fails the gate agains
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import os
 import random
@@ -27,7 +32,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from rehearsal import measure  # noqa: E402
+from rehearsal import calibrate, measure  # noqa: E402
 from rehearsal.record import DictCache, Recorder, RecordingGateway, ReplayGateway, transcript  # noqa: E402
 from rehearsal.scenarios import Scenario, Stage, scenarios  # noqa: E402
 from thespis import expression  # noqa: E402
@@ -74,16 +79,22 @@ def live(args) -> int:
     from thespis.gateway import OpenAICompatGateway, gateway_from_env
 
     load_dotenv(ROOT / ".env")
-    speaker = gateway_from_env()
+    env: dict[str, str] = dict(os.environ)
+    local = None
+    if args.local:  # the speaker runs here; every cloud LLM_* setting is dropped, so nothing else can speak
+        from thespis.runtime.local import LocalModel
+        local = LocalModel(args.local).start()
+        env = {k: v for k, v in env.items() if not k.startswith("LLM_")} | local.env()
+        print(f"speaking through {local.plan.describe()}")
+    speaker = gateway_from_env(env)
     if not isinstance(speaker, OpenAICompatGateway):
-        print("No model configured: set LLM_* in .env")
+        print("No model configured: set LLM_* in .env, or pass --local <model>")
         return 1
-    judge = None if args.lines == 0 else measure.judge_from_env(args.judge)
-    if args.lines and judge is None:
-        print(f"No judge: set JUDGE_{args.judge.upper()}_* in .env, or pass --lines 0")
+    if args.lines and not args.judge.startswith("local:") and measure.judge_from_env(args.judge) is None:
+        print(f"No judge: set JUDGE_{args.judge.upper()}_* in .env, judge with local:<model>, or pass --lines 0")
         return 1
     speaker.calls = deque()  # keep every call, not just the latest 1000
-    checking = checking_from_env(os.environ) if args.claim_check != "off" else None
+    checking = checking_from_env(env) if args.claim_check != "off" else None
     extractor = checking.gateway if checking is not None else None  # LLM_CHECK_*, if set
     if isinstance(extractor, OpenAICompatGateway):
         extractor.calls = deque()
@@ -97,6 +108,8 @@ def live(args) -> int:
         speaker.close()
         if isinstance(extractor, OpenAICompatGateway):
             extractor.close()
+        if local is not None:
+            local.stop()  # before a local judge starts: one model on the GPU at a time
     calls = list(speaker.calls) + list(getattr(extractor, "calls", []))
     report = {
         "when": datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC"), "commit": _commit(),
@@ -109,17 +122,27 @@ def live(args) -> int:
     report["summary"]["unanswered"] = recorder.unanswered
     lines = [s for s in recorder.samples if s["source"] == "llm" and s["line"]]
     sample = random.Random(SAMPLE_SEED).sample(lines, min(args.lines, len(lines)))
-    if sample and judge is not None:
-        print(f"judging {len(sample)} of {len(lines)} model lines with {judge.model}")
-        gateway = measure.judge_gateway(judge)
-        try:
-            measure.extract(gateway, sample)
-        finally:
-            gateway.close()
+    judge_model = None
+    if sample and args.lines:
+        with measure.judging(args.judge, env) if args.judge.startswith("local:") else \
+                contextlib.nullcontext(measure.judge_from_env(args.judge)) as judge:
+            assert judge is not None
+            judge_model = judge.model
+            print(f"judging {len(sample)} of {len(lines)} model lines with {judge.model}")
+            gateway = measure.judge_gateway(judge)
+            try:
+                measure.extract(gateway, sample)
+            finally:
+                gateway.close()
         measure.categorise(sample, recorder.snapshots)
-    report["claims"] = measure.judged(sample, judge.model if judge else None)
+    report["claims"] = measure.judged(sample, judge_model)
+    report["claims"]["calibration"] = calibrate.lookup(judge_model)
     REPORTS.mkdir(exist_ok=True)
     stem = REPORTS / f"{datetime.now(UTC).strftime('%Y-%m-%d-%H%M')}-{report['commit']}"
+    if sample and judge_model:
+        kept = calibrate.keep(stem.with_suffix(".lines.json.gz"), judge_model, report["when"], report["commit"],
+                              sample, recorder.snapshots)
+        print(f"kept the judged lines in {kept.relative_to(ROOT)}")
     stem.with_suffix(".json").write_text(measure.dumps(report), encoding="utf-8", newline="\n")
     stem.with_suffix(".md").write_text(measure.markdown(report), encoding="utf-8", newline="\n")
     print(measure.markdown(report))
@@ -133,6 +156,27 @@ def live(args) -> int:
             _write(TRANSCRIPTS, transcripts)
             print(f"recorded {sum(len(v) for v in recording.replies.values())} replies to "
                   f"{RECORDINGS.relative_to(ROOT)}, transcripts to {TRANSCRIPTS.relative_to(ROOT)}")
+    return 0
+
+
+def calibrate_judge(args) -> int:
+    """Have a judge re-judge lines another judge scored, and record how far they agree."""
+    from dotenv import load_dotenv
+
+    load_dotenv(ROOT / ".env")
+    files = [Path(f) for f in args.files]
+    with measure.judging(args.judge) as judge:
+        if judge is None:
+            print(f"No judge: set JUDGE_{args.judge.upper()}_* in .env, or judge with local:<model>")
+            return 1
+        gateway = measure.judge_gateway(judge)
+        try:
+            result = calibrate.calibrate(files, judge.model, gateway, args.n)
+        finally:
+            gateway.close()
+    path = calibrate.save(result)
+    print(calibrate.markdown(result))
+    print(f"wrote {path.relative_to(ROOT)}")
     return 0
 
 
@@ -201,12 +245,18 @@ def main(argv: list[str] | None = None) -> int:
     sub = parser.add_subparsers(dest="command", required=True)
     p = sub.add_parser("live", help="the live model speaks")
     p.add_argument("--lines", type=int, default=150, help="model lines to judge; 0 skips the judge")
-    p.add_argument("--judge", default="deepseek", help="JUDGE_<NAME>_* in .env")
+    p.add_argument("--judge", default="deepseek", help="JUDGE_<NAME>_* in .env, or local:<model>")
     p.add_argument("--record", action="store_true", help="write recordings.json and transcripts.json")
     p.add_argument("--only", help="play only scenarios whose name contains this")
     p.add_argument("--claim-check", default="consequential", choices=("consequential", "all", "off"),
                    help="which lines meet the claim check, as CLAIM_CHECK on the host")
+    p.add_argument("--local", help="speak through this registry model on this machine (thespis.runtime)")
     p.set_defaults(fn=live)
+    p = sub.add_parser("calibrate", help="a judge against the reference, on lines the reference judged")
+    p.add_argument("files", nargs="+", help="<report>.lines.json.gz files")
+    p.add_argument("--judge", required=True, help="local:<model>, or a JUDGE_<NAME>_* name")
+    p.add_argument("--n", type=int, default=calibrate.CALIBRATE_N, help="lines to re-judge")
+    p.set_defaults(fn=calibrate_judge)
     p = sub.add_parser("replay", help="the recordings answer, no network")
     p.add_argument("--update", action="store_true", help="rewrite transcripts.json from the replay")
     p.set_defaults(fn=replay)
