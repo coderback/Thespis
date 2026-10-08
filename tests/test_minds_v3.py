@@ -8,7 +8,9 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
+from tests.test_model_voice import FakeModel
 from thespis.api import DefinitionError, Game, Session, Unknown
+from thespis.expression import Mind
 from thespis.ledger import Claim
 from thespis.server import create_app
 
@@ -168,3 +170,66 @@ def test_players_over_http():
     assert told["cites"] == ["e0001"] and told["text"] == "Ada cheated Osric at Osric's mill."
     assert client.post(f"/v1/sessions/{sid}/narrate", json={"to": "bram"}).json()["text"] is None
     assert client.post(f"/v1/sessions/{sid}/update", json={"npc": "cara", "loc": "mill"}).json()["loc"] == "mill"
+
+
+# ---------------------------------------------------------------- the narrator tells a scene (4.5b)
+def gossiped() -> Session:
+    s = Session.new(HAMLET)
+    s.observe("cheat", "ada", "osric", claim=CHEAT)
+    s.tick()  # Osric tells Hild and Maud
+    return s
+
+
+def scene(segments):
+    return lambda call_type, pack: {"segments": segments(pack)} if call_type == "tell" else None
+
+
+def test_without_a_model_the_scene_is_the_narrators_one_segment_an_event():
+    s = gossiped()
+    line = s.narrate()
+    assert [x["speaker"] for x in line.segments] == ["narrator"] * 3
+    assert [x["cites"] for x in line.segments] == [["e0001"], ["e0002"], ["e0003"]]
+
+
+def test_a_told_scene_quotes_only_whoever_did_what_it_cites():
+    good = scene(lambda p: [{"speaker": "narrator", "cites": ["e1"], "line": "Ada shorted the miller."},
+                            {"speaker": "osric", "cites": ["e2"], "line": "Hild, she cheated me!"}])
+    s = gossiped()
+    s.mind = Mind(FakeModel(reply=good), HAMLET.voice.validator)
+    line = s.narrate()
+    assert line.source == "llm" and [x["speaker"] for x in line.segments] == ["narrator", "osric"]
+    assert line.segments[1]["cites"] == ["e0002"]  # mapped back to the ledger
+    assert line.text == 'Ada shorted the miller. Osric: "Hild, she cheated me!"'
+
+    wrong = scene(lambda p: [{"speaker": "maud", "cites": ["e2"], "line": "Fancy that!"}])  # Maud didn't tell e2
+    s = gossiped()
+    s.mind = Mind(FakeModel(reply=wrong), HAMLET.voice.validator)
+    line = s.narrate()
+    assert line.source == "fallback" and "maud' speaks, but did none of the events it cites" in line.reason
+    assert [x["speaker"] for x in line.segments] == ["narrator"] * 3  # the code's telling stands
+
+
+def test_a_told_scene_is_held_to_its_shape():
+    from thespis.expression import TELL_SEGMENT, tell_schema
+    s = gossiped()
+    pack = s.voice.narration(s.world.ledger.since(0), "", lambda es: "x", structured=True)
+    assert pack.speakers == ["osric"]  # the one NPC who did something here; Ada is a player
+    assert tell_schema(list(pack.refs), pack.speakers)["properties"]["segments"]["items"]["properties"]["speaker"] \
+        == {"type": "string", "enum": ["narrator", "osric"]}
+    v = HAMLET.voice.validator
+    seg = {"speaker": "narrator", "cites": ["e1"], "line": "Ada cheated Osric."}
+    assert v.problem({"segments": [seg]}, pack, "tell") is None
+    assert v.problem({"segments": [seg] * 7}, pack, "tell") == "segments: 1 to 6 of them"
+    assert v.problem({"segments": [{**seg, "cites": ["e9"]}]}, pack, "tell") == \
+        "segment 1: cites e9, not in its state pack"
+    assert v.problem({"segments": [{**seg, "line": "x" * (TELL_SEGMENT + 1)}]}, pack, "tell").startswith("segment 1")
+    assert v.problem({"segments": [{**seg, "line": "Father Aldo frowned."}]}, pack, "tell") == \
+        "segment 1: names aldo, absent from its state pack"
+
+
+def test_a_told_scene_gets_room_to_speak():
+    from thespis.gateway import Provider
+    from thespis.profiles import profile
+    p = Provider("local", "http://127.0.0.1:1/v1", "", "m", profile=profile("llamacpp"))
+    assert p.body([{"role": "user", "content": "x"}], None, "react")["max_tokens"] == 300
+    assert p.body([{"role": "user", "content": "x"}], None, "tell")["max_tokens"] == 450

@@ -267,6 +267,7 @@ class Line:
     action: str | None = None  # what it decided to do, for decide
     reason: str = ""
     event: str | None = None  # the statement its action logged, if it states a claim
+    segments: list[dict] | None = None  # a told scene's, in order: {"speaker", "line", "cites"} (narrate)
 
     def to_json(self) -> dict:
         return asdict(self)
@@ -442,13 +443,18 @@ class Session:
             telling = " ".join(self.sentence(e) for e in events)
             w.counters["narrations"] = n = w.counters.get("narrations", 0) + 1
             reason = f"since phase {since}" + (f", to {to}" if to else "")
-            line = Line(f"n{n:04d}", "narrator", telling, [e.id for e in events], reason=reason)
+            structured = bool(self.game.cast.data.get("narrator", {}).get("structured"))
+            segments = [{"speaker": "narrator", "line": self.sentence(e), "cites": [e.id]} for e in events] \
+                if structured else None
+            line = Line(f"n{n:04d}", "narrator", telling, [e.id for e in events], reason=reason, segments=segments)
             pack = None
             if self.mind.active and "narrator" in self.game.cast.data:
                 setting = self.game.cast.data.get("game", {}).get("setting", "")
                 pack = self.voice.narration(events, setting, lambda es: " ".join(self.sentence(e) for e in es),
-                                            audience=self.who(to) if to and to != "player" else None)
-            return self._voice(line, "narrate", pack, Utterance(None, telling, line.cites, "fallback"), wait)
+                                            audience=self.who(to) if to and to != "player" else None,
+                                            structured=structured)
+            return self._voice(line, "tell" if structured else "narrate", pack,
+                               Utterance(None, telling, line.cites, "fallback", segments=segments), wait)
 
     def tick(self, steps: int = 1) -> Tick:
         """The minds' own time, `steps` phases of it: scheduled walks, then gossip, then drives settling, then the
@@ -685,6 +691,8 @@ class Session:
             return self.mind.act(pack, fallback)
         if kind == "narrate":
             return self.mind.narrate(pack, fallback)
+        if kind == "tell":
+            return self.mind.tell(pack, fallback)
         return self.mind.react_many([(pack, fallback)])[0]
 
     def _settle(self, lid: str, u: Utterance, d: Decision | None, statement: Event | None) -> None:
@@ -696,6 +704,10 @@ class Session:
             cites = [statement.id if c == SAID and statement else c for c in u.cites]
             line.text = u.line if u.line is not None else line.text  # the model's words, or the template's
             line.cites, line.source, line.status = cites, u.source, FINAL
+            if u.segments is not None:  # a told scene: the speakers' words quoted and named in the flat text
+                line.segments = u.segments
+                line.text = " ".join(s["line"] if s["speaker"] == "narrator" else
+                                     f"{self.who(s['speaker'])}: \"{s['line']}\"" for s in u.segments)
             self.settled_at[lid] = time.monotonic()
             if u.note:
                 line.reason = f"{line.reason}; {u.note}"

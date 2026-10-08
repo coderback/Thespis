@@ -161,9 +161,10 @@ class Voice:
         return u.line or text, u.cites, u.source
 
     def narration(self, events: list[Event], setting: str, telling: Callable[[list[Event]], str],
-                  audience: str | None = None) -> StatePack:
+                  audience: str | None = None, structured: bool = False) -> StatePack:
         """The narrator's state pack for `events`: each told in the code's words, and only their names to use.
-        `audience` names the one player it is told to, when there are several."""
+        `audience` names the one player it is told to, when there are several. A `structured` pack is for a told
+        scene: each event says which NPC did it ("by"), who may then speak in a segment citing it."""
         cast = self.cast.data["narrator"]
         names = set(self.places)
         for e in events:
@@ -174,8 +175,10 @@ class Voice:
             npc="narrator", name=cast["name"], persona=cast["persona"], goal="Tell the story so far, truthfully",
             situation=f"Tell {audience or 'the player'} what happened since they last looked.", here=[], drives={},
             trust_in={},
-            beliefs=[], events=[{"id": e.id, "what": telling([e])} for e in events],
-            names={x for x in names if x and x != "player"}, setting=setting, stakes=True)
+            beliefs=[], events=[{"id": e.id, "what": telling([e]),
+                                 **({"by": e.actor} if structured and e.actor in self.cast.data["npc"] else {})}
+                                for e in events],
+            names={x for x in names if x and x != "player"}, setting=setting, stakes=True, structured=structured)
 
 
 def reply(d: Decision) -> dict:
