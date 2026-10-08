@@ -48,10 +48,11 @@ from thespis.deception import SAID
 from thespis.gateway import ModelGateway, ModelReply
 from thespis.ledger import Claim
 from thespis.moderation import Moderator, NoModeration
+from thespis.profiles import LINE_LIMITS
 
 log = logging.getLogger("thespis.moderation")
 
-LINE_MAX = 160
+LINE_MAX = LINE_LIMITS["act"]
 
 _RULES = ("You know only what is listed below. Never state a fact that is not listed.\n"
           "In \"cites\", list the ids of the beliefs or events your line relies on. Always cite at least one: if none "
@@ -67,7 +68,7 @@ NARRATE_PROMPT = ("You are {name}. {persona}\n" + _RULES +
                   "Tell the player what happened, including what they couldn't see, in 2 or 3 short sentences: speak "
                   "to the player as \"you\", in the past tense, mentioning only the events listed.\n" + _REPLY)
 PROMPTS = {"act": ACT_PROMPT, "react": REACT_PROMPT, "narrate": NARRATE_PROMPT}
-LIMITS = {"act": LINE_MAX, "react": LINE_MAX, "narrate": 400}  # characters per line, by call type
+LIMITS = dict(LINE_LIMITS)  # characters per line, by call type
 
 
 def schema_for(refs: list[str]) -> dict:
