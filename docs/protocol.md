@@ -203,4 +203,5 @@ Over a daily model cap a project isn't refused: its lines come from templates un
 These are still to come in Phase 4:
 
 - Lines are polled. The Godot spike (4.1b) found long-polling (`?wait=2`) natural in GDScript, where server-sent events
-  would mean driving `HTTPClient` by hand, so SSE waits until an engine needs it ([sdk/godot/spike](../sdk/godot/spike/README.md)).
+  would mean driving `HTTPClient` by hand, so SSE waits until an engine needs it. The Godot addon follows provisional
+  lines by long-polling ([sdk/godot](../sdk/godot/README.md)).

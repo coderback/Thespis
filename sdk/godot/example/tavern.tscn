@@ -1,0 +1,104 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://example/tavern.gd" id="1"]
+
+[node name="Lantern" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Box" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Box"]
+layout_mode = 2
+text = "The Lantern's taproom, an hour before dusk. Garrick nurses a drink; Wren polishes the bar."
+autowrap_mode = 3
+
+[node name="Where" type="Label" parent="Box"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Hour 0. Pip is in the yard."
+
+[node name="Garrick" type="Label" parent="Box"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+
+[node name="Wren" type="Label" parent="Box"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+
+[node name="Pip" type="Label" parent="Box"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+
+[node name="Narrator" type="Label" parent="Box"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+autowrap_mode = 3
+
+[node name="Actions" type="HFlowContainer" parent="Box"]
+layout_mode = 2
+
+[node name="Insult" type="Button" parent="Box/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Insult Garrick"
+
+[node name="Help" type="Button" parent="Box/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Help with his gear"
+
+[node name="Ask" type="Button" parent="Box/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "What does Garrick do?"
+
+[node name="TalkWren" type="Button" parent="Box/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Talk to Wren"
+
+[node name="Wait" type="Button" parent="Box/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "An hour passes"
+
+[node name="Tell" type="Button" parent="Box/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "What happened?"
+
+[node name="Save" type="Button" parent="Box/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Save"
+
+[node name="Load" type="Button" parent="Box/Actions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Load"
+
+[node name="Status" type="Label" parent="Box"]
+unique_name_in_owner = true
+layout_mode = 2
+modulate = Color(1, 1, 1, 0.6)
