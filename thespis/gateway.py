@@ -48,6 +48,7 @@ from urllib.parse import urlparse
 import httpx
 
 from thespis.profiles import DEFAULT, Profile, profile, with_timeout
+from thespis.tracing import span
 
 log = logging.getLogger("thespis.gateway")
 
@@ -57,7 +58,7 @@ ANTHROPIC_VERSION = "2023-06-01"
 PLAYER_FACING = frozenset({"act", "react", "narrate", "extract", "check"})  # call types a player is waiting for
 MAX_TOKENS = 150
 TEMPERATURE = 0.6
-MAX_CONCURRENT = 4  # model calls in flight at once, across every session
+MAX_CONCURRENT = 4  # threads one complete_many uses; each provider's own limit is its profile's `concurrency`
 COOLDOWN = {401: 600.0, 402: 600.0, 403: 600.0, 429: 30.0}  # seconds to skip a provider after these answers
 
 
@@ -173,6 +174,8 @@ class ModelReply:
     provider: str
     model: str
     latency: float  # seconds
+    prompt_tokens: int | None = None  # from the reply's usage, when the provider reports it
+    completion_tokens: int | None = None
 
 
 @dataclass(frozen=True)
@@ -248,7 +251,7 @@ class OpenAICompatGateway:
         self._skip_until: dict[str, float] = {}
         self._json_only: set[str] = set()  # providers that refused a schema: JSON mode from then on
         self._lock = threading.Lock()
-        self._slots = {p.name: PrioritySlots(min(p.profile.concurrency, MAX_CONCURRENT)) for p in self.providers}
+        self._slots = {p.name: PrioritySlots(p.profile.concurrency) for p in self.providers}
 
     @property
     def models(self) -> tuple[str, ...]:
@@ -278,6 +281,16 @@ class OpenAICompatGateway:
         self._client.close()
 
     def _call(self, p: Provider, call_type: str, messages: list[dict], schema: dict | None) -> ModelReply | None:
+        with span("thespis.model", call_type=call_type, provider=p.name, model=p.model,
+                  structured=schema is not None) as s:
+            reply, record = self._post(p, call_type, messages, schema)
+            s.set_attributes({k: v for k, v in (("ok", record.ok), ("error", record.error),
+                                                ("prompt_tokens", record.prompt_tokens),
+                                                ("completion_tokens", record.completion_tokens)) if v is not None})
+            return reply
+
+    def _post(self, p: Provider, call_type: str, messages: list[dict],
+              schema: dict | None) -> tuple[ModelReply | None, CallRecord]:
         started = time.perf_counter()
         reply, error, usage = None, None, {}
         slots = self._slots[p.name]
@@ -293,7 +306,8 @@ class OpenAICompatGateway:
             if r.status_code == 200:
                 data, error, usage = p.read(r.json())
                 if data is not None:
-                    reply = ModelReply(data, p.name, p.model, time.perf_counter() - started)
+                    reply = ModelReply(data, p.name, p.model, time.perf_counter() - started,
+                                       usage.get("prompt_tokens"), usage.get("completion_tokens"))
             elif schema is not None and _schema_refused(r):
                 error = "schema refused"
                 with self._lock:
@@ -318,7 +332,7 @@ class OpenAICompatGateway:
                         "structured": schema is not None,
                         "latency_ms": round(record.latency * 1000), "prompt_tokens": record.prompt_tokens,
                         "completion_tokens": record.completion_tokens, "error": error})
-        return reply
+        return reply, record
 
 
 def _schema_refused(r: httpx.Response) -> bool:
@@ -347,7 +361,8 @@ def provider_from_env(env: Mapping[str, str], prefix: str) -> Provider | None:
     """The provider configured under `prefix` (e.g. LLM_ or JUDGE_DEEPSEEK_): PROFILE (thespis.profiles; a name or a
     probe's file), BASE_URL (the profile's if left out), API_KEY (unless the profile needs none), MODEL, and optional
     TIMEOUT (seconds), EXTRA (JSON), API_VERSION and STRUCTURED (0 keeps it to JSON mode). None unless it has a model,
-    a URL and, where needed, a key."""
+    a URL and, where needed, a key. CONCURRENCY overrides the profile's calls at once (a server shared by many
+    players wants more than a laptop's model can take)."""
     named = env.get(f"{prefix}PROFILE", "").strip()
     prof = profile(named)
     # A profile's URL stands in only when the profile was named: a provider configured without a URL stays off,
@@ -358,6 +373,8 @@ def provider_from_env(env: Mapping[str, str], prefix: str) -> Provider | None:
         return None
     timeout = env.get(f"{prefix}TIMEOUT", "").strip()
     extra = env.get(f"{prefix}EXTRA", "").strip()
+    if concurrency := env.get(f"{prefix}CONCURRENCY", "").strip():
+        prof = replace(prof, concurrency=max(1, int(concurrency)))
     return Provider(name=f"{urlparse(base).hostname or base}/{model}", base_url=base, api_key=key, model=model,
                     extra=json.loads(extra) if extra else {}, api_version=env.get(f"{prefix}API_VERSION", "").strip(),
                     structured=env.get(f"{prefix}STRUCTURED", "1").strip() != "0",

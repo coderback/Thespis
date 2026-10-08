@@ -10,7 +10,7 @@ There's one set of calls, made in one of two ways:
 | Runtime | For | How |
 | --- | --- | --- |
 | Library | Python games | `from thespis.api import Game, Session` |
-| `/v1` HTTP | Any engine | `python -m thespis serve --game game.toml` (needs `pip install thespis[serve]`) |
+| `/v1` HTTP | Any engine | `thespis serve --game game.toml`, a sidecar beside the game, or `thespis serve --server`, many projects each with its key ([serve.md](serve.md)). Needs `pip install thespis[serve]`, or `thespis[server]` for a server |
 
 The two make the same calls with the same results; a test plays one scene both ways and compares them.
 [openapi-v1.json](openapi-v1.json) is the HTTP contract, generated from the server and committed. A test fails when
@@ -114,16 +114,30 @@ HTTP errors carry `{error, reason}`:
 | Status | Error | Cause |
 | --- | --- | --- |
 | 400 | `bad_request` or `bad_definition` | A malformed body, or a snapshot of another game or version |
-| 404 | `unknown` | An unknown game, session, NPC, choice set or line |
-| 409 | `not_allowed` | A call the game doesn't allow now |
-| 503 | `full` | The server holds its limit of sessions |
+| 401 | `unauthorized` | No key, or the wrong one: a server wants the project's, a sidecar its token if it has one |
+| 404 | `unknown` | An unknown game, session, NPC, choice set or line, or another project's session |
+| 409 | `not_allowed` or `conflict` | A call the game doesn't allow now, or a session another instance moved on (call again) |
+| 413 | `too_large` | A game definition over 256 KB |
+| 429 | `over_cap` | A project at its limit of games |
+| 503 | `full` | The project holds its limit of sessions |
+
+Over a daily model cap a project isn't refused: its lines come from templates until the next UTC day
+([serve.md](serve.md#caps-and-usage)).
+
+### Projects
+
+| Route | What it does |
+| --- | --- |
+| `PUT /v1/games/{id}` / `DELETE` | Send a game definition (`{"toml": "..."}`): the project's own, shadowing the host's of the same id |
+| `GET /v1/project` | Its caps, today's calls and tokens, open sessions, and its model settings with the keys left out |
+| `PUT /v1/project/model` / `DELETE` | Its own models and keys, sealed at rest (a server only) |
+| `GET /v1/usage?since=&format=csv` | Its usage events: model calls, lines settled and where from, calls a cap refused |
+| `GET /v1/health` | Up, and whether it's offline: `{"ok", "offline", "refused"}` |
 
 ## Not yet
 
 These are still to come in Phase 4:
 
-- Sessions are held in memory. The sidecar keeps them in SQLite and the server in Postgres (4.4).
-- Model keys come from the server's environment. Keys per project come with the server runtime (4.4).
 - Lines are polled. The Godot spike (4.1b) found long-polling (`?wait=2`) natural in GDScript, where server-sent events
   would mean driving `HTTPClient` by hand, so SSE waits until an engine needs it ([sdk/godot/spike](../sdk/godot/spike/README.md)).
 - Multi-speaker narration, many players, relationship ties and retrieval by meaning (4.5).

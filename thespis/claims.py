@@ -33,6 +33,7 @@ from thespis.beliefs import Belief
 from thespis.expression import StatePack
 from thespis.gateway import ModelGateway
 from thespis.ledger import Claim, Event
+from thespis.tracing import span
 from thespis.world import World
 
 CATEGORIES = ("grounded", "leak", "false_belief", "lie", "contradiction", "hallucination", "unverifiable")
@@ -294,6 +295,12 @@ class ClaimCheck:
         return self.every or pack.stakes
 
     def problems(self, items: list[tuple[StatePack, str]]) -> list[str | None]:
+        with span("thespis.check", lines=len(items)) as s:
+            found = self._problems(items)
+            s.set_attribute("refused", sum(p is not None for p in found))
+            return found
+
+    def _problems(self, items: list[tuple[StatePack, str]]) -> list[str | None]:
         """Why each (pack, line) can't be heard, or None for one that can. One extraction call per line."""
         calls = [("extract", extraction_messages(self.vocab, pack.npc, pack.name, pack.situation, pack.here, line,
                                                  CHECK_PROMPT), self.schema) for pack, line in items]

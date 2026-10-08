@@ -13,13 +13,15 @@ from __future__ import annotations
 
 import atexit
 import ctypes
+import os
 import socket
 import subprocess
 import sys
 import tarfile
+import threading
 import time
 import zipfile
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import IO
 
@@ -106,6 +108,33 @@ def _windows_job():
 def _linux_pdeathsig() -> None:  # runs in the child, before exec
     import signal
     ctypes.CDLL("libc.so.6", use_errno=True).prctl(1, signal.SIGTERM)  # PR_SET_PDEATHSIG
+
+
+def watch_parent(pid: int, gone: Callable[[], None]) -> threading.Thread:
+    """Call `gone` once process `pid` (the game that started this one) has ended, whatever ended it. The other side
+    of `spawn`: a sidecar started by an engine stops with it, even if the engine is killed."""
+    def wait() -> None:
+        if sys.platform == "win32":
+            from ctypes import wintypes
+            k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+            k32.OpenProcess.restype = wintypes.HANDLE
+            handle = k32.OpenProcess(0x00100000, False, pid)  # SYNCHRONIZE
+            if handle:
+                k32.WaitForSingleObject(wintypes.HANDLE(handle), 0xFFFFFFFF)  # INFINITE
+                k32.CloseHandle(wintypes.HANDLE(handle))
+        else:
+            while True:
+                try:
+                    os.kill(pid, 0)  # POSIX: signal 0 only asks whether it exists
+                except ProcessLookupError:
+                    break
+                except PermissionError:
+                    pass
+                time.sleep(1)
+        gone()
+    t = threading.Thread(target=wait, name="thespis-parent", daemon=True)
+    t.start()
+    return t
 
 
 def spawn(args: Sequence[str], log: IO[bytes] | int = subprocess.DEVNULL) -> subprocess.Popen:

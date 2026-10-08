@@ -18,9 +18,11 @@ The library calls these methods; the HTTP API (thespis.http) calls the same ones
 
 from __future__ import annotations
 
+import contextvars
 import hashlib
 import threading
 import time
+import tomllib
 from collections.abc import Callable, Mapping, Sequence
 from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import asdict, dataclass, field, replace
@@ -104,10 +106,18 @@ class Game:
     def load(cls, path: str | Path) -> Game:
         return cls(Cast(Path(path)))
 
+    @classmethod
+    def parse(cls, text: str, name: str = "game") -> Game:
+        """A game from its TOML text; `name` is its id unless [game] gives one."""
+        try:
+            return cls(Cast(Path(f"{name}.toml"), text))
+        except tomllib.TOMLDecodeError as e:
+            raise DefinitionError(f"not TOML: {e}") from e
+
     @cached_property
     def digest(self) -> str:
         """A fingerprint of the definition, saved in snapshots so a restore can tell the game changed under it."""
-        return hashlib.sha256(self.cast.path.read_bytes()).hexdigest()[:16]
+        return hashlib.sha256(self.cast.source).hexdigest()[:16]
 
     def _check(self) -> None:
         d = self.cast.data
@@ -223,6 +233,7 @@ class Session:
         self._pool: ThreadPoolExecutor | None = None
         self.settled_at: dict[str, float] = {}  # when each line settled (time.monotonic), for measuring
         self.on_pack: Callable[[StatePack], None] | None = None  # sees each state pack as it's built (Rehearsal)
+        self.on_settle: Callable[[Line], None] | None = None  # sees each provisional line once it settles (a store)
 
     @classmethod
     def new(cls, game: Game, seed: int = 0, **kw) -> Session:
@@ -406,6 +417,11 @@ class Session:
                 raise Unknown(f"no line {line_id!r}")
             return replace(self._lines[line_id])
 
+    def pending(self, line_id: str) -> Future | None:
+        """The model call a provisional line waits on, or None once it has settled: for a caller that waits on it
+        its own way (the HTTP API, without holding a thread)."""
+        return self._pending.get(line_id)
+
     def close(self) -> None:
         """Stop: every line still provisional is withdrawn, and its model call's answer is dropped."""
         with self._lock:
@@ -508,7 +524,8 @@ class Session:
         if self._pool is None:
             self._pool = ThreadPoolExecutor(WORKERS, thread_name_prefix="thespis-line")
         lid = line.id
-        fut = self._pool.submit(self._call, kind, pack, fallback)
+        # The model call runs in the caller's context, so its trace span joins the request's (thespis.tracing).
+        fut = self._pool.submit(contextvars.copy_context().run, self._call, kind, pack, fallback)
         self._pending[lid] = fut
         fut.add_done_callback(lambda f: self._settle(lid, f.result(), d, statement) if not f.cancelled() and
                               f.exception() is None else self._settle(lid, fallback, d, statement))
@@ -535,3 +552,6 @@ class Session:
                 line.reason = f"{line.reason}; {u.note}"
             if d is not None:
                 self.world.decisions.settle(d.id, line=line.text, cites=cites, reason=line.reason, source=u.source)
+            settled = replace(line)
+        if self.on_settle is not None:
+            self.on_settle(settled)

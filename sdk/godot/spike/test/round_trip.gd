@@ -11,8 +11,11 @@ var checks := 0
 
 
 func _initialize() -> void:
-	create_timer(TIMEOUT).timeout.connect(func():
-		printerr("TIMEOUT after %ss" % TIMEOUT)
+	var limit := TIMEOUT
+	if not OS.get_environment("THESPIS_TEST_TIMEOUT").is_empty():
+		limit = float(OS.get_environment("THESPIS_TEST_TIMEOUT"))  # a local model takes longer than a script
+	create_timer(limit).timeout.connect(func():
+		printerr("TIMEOUT after %ss" % limit)
 		quit(2))
 	_run.call_deferred()
 

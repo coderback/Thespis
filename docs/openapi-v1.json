@@ -196,6 +196,20 @@
         "title": "EventOut",
         "type": "object"
       },
+      "GameIn": {
+        "properties": {
+          "toml": {
+            "description": "The game's definition, as in a game.toml",
+            "title": "Toml",
+            "type": "string"
+          }
+        },
+        "required": [
+          "toml"
+        ],
+        "title": "GameIn",
+        "type": "object"
+      },
       "GameOut": {
         "properties": {
           "choices": {
@@ -258,6 +272,31 @@
           }
         },
         "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "HealthOut": {
+        "properties": {
+          "offline": {
+            "description": "It refuses every connection off this machine (a sidecar, unless --online)",
+            "title": "Offline",
+            "type": "boolean"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "refused": {
+            "description": "Connections off this machine it has refused since it started",
+            "title": "Refused",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "ok",
+          "offline",
+          "refused"
+        ],
+        "title": "HealthOut",
         "type": "object"
       },
       "LineOut": {
@@ -345,6 +384,28 @@
           "source"
         ],
         "title": "LineOut",
+        "type": "object"
+      },
+      "ModelIn": {
+        "properties": {
+          "backup": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProviderIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "primary": {
+            "$ref": "#/components/schemas/ProviderIn"
+          }
+        },
+        "required": [
+          "primary"
+        ],
+        "title": "ModelIn",
         "type": "object"
       },
       "NarrateIn": {
@@ -475,6 +536,127 @@
           "actor"
         ],
         "title": "ObserveIn",
+        "type": "object"
+      },
+      "ProjectOut": {
+        "properties": {
+          "caps": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "description": "0 means no cap",
+            "title": "Caps",
+            "type": "object"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Its own model settings, keys left out; null: the host's",
+            "title": "Model"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "sessions": {
+            "description": "Sessions open now",
+            "title": "Sessions",
+            "type": "integer"
+          },
+          "today": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "description": "Model calls and tokens so far today (UTC)",
+            "title": "Today",
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "caps",
+          "today",
+          "sessions"
+        ],
+        "title": "ProjectOut",
+        "type": "object"
+      },
+      "ProviderIn": {
+        "properties": {
+          "api_key": {
+            "default": "",
+            "description": "Kept sealed; never sent back",
+            "title": "Api Key",
+            "type": "string"
+          },
+          "api_version": {
+            "default": "",
+            "title": "Api Version",
+            "type": "string"
+          },
+          "base_url": {
+            "default": "",
+            "description": "The endpoint; the profile's if left out",
+            "title": "Base Url",
+            "type": "string"
+          },
+          "extra": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Extra"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "profile": {
+            "default": "",
+            "description": "A provider profile: openai, azure, anthropic, gemini, groq, ...",
+            "title": "Profile",
+            "type": "string"
+          },
+          "structured": {
+            "default": true,
+            "title": "Structured",
+            "type": "boolean"
+          },
+          "timeout": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "maximum": 120.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timeout"
+          }
+        },
+        "required": [
+          "model"
+        ],
+        "title": "ProviderIn",
         "type": "object"
       },
       "ReactIn": {
@@ -724,6 +906,113 @@
         "title": "UpdateIn",
         "type": "object"
       },
+      "UsageOut": {
+        "properties": {
+          "at": {
+            "title": "At",
+            "type": "number"
+          },
+          "call_type": {
+            "title": "Call Type",
+            "type": "string"
+          },
+          "completion_tokens": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completion Tokens"
+          },
+          "kind": {
+            "description": "call (a model call), line (a line settled) or capped (a call the caps refused)",
+            "title": "Kind",
+            "type": "string"
+          },
+          "latency_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latency Ms"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "project": {
+            "title": "Project",
+            "type": "string"
+          },
+          "prompt_tokens": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prompt Tokens"
+          },
+          "provider": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider"
+          },
+          "session": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Session"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "For a line: llm, cache or fallback. For capped: which cap",
+            "title": "Source"
+          }
+        },
+        "required": [
+          "project",
+          "session",
+          "kind",
+          "call_type",
+          "ok",
+          "provider",
+          "source",
+          "latency_ms",
+          "prompt_tokens",
+          "completion_tokens",
+          "at"
+        ],
+        "title": "UsageOut",
+        "type": "object"
+      },
       "ValidationError": {
         "properties": {
           "ctx": {
@@ -767,7 +1056,7 @@
     }
   },
   "info": {
-    "description": "The /v1 HTTP API: the session calls (thespis.session), one route each, for engines that aren't Python.\n\nAn engine opens a session on a game the server loaded, reports events and changes, and asks for decisions and lines.\nLines come back provisional by default and are polled until final (`GET .../lines/{id}?wait=2`). The routes mirror\nthe library's calls one for one, and the generated OpenAPI spec, committed as docs/openapi-v1.json, is the SDKs'\ncontract: tests fail when the two drift apart.\n\nErrors carry `{error, reason}`: 400 for a malformed body or a definition the call breaks, 404 for an unknown game,\nsession, NPC, moment or line, 409 for a call the game doesn't allow now, 503 when the server holds its limit of\nsessions. Sessions live in memory here; the sidecar and server runtimes (Phase 4.4) keep them in a store.\n",
+    "description": "The /v1 HTTP API: the session calls (thespis.session), one route each, for engines that aren't Python.\n\nAn engine opens a session on a game the server loaded or the project sent, reports events and changes, and asks for\ndecisions and lines. Lines come back provisional by default and are polled until final (`GET .../lines/{id}?wait=2`).\nThe routes mirror the library's calls one for one, and the generated OpenAPI spec, committed as docs/openapi-v1.json,\nis the SDKs' contract: tests fail when the two drift apart.\n\nA server (`thespis serve --server`) wants the project's key on every call: `Authorization: Bearer tsk_...`. A sidecar\nwants the token its launcher gave it, if it was given one. Projects send their own games (`PUT /v1/games/{id}`), set\ntheir own model keys on a server (`PUT /v1/project/model`), and export their usage (`GET /v1/usage`).\n\nErrors carry `{error, reason}`: 400 for a malformed body or a definition the call breaks, 401 without the right key,\n404 for an unknown game, session, NPC, moment or line, 409 for a call the game doesn't allow now (or a session another\ninstance moved on), 413 for a game too large, 429 over a project's cap, 503 when the project holds its limit of\nsessions. Sessions are kept by the host (thespis.host): in memory, in a sidecar's SQLite file, or in a server's\ndatabase.\n",
     "title": "Thespis",
     "version": "v1"
   },
@@ -776,6 +1065,26 @@
     "/v1/games": {
       "get": {
         "operationId": "list_games_v1_games_get",
+        "parameters": [
+          {
+            "description": "Bearer <the project's key, or the sidecar's token>",
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer <the project's key, or the sidecar's token>",
+              "title": "Authorization"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -790,24 +1099,147 @@
               }
             },
             "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
           }
         },
         "summary": "List Games"
       }
     },
+    "/v1/games/{gid}": {
+      "delete": {
+        "operationId": "delete_game_v1_games__gid__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "gid",
+            "required": true,
+            "schema": {
+              "title": "Gid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Bearer <the project's key, or the sidecar's token>",
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer <the project's key, or the sidecar's token>",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Game"
+      },
+      "put": {
+        "description": "Send a game: the project's own, which shadows the host's game of the same id.",
+        "operationId": "put_game_v1_games__gid__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "gid",
+            "required": true,
+            "schema": {
+              "title": "Gid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Bearer <the project's key, or the sidecar's token>",
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer <the project's key, or the sidecar's token>",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GameIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put Game"
+      }
+    },
     "/v1/health": {
       "get": {
+        "description": "Up, and whether it is offline (thespis.offline): a game promising offline play can check it is.",
         "operationId": "health_v1_health_get",
         "responses": {
           "200": {
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": {
-                    "type": "boolean"
-                  },
-                  "title": "Response Health V1 Health Get",
-                  "type": "object"
+                  "$ref": "#/components/schemas/HealthOut"
                 }
               }
             },
@@ -817,9 +1249,168 @@
         "summary": "Health"
       }
     },
+    "/v1/project": {
+      "get": {
+        "operationId": "get_project_v1_project_get",
+        "parameters": [
+          {
+            "description": "Bearer <the project's key, or the sidecar's token>",
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer <the project's key, or the sidecar's token>",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Project"
+      }
+    },
+    "/v1/project/model": {
+      "delete": {
+        "operationId": "delete_model_v1_project_model_delete",
+        "parameters": [
+          {
+            "description": "Bearer <the project's key, or the sidecar's token>",
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer <the project's key, or the sidecar's token>",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Model"
+      },
+      "put": {
+        "description": "Set the models the project's sessions speak through, with its own keys (a server only). Sessions\nopened or reloaded from now on use them.",
+        "operationId": "put_model_v1_project_model_put",
+        "parameters": [
+          {
+            "description": "Bearer <the project's key, or the sidecar's token>",
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer <the project's key, or the sidecar's token>",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModelIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put Model"
+      }
+    },
     "/v1/sessions": {
       "post": {
         "operationId": "open_session_v1_sessions_post",
+        "parameters": [
+          {
+            "description": "Bearer <the project's key, or the sidecar's token>",
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer <the project's key, or the sidecar's token>",
+              "title": "Authorization"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -867,6 +1458,24 @@
               "title": "Sid",
               "type": "string"
             }
+          },
+          {
+            "description": "Bearer <the project's key, or the sidecar's token>",
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer <the project's key, or the sidecar's token>",
+              "title": "Authorization"
+            }
           }
         ],
         "responses": {
@@ -898,6 +1507,24 @@
             "schema": {
               "title": "Sid",
               "type": "string"
+            }
+          },
+          {
+            "description": "Bearer <the project's key, or the sidecar's token>",
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer <the project's key, or the sidecar's token>",
+              "title": "Authorization"
             }
           }
         ],
@@ -969,6 +1596,24 @@
               "title": "Wait",
               "type": "number"
             }
+          },
+          {
+            "description": "Bearer <the project's key, or the sidecar's token>",
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer <the project's key, or the sidecar's token>",
+              "title": "Authorization"
+            }
           }
         ],
         "responses": {
@@ -1007,6 +1652,24 @@
             "schema": {
               "title": "Sid",
               "type": "string"
+            }
+          },
+          {
+            "description": "Bearer <the project's key, or the sidecar's token>",
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer <the project's key, or the sidecar's token>",
+              "title": "Authorization"
             }
           }
         ],
@@ -1066,6 +1729,24 @@
               "title": "Npc",
               "type": "string"
             }
+          },
+          {
+            "description": "Bearer <the project's key, or the sidecar's token>",
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer <the project's key, or the sidecar's token>",
+              "title": "Authorization"
+            }
           }
         ],
         "responses": {
@@ -1104,6 +1785,24 @@
             "schema": {
               "title": "Sid",
               "type": "string"
+            }
+          },
+          {
+            "description": "Bearer <the project's key, or the sidecar's token>",
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer <the project's key, or the sidecar's token>",
+              "title": "Authorization"
             }
           }
         ],
@@ -1154,6 +1853,24 @@
               "title": "Sid",
               "type": "string"
             }
+          },
+          {
+            "description": "Bearer <the project's key, or the sidecar's token>",
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer <the project's key, or the sidecar's token>",
+              "title": "Authorization"
+            }
           }
         ],
         "requestBody": {
@@ -1203,6 +1920,24 @@
               "title": "Sid",
               "type": "string"
             }
+          },
+          {
+            "description": "Bearer <the project's key, or the sidecar's token>",
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer <the project's key, or the sidecar's token>",
+              "title": "Authorization"
+            }
           }
         ],
         "responses": {
@@ -1243,6 +1978,24 @@
             "schema": {
               "title": "Sid",
               "type": "string"
+            }
+          },
+          {
+            "description": "Bearer <the project's key, or the sidecar's token>",
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer <the project's key, or the sidecar's token>",
+              "title": "Authorization"
             }
           }
         ],
@@ -1293,6 +2046,24 @@
               "title": "Sid",
               "type": "string"
             }
+          },
+          {
+            "description": "Bearer <the project's key, or the sidecar's token>",
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer <the project's key, or the sidecar's token>",
+              "title": "Authorization"
+            }
           }
         ],
         "requestBody": {
@@ -1330,6 +2101,110 @@
           }
         },
         "summary": "Update"
+      }
+    },
+    "/v1/usage": {
+      "get": {
+        "description": "The project's usage events, oldest first: each model call, each line settled, each call a cap refused.",
+        "operationId": "usage_v1_usage_get",
+        "parameters": [
+          {
+            "description": "Unix time",
+            "in": "query",
+            "name": "since",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "description": "Unix time",
+              "title": "Since",
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "until",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Until"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 10000,
+              "maximum": 100000,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "format",
+            "required": false,
+            "schema": {
+              "default": "json",
+              "pattern": "^(json|csv)$",
+              "title": "Format",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Bearer <the project's key, or the sidecar's token>",
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer <the project's key, or the sidecar's token>",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/UsageOut"
+                  },
+                  "title": "Response Usage V1 Usage Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Usage"
       }
     }
   }
