@@ -34,6 +34,10 @@ def test_a_local_profile_needs_no_key_and_has_a_longer_budget():
     assert tuned is not None and tuned.profile.timeout == 30.0
 
 
+def test_without_a_named_profile_a_provider_needs_its_own_url():
+    assert provider_from_env({"LLM_BACKUP_API_KEY": "k", "LLM_BACKUP_MODEL": "m"}, "LLM_BACKUP_") is None
+
+
 def test_an_unknown_profile_fails_loudly():
     with pytest.raises(ValueError, match="no profile 'llama'"):
         profile("llama")

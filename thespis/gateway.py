@@ -348,8 +348,11 @@ def provider_from_env(env: Mapping[str, str], prefix: str) -> Provider | None:
     probe's file), BASE_URL (the profile's if left out), API_KEY (unless the profile needs none), MODEL, and optional
     TIMEOUT (seconds), EXTRA (JSON), API_VERSION and STRUCTURED (0 keeps it to JSON mode). None unless it has a model,
     a URL and, where needed, a key."""
-    prof = profile(env.get(f"{prefix}PROFILE", "").strip())
-    base = env.get(f"{prefix}BASE_URL", "").strip() or prof.base_url
+    named = env.get(f"{prefix}PROFILE", "").strip()
+    prof = profile(named)
+    # A profile's URL stands in only when the profile was named: a provider configured without a URL stays off,
+    # rather than sending its key to the default profile's host.
+    base = env.get(f"{prefix}BASE_URL", "").strip() or (prof.base_url if named else "")
     key, model = (env.get(f"{prefix}{k}", "").strip() for k in ("API_KEY", "MODEL"))
     if not (base and model and (key or not prof.key)):
         return None
