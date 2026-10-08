@@ -87,6 +87,7 @@ TELL_PROMPT = ("You are {name}. {persona}\n" + _RULES +
 TELL_SEGMENTS = (1, 6)  # how many segments a telling may have
 TELL_SEGMENT = 200  # characters per segment
 TELL_LIMIT = 600  # characters in all
+REF = re.compile(r"\b[be]\d+\b")  # a pack reference (b1, e2), which belongs in cites, not in the words
 
 
 def schema_for(refs: list[str]) -> dict:
@@ -265,6 +266,8 @@ class Validator:
                 return f"segment {i}: {problem}"
             if len(s["line"]) > TELL_SEGMENT:
                 return f"segment {i} is {len(s['line'])} characters, over {TELL_SEGMENT}"
+            if ref := REF.search(s["line"]):  # live Rehearsal: "...at Osric's mill, e1." It belongs in cites
+                return f"segment {i} shows a reference ({ref.group(0)}) in its words"
             speaker = s.get("speaker")
             if speaker != "narrator" and not any(by.get(c) == speaker for c in s["cites"]):
                 return f"segment {i}: {speaker!r} speaks, but did none of the events it cites"

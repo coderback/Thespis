@@ -225,6 +225,8 @@ def test_a_told_scene_is_held_to_its_shape():
     assert v.problem({"segments": [{**seg, "line": "x" * (TELL_SEGMENT + 1)}]}, pack, "tell").startswith("segment 1")
     assert v.problem({"segments": [{**seg, "line": "Father Aldo frowned."}]}, pack, "tell") == \
         "segment 1: names aldo, absent from its state pack"
+    assert v.problem({"segments": [{**seg, "line": "Ada cheated Osric at the mill, e1."}]}, pack, "tell") == \
+        "segment 1 shows a reference (e1) in its words"
 
 
 def test_a_told_scene_gets_room_to_speak():
