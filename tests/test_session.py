@@ -205,6 +205,39 @@ def test_closing_withdraws_what_is_still_on_its_way():
     assert s.line(line.id).status == WITHDRAWN
 
 
+def test_a_waited_line_and_a_background_one_settling_together_dont_deadlock_a_store():
+    # A store saves when a background line settles (thespis.host): it takes its own lock, then the session's, for the
+    # snapshot. A line the caller waits for settles while the caller holds the session's lock, so it must not call the
+    # store as well, or each holds the lock the other wants. The Unity SDK's check found it: the sidecar hung.
+    store = threading.Lock()
+    store_held, deciding = threading.Event(), threading.Event()
+
+    class Gated(FakeModel):
+        def complete(self, call_type, messages, schema=None):
+            if not threading.current_thread().name.startswith("thespis-line"):  # the waited decide, lock held
+                deciding.set()
+                store_held.wait(5)  # until the background line's save holds the store
+            return super().complete(call_type, messages, schema)
+
+    s = Session.new(TAVERN, gateway=Gated())
+    insulted(s)
+
+    def save(line) -> None:
+        with store:
+            store_held.set()
+            deciding.wait(5)
+            s.snapshot()
+
+    s.on_settle = save
+    s.react("garrick", "insulted", wait=False)  # settles in the background, into save()
+    decided: list = []
+    t = threading.Thread(target=lambda: decided.append(s.decide("garrick", "turn")), name="decide", daemon=True)
+    t.start()
+    t.join(10)
+    assert not t.is_alive(), "the waited decide and the background save locked each other out"
+    assert decided[0].status == FINAL
+
+
 # ---------------------------------------------------------------- /v1
 def play(call) -> list:
     """One scene, through `call(name, **body)`: the library's methods or the HTTP routes, which must agree."""
