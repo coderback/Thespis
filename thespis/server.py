@@ -369,7 +369,9 @@ def create_app(games: Mapping[str, Game] | None = None, gateway: ModelGateway | 
                 await asyncio.wait_for(asyncio.shield(asyncio.wrap_future(pending)), wait)
             except Exception:
                 pass  # still provisional, or it settled with the template line: either way, say how it stands
-        return LineOut(**session.line(lid).to_json())
+        # Read off the event loop: the line takes the session's lock, which a waited call holds through its model
+        # call, and the loop serves every session.
+        return LineOut(**(await asyncio.to_thread(session.line, lid)).to_json())
 
     @app.get(f"/{VERSION}/sessions/{{sid}}/npcs/{{npc}}")
     def inspect(p: Caller, sid: str, npc: str) -> NpcOut:
