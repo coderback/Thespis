@@ -400,7 +400,7 @@ Rows are in a suggested order for after the hackathon.
 | Ambush, bluff and other verbs | Balance time | Adapter |
 | Authoring tool: the inspector becomes an editor for cast and rules | Polish after the core settles | Inspector API |
 | Production: Postgres, auth, per-tenant keys, rate limits, prompt-injection filtering | SQLite is enough for a demo | Core storage and gateway |
-| Legal advice on the Nemesis patent | Only matters commercially | Before charging anyone |
+| Legal advice on the Nemesis patent | Only matters comm<br/>ercially | Before charging anyone |
 
 ## Stretch goals
 
