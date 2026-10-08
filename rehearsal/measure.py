@@ -24,7 +24,7 @@ from importlib import import_module
 
 from rehearsal import checks
 from rehearsal.record import refusal
-from thespis.claims import BAD, ClaimVocabulary, Facts, extraction_messages, parse_claims, score
+from thespis.claims import BAD, ClaimVocabulary, Facts, categorize, extraction_messages, label, parse_claims, score
 from thespis.gateway import OpenAICompatGateway, Provider, provider_from_env
 from thespis.profiles import PROFILES
 from thespis.world import World
@@ -120,6 +120,42 @@ def extract(gateway, samples: list[dict], progress=print) -> None:
         for s, reply in zip(chunk, gateway.complete_many(calls)):
             s["claims"] = parse_claims(reply.data) if reply is not None else None
         progress(f"  judged {min(start + batch, len(samples))} of {len(samples)} lines")
+
+
+VERIFY_PROMPT = (
+    "You check one claim against one line of dialogue from a game. Answer whether the line itself states the claim "
+    "as a fact: something that already happened or is true now. Threats, plans, promises, questions, orders, "
+    "opinions and insults don't state facts. Reported speech states that the teller told it, and what they said. "
+    "The claim is written pred(a, b) with these predicates and ids:\n{vocab}\n"
+    'Reply with JSON only: {{"states": true}} or {{"states": false}}')
+
+
+def verify(gateway, samples: list[dict], snapshots: dict[str, dict], progress=print) -> None:
+    """The checklist pass, for judges that extract too freely: each claim the code would count against a line
+    (a leak, contradiction or hallucination) goes back to the judge as one yes/no question, does the line state
+    it? A claim the judge says the line doesn't state is dropped, and the line scored again. Small local models
+    extract claims a line only implies (calibration found Gemma 4 E4B flagging three times as many lines as the
+    reference); a yes/no question about one claim is a task they do better."""
+    asks: list[tuple[dict, dict]] = []
+    for s in samples:
+        if not s.get("claims") or not any(s.get("categories", {}).get(k) for k in BAD):
+            continue
+        f = facts(s, snapshots[s["snapshot"]])
+        v = vocabulary(s["game"])
+        asks += [(s, c) for c in s["claims"] if categorize(v, c, f, s["asserting"]) in BAD]
+    calls = [("verify", [{"role": "system", "content": VERIFY_PROMPT.format(vocab=vocabulary(s["game"]).description)},
+                         {"role": "user", "content": f"Speaker: {s['name']} (id {s['npc']}). Situation: "
+                                                     f"{s['situation']}\nLine: \"{s['line']}\"\nClaim: {label(c)}"}],
+              None) for s, c in asks]
+    replies = gateway.complete_many(calls) if calls else []
+    dropped = 0
+    for (s, c), reply in zip(asks, replies):
+        if reply is not None and reply.data.get("states") is False:
+            s["claims"] = [x for x in s["claims"] if x is not c]
+            s.setdefault("unstated", []).append(c)
+            dropped += 1
+    progress(f"  verified {len(asks)} claims: {dropped} not stated by their lines")
+    categorise([s for s in samples if s.get("unstated")], snapshots)
 
 
 def categorise(samples: list[dict], snapshots: dict[str, dict]) -> None:

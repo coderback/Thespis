@@ -1,0 +1,54 @@
+{
+ "agreement": {
+  "any_bad": {
+   "agree": 0.6938775510204082,
+   "extra": 41,
+   "hi": 0.28692699490662155,
+   "judge_yes": 49,
+   "kappa": 0.1509433962264147,
+   "lo": 0.021878876733957123,
+   "missed": 4,
+   "reference_yes": 12
+  },
+  "contradiction": {
+   "agree": 0.9931972789115646,
+   "extra": 1,
+   "hi": 0.0,
+   "judge_yes": 1,
+   "kappa": 0.0,
+   "lo": 0.0,
+   "missed": 0,
+   "reference_yes": 0
+  },
+  "hallucination": {
+   "agree": 0.7074829931972789,
+   "extra": 38,
+   "hi": 0.2522441651705567,
+   "judge_yes": 44,
+   "kappa": 0.11184487846002525,
+   "lo": -0.022843639228042684,
+   "missed": 5,
+   "reference_yes": 11
+  },
+  "leak": {
+   "agree": 0.9795918367346939,
+   "extra": 3,
+   "hi": 1.0,
+   "judge_yes": 5,
+   "kappa": 0.5629335976214077,
+   "lo": 0.0,
+   "missed": 0,
+   "reference_yes": 2
+  },
+  "n": 147
+ },
+ "judge": "qwen3.5-4b",
+ "reference": [
+  "DeepSeek-V4-Pro"
+ ],
+ "sources": [
+  "calib-qwen3.5-4b.lines.json.gz"
+ ],
+ "unanswered": 0,
+ "when": "2026-10-08 17:32 UTC"
+}

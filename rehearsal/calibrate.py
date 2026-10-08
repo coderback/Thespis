@@ -116,8 +116,10 @@ def agreement(reference: list[dict], judged: list[dict]) -> dict:
     return out
 
 
-def calibrate(files: list[Path], judge_name: str, judge_gateway, n: int = CALIBRATE_N, progress=print) -> dict:
-    """Have `judge_gateway` re-judge up to `n` lines the reference judged, and measure agreement."""
+def calibrate(files: list[Path], judge_name: str, judge_gateway, n: int = CALIBRATE_N, progress=print,
+              verify: bool = False) -> dict:
+    """Have `judge_gateway` re-judge up to `n` lines the reference judged, and measure agreement. With `verify`,
+    the judge also checks each claim it would count against a line (measure.verify)."""
     from rehearsal import measure
 
     reference, snapshots, sources, ref_judges = [], {}, [], set()
@@ -132,9 +134,25 @@ def calibrate(files: list[Path], judge_name: str, judge_gateway, n: int = CALIBR
     progress(f"re-judging {len(judged)} lines with {judge_name}")
     measure.extract(judge_gateway, judged, progress)
     measure.categorise(judged, snapshots)
+    if verify:
+        measure.verify(judge_gateway, judged, snapshots, progress)
+        judge_name = f"{judge_name}+verify"
     return {"judge": judge_name, "reference": sorted(j for j in ref_judges if j), "sources": sources,
             "when": datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC"), "agreement": agreement(reference, judged),
-            "unanswered": sum(1 for s in judged if s.get("claims") is None)}
+            "unanswered": sum(1 for s in judged if s.get("claims") is None),
+            "disagreements": disagreements(reference, judged)}
+
+
+def disagreements(reference: list[dict], judged: list[dict]) -> list[dict]:
+    """The lines the judges called differently, with what each extracted: where to look to improve a judge."""
+    out = []
+    for r, j in zip(reference, judged):
+        bad_r, bad_j = (any(x.get("categories", {}).get(k) for k in BAD) for x in (r, j))
+        if "categories" in r and "categories" in j and bad_r != bad_j:
+            out.append({"scenario": r["scenario"], "npc": r["npc"], "line": r["line"],
+                        "reference": {"claims": r.get("claims"), "categories": r["categories"]},
+                        "judge": {"claims": j.get("claims"), "categories": j["categories"]}})
+    return out
 
 
 def path_for(judge_model: str) -> Path:

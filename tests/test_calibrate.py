@@ -74,3 +74,23 @@ def test_a_report_says_how_far_its_judge_is_calibrated():
     assert "kappa 0.71 [0.50, 0.85] (n=100, 95% raw agreement" in measure.markdown(report)
     report["claims"]["judge"] = "DeepSeek-V4-Pro"  # the reference needs no calibration line
     assert "Judge calibration" not in measure.markdown(report)
+
+
+class Checklist(Judge):
+    """Extracts a false accusation from every line, then, asked about it, says the line doesn't state it."""
+
+    def __init__(self, stated: bool):
+        super().__init__(accuse=True)
+        self.stated = stated
+
+    def complete_many(self, calls):
+        return [ModelReply({"states": self.stated}, "scripted", "scripted", 0.1) if c[0] == "verify" else r
+                for c, r in zip(calls, super().complete_many(calls))]
+
+
+def test_the_checklist_pass_drops_claims_the_line_doesnt_state(judged_lines):
+    path, _ = judged_lines
+    unstated = calibrate.calibrate([path], "careful", Checklist(stated=False), progress=lambda _: None, verify=True)
+    assert unstated["judge"] == "careful+verify" and unstated["agreement"]["any_bad"]["judge_yes"] == 0
+    stated = calibrate.calibrate([path], "careful", Checklist(stated=True), progress=lambda _: None, verify=True)
+    assert stated["agreement"]["any_bad"]["judge_yes"] > 0 and stated["disagreements"]

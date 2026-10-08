@@ -158,9 +158,12 @@ def live(args) -> int:
             gateway = measure.judge_gateway(judge)
             try:
                 measure.extract(gateway, sample)
+                measure.categorise(sample, recorder.snapshots)
+                if args.verify:
+                    measure.verify(gateway, sample, recorder.snapshots)
+                    judge_model = f"{judge.model}+verify"
             finally:
                 gateway.close()
-        measure.categorise(sample, recorder.snapshots)
     report["claims"] = measure.judged(sample, judge_model)
     report["claims"]["calibration"] = calibrate.lookup(judge_model)
     REPORTS.mkdir(exist_ok=True)
@@ -203,7 +206,7 @@ def calibrate_judge(args) -> int:
             return 1
         gateway = measure.judge_gateway(judge)
         try:
-            result = calibrate.calibrate(files, judge.model, gateway, args.n)
+            result = calibrate.calibrate(files, judge.model, gateway, args.n, verify=args.verify)
         finally:
             gateway.close()
     path = calibrate.save(result)
@@ -291,6 +294,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--claim-check", default="consequential", choices=("consequential", "all", "off"),
                    help="which lines meet the claim check, as CLAIM_CHECK on the host")
     p.add_argument("--local", help="speak through this registry model on this machine (thespis.runtime)")
+    p.add_argument("--verify", action="store_true", help="the judge checks each claim it counts against a line")
     p.add_argument("--game", help="any game.toml, played through sessions (needs --scenarios)")
     p.add_argument("--scenarios", help="the scenario file for --game (rehearsal/sessions.py)")
     p.set_defaults(fn=live)
@@ -302,6 +306,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("files", nargs="+", help="<report>.lines.json.gz files")
     p.add_argument("--judge", required=True, help="local:<model>, or a JUDGE_<NAME>_* name")
     p.add_argument("--n", type=int, default=calibrate.CALIBRATE_N, help="lines to re-judge")
+    p.add_argument("--verify", action="store_true", help="the judge checks each claim it counts against a line")
     p.set_defaults(fn=calibrate_judge)
     p = sub.add_parser("replay", help="the recordings answer, no network")
     p.add_argument("--update", action="store_true", help="rewrite transcripts.json from the replay")
