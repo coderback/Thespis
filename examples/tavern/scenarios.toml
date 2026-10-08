@@ -1,0 +1,69 @@
+# Rehearsal scenarios for the tavern (rehearsal/sessions.py): each is what an engine would send, in order.
+#   python -m rehearsal live --game examples/tavern/game.toml --scenarios examples/tavern/scenarios.toml
+# `wait` is the player's pacing: lines are asked for without waiting, as an engine asks, so a line may settle after
+# the world has moved on, and the report counts how often.
+
+[[scenario]]
+name = "insult_and_answer"
+steps = [
+  { call = "observe", verb = "insult", actor = "player", target = "garrick", witnesses = ["wren"], claim = { pred = "insulted", a = "player", b = "garrick" } },
+  { call = "update", npc = "garrick", nudge = { grudge = 4 } },
+  { call = "react", npc = "garrick", trigger = "insulted" },
+  { call = "react", npc = "wren", trigger = "insulted" },
+  { call = "wait", seconds = 2.0 },
+  { call = "decide", npc = "garrick", moment = "turn" },
+  { call = "wait", seconds = 2.0 },
+]
+
+[[scenario]]
+name = "gossip_reaches_pip"
+steps = [
+  { call = "observe", verb = "insult", actor = "player", target = "garrick", witnesses = ["wren"], claim = { pred = "insulted", a = "player", b = "garrick" } },
+  { call = "tick" },
+  { call = "react", npc = "pip", trigger = "told" },
+  { call = "wait", seconds = 2.0 },
+  { call = "narrate", since = 0 },
+  { call = "wait", seconds = 2.0 },
+]
+
+[[scenario]]
+name = "a_lie_to_wren"
+steps = [
+  { call = "observe", verb = "tell", actor = "player", target = "wren", said = true, claim = { pred = "insulted", a = "garrick", b = "pip" } },
+  { call = "react", npc = "wren", trigger = "told" },
+  { call = "wait", seconds = 2.0 },
+  { call = "react", npc = "garrick", trigger = "talk" },
+  { call = "wait", seconds = 2.0 },
+]
+
+[[scenario]]
+name = "a_drink_with_garrick"
+steps = [
+  { call = "observe", verb = "pay", actor = "player", target = "wren", witnesses = ["garrick"], claim = { pred = "paid", a = "player", b = "wren" } },
+  { call = "observe", verb = "help", actor = "player", target = "garrick", witnesses = ["wren"], claim = { pred = "helped", a = "player", b = "garrick" } },
+  { call = "update", npc = "garrick", nudge = { respect = 4 } },
+  { call = "decide", npc = "garrick", moment = "turn" },
+  { call = "wait", seconds = 2.0 },
+  { call = "react", npc = "wren", trigger = "talk" },
+  { call = "wait", seconds = 2.0 },
+]
+
+[[scenario]]
+name = "the_engine_does_not_wait"
+steps = [
+  { call = "observe", verb = "insult", actor = "player", target = "garrick", witnesses = ["wren"], claim = { pred = "insulted", a = "player", b = "garrick" } },
+  { call = "update", npc = "garrick", nudge = { grudge = 4 } },
+  { call = "decide", npc = "garrick", moment = "turn" },
+  { call = "tick" },
+  { call = "react", npc = "wren", trigger = "talk" },
+  { call = "tick" },
+  { call = "narrate", since = 0 },
+]
+
+[[scenario]]
+name = "nothing_has_happened"
+steps = [
+  { call = "react", npc = "garrick", trigger = "talk" },
+  { call = "decide", npc = "garrick", moment = "turn" },
+  { call = "react", npc = "pip", trigger = "talk" },
+]

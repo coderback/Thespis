@@ -20,7 +20,8 @@ from __future__ import annotations
 
 import hashlib
 import threading
-from collections.abc import Mapping, Sequence
+import time
+from collections.abc import Callable, Mapping, Sequence
 from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import asdict, dataclass, field, replace
 from functools import cached_property
@@ -29,6 +30,7 @@ from pathlib import Path
 from thespis.beliefs import credence
 from thespis.brain import Brain, UtilityBrain
 from thespis.cast import Cast
+from thespis.claims import ClaimVocabulary, EventPred, Facts
 from thespis.considerations import DefinitionError, declared
 from thespis.deception import SAID, log_statement
 from thespis.decisions import DECIDE, REACT, Decision
@@ -161,6 +163,28 @@ class Game:
         template = self.cast.data.get("actions", {}).get(kind)
         return template.format_map(_Fill(who=self.who(arg))) if template else kind.replace("_", " ")
 
+    def vocabulary(self) -> ClaimVocabulary:
+        """What a claim extractor may say this game's lines assert (thespis.claims), from the game file: its
+        `[claims] description` if it has one, else one built from `[words.claims]`, its NPCs and its places."""
+        d = self.cast.data
+        preds = dict(d.get("words", {}).get("claims", {}))
+        npcs = list(d["npc"])
+        description = d.get("claims", {}).get("description") or "\n".join([
+            "Predicates (a and b are ids):",
+            *[f"- {p}(a, b): " + t.format(a="a", b="b") for p, t in preds.items()],
+            "- went_to(a, place); at(a, place): a is at place now; told(a, b): a told b something",
+            "- other: any other assertion about what happened, with b set to a short paraphrase",
+            "Characters: player (the one being spoken to, \"you\"), " + ", ".join(npcs) + ". Places: "
+            + ", ".join(self.places) + "."])
+        aliases = {"you": "player", "the player": "player",
+                   **{str(t["name"]).lower(): n for n, t in d["npc"].items()},
+                   **{name.lower(): p for p, name in self.places.items()}}
+        return ClaimVocabulary(game=self.id, description=description, characters=("player", *npcs),
+                               places=tuple(self.places), ledger_preds=frozenset(preds),
+                               event_preds={"went_to": EventPred(("move",), "target"),
+                                            "told": EventPred(("tell", "gossip"), "target")},
+                               place_preds=frozenset({"went_to", "at"}), aliases=aliases)
+
     def situation(self, key: str, fill: Mapping) -> str:
         template = self.cast.data.get("situations", {}).get(key)
         return template.format_map(_Fill(fill)) if template else ""
@@ -197,6 +221,8 @@ class Session:
         self._pending: dict[str, Future] = {}
         self._lock = threading.RLock()
         self._pool: ThreadPoolExecutor | None = None
+        self.settled_at: dict[str, float] = {}  # when each line settled (time.monotonic), for measuring
+        self.on_pack: Callable[[StatePack], None] | None = None  # sees each state pack as it's built (Rehearsal)
 
     @classmethod
     def new(cls, game: Game, seed: int = 0, **kw) -> Session:
@@ -419,6 +445,11 @@ class Session:
     def sentence(self, e: Event) -> str:
         return self.game.sentence(e)
 
+    def facts(self, npc: str) -> Facts:
+        """What `npc` could know of this world, for checking what it says (thespis.claims)."""
+        w = self.world
+        return Facts(w, npc, lambda w, c: w.ledger.happened(c), lambda event_id: self.voice.knows(w, npc, event_id))
+
     # ------------------------------------------------------------ inside
     def _npc(self, npc: str) -> NPC:
         if npc not in self.world.npcs:
@@ -466,7 +497,10 @@ class Session:
         assert line.id is not None
         self._lines[line.id] = line
         if pack is None:
+            self.settled_at[line.id] = time.monotonic()
             return replace(line)
+        if self.on_pack is not None:
+            self.on_pack(pack)
         if wait:
             self._settle(line.id, self._call(kind, pack, fallback), d, statement)
             return replace(self._lines[line.id])
@@ -496,6 +530,7 @@ class Session:
             cites = [statement.id if c == SAID and statement else c for c in u.cites]
             line.text = u.line if u.line is not None else line.text  # the model's words, or the template's
             line.cites, line.source, line.status = cites, u.source, FINAL
+            self.settled_at[lid] = time.monotonic()
             if u.note:
                 line.reason = f"{line.reason}; {u.note}"
             if d is not None:

@@ -32,7 +32,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from rehearsal import calibrate, measure  # noqa: E402
+from rehearsal import calibrate, handread, measure, sessions  # noqa: E402
 from rehearsal.record import DictCache, Recorder, RecordingGateway, ReplayGateway, transcript  # noqa: E402
 from rehearsal.scenarios import Scenario, Stage, scenarios  # noqa: E402
 from thespis import expression  # noqa: E402
@@ -99,27 +99,53 @@ def live(args) -> int:
     if isinstance(extractor, OpenAICompatGateway):
         extractor.calls = deque()
     recording = RecordingGateway(speaker)
-    chosen = _pick(args.only)
-    print(f"playing {len(chosen)} scenarios with {', '.join(speaker.models)}, claim check {args.claim_check}"
-          + (f", extracted by {', '.join(extractor.models)}" if extractor is not None else ""))
-    try:
-        stage, recorder, transcripts = rehearse(recording, chosen, args.claim_check, extractor)
-    finally:
-        speaker.close()
-        if isinstance(extractor, OpenAICompatGateway):
-            extractor.close()
-        if local is not None:
-            local.stop()  # before a local judge starts: one model on the GPU at a time
+    games: dict[str, str] = {}
+    played = None
+    if args.game:  # any game, through the session API (rehearsal/sessions.py); sessions have no claim check yet
+        if not args.scenarios:
+            print("--game needs --scenarios, a scenario file for it")
+            return 1
+        gid = measure.register(args.game)
+        games[gid] = str(args.game)
+        chosen_sessions = [x for x in sessions.load(Path(args.scenarios), measure.SESSION_GAMES[gid])
+                           if not args.only or args.only in x.name]
+        args.claim_check, args.record = "off", False
+        print(f"playing {len(chosen_sessions)} {gid} scenarios through sessions with {', '.join(speaker.models)}")
+        recorder = sessions.SessionRecorder()
+        try:
+            played = sessions.play(measure.SESSION_GAMES[gid], speaker, chosen_sessions, recorder)
+        finally:
+            speaker.close()
+            if local is not None:
+                local.stop()
+        acts, n_scenarios, transcripts = played.acts, len(chosen_sessions), {}
+    else:
+        chosen = _pick(args.only)
+        print(f"playing {len(chosen)} scenarios with {', '.join(speaker.models)}, claim check {args.claim_check}"
+              + (f", extracted by {', '.join(extractor.models)}" if extractor is not None else ""))
+        try:
+            stage, recorder, transcripts = rehearse(recording, chosen, args.claim_check, extractor)
+        finally:
+            speaker.close()
+            if isinstance(extractor, OpenAICompatGateway):
+                extractor.close()
+            if local is not None:
+                local.stop()  # before a local judge starts: one model on the GPU at a time
+        acts, n_scenarios = stage.acts, len(chosen)
     calls = list(speaker.calls) + list(getattr(extractor, "calls", []))
     report = {
         "when": datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC"), "commit": _commit(),
         "prompts": str(getattr(expression, "PROMPT_HASH", getattr(expression, "PROMPT_VERSION", "?"))),
         "models": list(speaker.models), "claim_check": args.claim_check,
         "extractor": list(extractor.models) if extractor is not None else None,
-        "summary": measure.summary(recorder.samples, calls, stage.acts, len(chosen)),
+        "summary": measure.summary(recorder.samples, calls, acts, n_scenarios),
         "violations": recorder.violations,
     }
+    if played is not None:
+        report["sessions"] = sessions.measures(played)
     report["summary"]["unanswered"] = recorder.unanswered
+    measure.run_checks(recorder.samples, recorder.snapshots)
+    report["checks"] = measure.check_rates(recorder.samples)
     lines = [s for s in recorder.samples if s["source"] == "llm" and s["line"]]
     sample = random.Random(SAMPLE_SEED).sample(lines, min(args.lines, len(lines)))
     judge_model = None
@@ -140,8 +166,8 @@ def live(args) -> int:
     REPORTS.mkdir(exist_ok=True)
     stem = REPORTS / f"{datetime.now(UTC).strftime('%Y-%m-%d-%H%M')}-{report['commit']}"
     if sample and judge_model:
-        kept = calibrate.keep(stem.with_suffix(".lines.json.gz"), judge_model, report["when"], report["commit"],
-                              sample, recorder.snapshots)
+        kept = calibrate.keep(calibrate.sibling(stem, ".lines.json.gz"), judge_model, report["when"], report["commit"],
+                              sample, recorder.snapshots, games)
         print(f"kept the judged lines in {kept.relative_to(ROOT)}")
     stem.with_suffix(".json").write_text(measure.dumps(report), encoding="utf-8", newline="\n")
     stem.with_suffix(".md").write_text(measure.markdown(report), encoding="utf-8", newline="\n")
@@ -156,6 +182,12 @@ def live(args) -> int:
             _write(TRANSCRIPTS, transcripts)
             print(f"recorded {sum(len(v) for v in recording.replies.values())} replies to "
                   f"{RECORDINGS.relative_to(ROOT)}, transcripts to {TRANSCRIPTS.relative_to(ROOT)}")
+    return 0
+
+
+def hand_read(args) -> int:
+    path = handread.make(calibrate.stem_of(Path(args.report)), args.n)
+    print(f"wrote {path}: tick each line's boxes, commit it, and compare reads it")
     return 0
 
 
@@ -230,6 +262,14 @@ def _differ(want, got) -> str:
 def compare(args) -> int:
     base, new = (json.loads(Path(p).read_text(encoding="utf-8")) for p in (args.base, args.new))
     results = measure.gate(base, new)
+    read = handread.verdict(calibrate.stem_of(Path(args.new)))
+    if read is not None:
+        results.append(("hand-read: nothing the checks missed", *read))
+    elif args.release:
+        results.append(("hand-read: nothing the checks missed", False,
+                        f"not hand-read: python -m rehearsal handread {calibrate.stem_of(Path(args.new))}"))
+    else:
+        print("note: not hand-read (a release needs it: --release)")
     for what, ok, detail in results:
         print(f"{'ok  ' if ok else 'FAIL'} {what}: {detail}")
     return 0 if all(ok for _, ok, _ in results) else 1
@@ -251,7 +291,13 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--claim-check", default="consequential", choices=("consequential", "all", "off"),
                    help="which lines meet the claim check, as CLAIM_CHECK on the host")
     p.add_argument("--local", help="speak through this registry model on this machine (thespis.runtime)")
+    p.add_argument("--game", help="any game.toml, played through sessions (needs --scenarios)")
+    p.add_argument("--scenarios", help="the scenario file for --game (rehearsal/sessions.py)")
     p.set_defaults(fn=live)
+    p = sub.add_parser("handread", help="20 lines of a run for a person to read")
+    p.add_argument("report", help="the run's report (.json) or its stem")
+    p.add_argument("--n", type=int, default=handread.N)
+    p.set_defaults(fn=hand_read)
     p = sub.add_parser("calibrate", help="a judge against the reference, on lines the reference judged")
     p.add_argument("files", nargs="+", help="<report>.lines.json.gz files")
     p.add_argument("--judge", required=True, help="local:<model>, or a JUDGE_<NAME>_* name")
@@ -263,6 +309,7 @@ def main(argv: list[str] | None = None) -> int:
     p = sub.add_parser("compare", help="the gate: a new report against a base")
     p.add_argument("base")
     p.add_argument("new")
+    p.add_argument("--release", action="store_true", help="fail unless the new run was hand-read")
     p.set_defaults(fn=compare)
     args = parser.parse_args(argv)
     return args.fn(args)

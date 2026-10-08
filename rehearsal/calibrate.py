@@ -30,10 +30,26 @@ BOOT = 2000
 CALIBRATE_N = 100
 
 
-def keep(path: Path, judge: str | None, when: str, commit: str, samples: list[dict], snapshots: dict) -> Path:
-    """Save the judged lines and the snapshots they need, compressed, beside the report."""
+def sibling(stem: Path, suffix: str) -> Path:
+    """A file beside a report, named from its stem (which may hold dots: local-qwen3.5-4b)."""
+    return stem.with_name(stem.name + suffix)
+
+
+def stem_of(report: Path) -> Path:
+    """A report's stem, from its .json, .md or .lines.json.gz path, or the stem itself."""
+    name = report.name
+    for suffix in (".lines.json.gz", ".handread.md", ".json", ".md"):
+        if name.endswith(suffix):
+            return report.with_name(name[: -len(suffix)])
+    return report
+
+
+def keep(path: Path, judge: str | None, when: str, commit: str, samples: list[dict], snapshots: dict,
+         games: dict[str, str] | None = None) -> Path:
+    """Save the judged lines and the snapshots they need, compressed, beside the report. `games` names the game
+    files of any session games among them, so their lines can be judged again later."""
     used = {s["snapshot"] for s in samples if s.get("snapshot")}
-    body = {"judge": judge, "when": when, "commit": commit, "samples": samples,
+    body = {"judge": judge, "when": when, "commit": commit, "samples": samples, "games": games or {},
             "snapshots": {k: v for k, v in snapshots.items() if k in used}}
     with gzip.open(path, "wt", encoding="utf-8") as f:
         json.dump(body, f, ensure_ascii=False)
@@ -41,8 +57,13 @@ def keep(path: Path, judge: str | None, when: str, commit: str, samples: list[di
 
 
 def load(path: Path) -> dict:
+    """Kept lines, with any session games they came from registered for judging."""
+    from rehearsal import measure
     with gzip.open(path, "rt", encoding="utf-8") as f:
-        return json.load(f)
+        kept = json.load(f)
+    for path_ in kept.get("games", {}).values():
+        measure.register(path_)
+    return kept
 
 
 def kappa(a: list[bool], b: list[bool]) -> float | None:

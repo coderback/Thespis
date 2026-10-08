@@ -22,6 +22,7 @@ from collections.abc import Iterator, Mapping
 from contextlib import contextmanager
 from importlib import import_module
 
+from rehearsal import checks
 from rehearsal.record import refusal
 from thespis.claims import BAD, ClaimVocabulary, Facts, extraction_messages, parse_claims, score
 from thespis.gateway import OpenAICompatGateway, Provider, provider_from_env
@@ -73,17 +74,40 @@ def judging(name: str, env: Mapping[str, str] | None = None) -> Iterator[Provide
                        extra={"temperature": 0, "max_tokens": 800})
 
 
+# Games played through sessions (rehearsal/sessions.py), by id: their vocabulary and facts come from the game file.
+SESSION_GAMES: dict = {}
+
+
+def register(path: str) -> str:
+    """Load a game file for judging its sessions' lines; returns its id."""
+    from thespis.session import Game
+    game = Game.load(path)
+    SESSION_GAMES[game.id] = game
+    return game.id
+
+
 def vocabulary(game: str) -> ClaimVocabulary:
+    if game in SESSION_GAMES:
+        return SESSION_GAMES[game].vocabulary()
     return import_module(GAMES[game]).VOCABULARY
+
+
+def world_of(sample: dict, snapshot: dict) -> World:
+    """The world a line was said in: a session's snapshot holds it with who saw what; a game's is the world."""
+    return World.from_json(snapshot["world"] if sample["game"] in SESSION_GAMES else snapshot)
 
 
 def facts(sample: dict, snapshot: dict) -> Facts:
     """What the speaker could know when it spoke. The narrator knows exactly the events it was told about."""
-    module, w = import_module(GAMES[sample["game"]]), World.from_json(snapshot)
+    if sample["game"] in SESSION_GAMES:
+        from thespis.session import Session
+        known = Session.restore(SESSION_GAMES[sample["game"]], snapshot).facts(sample["npc"])
+    else:
+        known = import_module(GAMES[sample["game"]]).facts(World.from_json(snapshot), sample["npc"])
     if sample["npc"] == "narrator":
         ids = set(sample["ids"])
-        return dataclasses.replace(module.facts(w, "narrator"), knows=lambda event_id: event_id in ids)
-    return module.facts(w, sample["npc"])
+        return dataclasses.replace(known, knows=lambda event_id: event_id in ids)
+    return known
 
 
 def extract(gateway, samples: list[dict], progress=print) -> None:
@@ -104,6 +128,31 @@ def categorise(samples: list[dict], snapshots: dict[str, dict]) -> None:
             continue
         counts = score(vocabulary(s["game"]), s["claims"], facts(s, snapshots[s["snapshot"]]), s["asserting"])
         s["categories"] = dict(counts)
+
+
+def run_checks(samples: list[dict], snapshots: dict[str, dict]) -> None:
+    """Give every model line the judge-free checks it fails (rehearsal/checks.py), as "checks"."""
+    names_of: dict[str, dict[str, str]] = {}
+    for s in samples:
+        if s["source"] != "llm" or not s.get("line") or not s.get("snapshot"):
+            continue
+        if s["game"] not in names_of:
+            v = vocabulary(s["game"])
+            names_of[s["game"]] = {c.lower(): c for c in v.characters} | \
+                {k.lower(): x for k, x in v.aliases.items() if x in v.characters}
+        f = facts(s, snapshots[s["snapshot"]])
+        s["checks"] = checks.flags(s, f.world, f.knows, names_of[s["game"]])
+
+
+def check_rates(samples: list[dict]) -> dict:
+    """How often model lines failed the judge-free checks: every line for words in the player's mouth, the
+    narrator's for who spoke."""
+    lines = [s for s in samples if "checks" in s]
+    narration = [s for s in lines if s["npc"] == "narrator"]
+    return {"player_words": [("player_words" in s["checks"]) for s in lines],
+            "attribution": [("attribution" in s["checks"]) for s in narration],
+            "failed": [{"scenario": s["scenario"], "npc": s["npc"], "line": s["line"], "checks": s["checks"]}
+                       for s in lines if s["checks"]]}
 
 
 # ---------------------------------------------------------------- numbers
@@ -198,6 +247,14 @@ def gate(base: dict, new: dict) -> list[tuple[str, bool, str]]:
         detail = "not judged" if d["d"] is None else \
             f"{_pct(sum(n) / len(n))} vs {_pct(sum(b) / len(b))}: {d['d']:+.1%} [{d['lo']:+.1%}, {d['hi']:+.1%}]"
         out.append((f"{k} no worse (n={len(n)} vs {len(b)})", ok, detail))
+    for k, what in (("player_words", "words in the player's mouth"), ("attribution", "narration's speakers")):
+        if k in base.get("checks", {}) and k in new.get("checks", {}):
+            b, n = base["checks"][k], new["checks"][k]
+            d = difference(b, n)
+            ok = d["d"] is None or (d["lo"] is not None and d["lo"] <= 0)
+            detail = "no lines" if d["d"] is None else \
+                f"{_pct(sum(n) / len(n))} vs {_pct(sum(b) / len(b))}: {d['d']:+.1%} [{d['lo']:+.1%}, {d['hi']:+.1%}]"
+            out.append((f"{what} no worse (n={len(n)} vs {len(b)})", ok, detail))
     bp, np_ = base["summary"]["act_latency"]["p95"], new["summary"]["act_latency"]["p95"]
     ok = bp is not None and np_ is not None and np_ <= bp * GATE["p95"]
     out.append(("act p95 no worse", ok, f"{_ms(np_)} vs {_ms(bp)}"))
@@ -239,6 +296,15 @@ def markdown(report: dict) -> str:
         f"| Lines with a hallucination | {_rate(c['rates']['hallucination'])} |",
         f"| Lines with a contradiction | {_rate(c['rates']['contradiction'])} |",
         f"| Lines with any of the three | {_rate(c['rates']['any_bad'])} |",
+        *([f"| Provisional lines settled, p50 / p95 | {_ms(report['sessions']['settle_p50'])} / "
+            f"{_ms(report['sessions']['settle_p95'])} ({report['sessions']['provisional']} of "
+            f"{report['sessions']['asked']} lines asked) |",
+            f"| Provisional lines that settled after the world moved on | {report['sessions']['stale']} |",
+            f"| Lines withdrawn (the session ended first) | {report['sessions']['withdrawn']} |"]
+          if report.get("sessions") else []),
+        *([f"| Lines putting words in the player's mouth (every line) | {_rate(rate(report['checks']['player_words']))} |",
+           f"| Narration naming a speaker who didn't speak | {_rate(rate(report['checks']['attribution']))} |"]
+          if report.get("checks") else []),
         f"| Action with a model call, p50 / p95 | {_ms(s['act_latency']['p50'])} / {_ms(s['act_latency']['p95'])} "
         f"({s['act_latency']['n']} actions) |",
         *[f"| `{k}` call, p50 / p95 | {_ms(v['p50'])} / {_ms(v['p95'])} ({v['n']} calls) |"

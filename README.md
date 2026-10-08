@@ -246,10 +246,50 @@ the judge). Its report covers:
 - latency per call type and per action;
 - cost.
 
+Every report also counts, over every model line with no judge involved
+([rehearsal/checks.py](rehearsal/checks.py)):
+- **words in the player's mouth:** "you told me..." when the player said nothing;
+- **who spoke, in narration:** the narrator says someone spoke, but none of the events it was given has them
+  speaking.
+
 **`compare`** fails when the new report is worse than the base in any of these ways:
 - protocol refusals above 1% of replies;
 - leaks or hallucinations worse with 95% confidence;
-- action p95 more than 10% slower.
+- either check above worse with 95% confidence;
+- action p95 more than 10% slower;
+- a hand-read of the run that found something no check flagged, or left lines unread (below).
+
+**Offline.** Rehearsal can run with the network off:
+
+```bash
+python -m rehearsal live --local gemma4-e4b --judge local:qwen3.5-4b   # local speaker, then a local judge
+```
+
+The speaker stops before the judge starts, so only one model is on the GPU at a time. A stand-in judge is only as
+good as its agreement with the reference (DeepSeek-V4-Pro), so every report it scores prints that agreement, or says
+it has none. To measure it, re-judge lines the reference judged:
+
+```bash
+python -m rehearsal calibrate rehearsal/reports/<run>.lines.json.gz --judge local:qwen3.5-4b
+```
+
+Each judged run keeps its lines beside its report (`.lines.json.gz`). The result, Cohen's kappa on each verdict with
+a 95% interval, goes to `rehearsal/calibration/`.
+
+**A person reads 20 lines per release,** because zero automatic flags is not proof:
+
+```bash
+python -m rehearsal handread rehearsal/reports/<run>   # writes <run>.handread.md: tick what's wrong, commit it
+python -m rehearsal compare <base>.json <run>.json --release   # fails until it's read, and if it found a miss
+```
+
+**Any game:** a game file and a scenario file play through the session API as an engine plays it. Lines are
+provisional, and the scenario doesn't wait for them. The report adds what an engine sees: how long provisional lines
+take to settle, how many settled after the world moved on, and how many were withdrawn.
+
+```bash
+python -m rehearsal live --game examples/tavern/game.toml --scenarios examples/tavern/scenarios.toml --local gemma4-e4b
+```
 
 `rehearsal/reports/baseline.json` is the system before Phase 2.
 
