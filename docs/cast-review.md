@@ -255,6 +255,12 @@ Each phase ends at a gate Rehearsal can measure. The durations assume one engine
      Beliefs are subjective-logic opinions: evidence for and against fuses, a belief is retracted when disbelief
      outweighs belief, and discrediting a source re-weighs everything it said. Every route on seeds 1, 2 and 4 and
      every manor route ends exactly as before; only retracted beliefs' numbers moved.
+     The mind loop is in the core: perception, Voice (packs, delivery, the narrator), affordances and the decision,
+     the tick with walks and gossip, verbs and refusals, contradiction handling, and content loading. Both games are
+     ported, with their text in their casts, and every route plays exactly as before. The adapters didn't halve:
+     the crypt road went from 1,252 lines of Python to 1,049 and the manor from 678 to 508, about 84% and 75%. What's
+     left is each game's own rules (duels, the haggle, the gate, testimony, the case) and which line each moment
+     calls for, which a new game writes for itself.
 4. **Service and SDK (3–4 weeks).**
    - `/v1` API, tenants and keys, the async gateway, Postgres, OpenTelemetry, cost metering.
    - The Godot SDK and one example scene.

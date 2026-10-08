@@ -10,15 +10,7 @@ from thespis.world import World
 
 VOCABULARY = ClaimVocabulary(
     game="manor",
-    description=(
-        "Predicates (a and b are ids):\n"
-        "- took(a, ring): a took the signet ring; was_in(a, ROOM@TIME): a was in a room at a time, with TIME a "
-        "number: 0 early morning, 1 mid-morning (also \"this morning\" or \"all morning\"), 2 noon, 3 early "
-        "afternoon, 4 mid-afternoon, 5 late afternoon, 6 teatime, 7 evening; e.g. kitchen@1\n"
-        "- left(a, room); at(a, room): a is in that room now; told(a, b); questioned(a, b); accused(a, b)\n"
-        "- other: any other assertion about what happened, with b set to a short paraphrase\n"
-        "Characters: player (the one being spoken to, \"you\"), vane (Lady Vane, her ladyship), pell, sable. "
-        "Rooms: hall, study, kitchen."),
+    description=C.CAST.data["claims"]["description"],
     characters=("player", C.OWNER, C.BUTLER, C.MAID),
     places=tuple(C.ROOMS),
     ledger_preds=frozenset({"took", "was_in"}),
