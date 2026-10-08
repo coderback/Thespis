@@ -15,6 +15,9 @@ words. Everything in it is checked when it loads. What a game declares there, it
   - `[npc.<id>.decay]`: drives that fade towards a baseline with a half-life, keeping a share of their peak.
   - `[[tie]]` and `[gossip] along`: gossip travels along ties wherever the two are, each report discounted by the
     listener's trust in the teller and by the kind of tie, so a story weakens as it passes from mouth to mouth.
+  - `[memory] recall = "meaning"`: what an NPC remembers when it speaks is chosen by how well it bears on the moment
+    (thespis.recall), given an embedder; without one, as usual.
+  - `[narrator] structured = true`: the narrator tells a scene, segments each its own or one speaker's.
 A statement that denies a claim (`neg`) is evidence against the claim for everyone who hears it, as far as each
 trusts the one denying it.
 
@@ -52,6 +55,7 @@ from thespis.gateway import ModelGateway
 from thespis.ledger import Claim, Event
 from thespis.minds import NPC
 from thespis.perception import at_the_scene, reported
+from thespis.recall import Embedder, MeaningRetriever, Weights
 from thespis.tick import Tick, gossip, run_tick, spread, walks
 from thespis.voice import View, Voice
 from thespis.world import World
@@ -277,13 +281,20 @@ class Session:
     """One playthrough's minds: the world they live in, what each saw, and the lines still on their way."""
 
     def __init__(self, game: Game, world: World, witnesses: dict[str, list[str]] | None = None,
-                 gateway: ModelGateway | None = None, mind: Mind | None = None, brain: Brain | None = None):
+                 gateway: ModelGateway | None = None, mind: Mind | None = None, brain: Brain | None = None,
+                 embedder: Embedder | None = None):
+        """`embedder` serves recall by meaning, for a game that declares it (`[memory]`)."""
         self.game, self.world = game, world
         self.witnesses: dict[str, list[str]] = witnesses if witnesses is not None else {}
         self.voice = replace(game.voice, sees=reported(self.witnesses), who=self.who,
                              claim_text=lambda c: game.claim_text(c, self._names()),
                              sentence=self.sentence,
                              describe=lambda w, npc, action: game.describe(w, npc, action, self._names()))
+        memory = game.cast.data.get("memory", {})
+        if embedder is not None and memory.get("recall") == "meaning":
+            self.voice.recall = MeaningRetriever(embedder, self.voice.claim_text, self.sentence,
+                                                 Weights.from_toml(memory), int(memory.get("k", 5)),
+                                                 int(memory.get("events", 5)))
         self.mind = mind or Mind(gateway, self.voice.validator)
         self.brain = brain or UtilityBrain()
         self._lines: dict[str, Line] = {}

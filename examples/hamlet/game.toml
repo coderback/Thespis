@@ -6,7 +6,8 @@
 #   - feelings: being cheated angers Osric with no word from the engine, and the anger fades with a half-life,
 #     never quite to nothing;
 #   - denials: a player who says "I never did" is evidence against the story, as far as the listener trusts them;
-#   - a narrator who tells a scene: its own segments and the villagers' words, each speaker one who did what it cites.
+#   - a narrator who tells a scene: its own segments and the villagers' words, each speaker one who did what it cites;
+#   - memory by meaning: an NPC recalls what bears on the moment, from only what it knows.
 
 [game]
 id = "hamlet"
@@ -126,6 +127,13 @@ priority = { cheated = 3, lied = 2, helped = 1 }
 threshold = 0.5
 along = { kin = 1.0, friend = 0.9, rival = 0.5 }
 in_person = 0.8
+
+# ---------------------------------------------------------------- memory (thespis.recall)
+# Given an embedder (thespis serve --embed local, or EMBED_*), what an NPC remembers when it speaks is chosen by how
+# well it bears on the moment, among only what it knows; without one, its surest beliefs and latest events, as usual.
+[memory]
+recall = "meaning"
+salient = { cheated = 1.0, lied = 0.6, helped = 0.4 }
 
 # ---------------------------------------------------------------- words
 [words.claims]

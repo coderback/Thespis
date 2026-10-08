@@ -200,6 +200,8 @@ class LocalModel:
         args = [str(self.server), "-m", str(path), "--host", "127.0.0.1", "--port", str(self.port),
                 "-c", str(self.ctx * self.parallel), "-np", str(self.parallel), "--reasoning", "off", "--no-webui",
                 "--cache-ram", str(CACHE_RAM_MB)]
+        if self.model.kind == "embed":
+            args += ["--embedding"]  # /v1/embeddings, pooled as the model was trained (BGE: its CLS token)
         if self.machine.os != "macos":
             if dev is None:
                 args += ["-dev", "none", "-ngl", "0"]
@@ -250,7 +252,10 @@ class LocalModel:
         """Calls shaped like play's, small to large, so the first real lines don't pay for first use. On Vulkan
         that cost is real: a GPU compiles its kernels for each new size of prompt it meets, and in live Rehearsal the
         first lines of a run met them at 1 to 3 tokens a second, 14 to 32 seconds a call, where warm ones ran at 755.
-        A two-word warm-up never reached those sizes."""
+        A two-word warm-up never reached those sizes. An embedding model embeds one short text."""
+        if self.model.kind == "embed":
+            httpx.post(f"{self.url}/embeddings", timeout=60, json={"model": self.model.id, "input": ["warm"]})
+            return
         schema = {"type": "object", "required": ["cites", "line"], "additionalProperties": False,
                   "properties": {"cites": {"type": "array", "minItems": 1, "items": {"type": "string",
                                                                                     "enum": ["e1", "e2"]}},
@@ -278,7 +283,9 @@ class LocalModel:
         self.proc = None
 
     def env(self, prefix: str = "LLM_") -> dict[str, str]:
-        """The settings that point the gateway at this server."""
+        """The settings that point the gateway at this server; for an embedding model, recall (EMBED_*)."""
+        if self.model.kind == "embed":
+            return {"EMBED_BASE_URL": self.url, "EMBED_MODEL": self.model.id}
         return {f"{prefix}PROFILE": "llamacpp", f"{prefix}BASE_URL": self.url, f"{prefix}MODEL": self.model.id}
 
     def __enter__(self) -> LocalModel:

@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Collection, Mapping, Sequence
 from dataclasses import dataclass, field
+from typing import Any
 
 from thespis import perception
 from thespis.beliefs import Belief
@@ -20,7 +21,7 @@ from thespis.deception import asserting
 from thespis.decisions import REACT, Decision
 from thespis.expression import Mind, StatePack, Utterance, Validator
 from thespis.ledger import Claim, Event
-from thespis.perception import Sees, at_the_scene, known
+from thespis.perception import Sees, at_the_scene, known, latest
 from thespis.retriever import Retriever, TopKRetriever
 from thespis.world import World
 
@@ -66,6 +67,7 @@ class Voice:
     stakes: Collection[str] = ()  # actions (by id or kind) and triggers whose lines have consequences
     retriever: Retriever = field(default_factory=lambda: TopKRetriever(5))
     events: int = 5  # how many known events a pack shows
+    recall: Any = None  # a thespis.recall.MeaningRetriever: memories chosen by meaning, for a game that declares it
 
     def view(self, w: World, view: View | None = None) -> View:
         return view or View(w.player["loc"])
@@ -87,8 +89,16 @@ class Voice:
         if view.player_at == npc.loc:
             others.append("player")
         others += [pid for pid, p in w.players.items() if p.get("loc") == npc.loc]  # the other players present
-        beliefs = self.retriever.beliefs(w.beliefs, npc_id)  # active only: a retracted belief is never offered
-        events = known(w, npc_id, self.events, self.sees, view.hidden)
+        recalled = None
+        if self.recall is not None:  # by meaning, to the moment; with nothing to say it by, the newest it knows
+            last = latest(w, npc_id, self.sees)
+            query = situation.strip() or (self.sentence(w.ledger.get(last)) if last else "")
+            recalled = self.recall.recall(w, npc_id, query, self.sees, view.hidden)
+        if recalled is not None:
+            beliefs, events = recalled
+        else:
+            beliefs = self.retriever.beliefs(w.beliefs, npc_id)  # active only: a retracted belief is never offered
+            events = known(w, npc_id, self.events, self.sees, view.hidden)
         doing = {"id": action, "does": self.describe(w, npc_id, action)} if action else None
         if doing and asserts:
             doing = asserting(doing, self.claim_text(asserts))

@@ -56,6 +56,11 @@ MODELS: dict[str, Model] = {m.id: m for m in (
     Model("qwen3.5-9b", _hf("unsloth/Qwen3.5-9B-GGUF", "Qwen3.5-9B-Q4_K_M.gguf",
                              "03b74727a860a56338e042c4420bb3f04b2fec5734175f4cb9fa853daf52b7e8", 5_680_522_464),
           "9B", "Q4_K_M", "Apache-2.0", vram_gb=6.2, ram_gb=8.5),  # estimated; on a 4 GB GPU, 8-13 s a line
+    # Embeddings for recall by meaning (thespis.recall): BGE small, English, 384 dimensions. Small enough to run on the
+    # CPU beside a chat model that has the GPU.
+    Model("bge-small", _hf("CompendiumLabs/bge-small-en-v1.5-gguf", "bge-small-en-v1.5-q8_0.gguf",
+                           "ec38e8da142596baa913124ae50550de284b6916bf59577ef2f0cb9660c2f514", 36_806_944),
+          "33M", "Q8_0", "MIT", vram_gb=0.2, ram_gb=0.3, ctx=512, kind="embed"),
 )}
 
 # Tiers, smallest first: the probe picks the largest the machine can run (thespis.runtime.hardware.choose). Only a
