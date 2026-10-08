@@ -52,15 +52,16 @@ def test_an_npc_cites_only_what_it_saw():
 
 def test_choices_are_the_games_and_follow_the_engines_changes():
     s = Session.new(TAVERN)
-    insulted(s)
+    insulted(s)  # the game file says an insult angers him: grudge 4, with no update from the engine
     first = s.decide("garrick", "turn")
-    assert (first.action, first.reason, first.cites) == ("leave", "leave scores 5", ["e0001"])
-    s.update("garrick", nudge={"grudge": 4})
-    second = s.decide("garrick", "turn")
-    assert (second.action, second.text) == ("confront:player", "You. Say it again, to my face.")
+    assert (first.action, first.text) == ("confront:player", "You. Say it again, to my face.")
     s.update("player", loc="yard")  # out of reach: he can't confront someone who isn't there
+    second = s.decide("garrick", "turn")
+    assert (second.action, second.reason, second.cites) == ("leave", "leave scores 5", ["e0001"])
+    s.update("player", loc="taproom")
+    s.update("garrick", nudge={"grudge": -1})  # the engine's rules calm him below the threshold
     assert s.decide("garrick", "turn").action == "leave"
-    assert [d.chosen for d in s.world.decisions] == ["leave", "confront:player", "leave"]
+    assert [d.chosen for d in s.world.decisions] == ["confront:player", "leave", "leave"]
 
 
 def test_drives_stay_in_range_and_flags_clear():
@@ -72,13 +73,12 @@ def test_drives_stay_in_range_and_flags_clear():
 
 def test_the_tick_walks_gossips_and_settles():
     s = Session.new(TAVERN)
-    insulted(s)
-    s.update("garrick", nudge={"grudge": 3})
+    insulted(s)  # grudge 4, felt
     t = s.tick()
     assert t.moves == [{"who": "pip", "from": "yard", "to": "taproom"}]
     assert [(e.verb, e.actor, e.target) for e in t.events] == [("move", "pip", "taproom"), ("gossip", "wren", "pip")]
     assert s.inspect("pip")["beliefs"][0]["opinion"]["b"] == 0.8  # wren's certainty times the decay
-    assert s.world.npcs["garrick"].drives["grudge"] == 2 and s.world.phase == 1  # one step back towards rest
+    assert s.world.npcs["garrick"].drives["grudge"] == 3 and s.world.phase == 1  # one step back towards rest
     assert s.react("pip", "told").cites == ["e0003"]  # he heard it, so he knows it
 
 

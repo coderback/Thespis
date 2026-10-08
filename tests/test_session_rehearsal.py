@@ -96,3 +96,15 @@ def test_the_tavern_scenarios_load():
     measure.register(str(TAVERN))
     chosen = sessions.load(ROOT / "examples" / "tavern" / "scenarios.toml", measure.SESSION_GAMES["tavern"])
     assert len(chosen) == 6 and chosen[0].name == "tavern/insult_and_answer"
+
+
+@pytest.mark.parametrize("game", ["tavern", "hamlet"])
+def test_every_example_scenario_plays_through(game):
+    """Each example game's scenario file loads and plays end to end, every call accepted, every line settled."""
+    gid = measure.register(str(ROOT / "examples" / game / "game.toml"))
+    chosen = sessions.load(ROOT / "examples" / game / "scenarios.toml", measure.SESSION_GAMES[gid])
+    result = sessions.play(measure.SESSION_GAMES[gid], FakeModel(), chosen, sessions.SessionRecorder(), settle=5,
+                           pace=0)
+    spoken = [x for x in result.lines if not x.get("silent")]
+    assert spoken and all(x["status"] == "final" for x in spoken), result.lines
+    assert {x["scenario"].split("/")[1] for x in result.lines} == {sc.name.split("/")[1] for sc in chosen}

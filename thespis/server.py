@@ -103,6 +103,13 @@ class ReactIn(BaseModel):
 class NarrateIn(BaseModel):
     since: int = Field(0, description="Tell the story from this phase on")
     wait: bool = False
+    to: str | None = Field(None, description="Tell it to this player: only what they took part in or saw")
+
+
+class JoinIn(BaseModel):
+    player: str = Field(description="A new player's id (not 'player', which every game has, nor an NPC's)")
+    name: str | None = Field(None, description="What NPCs and the narrator call them")
+    at: str | None = Field(None, description="Where they are")
 
 
 class TickIn(BaseModel):
@@ -333,7 +340,13 @@ def create_app(games: Mapping[str, Game] | None = None, gateway: ModelGateway | 
 
     @app.post(f"/{VERSION}/sessions/{{sid}}/narrate")
     def narrate(p: Caller, sid: str, body: NarrateIn) -> LineOut:
-        return LineOut(**call(p, sid, lambda s: s.narrate(body.since, body.wait)).to_json())
+        return LineOut(**call(p, sid, lambda s: s.narrate(body.since, body.wait, body.to)).to_json())
+
+    @app.post(f"/{VERSION}/sessions/{{sid}}/players", status_code=201)
+    def join(p: Caller, sid: str, body: JoinIn) -> dict[str, Any]:
+        """A player joins, or one already here is renamed or moves: an agent NPCs see, hear and hold beliefs
+        about by id. Move them later with update (npc = their id, loc)."""
+        return call(p, sid, lambda s: s.join(body.player, body.name, body.at))
 
     @app.post(f"/{VERSION}/sessions/{{sid}}/tick")
     def tick(p: Caller, sid: str, body: TickIn) -> TickOut:

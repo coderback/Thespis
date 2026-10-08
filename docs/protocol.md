@@ -27,10 +27,14 @@ NPCs, one choice set, gossip and words. Everything in it is checked when it load
 | `[game]` | `id`, `name`, and the `setting` every NPC's model reads |
 | `[places]` | Place ids and their names |
 | `[player]` | `start`: where the player begins |
+| `[players.<id>]` | More players than the one: `name`, `start`. Or the engine `join`s them (below) |
 | `[npc.<id>]` | `name`, `persona`, `goal`, `start`, and optionally `drives` (0 to 10), `trust_in` (-5 to 5), `walk` (a place per tick), `settle` (drives that drift back to a resting value), `aliases` |
+| `[npc.<id>.feels]` | How its drives move when it comes to believe something was done to it (it is the claim's `b`), by predicate: `insulted = { grudge = 4 }`, scaled by how sure it is |
+| `[npc.<id>.decay]` | Drives that fade: `grudge = { to = 0, half_life = 2, keep = 0.25 }` (below) |
 | `[npc.<id>.lines]` | Template lines by key: an action's kind for `decide`, a trigger for `react`. `{who}` and bindings fill them |
 | `[[npc.<id>.choices.<moment>]]` | What the NPC may do at that moment (below) |
-| `[gossip]` | `gossips`, `about`, `priority` by predicate, `threshold`, `decay` |
+| `[gossip]` | `gossips`, `about`, `priority` by predicate, `threshold`, `decay`; with ties, `along` and `in_person` (below) |
+| `[[tie]]` | `between = [a, b]`, `kind`: a relationship gossip travels along |
 | `[words.claims]`, `[words.events]` | A claim and an event in words, as the model reads them |
 | `[actions]` | What each action does, by kind, for the model |
 | `[situations]` | The situation a moment or trigger is spoken in, if the caller doesn't say |
@@ -68,16 +72,52 @@ the statement is logged with its real truth, and the listener `to` believes it a
 The Crypt Road and the manor declare their NPCs' choices this way too (`games/*/cast.toml`). Kael's race, Brenna's
 arrests and haggling, and Sable's lie play all 35 routes exactly as they did in code (`tests/test_outcomes.py`).
 
+### Players, feelings, ties
+
+These come only with what a game declares. A game that declares none of them plays as before.
+[examples/hamlet/game.toml](../examples/hamlet/game.toml) uses them all.
+
+**Players.** Every game has `"player"`. A game with more declares them (`[players.ada] name = "Ada"`), or the
+engine adds them with `join`.
+- Each player is an actor, a target and a witness like any character, and moves with `update`.
+- NPCs hold beliefs about each player by id, so a choice can name one: `when = [{ with = "{who}" }, { believes = {
+  pred = "cheated", a = "{who}", b = "self" } }]`.
+- `narrate(to=...)` tells one player only what they took part in or witnessed.
+
+**Feelings.** `[npc.osric.feels] cheated = { grudge = 6 }` moves Osric's drives when he comes to believe that
+someone cheated him (he is the claim's `b`), so the engine reports only the event. "Osric cheated Ada" doesn't
+anger him.
+- The move is scaled by how sure he is: hearsay believed at 0.9 moves grudge by 5.
+- It happens once per claim. Hearing it a second time isn't a second offence.
+
+**Decay.** A drive with `half_life` fades from its last peak, halving every `half_life` ticks towards `to`, but never
+below `keep` of the peak:
+- `grudge = { to = 0, half_life = 2, keep = 0.25 }` takes a grudge of 6 to 4, 3, 2, then holds at 2.
+- Setting the drive, from the engine or from a feeling, starts a new peak.
+
+**Ties.** With `[[tie]]` and `[gossip] along`, gossip travels along ties wherever the two are, one tie per tick.
+- Each tick, everyone tied tells each tie one thing it hasn't heard about whoever is in `about`: the worst news first.
+- The listener believes the report with subjective logic's trust discounting: the teller's confidence × the
+  listener's trust in the teller (as it would believe them face to face) × what carries along that kind of tie
+  (`along = { kin = 1.0, friend = 0.9, rival = 0.5 }`). So a story weakens with each mouth it passes through.
+- Anyone else standing with the teller hears it at `in_person`.
+- Word passed between two people apart has no witnesses.
+
+**Denials.** A statement whose claim is `neg` ("I never cheated him") is also evidence against the claim it denies, for
+everyone who hears it, weighted by their trust in whoever denied it. A barely trusted denial dents a kinsman's
+report; a trusted one can overturn it.
+
 ## The calls
 
 | Library (`Session`) | HTTP | What it does |
 | --- | --- | --- |
 | `Session.new(game, seed)` | `POST /v1/sessions {game, seed}` | A new playthrough |
 | `observe(verb, actor, target, at, claim, witnesses, said, true, amount)` | `POST .../observe` | Something happened. `witnesses` saw it. A deed's claim is believed for certain by whoever saw it or took part in it. A statement (`said`) is believed by whoever heard it, as far as each trusts the speaker. Its truth is the ledger's unless `true` says |
-| `update(npc, loc, drives, nudge, flags, trust_in)` | `POST .../update` | The engine's rules changed an NPC (or, with `"player"`, moved the player) |
+| `update(npc, loc, drives, nudge, flags, trust_in)` | `POST .../update` | The engine's rules changed an NPC (or, with a player's id, moved that player) |
+| `join(player, name, at)` | `POST .../players` | A player joins, or one already here is renamed or moves |
 | `decide(npc, moment, bindings, situation, to, wait)` | `POST .../decide` | The NPC chooses among its declared choices, with the reason recorded, and says its line |
 | `react(npc, trigger, situation, cites, fill, wait)` | `POST .../react` | A line in reply to something |
-| `narrate(since, wait)` | `POST .../narrate` | The story since a phase, citing every event it tells |
+| `narrate(since, wait, to)` | `POST .../narrate` | The story since a phase, citing every event it tells; `to` a player, only what they saw |
 | `tick(steps)` | `POST .../tick` | The minds' own time: scheduled walks, gossip, drives settling, the next phase |
 | `line(id, wait)` | `GET .../lines/{id}?wait=2` | A line as it stands now; `wait` holds the request up to that many seconds for the model |
 | `inspect(npc)` | `GET .../npcs/{npc}` | The NPC's state and every belief, with its evidence |
@@ -140,4 +180,4 @@ These are still to come in Phase 4:
 
 - Lines are polled. The Godot spike (4.1b) found long-polling (`?wait=2`) natural in GDScript, where server-sent events
   would mean driving `HTTPClient` by hand, so SSE waits until an engine needs it ([sdk/godot/spike](../sdk/godot/spike/README.md)).
-- Multi-speaker narration, many players, relationship ties and retrieval by meaning (4.5).
+- Multi-speaker narration and retrieval by meaning (4.5b).

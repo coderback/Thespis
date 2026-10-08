@@ -12,7 +12,8 @@ declared wins a tie. Nothing here calls `eval`, so a definition is safe to load 
 
 Conditions:
 - `{drive = d, gte | gt | lte | lt | eq = n}`: a drive, which is 0 when the NPC doesn't have it.
-- `{at = place}`: where the NPC is. `{with = who}`: in the same place as `who` ("player" is where the player was seen).
+- `{at = place}`: where the NPC is. `{with = who}`: in the same place as `who`, an NPC or a player ("player" is where
+  the player was seen).
 - `{flag = f}` / `{not_flag = f}`: the NPC's flag is set, or isn't.
 - `{believes = claim, min = c}`: the NPC holds the claim with at least `min` confidence, or actively at all.
 - `{bound = name}`: a value the game passed when it asked is truthy.
@@ -84,7 +85,7 @@ def condition(c: object, where: str) -> Cond:
             return lambda w, n, v, env: n.loc == _fill(place, env)
         case "with":
             who = str(val)
-            return lambda w, n, v, env: n.loc == (v.player_at if (x := _fill(who, env)) == "player" else w.npcs[x].loc)
+            return lambda w, n, v, env: n.loc == (v.player_at if (x := _fill(who, env)) == "player" else w.where(x))
         case "flag" | "not_flag":
             flag, want = str(val), key == "flag"
             return lambda w, n, v, env: bool(n.flags.get(flag)) == want

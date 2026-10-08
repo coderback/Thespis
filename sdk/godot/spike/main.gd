@@ -30,12 +30,11 @@ func _ready() -> void:
 	opened.emit(r.has("session"))
 
 
-## The player insults Garrick in front of Wren. The engine's rules say it makes him angrier.
+## The player insults Garrick in front of Wren. The game file says an insult angers him ([npc.garrick.feels]), so
+## the engine reports only the event.
 func insult() -> Dictionary:
-	var e: Dictionary = await thespis.observe({"verb": "insult", "actor": "player", "target": "garrick",
+	return await thespis.observe({"verb": "insult", "actor": "player", "target": "garrick",
 			"claim": INSULT, "witnesses": ["wren"]})
-	await thespis.update({"npc": "garrick", "nudge": {"grudge": 4}})
-	return e
 
 
 ## What Garrick does now, and what he says: shown at once, then settled.

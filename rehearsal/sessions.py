@@ -35,7 +35,7 @@ from thespis.session import FINAL, WITHDRAWN, Game, Session
 
 SETTLE = 20.0  # seconds to wait, at the end of a scenario, for lines still on their way
 SPEAKS = ("decide", "react", "narrate")
-CHANGES = ("observe", "update", "tick")
+CHANGES = ("observe", "update", "tick", "join")
 
 
 @dataclass
@@ -98,7 +98,9 @@ class Played:
     acts: list[tuple[float, int]] = field(default_factory=list)  # decide: seconds to settle, whether a model spoke
 
 
-def play(game: Game, gateway, chosen: list[Scenario], recorder: SessionRecorder, settle: float = SETTLE) -> Played:
+def play(game: Game, gateway, chosen: list[Scenario], recorder: SessionRecorder, settle: float = SETTLE,
+         pace: float = 1.0) -> Played:
+    """Play `chosen` as an engine would. `pace` scales the scenarios' waits (0: no pauses, for a quick check)."""
     played = Played()
     for sc in chosen:
         s = Session.new(game, sc.seed, mind=Mind(gateway, game.voice.validator, observer=recorder))
@@ -110,7 +112,7 @@ def play(game: Game, gateway, chosen: list[Scenario], recorder: SessionRecorder,
             args = {k: v for k, v in step.items() if k != "call"}
             call = step["call"]
             if call == "wait":
-                time.sleep(float(args.get("seconds", 0)))
+                time.sleep(float(args.get("seconds", 0)) * pace)
             elif call in CHANGES:
                 getattr(s, call)(**args)
                 changed.append(time.monotonic())

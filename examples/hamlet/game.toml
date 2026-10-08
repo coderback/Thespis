@@ -1,0 +1,148 @@
+# Thornby: a hamlet of four households, two players, and a grapevine that runs along kinship and friendship rather
+# than who happens to share a room. What it shows (thespis.session):
+#   - two players, Ada and Bram, whom the NPCs know apart and hold separate beliefs about;
+#   - ties: what Osric knows reaches his sister Hild across the hamlet, then her friend the priest, each telling a
+#     little less sure than the last; what reaches someone first from a rival is believed least of all;
+#   - feelings: being cheated angers Osric with no word from the engine, and the anger fades with a half-life,
+#     never quite to nothing;
+#   - denials: a player who says "I never did" is evidence against the story, as far as the listener trusts them.
+
+[game]
+id = "hamlet"
+name = "Thornby"
+setting = "Thornby, four households on a river bend, the week before the harvest fair."
+
+[places]
+green = "the village green"
+mill = "Osric's mill"
+forge = "Hild's forge"
+chapel = "the chapel"
+
+[players.ada]
+name = "Ada"
+start = "mill"
+
+[players.bram]
+name = "Bram"
+start = "green"
+
+[npc.osric]
+name = "Osric"
+start = "mill"
+goal = "Get a fair price for his flour before the fair"
+persona = "The miller: thrifty, proud of his scales, and slow to forget a slight. He talks in flour and weights."
+drives = { grudge = 0, warmth = 3 }
+trust_in = { hild = 3, maud = 2, aldo = -2, ada = 0, bram = 0 }
+
+[npc.osric.feels]
+cheated = { grudge = 6 }
+helped = { warmth = 3 }
+
+[npc.osric.decay]  # his anger halves every two ticks, but a quarter of it stays
+grudge = { to = 0, half_life = 2, keep = 0.25 }
+
+[npc.osric.lines]
+trade = "Fair weight, fair coin. What'll it be?"
+refuse = "Not a grain for you. I know what you did."
+cheated = "You'll pay for that, every penny."
+talk = "Mind the flour dust."
+told = "Is that so."
+
+[npc.hild]
+name = "Hild"
+start = "forge"
+goal = "Keep the village tools mended and her brother out of trouble"
+persona = "The smith, Osric's older sister: blunt, loyal to her kin, and quicker to judge than to listen."
+drives = {}
+trust_in = { osric = 3, aldo = 2, ada = 1, bram = 0 }
+
+[npc.hild.lines]
+talk = "Speak up, the bellows are loud."
+told = "My brother said as much."
+denied = "Hm. Maybe. Maybe not."
+
+[npc.aldo]
+name = "Father Aldo"
+aliases = ["Aldo", "the priest"]
+start = "chapel"
+goal = "Keep the peace before the fair"
+persona = "The village priest: gentle, careful with gossip, and fond of reminding people there are two sides to everything."
+drives = {}
+trust_in = { hild = 2, osric = -2, maud = 1, ada = 0, bram = 0 }
+
+[npc.aldo.lines]
+talk = "Peace be with you."
+told = "I have heard something of the sort. I would hear the other side."
+
+[npc.maud]
+name = "Maud"
+start = "green"
+goal = "Know everything before anyone else does"
+persona = "The goodwife on the green: curious, warm, and the hamlet's quickest tongue."
+drives = {}
+trust_in = { osric = 2, aldo = 1, ada = 0, bram = 1 }
+
+[npc.maud.lines]
+talk = "Fine day for it, isn't it?"
+told = "Well! I never."
+thanked = "Bless you, love."
+
+# ---------------------------------------------------------------- choices (thespis.considerations)
+# When a player comes to the mill, Osric trades with them or turns them away. The engine binds `who` to the player.
+[[npc.osric.choices.meet]]
+do = "trade:{who}"
+utility = [{ drive = "warmth" }]
+
+[[npc.osric.choices.meet]]
+do = "refuse:{who}"
+utility = [{ drive = "grudge" }]
+when = [{ with = "{who}" }, { believes = { pred = "cheated", a = "{who}", b = "self" } }]
+
+# ---------------------------------------------------------------- the grapevine, along ties
+# Each tick, everyone tied to someone tells each of their ties one thing they haven't heard about either player:
+# worst news first. A listener believes it at the teller's confidence, times its trust in the teller (as it would
+# believe them face to face), times what carries along that kind of tie. Anyone else standing with the teller hears it
+# as a stranger's tale (`in_person`).
+[[tie]]
+between = ["osric", "hild"]
+kind = "kin"
+
+[[tie]]
+between = ["hild", "aldo"]
+kind = "friend"
+
+[[tie]]
+between = ["osric", "maud"]
+kind = "friend"
+
+[[tie]]
+between = ["maud", "aldo"]
+kind = "rival"
+
+[gossip]
+about = ["ada", "bram"]
+priority = { cheated = 3, lied = 2, helped = 1 }
+threshold = 0.5
+along = { kin = 1.0, friend = 0.9, rival = 0.5 }
+in_person = 0.8
+
+# ---------------------------------------------------------------- words
+[words.claims]
+cheated = "{a} cheated {b}"
+helped = "{a} helped {b}"
+lied = "{a} lied to {b}"
+
+[words.events]
+cheat = "{a} cheated {t} at {where}."
+help = "{a} helped {t} at {where}."
+tell = "{a} told {t} that {claim}."
+gossip = "{a} told {t} that {claim}."
+move = "{a} walked from {where} to {to}."
+
+[actions]
+trade = "sell flour to {who} at a fair weight"
+refuse = "refuse to trade with {who}"
+
+[narrator]
+name = "The Narrator"
+persona = "A wry village chronicler who tells only what happened, plainly, and ends with what the hamlet is whispering."
