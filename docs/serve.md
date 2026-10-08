@@ -201,11 +201,12 @@ python sdk/godot/test/run.py --godot <Godot console build> --mode sidecar [--loc
 | --- | --- | --- | --- |
 | `python -m thespis serve` | scripted, on localhost | 21 of 21 | 0 |
 | The packaged runtime (`dist/thespis/thespis.exe`) | scripted, on localhost | 21 of 21 | 0 |
-| `python -m thespis serve --local gemma4-e4b` | Gemma 4 E4B on the laptop's GPU | 13 of 13 in 4.4's spike (the model's line after 1.8 s) | 0 |
-| The packaged runtime, `--local gemma4-e4b` | Gemma 4 E4B on the laptop's GPU | 13 of 13 in 4.4's spike (the model's line after 1.3 s) | 0 |
+| `python -m thespis serve --local gemma4-e4b` | Gemma 4 E4B on the laptop's GPU | 21 of 21 (the model's line after 1.5 s) | 0 |
+| The packaged runtime, `--local gemma4-e4b` | Gemma 4 E4B on the laptop's GPU | 21 of 21 (the model's line after 1.25 s) | 0 |
 
 The same scene also plays through a hosted-mode server with a project key, unchanged (19 checks: the sidecar's two
-don't apply), and CI plays both on Linux on every push.
+don't apply), and CI plays both on Linux on every push. After each run, nothing is left running: no runtime and no
+llama-server.
 
 The template line shows in under 30 ms either way, and the model's words replace it when they come.
 
