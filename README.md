@@ -134,6 +134,8 @@ The core owns the mind loop; a game supplies its content and the rules only it h
 | Content loading (`cast.py`) | `cast.toml`: personas, template lines, event sentences, situations |
 | Choices as data, compiled to affordances (`considerations.py`) | `[[npc.<id>.choices.<moment>]]`: conditions and utilities |
 
+Any model can speak: OpenAI-compatible endpoints, Anthropic, or a local model on the player's own GPU for offline play, measured as accurate as the cloud in live Rehearsal ([docs/models.md](docs/models.md)).
+
 A game whose world lives in an engine supplies only the TOML: [docs/protocol.md](docs/protocol.md) covers the calls
 (observe, decide, react, narrate, tick, snapshot, restore) in the library (`thespis.api`) and over `/v1` HTTP
 (`python -m thespis serve`), and [examples/tavern/game.toml](examples/tavern/game.toml) is a complete game.
@@ -264,6 +266,8 @@ To work on the client with hot reload, run `npm run dev` in `client/` next to th
 | `python tools/warm_cache.py <host>` | Plays the client's autoplay route until the cache answers it all |
 | `python tools/bench_models.py` | Each configured model alone on real state packs: latency and valid picks |
 | `python tools/make_fixtures.py` | Regenerates `fixtures/` from the real API |
+| `python -m thespis models hardware` / `models serve` | What this machine can run locally, and run it (Gemma 4 E4B by default; [docs/models.md](docs/models.md#local-models-playing-offline)) |
+| `python -m thespis models probe <url> --out p.json` | Measure any model endpoint and write a profile for `LLM_PROFILE` |
 | `python -m tools.outcomes` | Plays all 35 routes with the brain off and shows what differs from `tests/outcomes.json`; `--update` records them |
 | `python -m thespis serve --game examples/tavern/game.toml` | The `/v1` protocol on localhost, for an engine ([docs/protocol.md](docs/protocol.md)) |
 | `python sdk/godot/spike/test/run.py --godot <path>` | The Godot spike's round trip, headless, against a scripted model |
