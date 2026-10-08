@@ -47,7 +47,7 @@ def check(options: list[dict], verb: str, target: str | None) -> dict:
             if not option["enabled"]:
                 raise NotAllowed(option["reason"])
             return option
-    raise NotAllowed(f"You can't {verb.replace('_', ' ')} {target or ''} here".strip())
+    raise NotAllowed(" ".join(x for x in ("You can't", verb.replace("_", " "), target, "here") if x))
 
 
 def open_mind(w: World, validator: Validator, gateway: ModelGateway | None = None, cache: ReplyCache | None = None,
