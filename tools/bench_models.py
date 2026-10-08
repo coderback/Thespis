@@ -48,21 +48,21 @@ class Recorder:
 def demo_packs() -> list[tuple[str, StatePack]]:
     """Every (call type, state pack) the demo route asks the model for, in order."""
     recorder, packs = Recorder(), []
-    original = voice.pack_for
+    original = voice.VOICE.pack  # every pack the game builds goes through its Voice
 
     def recording(*args, **kwargs):
         pack = original(*args, **kwargs)
         packs.append(("act" if pack.action else "react", pack))
         return pack
 
-    voice.pack_for = recording
+    voice.VOICE.pack = recording  # type: ignore[method-assign]
     try:
         w = new_world(1)
         for step in ROUTE:
             rules.act(w, step["verb"], step.get("target"), step.get("claim"), step.get("amount"), step.get("text"),
                       gateway=recorder)
     finally:
-        voice.pack_for = original
+        del voice.VOICE.pack  # back to the class's method
     return packs
 
 

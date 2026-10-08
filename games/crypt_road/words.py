@@ -33,43 +33,20 @@ def claim_text(c: Claim, speaker: str | None = None, negate: bool = False,
 
 
 def sentence(e: Event, player: tuple[str, str] = TO_PLAYER) -> str:
+    """An event in words, from cast.toml's [words.events]."""
     a, t = who(e.actor, start=True, player=player), who(e.target, player=player)
-    where = C.STOP_NAMES.get(e.loc, e.loc)
-    match e.verb:
-        case "insult":
-            return f"{a} insulted {t} at {where}."
-        case "challenge":
-            return f"{a} challenged {t} to a duel."
-        case "beat":
-            return f"{a} beat {t} in the duel."
-        case "humiliate":
-            if e.target == "player":
-                purse = "your" if player == TO_PLAYER else "the player's"
-            else:
-                purse = PRONOUNS.get(e.target or "", ("", "his"))[1].replace("him", "his")
-            return f"{a} humiliated {t} and took {purse} purse."
-        case "spare":
-            return f"{a} spared {t}."
-        case "bribe":
-            return f"{a} paid {t} {e.amount} coins." if e.amount else f"{a} paid {t} a fine."
-        case "offer":
-            return f"{a} offered {t} {e.amount} coins."
-        case "counter":
-            return f"{a} asked {t} for {e.amount} coins."
-        case "refuse":
-            return f"{a} turned down {'your' if t == 'you' else t + chr(39) + 's'} offer."
-        case "move":
-            return f"{a} walked from {where} to {C.STOP_NAMES.get(e.target or '', e.target)}."
-        case "block":
-            return f"{who(C.GUARD, start=True)} turned {who(e.actor, player=player)} back at the gate."
-        case "detain":
-            return f"{a} detained {t}."
-        case "release":
-            return f"{a} released {t}."
-        case "testify":
-            return f"{a} told {t} that {claim_text(e.claimed, e.actor, negate=True, player=player)}."
-        case "take_relic":
-            return f"{a} took the relic."
-        case _ if e.claim is not None:  # tell_claim, accuse, gossip
-            return f"{a} told {t} that {claim_text(e.claim, e.actor, player=player)}."
-    return f"{a} {e.verb.replace('_', ' ')} {t}.".replace("  ", " ")
+    key = "bribe_fine" if e.verb == "bribe" and not e.amount else e.verb
+    if not C.CAST.has("words.events", key):
+        if e.claim is None:
+            return f"{a} {e.verb.replace('_', ' ')} {t}.".replace("  ", " ")
+        key = "told"
+    if e.target == "player":
+        purse = "your" if player == TO_PLAYER else "the player's"
+    else:
+        purse = PRONOUNS.get(e.target or "", ("", "his"))[1].replace("him", "his")
+    return C.CAST.text(
+        "words.events", key, a=a, t=t, where=C.STOP_NAMES.get(e.loc, e.loc), amount=e.amount, purse=purse,
+        to=C.STOP_NAMES.get(e.target or "", e.target), whose="your" if t == "you" else t + "'s",
+        guard=who(C.GUARD, start=True), actor=who(e.actor, player=player),
+        claim=claim_text(e.claim, e.actor, player=player) if e.claim else "",
+        denied=claim_text(e.claim, e.actor, negate=True, player=player) if e.claim else "")

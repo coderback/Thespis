@@ -15,7 +15,6 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass, field
-from types import EllipsisType
 
 from games.crypt_road import claims, voice
 from games.crypt_road import content as C
@@ -26,19 +25,14 @@ from thespis.expression import Mind, Observer, ReplyCache, Utterance
 from thespis.gateway import ModelGateway
 from thespis.ledger import Claim, Event
 from thespis.moderation import Moderator
+from thespis.play import NotAllowed, Verbs, check, count_calls, open_mind
 from thespis.world import LOST, PLAYING, WON, World
+
+__all__ = ["NotAllowed"]
 
 TALK_MAX = 200
 EPILOGUE_PHASES = 2
 DUEL_WON = "duel_won"
-
-
-class NotAllowed(Exception):
-    """The verb isn't allowed right now. `reason` is readable by a player."""
-
-    def __init__(self, reason: str):
-        super().__init__(reason)
-        self.reason = reason
 
 
 @dataclass
@@ -118,14 +112,8 @@ def allowed(w: World) -> list[dict]:
     loc = w.player["loc"]
     here = [n.id for n in w.npcs_at(loc)]
     ended = w.status != PLAYING
-    lock = "The race is over" if ended else ("Choose: humiliate or spare" if w.pending == DUEL_WON else None)
-    out: list[dict] = []
-
-    def add(verb, target, label, args, ends_phase, ok=True, why=None, reason: str | None | EllipsisType = ...):
-        if reason is ...:
-            reason = lock or (None if ok else why)
-        out.append({"verb": verb, "target": target, "label": label, "args": args, "ends_phase": ends_phase,
-                    "enabled": reason is None, "reason": reason})
+    verbs = Verbs("The race is over" if ended else ("Choose: humiliate or spare" if w.pending == DUEL_WON else None))
+    add = verbs.add
 
     for n in here:
         add("talk", n, f"Talk to {_npc_name(n)}", {"max_len": TALK_MAX}, False)
@@ -154,16 +142,7 @@ def allowed(w: World) -> list[dict]:
         add("move", None, "Move on", {}, True, ok=False, why="This is the end of the road")
     add("wait", None, "Wait", {}, True)
     add("take_relic", None, "Take the relic", {}, False, ok=loc == "crypt", why="The relic is in the crypt")
-    return out
-
-
-def _check(w: World, verb: str, target: str | None) -> dict:
-    for option in allowed(w):
-        if option["verb"] == verb and option["target"] == target:
-            if not option["enabled"]:
-                raise NotAllowed(option["reason"])
-            return option
-    raise NotAllowed(f"You can't {verb} {target or ''} here".strip())
+    return verbs.options
 
 
 # ---------------------------------------------------------------- acting
@@ -180,10 +159,10 @@ def act(w: World, verb: str, target: str | None = None, claim: dict | Claim | No
     the session's running total is kept in `w.counters["model_calls"]`. An `observer` sees every line the model
     settles (thespis.expression.Mind). With `checking`, lines with consequences meet the claim check (thespis.claims).
     """
-    _check(w, verb, target)
+    check(allowed(w), verb, target)
     brain = brain or UtilityBrain()
-    mind = Mind(gateway if w.brain_mode == "model" else None, voice.VALIDATOR, cache, replay, budget, moderator,
-                observer, claims.check(w, checking, gateway) if checking and gateway else None)
+    mind = open_mind(w, voice.VALIDATOR, gateway, cache, replay, budget, moderator, observer,
+                     claims.check(w, checking, gateway) if checking and gateway else None)
     start = len(w.ledger)
     ends_phase = None  # the tick this verb triggers, if any: "move" or "wait"
     told = haggle = None
@@ -224,9 +203,7 @@ def act(w: World, verb: str, target: str | None = None, claim: dict | Claim | No
     events = list(w.ledger)[start:]
     epilogue = run_epilogue(w, brain, mind) if w.status != PLAYING and w.ended_at is not None and not \
         w.counters.get("epilogue_done") else None
-    if mind.asked:
-        w.counters["model_calls"] = w.counters.get("model_calls", 0) + mind.asked
-    return ActResult(events=events, tick=tick, epilogue=epilogue, replies=replies, model_calls=mind.asked)
+    return ActResult(events=events, tick=tick, epilogue=epilogue, replies=replies, model_calls=count_calls(w, mind))
 
 
 def _offered_amount(w: World, amount: int | None) -> int:

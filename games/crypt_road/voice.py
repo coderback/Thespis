@@ -1,23 +1,19 @@
 """NPC voices: the model's lines when there is one, template lines from cast.toml when not.
 
-Every line, whoever writes it, cites at least one belief or ledger event its speaker knows, so the inspector's
-why-chain can trace it. Each line starts as a Speech carrying its template fallback. deliver() asks the model for
-all of a moment's lines at once, keeps only the replies that pass the validator, and records the result.
+The core (thespis.voice) builds each state pack and delivers each moment's lines; this module says which line each
+moment calls for, and what the Crypt Road's NPCs see and say.
 """
 
 from __future__ import annotations
 
 import re
-from collections.abc import Sequence
-from dataclasses import dataclass
 
 from games.crypt_road import content as C
 from games.crypt_road import words
 from thespis.beliefs import Belief
-from thespis.decisions import REACT
-from thespis.expression import Mind, StatePack, Utterance, Validator
+from thespis.expression import Mind, StatePack, Validator
 from thespis.ledger import Claim, Event
-from thespis.retriever import TopKRetriever
+from thespis.voice import Speech, View, Voice, belief_cites, top_belief
 from thespis.world import World
 
 # Every way a line can name a character or a place, mapped to its game id, for the validator.
@@ -60,7 +56,6 @@ class CryptRoadValidator(Validator):
 
 
 VALIDATOR = CryptRoadValidator(VOCABULARY)
-RETRIEVER = TopKRetriever(5)
 KNOWN_EVENTS = 5
 THRESHOLDS = {"grudge": (4, 5), "respect": (4,), "fear": (4,)}  # crossing one makes the rival stop and think
 # Lines with consequences, which meet the claim check (thespis.claims): accusations, arrests, questioning, deals,
@@ -69,63 +64,12 @@ STAKES_ACTIONS = ("accuse", "detain", "question", "counter", "refuse")
 STAKES_TRIGGERS = ("testify",)
 
 
-@dataclass(frozen=True)
-class View:
-    """What NPCs perceive of the player while a phase plays out: where the player started it. A player who is
-    moving is on the road until the next phase, so that move isn't visible yet (`hidden`)."""
-
-    player_at: str
-    hidden: frozenset[str] = frozenset()
-
-
-def _view(w: World, view: View | None) -> View:
-    return view or View(w.player["loc"])
-
-
-@dataclass
-class Speech:
-    npc: str
-    trigger: str
-    said: tuple[str, list[str]] | None  # the fallback line and its cites; None means the NPC stays silent
-    situation: str  # what just happened, from the NPC's point of view, for the model
-    untrusted: tuple[str, ...] = ()  # what the player wrote that the situation quotes, for moderation
-
-
-def template(npc: str, key: str) -> str | None:
-    return C.load_cast()["npc"][npc].get("lines", {}).get(key)
-
-
-def knows(w: World, npc: str, event_id: str) -> bool:
-    """Can this NPC cite the event? It took part, it learned of it, or it happened at its stop."""
-    e = w.ledger.get(event_id)
-    if npc in (e.actor, e.target):
-        return True
-    if any(ev.event == event_id for b in w.beliefs.for_npc(npc) for ev in b.evidence):
-        return True
-    return w.npcs[npc].loc in (e.loc, e.target)
-
-
-def belief_cites(b: Belief | None) -> list[str]:
-    """A belief and the event its strongest evidence came from."""
-    if b is None:
-        return []
-    best = max(b.evidence, key=lambda e: e.conf)
-    return [b.id, best.event]
-
-
-def line(npc: str, key: str, cites: Sequence[str | None], **fmt) -> tuple[str, list[str]] | None:
-    """Fill a template, or None when there is no template or nothing to cite: no line without a source."""
-    text, known = template(npc, key), [c for c in cites if c]
-    if text is None or not known:
-        return None
-    return text.format(**fmt), list(dict.fromkeys(known))
+def line(npc: str, key: str, cites, **fmt) -> tuple[str, list[str]] | None:
+    return C.CAST.line(npc, key, cites, **fmt)
 
 
 def _top(w: World, npc: str, about: tuple[str, ...]) -> Belief | None:
-    held = [b for b in w.beliefs.for_npc(npc) if b.active and b.conf >= C.CRIME_CONF
-            and any(b.claim.mentions(x) for x in about)]
-    held.sort(key=lambda b: (C.GOSSIP_PRIORITY.get(b.claim.pred, 0), b.conf), reverse=True)
-    return held[0] if held else None
+    return top_belief(w, npc, about, C.CRIME_CONF, C.GOSSIP_PRIORITY)
 
 
 def _about(c: Claim, speaker: str | None = None) -> str:
@@ -143,82 +87,41 @@ PERSONA_MAX = 300  # characters in an edited persona (#39)
 
 def persona_of(w: World, npc_id: str) -> str:
     """The persona the model voices: this session's edit (#39), or the one in cast.toml."""
-    return w.npcs[npc_id].flags.get("persona") or C.load_cast()["npc"][npc_id]["persona"]
+    return C.CAST.persona(w, npc_id)
 
 
-def describe(option: str, w: World, npc: str) -> str:
+def describe(w: World, npc: str, option: str) -> str:
     """One line on what an action does, for the model."""
     kind, _, who = option.partition(":")
     nxt = C.next_stop(w.npcs[npc].loc)
-    return {
-        "go_to": f"walk on towards the relic, to {C.STOP_NAMES[nxt]}" if nxt else "walk on",
-        "wait": "stay where you are and do nothing this phase",
-        "take_relic": "take the relic and win the race",
-        "accuse": "tell the Captain what the player did to you; she trusts you and will stop them at the gate",
-        "share_drink": "stay this phase to share a drink with the player and tell them something useful",
-        "detain": f"have the sergeant hold {C.short_name(who)} for two phases",
-        "question": f"ask {C.short_name(who)} whether the claim about them is true",
-        "counter": f"name your price: {who} coins, and not a coin less",
-        "refuse": "turn the offer down and hear no more offers for now",
-    }.get(kind, option.replace("_", " "))
+    kind = "go_to_end" if kind == "go_to" and not nxt else kind
+    if not C.CAST.has("actions", kind):
+        return option.replace("_", " ")
+    return C.CAST.text("actions", kind, next=C.STOP_NAMES.get(nxt or "", ""),
+                       who=who if kind == "counter" else C.short_name(who))
+
+
+VOICE = Voice(
+    cast=C.CAST, validator=VALIDATOR, claim_text=lambda c: _about(c),
+    sentence=lambda e: words.sentence(e, words.ABOUT_PLAYER), who=lambda x: words.who(x, player=words.ABOUT_PLAYER),
+    setting=lambda w, npc: f"You are at {C.STOP_NAMES[w.npcs[npc].loc]}. The road runs east: "
+                           + ", ".join(C.STOP_NAMES[s] for s in C.STOPS) + ". The relic lies in the crypt.",
+    describe=describe, places=C.STOPS, stakes={*STAKES_ACTIONS, *STAKES_TRIGGERS}, events=KNOWN_EVENTS)
+
+
+def knows(w: World, npc: str, event_id: str) -> bool:
+    """Can this NPC cite the event? It took part, it learned of it, or it happened at its stop."""
+    return VOICE.knows(w, npc, event_id)
 
 
 def pack_for(w: World, npc_id: str, situation: str, action: str | None = None, view: View | None = None,
              untrusted: tuple[str, ...] = (), stakes: bool = False) -> StatePack:
-    """Everything the model may know when it speaks for this NPC, and nothing more. Never whether a belief is true.
-    `action` is what code decided the NPC does, if it is acting. `untrusted` is what the player wrote that the
-    situation quotes; a persona the player edited counts too."""
-    npc, cast, view = w.npcs[npc_id], C.load_cast()["npc"][npc_id], _view(w, view)
-    others = [n.id for n in w.npcs_at(npc.loc) if n.id != npc_id]
-    if view.player_at == npc.loc:
-        others.append("player")
-    beliefs = RETRIEVER.beliefs(w.beliefs, npc_id)  # active only: a retracted belief is never offered as fact
-    known = [e for e in reversed(list(w.ledger))
-             if e.id not in view.hidden and knows(w, npc_id, e.id)][:KNOWN_EVENTS][::-1]
-    names = {npc_id, *others, *C.STOPS}  # everyone knows the road
-    names |= VALIDATOR.named(situation)  # and may name whoever the player just mentioned
-    for b in beliefs:
-        names |= {b.claim.a, b.claim.b}
-    for e in known:
-        names |= {e.actor, e.target}
-        if e.claim:
-            names |= {e.claim.a, e.claim.b}
-    if action:
-        names.add(action.partition(":")[2])
-    return StatePack(
-        npc=npc_id, name=cast["name"], persona=persona_of(w, npc_id), goal=cast["goal"], situation=situation,
-        here=[words.who(x, player=words.ABOUT_PLAYER) for x in others],
-        drives=dict(npc.drives), trust_in=dict(npc.trust_in),
-        beliefs=[{"id": b.id, "claim": _about(b.claim), "conf": b.conf,
-                  "from": sorted({e.source for e in b.evidence})} for b in beliefs],
-        events=[{"id": e.id, "what": words.sentence(e, words.ABOUT_PLAYER)} for e in known],
-        action={"id": action, "does": describe(action, w, npc_id)} if action else None,
-        names={x for x in names if x and x != "player"},
-        setting=f"You are at {C.STOP_NAMES[npc.loc]}. The road runs east: "
-                + ", ".join(C.STOP_NAMES[s] for s in C.STOPS) + ". The relic lies in the crypt.",
-        untrusted=[t for t in (npc.flags.get("persona"), *untrusted) if t],
-        stakes=stakes or bool(action and action.partition(":")[0] in STAKES_ACTIONS),
-    )
+    """Everything the model may know when it speaks for this NPC (thespis.voice.Voice.pack)."""
+    return VOICE.pack(w, npc_id, situation, action, view=view, untrusted=untrusted, stakes=stakes)
 
 
 def deliver(w: World, mind: Mind, speeches: list[Speech]) -> list[dict]:
-    """Voice a moment's lines, all model calls in parallel, and record each as a react decision."""
-    voiced = [(s, s.said) for s in speeches if s.said]
-    speeches = [s for s, _ in voiced]
-    fallbacks = [Utterance(None, said[0], said[1], "fallback") for _, said in voiced]
-    if mind.active:
-        spoken = mind.react_many([(pack_for(w, s.npc, s.situation, untrusted=s.untrusted,
-                                            stakes=s.trigger in STAKES_TRIGGERS), f)
-                                  for s, f in zip(speeches, fallbacks)])
-    else:
-        spoken = fallbacks
-    replies = []
-    for s, u in zip(speeches, spoken):
-        reason = f"{s.trigger}; {u.note}" if u.note else s.trigger
-        d = w.decisions.record(REACT, s.npc, w.phase, s.trigger, line=u.line, cites=u.cites, reason=reason,
-                               source=u.source)
-        replies.append({"decision": d.id, "npc": s.npc, "line": u.line, "cites": u.cites, "source": u.source})
-    return replies
+    return VOICE.deliver(w, mind, speeches)
 
 
 # ---------------------------------------------------------------- reactions to the player's verb
@@ -302,7 +205,7 @@ def decision_line(w: World, npc: str, chosen: str, claim: Claim | None = None,
             return line(C.RIVAL, f"accuse_{claim.pred}", belief_cites(w.beliefs.get(C.RIVAL, claim)))
         if chosen == "share_drink":
             return line(C.RIVAL, "share_drink", belief_cites(w.beliefs.get(C.RIVAL, Claim("spared", "player", C.RIVAL))))
-        if chosen == "go_to" and w.npcs[C.RIVAL].loc == _view(w, view).player_at:  # said to the player's face
+        if chosen == "go_to" and w.npcs[C.RIVAL].loc == VOICE.view(w, view).player_at:  # said to the player's face
             return line(C.RIVAL, "leaving", belief_cites(_top(w, C.RIVAL, ("player",))))
     if npc == C.GUARD and claim is not None:
         b = belief_cites(w.beliefs.get(C.GUARD, claim))
@@ -321,7 +224,7 @@ def haggle_line(chosen: str, offer: Event, amount: int, price: int) -> tuple[str
 def crossed_threshold(w: World, npc_id: str) -> bool:
     """Has a drive crossed one of its thresholds since this NPC last decided? Remembers the drives either way."""
     npc = w.npcs[npc_id]
-    before = npc.flags.get("drives_seen") or C.load_cast()["npc"][npc_id]["drives"]
+    before = npc.flags.get("drives_seen") or C.CAST.npc(npc_id)["drives"]
     npc.flags["drives_seen"] = dict(npc.drives)
     return any(min(before.get(k, 0), npc.drives.get(k, 0)) < t <= max(before.get(k, 0), npc.drives.get(k, 0))
                for k, ts in THRESHOLDS.items() for t in ts)

@@ -4,8 +4,7 @@ ROOM@TIME; thespis.claims.as_claim types it into the claim's place and at."""
 from __future__ import annotations
 
 from games.manor import content as C
-from thespis.claims import ClaimCheck, ClaimChecking, ClaimVocabulary, EventPred, Facts
-from thespis.expression import StatePack
+from thespis.claims import ClaimCheck, ClaimChecking, ClaimVocabulary, EventPred, Facts, check_for
 from thespis.gateway import ModelGateway
 from thespis.world import World
 
@@ -43,7 +42,4 @@ def facts(w: World, speaker: str) -> Facts:
 
 def check(w: World, checking: ClaimChecking, gateway: ModelGateway) -> ClaimCheck:
     """The claim check for lines said in `w`, through the checking's own gateway or the one the lines came from."""
-    def facts_for(pack: StatePack) -> Facts:
-        return facts(w, pack.npc)
-
-    return ClaimCheck(checking.gateway or gateway, VOCABULARY, facts_for, every=checking.mode == "all")
+    return check_for(checking, gateway, VOCABULARY, lambda pack: facts(w, pack.npc))

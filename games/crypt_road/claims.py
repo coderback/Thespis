@@ -4,7 +4,7 @@ each claim is checked against."""
 from __future__ import annotations
 
 from games.crypt_road import content as C
-from thespis.claims import ClaimCheck, ClaimChecking, ClaimVocabulary, EventPred, Facts
+from thespis.claims import ClaimCheck, ClaimChecking, ClaimVocabulary, EventPred, Facts, check_for
 from thespis.expression import StatePack
 from thespis.gateway import ModelGateway
 from thespis.world import World
@@ -54,4 +54,4 @@ def check(w: World, checking: ClaimChecking, gateway: ModelGateway) -> ClaimChec
     def facts_for(pack: StatePack) -> Facts:
         return narrator_facts(w) if pack.npc == "narrator" else facts(w, pack.npc)
 
-    return ClaimCheck(checking.gateway or gateway, VOCABULARY, facts_for, every=checking.mode == "all")
+    return check_for(checking, gateway, VOCABULARY, facts_for)

@@ -35,23 +35,10 @@ def claim_text(c: Claim, about: bool = False, speaker: str | None = None, start:
 
 
 def sentence(e: Event, about: bool = False) -> str:
+    """An event in words, from cast.toml's [words.events]."""
     a, t = who(e.actor, about, start=True), who(e.target, about)
-    room = C.ROOM_NAMES.get(e.loc, e.loc)
-    match e.verb:
-        case "take":
-            return f"{a} took the signet ring from {room}."
-        case "leave":
-            return f"{a} left {room}."
-        case "tell" | "testify":
-            return f"{a} told {t} that {claim_text(e.claimed, about, speaker=e.actor, start=False)}."
-        case "arrive":
-            return f"{a} arrived at the manor."
-        case "move":
-            return f"{a} walked from {room} to {C.ROOM_NAMES.get(e.target or '', e.target)}."
-        case "question":
-            return f"{a} questioned {t} in {room}."
-        case "accuse":
-            return f"{a} accused {t} before Lady Vane."
-        case "constable":
-            return f"{a} sent for the constable."
-    return f"{a} {e.verb.replace('_', ' ')} {t}".strip() + "."
+    if not C.CAST.has("words.events", e.verb):
+        return f"{a} {e.verb.replace('_', ' ')} {t}".strip() + "."
+    claim = claim_text(e.claim, about, speaker=e.actor, start=False) if e.claim else ""
+    return C.CAST.text("words.events", e.verb, a=a, t=t, room=C.ROOM_NAMES.get(e.loc, e.loc), claim=claim,
+                       to=C.ROOM_NAMES.get(e.target or "", e.target))

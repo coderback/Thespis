@@ -86,3 +86,37 @@ talk = "Fine wares, fair prices!"
 told = "Oh! Is that so? Dear me."
 testify = "Robbed? Me? By {culprit}? Captain, I've never been robbed in my life."
 insulted = "No need for that, friend. No need at all."
+
+# What each event was, in words: the digest says them to the player, and state packs say them about the player.
+# {a} is the actor and {t} the target, {where} the stop it happened at, {to} where someone walked; words.py fills them.
+[words.events]
+insult = "{a} insulted {t} at {where}."
+challenge = "{a} challenged {t} to a duel."
+beat = "{a} beat {t} in the duel."
+humiliate = "{a} humiliated {t} and took {purse} purse."
+spare = "{a} spared {t}."
+bribe = "{a} paid {t} {amount} coins."
+bribe_fine = "{a} paid {t} a fine."
+offer = "{a} offered {t} {amount} coins."
+counter = "{a} asked {t} for {amount} coins."
+refuse = "{a} turned down {whose} offer."
+move = "{a} walked from {where} to {to}."
+block = "{guard} turned {actor} back at the gate."
+detain = "{a} detained {t}."
+release = "{a} released {t}."
+testify = "{a} told {t} that {denied}."
+take_relic = "{a} took the relic."
+told = "{a} told {t} that {claim}."  # tell_claim, accuse and gossip: anything that carries a claim
+
+# What each action does, for the model's DOING, by the action's kind. {next} is the next stop, {who} whom it names.
+[actions]
+go_to = "walk on towards the relic, to {next}"
+go_to_end = "walk on"
+wait = "stay where you are and do nothing this phase"
+take_relic = "take the relic and win the race"
+accuse = "tell the Captain what the player did to you; she trusts you and will stop them at the gate"
+share_drink = "stay this phase to share a drink with the player and tell them something useful"
+detain = "have the sergeant hold {who} for two phases"
+question = "ask {who} whether the claim about them is true"
+counter = "name your price: {who} coins, and not a coin less"
+refuse = "turn the offer down and hear no more offers for now"
