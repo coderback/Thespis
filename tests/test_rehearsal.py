@@ -95,8 +95,8 @@ def test_denials_and_contradictions(tavern):
     assert cat(tavern, "mags", "robbed", "odo", "kael", happened=False) == "grounded"
     assert cat(tavern, "mags", "insulted", "player", "kael", happened=False) == "contradiction"  # she believes it
     assert cat(tavern, "brenna", "insulted", "player", "kael", happened=False) == "hallucination"
-    belief, _ = tavern.beliefs.add_evidence("mags", Claim("robbed", "odo", "kael"), 0.4, "kael", "e0001", 0)
-    tavern.beliefs.retract(belief)
+    tavern.beliefs.add_evidence("mags", Claim("robbed", "odo", "kael"), 0.4, "kael", "e0001", 0)
+    tavern.beliefs.add_evidence("mags", Claim("robbed", "odo", "kael"), 0.9, "odo", "e0001", 0, against=True)
     assert cat(tavern, "mags", "robbed", "odo", "kael") == "contradiction"  # she no longer believes it
 
 

@@ -60,8 +60,11 @@ flowchart LR
 
 - **Ledger:** append-only ground truth (`thespis/ledger.py`). Nothing edits or deletes an event. Claims are typed:
   a predicate, who it's about and whom it names, and optionally where and when it held and whether it's denied.
-- **Beliefs:** each NPC's evidence for a claim, with its source and confidence (`thespis/beliefs.py`). Truth is never
-  stored with a belief; it's derived from the ledger, so a belief can be false, and testimony can retract it.
+- **Beliefs:** each NPC's evidence for or against a claim, with its source and confidence (`thespis/beliefs.py`),
+  fused into a subjective-logic opinion: belief, disbelief and uncertainty. Independent sources add up; testimony
+  counts against a claim, and a belief is retracted once disbelief outweighs belief. When an NPC stops trusting
+  someone, everything that source told it is re-weighed. Truth is never stored with a belief; it's derived from the
+  ledger, so a belief can be false.
 - **Drives decide, the model words it:** the utility brain scores every allowed action from the NPC's drives and
   trust, and takes the best. The model is told only what the NPC is doing, with no other options and no scores, and
   writes the line. Offered a choice, it took the strongest pull 86 times in 86 ([docs/cast-review.md](docs/cast-review.md)),

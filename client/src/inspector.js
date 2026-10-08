@@ -129,15 +129,15 @@ export class Inspector {
   }
 
   beliefRow(b, isNew) {
-    const mark = b.conf < ACTION_LINE ? ["q", "?", "Below the 0.5 action line: stored, never acted on"]
+    const mark = b.status !== "retracted" && b.conf < ACTION_LINE ? ["q", "?", "Below the 0.5 action line: stored, never acted on"]
       : b.truth ? ["t", "✓", "True: the ledger shows it happened"] : ["f", "✗", "False: the ledger shows it never happened"];
     const how = (ev) => ev.source === "witnessed" ? "saw it" : ev.source === "self" ? "it happened to them" : "from " + esc(name(ev.source));
-    const src = (b.evidence || []).map((ev) => `<span class="chip">${how(ev)} · ${ev.conf.toFixed(1)}</span><span class="chip id" data-id="${esc(ev.event)}">${esc(ev.event)}</span>`).join(" ");
+    const src = (b.evidence || []).map((ev) => `<span class="chip${ev.against ? " against" : ""}">${ev.against ? "against, " : ""}${how(ev)} · ${ev.conf.toFixed(1)}</span><span class="chip id" data-id="${esc(ev.event)}">${esc(ev.event)}</span>`).join(" ");
     const cls = ["belief", b.status === "retracted" ? "retracted" : "", isNew ? "new" : "", this.highlight === b.id ? "ev hl" : ""].join(" ");
     return `<div class="${cls}" data-b="${esc(b.id)}">
       <span class="mark ${mark[0]}" title="${mark[2]}">${mark[1]}</span>
       <span class="claim">${esc(claimText(b.claim))}${b.status === "retracted" ? ' <span class="badge offline">retracted</span>' : ""}</span>
-      <div class="meter" title="confidence ${b.conf}"><i style="width:${b.conf * 100}%;background:${b.conf >= ACTION_LINE ? "var(--accent)" : "var(--muted)"}"></i></div>
+      <div class="meter" title="confidence ${b.conf}${b.opinion && b.opinion.d > 0 ? `, doubt ${b.opinion.d}` : ""}"><i style="width:${b.conf * 100}%;background:${b.conf >= ACTION_LINE ? "var(--accent)" : "var(--muted)"}"></i>${b.opinion && b.opinion.d > 0 ? `<i class="dis" style="width:${b.opinion.d * 100}%"></i>` : ""}</div>
       <div class="src"><span class="chip id" data-id="${esc(b.id)}">${esc(b.id)}</span> ${src}</div>
     </div>`;
   }
@@ -190,7 +190,7 @@ export class Inspector {
       if (l.kind === "belief") {
         const b = l.belief;
         const ev = l.evidence.map((e) => `${how(e)} in ${chip(e.event.id)}${e.event.verb ? ": " + esc(eventText(e.event)) : ""} (${e.conf.toFixed(1)})`).join("<br>");
-        node("", `Belief ${chip(b.id)} · confidence ${b.conf}${b.status === "retracted" ? ' · <span class="badge offline">retracted</span>' : ""}`,
+        node("", `Belief ${chip(b.id)} · confidence ${b.conf}${b.opinion && b.opinion.d > 0 ? `, doubt ${b.opinion.d}` : ""}${b.status === "retracted" ? ' · <span class="badge offline">retracted</span>' : ""}`,
           `${esc(name(b.npc))} believes <b>${esc(claimText(b.claim, { lower: true }))}</b>`, ev);
       } else if (l.kind === "event") {
         node("", `Event ${chip(l.id)} · phase ${l.event.phase}`, esc(eventText(l.event)), `at ${STOP_SHORT[l.event.loc] || esc(l.event.loc)}`);

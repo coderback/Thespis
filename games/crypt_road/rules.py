@@ -369,11 +369,16 @@ def end_phase(w: World, action: str, brain: Brain | None = None, mind: Mind | No
                              f"{C.short_name(wit)} would know whether it happened.", view=view)
             if not chosen.startswith("question"):
                 continue
-            w.beliefs.retract(belief)  # the witness knows it never happened
-            for src in {e.source for e in belief.evidence}:
+            sources = {e.source for e in belief.evidence if not e.against}
+            e = _event(w, "testify", wit, C.GUARD, guard.loc, belief.claim, happened(w, belief.claim))
+            # The witness knows it never happened: evidence against it, as far as she trusts the witness. Whoever
+            # told her loses her trust, and everything they told her is re-weighed.
+            w.beliefs.add_evidence(C.GUARD, belief.claim, C.conf_from_trust(guard.trust_in.get(wit, 0)), wit, e.id,
+                                   w.phase, against=True)
+            for src in sorted(sources):
                 if src in guard.trust_in:
                     guard.trust_in[src] -= 3
-            e = _event(w, "testify", wit, C.GUARD, guard.loc, belief.claim, happened(w, belief.claim))
+                    w.beliefs.discredit(C.GUARD, src, C.conf_from_trust(guard.trust_in[src]))
             voice.testimony(w, mind, wit, belief.claim, e)
             if kael.frozen(p):
                 kael.frozen_until = None

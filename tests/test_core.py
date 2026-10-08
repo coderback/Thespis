@@ -3,7 +3,7 @@
 import pytest
 
 from thespis import director
-from thespis.beliefs import RETRACTED, BeliefStore
+from thespis.beliefs import ACTIVE, RETRACTED, VACUOUS, Belief, BeliefStore, Evidence, Opinion, fuse
 from thespis.brain import UtilityBrain
 from thespis.decisions import DECIDE, DecisionLog
 from thespis.ledger import Claim, Event, Ledger
@@ -61,23 +61,59 @@ def test_a_denial_is_true_when_what_it_denies_never_happened():
     assert ledger.happened(LIE.negated())  # told, but it never happened
 
 
-def test_beliefs_keep_every_piece_of_evidence_and_take_the_max():
+def test_one_report_gives_its_own_confidence():
     store = BeliefStore()
     belief, is_new = store.add_evidence("brenna", ROBBED, 0.9, "kael", "e0011", 2)
-    again, is_new_again = store.add_evidence("brenna", ROBBED, 0.8, "odo", "e0012", 2)
-    assert (is_new, is_new_again) == (True, False) and again is belief
-    assert belief.id == "b0001"
-    assert [e.source for e in belief.evidence] == ["kael", "odo"]  # provenance kept, not overwritten
-    assert belief.conf == store.conf("brenna", ROBBED) == 0.9
+    assert is_new and belief.id == "b0001"
+    assert belief.opinion == Opinion(0.9, 0.0, 0.1) and belief.conf == store.conf("brenna", ROBBED) == 0.9
 
 
-def test_retracted_belief_ignores_new_evidence():
+def test_independent_sources_add_up_and_a_source_repeating_itself_does_not():
     store = BeliefStore()
-    belief, _ = store.add_evidence("brenna", LIE, 0.9, "player", "e0014", 3)
-    store.retract(belief)
-    store.add_evidence("brenna", LIE, 1.0, "mags", "e0020", 6)
-    assert belief.status == RETRACTED and len(belief.evidence) == 1
-    assert store.conf("brenna", LIE) == 0.0 and store.conf("nobody", LIE) == 0.0
+    belief, _ = store.add_evidence("brenna", ROBBED, 0.9, "kael", "e0011", 2)
+    again, is_new = store.add_evidence("brenna", ROBBED, 0.8, "kael", "e0012", 2)
+    assert again is belief and not is_new and belief.conf == 0.9  # the same source twice: its strongest word
+    store.add_evidence("brenna", ROBBED, 0.8, "odo", "e0013", 2)
+    assert [e.source for e in belief.evidence] == ["kael", "kael", "odo"]  # provenance kept, not overwritten
+    # Cumulative fusion of (0.9, 0, 0.1) and (0.8, 0, 0.2): u = 0.02 / 0.28, b = (0.18 + 0.08) / 0.28.
+    assert belief.opinion == Opinion(0.9286, 0.0, 0.0714)
+
+
+def test_what_an_npc_saw_itself_outweighs_any_report():
+    certain, hearsay = Opinion(1.0, 0.0, 0.0), Opinion(0.0, 0.9, 0.1)
+    assert certain.fuse(hearsay) == certain and hearsay.fuse(certain) == certain
+    assert certain.fuse(Opinion(0.0, 1.0, 0.0)) == Opinion(0.5, 0.5, 0.0)  # two certainties that disagree: average
+    assert VACUOUS.fuse(hearsay) == hearsay and fuse([]) == VACUOUS
+
+
+def test_evidence_against_lowers_a_belief_until_it_is_retracted():
+    store = BeliefStore()
+    belief, _ = store.add_evidence("brenna", LIE, 0.4, "player", "e0014", 3)
+    store.add_evidence("brenna", LIE, 0.4, "mags", "e0020", 6, against=True)
+    assert belief.status == ACTIVE and belief.opinion.b == belief.opinion.d  # as sure either way: not retracted
+    store.add_evidence("brenna", LIE, 0.9, "odo", "e0021", 6, against=True)
+    assert belief.status == RETRACTED and store.conf("brenna", LIE) == 0.0 and store.conf("nobody", LIE) == 0.0
+    store.add_evidence("brenna", LIE, 1.0, "witnessed", "e0030", 7)  # and it can come back
+    assert belief.status == ACTIVE and belief.conf == 1.0
+
+
+def test_discrediting_a_source_reweighs_everything_it_said():
+    store = BeliefStore()
+    lie, _ = store.add_evidence("brenna", LIE, 0.9, "player", "e0014", 3)
+    other, _ = store.add_evidence("brenna", ROBBED, 0.9, "player", "e0015", 3)
+    seen, _ = store.add_evidence("brenna", Claim("insulted", "player", "kael"), 1.0, "witnessed", "e0001", 0)
+    changed = store.discredit("brenna", "player", 0.2)
+    assert changed == [lie, other] and lie.conf == other.conf == 0.2 and seen.conf == 1.0
+    assert store.discredit("brenna", "player", 0.4) == []  # discredit only ever lowers
+    assert [e.event for e in lie.evidence] == ["e0014"]  # the justification is kept, at its new weight
+
+
+def test_a_retraction_saved_before_opinions_stays_retracted():
+    old = {"id": "b0007", "npc": "brenna", "claim": LIE.to_json(), "status": "retracted",
+           "evidence": [{"source": "player", "event": "e0014", "phase": 3, "conf": 0.9}]}
+    belief = Belief.from_json(old)
+    assert belief.status == RETRACTED and belief.evidence[-1] == Evidence("revised", "e0014", 3, 1.0, against=True)
+    assert Belief.from_json({**old, "status": "active"}).status == ACTIVE
 
 
 def test_belief_store_round_trip():
@@ -92,8 +128,8 @@ def test_retriever_ranks_by_confidence_then_recency():
     store.add_evidence("brenna", Claim("insulted", "player", "kael"), 0.8, "odo", "e0001", 1)
     store.add_evidence("brenna", Claim("beat", "player", "kael"), 0.8, "odo", "e0002", 2)
     store.add_evidence("brenna", ROBBED, 0.9, "kael", "e0003", 2)
-    gone, _ = store.add_evidence("brenna", LIE, 1.0, "player", "e0004", 3)
-    store.retract(gone)
+    store.add_evidence("brenna", LIE, 0.9, "player", "e0004", 3)
+    store.add_evidence("brenna", LIE, 1.0, "odo", "e0005", 3, against=True)  # retracted
     ranked = TopKRetriever(k=2).beliefs(store, "brenna")
     assert [b.claim.pred for b in ranked] == ["robbed", "beat"]
 

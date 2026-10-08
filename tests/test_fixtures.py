@@ -17,7 +17,7 @@ FIXTURES = pathlib.Path(__file__).resolve().parents[1] / "fixtures"
 STATE_KEYS = {"seed", "phase", "day", "phase_name", "status", "brain", "pending", "ended_at", "player", "npcs",
               "beliefs", "ledger_tail", "decisions_tail"}
 NPC_KEYS = {"id", "loc", "last_seen", "drives", "trust_in", "frozen_until", "persona", "persona_edited"}
-BELIEF_KEYS = {"id", "npc", "claim", "conf", "status", "truth", "evidence"}
+BELIEF_KEYS = {"id", "npc", "claim", "conf", "status", "opinion", "truth", "evidence"}
 EVENT_KEYS = {"id", "phase", "verb", "actor", "target", "loc", "claim", "truth", "schema_version"}
 DECISION_KEYS = {"id", "kind", "npc", "phase", "trigger", "allowed", "chosen", "line", "cites", "reason", "source"}
 VERB_KEYS = {"verb", "target", "label", "args", "ends_phase", "enabled", "reason"}
@@ -49,7 +49,10 @@ def check_state(s):
         assert set(n) == NPC_KEYS and n["loc"] in sim.STOPS
     for b in s["beliefs"]:
         assert set(b) == BELIEF_KEYS
-        assert b["conf"] == max(e["conf"] for e in b["evidence"])
+        o = b["opinion"]
+        assert (o["b"], o["d"], o["u"]) == sim.fuse(b["evidence"]) and b["conf"] == o["b"]
+        assert abs(o["b"] + o["d"] + o["u"] - 1) < 1e-3
+        assert b["status"] == ("retracted" if o["d"] > o["b"] else "active")
     for e in s["ledger_tail"]:
         assert set(e) - {"amount"} == EVENT_KEYS and e["loc"] in sim.STOPS  # amount only where coins moved (#36)
     for d in s["decisions_tail"]:
