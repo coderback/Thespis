@@ -118,6 +118,21 @@ are model-judged: GPT-5.4 nano read 50 of Luna's lines beside the state packs th
 
 Which models and why: [docs/models.md](docs/models.md).
 
+### What a game supplies
+
+The core owns the mind loop; a game supplies its content and the rules only it has.
+
+| The core (`thespis/`) | The game (`games/<game>/`) |
+| --- | --- |
+| Perception: who knows each event (`perception.py`) | One rule: what an NPC sees (`sees`) |
+| State packs, line delivery, the narrator (`voice.py`) | A `Voice`: its cast, validator, words and setting |
+| Declared actions and the decision among them (`affordances.py`) | Its NPCs' actions, their utilities and effects |
+| The phase as a pipeline, with walks and gossip (`tick.py`) | Its steps, in its order |
+| Beliefs as opinions, revision, contradictions (`beliefs.py`) | What contradicts what, and its trust ladder if not the default |
+| Verbs, refusals and the Mind per action (`play.py`) | Its verbs and what they do |
+| Claim checks (`claims.py`) | Its claim vocabulary |
+| Content loading (`cast.py`) | `cast.toml`: personas, template lines, event sentences, situations |
+
 ## Same core, a different game: the manor mystery
 
 [The Manor Mystery](https://thespis-production.up.railway.app/manor/) is a three-room detective scene on the same
@@ -250,8 +265,9 @@ To work on the client with hot reload, run `npm run dev` in `client/` next to th
 ## Repository layout
 
 ```
-thespis/            the core: ledger, beliefs, minds, decisions, gateway, expression, store. Knows no game
-games/crypt_road/   the demo game as a Thespis adapter: content, rules, voice, views, the web app
+thespis/            the core, which knows no game: the ledger, beliefs, perception, affordances, the tick,
+                    voice and expression, the gateway and the store
+games/crypt_road/   the demo game as a Thespis adapter: its cast and words (cast.toml), rules, views, web app
 games/manor/        a second adapter: the manor mystery, served at /manor (its client is client/manor/)
 client/             the browser client for both games: The Crypt Road (index.html) and the manor (manor/)
 docs/               the API contract (api.md), models.md, and the design docs

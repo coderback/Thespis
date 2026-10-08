@@ -77,3 +77,66 @@ def test_an_action_that_states_a_claim_shows_what_it_says():
     assert pack.action == {"id": "deceive:alibi", "does": mn_voice.DOES["deceive:alibi"],
                            "asserts": {"id": "said", "claim": "Sable was in the kitchen at mid-morning"}}
     assert pack.asserted == mn_voice.C.THE_ALIBI and pack.stakes
+
+
+def test_affordances_keep_their_declared_order_and_their_tests():
+    from thespis.affordances import Affordance, options
+    from thespis.voice import View
+
+    w = new_world(1)
+    acts = (Affordance("go_to", lambda w, n, v: n.drives["ambition"]),
+            Affordance("wait", lambda w, n, v: 0),
+            Affordance("take_relic", lambda w, n, v: 100, when=lambda w, n, v: n.loc == "crypt"))
+    assert options(w, "kael", acts, View("tavern")) == {"go_to": 6, "wait": 0}  # not at the crypt
+    w.npcs["kael"].loc = "crypt"
+    assert list(options(w, "kael", acts, View("tavern"))) == ["go_to", "wait", "take_relic"]
+
+
+def test_a_decision_is_chosen_by_code_voiced_and_recorded():
+    from thespis.affordances import decide
+    from thespis.brain import UtilityBrain
+    from thespis.expression import Mind
+
+    w = new_world(1)
+    d = decide(w, Mind(None, cr_voice.VALIDATOR), cr_voice.VOICE, UtilityBrain(), "kael", "tick",
+               {"go_to": 6, "wait": 0}, lambda ch: None, "You are at the tavern.")
+    assert (d.kind, d.chosen, d.allowed, d.reason, d.source) == ("decide", "go_to", ["go_to", "wait"], "go_to scores 6",
+                                                                 "fallback")
+    settled = decide(w, Mind(None, cr_voice.VALIDATOR), cr_voice.VOICE, UtilityBrain(), "kael", "tick", {"wait": 1},
+                     lambda ch: None, "Here.", scores="pulls", settle=lambda ch, u: {"cites": ["e0001"]})
+    assert settled.reason == "wait pulls 1" and settled.cites == ["e0001"]
+
+
+def test_the_tick_runs_its_steps_in_order_and_collects_what_they_did():
+    from thespis.tick import gossip, run_tick, walk, walks
+
+    w, order = new_world(1), []
+    tick = run_tick(w, [lambda t: order.append("first"), lambda t: walk(w, t, "mags", "market"),
+                        lambda t: order.append("last")])
+    assert order == ["first", "last"] and tick.moves == [{"who": "mags", "from": "tavern", "to": "market"}]
+    assert [e.verb for e in tick.events] == ["move"]
+    later = run_tick(w, [lambda t: walks(w, t, lambda npc: ["tavern", "tavern"] if npc == "mags" else None)])
+    assert later.moves == [{"who": "mags", "from": "market", "to": "tavern"}]
+
+    w2, heard = new_world(1), []
+    robbed = Claim("robbed", "player", "kael")
+    w2.beliefs.add_evidence("mags", robbed, 1.0, "witnessed", "e0001", 0)
+    gossip(w2, ["mags"], ["player"], {"robbed": 3}, 0.5, 0.8, lambda w, c: True,
+           lambda w, npc, c, conf, src, e: heard.append((npc, conf, src)))
+    assert heard == [("kael", 0.8, "mags"), ("odo", 0.8, "mags")]  # everyone at her stop, at 1.0 x 0.8
+
+
+def test_reconcile_lets_the_more_trusted_source_win_and_discredits_the_other():
+    from thespis.beliefs import BeliefStore, reconcile
+
+    here, there = Claim("was_in", "sable", place="study", at=1), Claim("was_in", "sable", place="kitchen", at=1)
+    store, trust = BeliefStore(), {"pell": 3, "sable": 2}
+    alibi, _ = store.add_evidence("vane", there, 0.9, "sable", "e0003", 1)
+    store.add_evidence("vane", here, 0.9, "pell", "e0009", 4)
+    contradicts = lambda a, b: a.at == b.at and a.place != b.place  # noqa: E731
+    assert reconcile(store, "vane", here, trust, 4, contradicts, 3) == [alibi]
+    assert trust == {"pell": 3, "sable": -1} and alibi.evidence[0].conf == credence(-1)
+    tied, tied_trust = BeliefStore(), {"pell": 2, "sable": 2}
+    tied.add_evidence("vane", there, 0.9, "sable", "e0003", 1)
+    tied.add_evidence("vane", here, 0.9, "pell", "e0009", 4)
+    assert reconcile(tied, "vane", here, tied_trust, 4, contradicts, 3) == [] and tied_trust["sable"] == 2

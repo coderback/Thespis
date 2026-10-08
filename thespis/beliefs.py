@@ -17,6 +17,7 @@ maintenance system, Doyle 1979), so the beliefs resting on it fall with it.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import asdict, dataclass, field, replace
 
 from thespis.ledger import Claim
@@ -187,3 +188,44 @@ class BeliefStore:
     @classmethod
     def from_json(cls, rows: list[dict]) -> BeliefStore:
         return cls([Belief.from_json(r) for r in rows])
+
+
+FIRST_HAND = ("self", "witnessed")
+SEEN = 5  # what an NPC saw itself counts as trust 5: beyond anyone's word
+
+
+def credit(belief: Belief, trust: dict[str, int]) -> int:
+    """How far the NPC trusts a belief's best source: what it saw itself beats anyone's word."""
+    return max(SEEN if e.source in FIRST_HAND else trust.get(e.source, 0) for e in belief.evidence)
+
+
+def reconcile(store: BeliefStore, npc: str, claim: Claim, trust: dict[str, int], phase: int,
+              contradicts: Callable[[Claim, Claim], bool], penalty: int,
+              credence: Callable[[int], float] = credence) -> list[Belief]:
+    """Settle what `claim` contradicts among the NPC's beliefs. Of two claims that can't both be true, the one from the
+    less trusted source loses: what the more trusted one said counts against it, and whoever told it the loser is
+    trusted `penalty` less, so everything they said is re-weighed (`discredit`). A tie settles nothing. Returns the
+    beliefs that ended retracted."""
+    new = store.get(npc, claim)
+    if new is None or not new.active:
+        return []
+    retracted = []
+    for old in store.for_npc(npc):
+        if old is new or not old.active or not contradicts(old.claim, new.claim):
+            continue
+        if credit(new, trust) > credit(old, trust):
+            loser, winner = old, new
+        elif credit(old, trust) > credit(new, trust):
+            loser, winner = new, old
+        else:
+            continue
+        sources = {e.source for e in loser.evidence if not e.against}
+        best = max(winner.evidence, key=lambda e: e.conf)
+        store.add_evidence(npc, loser.claim, best.conf, best.source, best.event, phase, against=True)
+        for src in sorted(sources):
+            if src in trust:
+                trust[src] -= penalty
+                store.discredit(npc, src, credence(trust[src]))
+        if not loser.active:
+            retracted.append(loser)
+    return retracted

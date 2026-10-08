@@ -15,11 +15,11 @@ from dataclasses import dataclass, field
 from games.manor import claims, voice
 from games.manor import content as C
 from games.manor.voice import Speech
-from thespis.beliefs import Belief
+from thespis.affordances import Affordance, decide, options
+from thespis.beliefs import Belief, credence, reconcile
 from thespis.brain import UtilityBrain
 from thespis.claims import ClaimChecking
 from thespis.deception import SAID, log_statement
-from thespis.decisions import DECIDE
 from thespis.expression import Mind, Observer, ReplyCache
 from thespis.gateway import ModelGateway
 from thespis.ledger import Claim, Event
@@ -119,35 +119,34 @@ def _ask(w: World, mind: Mind, npc: str, topic: str) -> list[dict]:
     return _say(w, mind, C.OWNER, "asked_morning", key, [cite], "vane_asked_morning")  # morning_doubt: what broke it
 
 
+# Asked about the morning, Sable lies once she is frightened enough, and deflects before that.
+SABLE = (Affordance("deceive:alibi", lambda w, n, v: n.drives["fear"] + 2,
+                    when=lambda w, n, v: n.drives.get("fear", 0) >= C.FEAR_TO_LIE),
+         Affordance("deflect", lambda w, n, v: 3))
+
+
 def _sable_answers(w: World, mind: Mind, listener: str, loc: str) -> dict:
-    """Asked where she was at mid-morning, Sable lies once she is frightened enough, and deflects before that. A lie
-    is an action code chose, logged false."""
-    sable = w.npcs[C.MAID]
+    """Where Sable says she was at mid-morning. A lie is an action code chose, logged false."""
     knows = _held(w, C.MAID, C.THE_TRUTH)  # she knows where she really was
-    options = {"deflect": 3}
-    if sable.drives.get("fear", 0) >= C.FEAR_TO_LIE:
-        options = {"deceive:alibi": sable.drives["fear"] + 2, "deflect": 3}
     asker = C.CAST.text("situations", "asker_player" if listener == "player" else "asker_vane")
-    situation = C.CAST.text("situations", "sable_asked_morning", asker=asker)
 
     def line_for(choice: str):
         if choice.startswith("deceive"):
             return voice.line(C.MAID, "deceive", [SAID, knows.id])
         return voice.line(C.MAID, "deflect", [knows.id])
 
-    choice = UtilityBrain().choose(C.MAID, options)
-    u = voice.VOICE.act(w, mind, C.MAID, choice, line_for, situation, C.THE_ALIBI if choice == "deceive:alibi" else None)
-    assert u.action is not None  # a decision always carries one of the options
-    reason = f"{u.action} pulls {options[u.action]}" + (f"; {u.note}" if u.note else "")
-    if u.action == "deceive:alibi":
+    def settle(choice: str, u) -> dict:
+        if choice != "deceive:alibi":
+            return {}
         told, cites = log_statement(w, "tell", C.MAID, listener, loc, C.THE_ALIBI, u.cites)
         if listener in w.npcs:
             _hear(w, listener, C.THE_ALIBI, C.MAID, told)
-        d = w.decisions.record(DECIDE, C.MAID, w.phase, "asked_morning", allowed=list(options), chosen=u.action,
-                               line=u.line, cites=cites, reason=reason, source=u.source, asserted=told.id)
-    else:
-        d = w.decisions.record(DECIDE, C.MAID, w.phase, "asked_morning", allowed=list(options), chosen=u.action,
-                               line=u.line, cites=u.cites, reason=reason, source=u.source)
+        return {"cites": cites, "asserted": told.id}
+
+    choices = options(w, C.MAID, SABLE, voice.VOICE.view(w))
+    d = decide(w, mind, voice.VOICE, UtilityBrain(), C.MAID, "asked_morning", choices, line_for,
+               C.CAST.text("situations", "sable_asked_morning", asker=asker), asserts={"deceive:alibi": C.THE_ALIBI},
+               scores="pulls", settle=settle)
     return voice.reply(d)
 
 
@@ -175,46 +174,11 @@ def _question(w: World, mind: Mind, npc: str) -> list[dict]:
 
 
 def _hear(w: World, npc: str, claim: Claim, source: str, event: Event) -> list:
-    """`npc` is told `claim` by `source`, believing it as far as it trusts them; then settles any contradiction."""
-    w.beliefs.add_evidence(npc, claim, C.conf_from_trust(w.npcs[npc].trust_in.get(source, 0)), source, event.id,
-                           w.phase)
-    return _reconcile(w, npc, claim)
-
-
-def _credit(w: World, npc: str, belief) -> int:
-    """How far the NPC trusts a belief's best source: what it saw itself beats anyone's word."""
+    """`npc` is told `claim` by `source`, believing it as far as it trusts them; then settles any contradiction: two
+    places at once can't both be true (thespis.beliefs.reconcile)."""
     trust = w.npcs[npc].trust_in
-    return max(5 if e.source in ("self", "witnessed") else trust.get(e.source, 0) for e in belief.evidence)
-
-
-def _reconcile(w: World, npc: str, claim: Claim) -> list:
-    """Two places at once can't both be true. The one the NPC has from the less trusted source loses: what the more
-    trusted one said counts against it, and whoever told it the loser is trusted less, so everything they said is
-    re-weighed. Returns the beliefs that ended retracted."""
-    new = w.beliefs.get(npc, claim)
-    if new is None or not new.active:
-        return []
-    retracted = []
-    trust = w.npcs[npc].trust_in
-    for old in w.beliefs.for_npc(npc):
-        if old is new or not old.active or not C.contradicts(old.claim, new.claim):
-            continue
-        if _credit(w, npc, new) > _credit(w, npc, old):
-            loser, winner = old, new
-        elif _credit(w, npc, old) > _credit(w, npc, new):
-            loser, winner = new, old
-        else:
-            continue
-        sources = {e.source for e in loser.evidence if not e.against}
-        best = max(winner.evidence, key=lambda e: e.conf)
-        w.beliefs.add_evidence(npc, loser.claim, best.conf, best.source, best.event, w.phase, against=True)
-        for src in sorted(sources):
-            if src in trust:
-                trust[src] -= C.CONTRADICTED
-                w.beliefs.discredit(npc, src, C.conf_from_trust(trust[src]))
-        if not loser.active:
-            retracted.append(loser)
-    return retracted
+    w.beliefs.add_evidence(npc, claim, credence(trust.get(source, 0)), source, event.id, w.phase)
+    return reconcile(w.beliefs, npc, claim, trust, w.phase, C.contradicts, C.CONTRADICTED)
 
 
 def _accuse(w: World, mind: Mind, npc: str) -> list[dict]:

@@ -13,33 +13,29 @@ When the race ends the world runs two more phases (the epilogue), so it visibly 
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 from dataclasses import dataclass, field
 
 from games.crypt_road import claims, voice
 from games.crypt_road import content as C
+from thespis import perception
+from thespis.affordances import Affordance, decide, options
 from thespis.brain import Brain, UtilityBrain
 from thespis.claims import ClaimChecking
-from thespis.decisions import DECIDE, Decision
-from thespis.expression import Mind, Observer, ReplyCache, Utterance
+from thespis.expression import Mind, Observer, ReplyCache
 from thespis.gateway import ModelGateway
 from thespis.ledger import Claim, Event
+from thespis.minds import NPC
 from thespis.moderation import Moderator
 from thespis.play import NotAllowed, Verbs, check, count_calls, open_mind
+from thespis.tick import Tick, gossip, run_tick, walk, walks
+from thespis.voice import View, reply
 from thespis.world import LOST, PLAYING, WON, World
 
-__all__ = ["NotAllowed"]
+__all__ = ["NotAllowed", "Tick"]
 
 TALK_MAX = 200
 EPILOGUE_PHASES = 2
 DUEL_WON = "duel_won"
-
-
-@dataclass
-class Tick:
-    moves: list[dict] = field(default_factory=list)  # {"who", "from", "to"}
-    decisions: list[Decision] = field(default_factory=list)
-    events: list[Event] = field(default_factory=list)
 
 
 @dataclass
@@ -87,12 +83,7 @@ def give_evidence(w: World, npc: str, claim: Claim, conf: float, source: str, ev
 
 def witness(w: World, claim: Claim, actor: str, target: str, event: Event) -> None:
     """Everyone at the player's stop sees it at 1.0; the actor and target always know it."""
-    for npc in w.npcs_at(w.player["loc"]):
-        if npc.id not in (actor, target):
-            give_evidence(w, npc.id, claim, 1.0, "witnessed", event)
-    for who in (actor, target):
-        if who in w.npcs:
-            give_evidence(w, who, claim, 1.0, "self", event)
+    perception.witness(w, claim, actor, target, event, w.player["loc"], give_evidence)
 
 
 def _gate_blocks(w: World, who: str, loc: str) -> bool:
@@ -230,18 +221,18 @@ def _offer(w: World, mind: Mind, brain: Brain, amount: int) -> dict | None:
         _event(w, "bribe", "player", C.GUARD, loc, amount=amount)
         return None
     offer = _event(w, "offer", "player", C.GUARD, loc, amount=amount)
-    options = {f"counter:{price}": 5, "refuse": 7 if amount * 2 < price else 3}  # a lowball is more likely refused
-    chosen = _decide(w, mind, brain, C.GUARD, "bribe_offer", options, f"an offer of {amount}, under her price of {price}",
-                     lambda ch: voice.haggle_line(ch, offer, amount, price),
-                     f"The player offers you {amount} coins to forget the trouble. You won't take less than {price}.")
-    if chosen == "refuse":
+    choices = {f"counter:{price}": 5, "refuse": 7 if amount * 2 < price else 3}  # a lowball is more likely refused
+    d = decide(w, mind, voice.VOICE, brain, C.GUARD, "bribe_offer", choices,
+               lambda ch: voice.haggle_line(ch, offer, amount, price),
+               f"The player offers you {amount} coins to forget the trouble. You won't take less than {price}.",
+               f"an offer of {amount}, under her price of {price}")
+    if d.chosen == "refuse":
         guard.flags["refused_phase"] = w.phase
         _event(w, "refuse", C.GUARD, "player", loc)
     else:
         guard.flags["asking"] = price
         _event(w, "counter", C.GUARD, "player", loc, amount=price)
-    d = list(w.decisions)[-1]
-    return {"decision": d.id, "npc": C.GUARD, "line": d.line, "cites": d.cites, "source": d.source}
+    return reply(d)
 
 
 def _as_claim(claim: dict | Claim | None) -> Claim:
@@ -296,99 +287,100 @@ def _tell(w: World, listener: str, c: Claim) -> None:
 
 
 # ---------------------------------------------------------------- the tick
+# What Kael may do each phase, by utility; the first declared wins a tie.
+ROBBED, BEATEN = Claim("robbed", "player", C.RIVAL), Claim("beat", "player", C.RIVAL)
+
+
+def _can_accuse(w: World, kael: NPC, view: View) -> bool:
+    """At the guard post, angry enough, not yet done, and with something to report."""
+    return (kael.loc == w.npcs[C.GUARD].loc and kael.drives["grudge"] >= 4 and not kael.flags.get("accused")
+            and bool(w.beliefs.conf(C.RIVAL, ROBBED) or w.beliefs.conf(C.RIVAL, BEATEN)))
+
+
+KAEL = (
+    Affordance("go_to", lambda w, n, v: n.drives["ambition"]),
+    Affordance("wait", lambda w, n, v: 0),
+    Affordance("take_relic", lambda w, n, v: 100, when=lambda w, n, v: n.loc == "crypt"),
+    Affordance("accuse:player", lambda w, n, v: n.drives["grudge"] + 3, when=_can_accuse),
+    Affordance("share_drink", lambda w, n, v: n.drives["respect"] + 3,
+               when=lambda w, n, v: n.drives["respect"] >= 4 and n.loc == v.player_at and not n.flags.get("drink")),
+)
+
+
 def end_phase(w: World, action: str, brain: Brain | None = None, mind: Mind | None = None) -> Tick:
+    """One phase, in order (see the module's docstring): the player's action, the guard, the rival, gossip, moves,
+    then upkeep and the next phase."""
     brain = brain or UtilityBrain()
     mind = mind or Mind(None, voice.VALIDATOR)
     p, pl = w.phase, w.player
     kael, guard = w.npcs[C.RIVAL], w.npcs[C.GUARD]
-    start_events, start_decisions = len(w.ledger), len(w.decisions)
-    tick = Tick()
-    view = voice.View(pl["loc"])  # what NPCs see of the player this phase: where they started it
-
-    # 1. The player's phase action.
-    if action == "move" and C.next_stop(pl["loc"]):
-        if _gate_blocks(w, "player", pl["loc"]):
-            _event(w, "block", "player", C.GUARD, pl["loc"])
-        else:
-            frm, pl["loc"] = pl["loc"], C.next_stop(pl["loc"])
-            move = _event(w, "move", "player", pl["loc"], frm)
-            tick.moves.append({"who": "player", "from": frm, "to": pl["loc"]})
-            view = voice.View(frm, frozenset({move.id}))  # still on the road until the phase ends
-
-    # 2a. The guard decides: detain anyone she believes robbed someone, then question witnesses.
-    if kael.loc == guard.loc and not kael.frozen(p):
-        for cj in list(guard.flags.get("crimes", [])):
-            c = Claim.from_json(cj)
-            detained = guard.flags.setdefault("detained_for", [])
-            if c.a == C.RIVAL and w.beliefs.conf(C.GUARD, c) >= C.CRIME_CONF and cj not in detained:
-                options = {f"detain:{C.RIVAL}": 10, "wait": 1}
-                chosen = _decide(w, mind, brain, C.GUARD, "crime_belief", options, "believes a robbery at 0.5 or more",
-                                 lambda ch, c=c: voice.decision_line(w, C.GUARD, ch, c, view),
-                                 f"You believe {voice._about(c)}. {C.short_name(c.a)} is here at your post.", view=view)
-                if chosen.startswith("detain"):
-                    detained.append(cj)
-                    kael.frozen_until = p + 1
-                    _event(w, "detain", C.GUARD, C.RIVAL, guard.loc, c, happened(w, c))
-    for wit in C.WITNESSES:
-        if w.npcs[wit].loc != guard.loc:
-            continue
-        for belief in w.beliefs.for_npc(C.GUARD):
-            if not belief.active or not belief.claim.mentions(wit):
-                continue
-            if all(e.source == wit for e in belief.evidence):
-                continue
-            if happened(w, belief.claim):
-                continue
-            options = {f"question:{wit}": 8, "wait": 1}
-            chosen = _decide(w, mind, brain, C.GUARD, "witness_present", options, f"{wit} can speak to a claim about them",
-                             lambda ch, c=belief.claim: voice.decision_line(w, C.GUARD, ch, c, view),
-                             f"{C.short_name(wit)} is here. You were told that {voice._about(belief.claim)}; "
-                             f"{C.short_name(wit)} would know whether it happened.", view=view)
-            if not chosen.startswith("question"):
-                continue
-            sources = {e.source for e in belief.evidence if not e.against}
-            e = _event(w, "testify", wit, C.GUARD, guard.loc, belief.claim, happened(w, belief.claim))
-            # The witness knows it never happened: evidence against it, as far as she trusts the witness. Whoever
-            # told her loses her trust, and everything they told her is re-weighed.
-            w.beliefs.add_evidence(C.GUARD, belief.claim, C.conf_from_trust(guard.trust_in.get(wit, 0)), wit, e.id,
-                                   w.phase, against=True)
-            for src in sorted(sources):
-                if src in guard.trust_in:
-                    guard.trust_in[src] -= 3
-                    w.beliefs.discredit(C.GUARD, src, C.conf_from_trust(guard.trust_in[src]))
-            voice.testimony(w, mind, wit, belief.claim, e)
-            if kael.frozen(p):
-                kael.frozen_until = None
-                _event(w, "release", C.GUARD, C.RIVAL, guard.loc)
-
-    # 2b. The rival decides.
+    view = View(pl["loc"])  # what NPCs see of the player this phase: where they started it
     kael_to: str | None = None  # where the rival walks this phase, if he does
-    if not kael.frozen(p):
-        d = kael.drives
-        options = {"go_to": d["ambition"], "wait": 0}
-        if kael.loc == "crypt":
-            options["take_relic"] = 100
-        robbed, beaten = Claim("robbed", "player", C.RIVAL), Claim("beat", "player", C.RIVAL)
-        if (kael.loc == guard.loc and d["grudge"] >= 4 and not kael.flags.get("accused")
-                and (w.beliefs.conf(C.RIVAL, robbed) or w.beliefs.conf(C.RIVAL, beaten))):
-            options["accuse:player"] = d["grudge"] + 3
-        if d["respect"] >= 4 and kael.loc == view.player_at and not kael.flags.get("drink"):
-            options["share_drink"] = d["respect"] + 3
-        grievance = robbed if w.beliefs.conf(C.RIVAL, robbed) else beaten
+
+    def choose(npc, trigger, choices, line_for, situation, reason=None, ask=True) -> str:
+        return decide(w, mind, voice.VOICE, brain, npc, trigger, choices, line_for, situation, reason, ask,
+                      view).chosen or ""
+
+    def player(tick: Tick) -> None:
+        nonlocal view
+        if action == "move" and C.next_stop(pl["loc"]):
+            if _gate_blocks(w, "player", pl["loc"]):
+                _event(w, "block", "player", C.GUARD, pl["loc"])
+            else:
+                frm, pl["loc"] = pl["loc"], C.next_stop(pl["loc"])
+                move = _event(w, "move", "player", pl["loc"], frm)
+                tick.moves.append({"who": "player", "from": frm, "to": pl["loc"]})
+                view = View(frm, frozenset({move.id}))  # still on the road until the phase ends
+
+    def the_guard(tick: Tick) -> None:
+        """Detain anyone she believes robbed someone, then question witnesses."""
+        if kael.loc == guard.loc and not kael.frozen(p):
+            for cj in list(guard.flags.get("crimes", [])):
+                c = Claim.from_json(cj)
+                detained = guard.flags.setdefault("detained_for", [])
+                if c.a == C.RIVAL and w.beliefs.conf(C.GUARD, c) >= C.CRIME_CONF and cj not in detained:
+                    chosen = choose(C.GUARD, "crime_belief", {f"detain:{C.RIVAL}": 10, "wait": 1},
+                                    lambda ch, c=c: voice.decision_line(w, C.GUARD, ch, c, view),
+                                    f"You believe {voice._about(c)}. {C.short_name(c.a)} is here at your post.",
+                                    "believes a robbery at 0.5 or more")
+                    if chosen.startswith("detain"):
+                        detained.append(cj)
+                        kael.frozen_until = p + 1
+                        _event(w, "detain", C.GUARD, C.RIVAL, guard.loc, c, happened(w, c))
+        for wit in C.WITNESSES:
+            if w.npcs[wit].loc != guard.loc:
+                continue
+            for belief in w.beliefs.for_npc(C.GUARD):
+                if not belief.active or not belief.claim.mentions(wit) or happened(w, belief.claim):
+                    continue
+                if all(e.source == wit for e in belief.evidence):
+                    continue
+                chosen = choose(C.GUARD, "witness_present", {f"question:{wit}": 8, "wait": 1},
+                                lambda ch, c=belief.claim: voice.decision_line(w, C.GUARD, ch, c, view),
+                                f"{C.short_name(wit)} is here. You were told that {voice._about(belief.claim)}; "
+                                f"{C.short_name(wit)} would know whether it happened.",
+                                f"{wit} can speak to a claim about them")
+                if chosen.startswith("question"):
+                    _testify(w, mind, wit, belief)
+
+    def the_rival(tick: Tick) -> None:
+        nonlocal kael_to
+        if kael.frozen(p):
+            return
+        choices = options(w, C.RIVAL, KAEL, view)
+        grievance = ROBBED if w.beliefs.conf(C.RIVAL, ROBBED) else BEATEN
         # Voice the choice only when it matters: an option beyond the default walk, or a drive past a threshold.
-        ask = voice.crossed_threshold(w, C.RIVAL) or len(options) > 2
-        chosen = _decide(w, mind, brain, C.RIVAL, "tick", options, None,
-                         lambda ch: voice.decision_line(w, C.RIVAL, ch, grievance, view),
-                         f"You are at {C.STOP_NAMES[kael.loc]}.", ask, view)
+        ask = voice.crossed_threshold(w, C.RIVAL) or len(choices) > 2
+        chosen = choose(C.RIVAL, "tick", choices, lambda ch: voice.decision_line(w, C.RIVAL, ch, grievance, view),
+                        f"You are at {C.STOP_NAMES[kael.loc]}.", ask=ask)
         if chosen == "take_relic":
             if w.status == PLAYING:
                 w.status, w.ended_at = LOST, p
                 _event(w, "take_relic", C.RIVAL, None, kael.loc)
         elif chosen == "accuse:player":
             kael.flags["accused"] = True
-            c = grievance
-            e = _event(w, "accuse", C.RIVAL, C.GUARD, kael.loc, c, happened(w, c))
-            give_evidence(w, C.GUARD, c, C.conf_from_trust(guard.trust_in.get(C.RIVAL, 0)), C.RIVAL, e)
+            e = _event(w, "accuse", C.RIVAL, C.GUARD, kael.loc, grievance, happened(w, grievance))
+            give_evidence(w, C.GUARD, grievance, C.conf_from_trust(guard.trust_in.get(C.RIVAL, 0)), C.RIVAL, e)
         elif chosen == "share_drink":
             kael.flags["drink"] = True
         elif chosen == "go_to":
@@ -397,56 +389,38 @@ def end_phase(w: World, action: str, brain: Brain | None = None, mind: Mind | No
             elif nxt := C.next_stop(kael.loc):
                 kael_to = nxt
 
-    # 3. Gossip, on the positions before anyone moves.
-    for g in C.GOSSIPS:
-        gossip = w.npcs[g]
-        mine = [b for b in w.beliefs.for_npc(g)
-                if b.active and b.conf >= C.CRIME_CONF and (b.claim.mentions("player") or b.claim.mentions(C.RIVAL))]
-        mine.sort(key=lambda b: (C.GOSSIP_PRIORITY.get(b.claim.pred, 0), b.conf,
-                                 (b.claim.pred, b.claim.a, b.claim.b)), reverse=True)
-        for listener in w.npcs_at(gossip.loc):
-            if listener.id == g:
-                continue
-            for b in mine:
-                if w.beliefs.get(listener.id, b.claim) is None:
-                    e = _event(w, "gossip", g, listener.id, gossip.loc, b.claim, happened(w, b.claim))
-                    give_evidence(w, listener.id, b.claim, round(b.conf * 0.8, 2), g, e)
-                    break
+    def moves(tick: Tick) -> None:
+        if kael_to:
+            walk(w, tick, C.RIVAL, kael_to)
+        walks(w, tick, C.walk)
 
-    # 4. Moves: the rival, then everyone on a fixed walk.
-    if kael_to:
-        frm, kael.loc = kael.loc, kael_to
-        _event(w, "move", C.RIVAL, kael.loc, frm)
-        tick.moves.append({"who": C.RIVAL, "from": frm, "to": kael.loc})
-    for npc in w.npcs.values():
-        route = C.walk(npc.id)
-        if route and route[(p + 1) % len(route)] != npc.loc:
-            frm, npc.loc = npc.loc, route[(p + 1) % len(route)]
-            _event(w, "move", npc.id, npc.loc, frm)
-            tick.moves.append({"who": npc.id, "from": frm, "to": npc.loc})
+    def upkeep(tick: Tick) -> None:
+        kael.drives["fear"] = max(1, kael.drives["fear"] - 1)
+        w.phase += 1
+        _see(w)
 
-    # 5. Drive upkeep, then 6. the next phase.
-    kael.drives["fear"] = max(1, kael.drives["fear"] - 1)
-    w.phase += 1
-    _see(w)
-
-    tick.events = list(w.ledger)[start_events:]
-    tick.decisions = list(w.decisions)[start_decisions:]
-    return tick
+    return run_tick(w, [player, the_guard, the_rival,
+                        lambda t: gossip(w, C.GOSSIPS, ("player", C.RIVAL), C.GOSSIP_PRIORITY, C.CRIME_CONF, 0.8,
+                                         happened, give_evidence),
+                        moves, upkeep])
 
 
-def _decide(w: World, mind: Mind, brain: Brain, npc: str, trigger: str, options: Mapping[str, float],
-            reason: str | None, line_for, situation: str, ask: bool = True, view: voice.View | None = None) -> str:
-    """Choose an action, by code, and its line: the model's words for it if asked and its reply passes, else the
-    template's. Returns the chosen action id, which is always one of `options`."""
-    choice = brain.choose(npc, options)
-    line, cites = line_for(choice) or (None, [])
-    fallback = Utterance(choice, line, cites, "fallback")
-    u = mind.act(voice.pack_for(w, npc, situation, choice, view), fallback) if ask and mind.active else fallback
-    base = reason or f"{choice} scores {options[choice]}"  # without a reason given, the utility explains it
-    w.decisions.record(DECIDE, npc, w.phase, trigger, allowed=list(options), chosen=choice, line=u.line,
-                       cites=u.cites, reason=f"{base}; {u.note}" if u.note else base, source=u.source)
-    return choice
+def _testify(w: World, mind: Mind, wit: str, belief) -> None:
+    """The witness tells the guard it never happened: evidence against it, as far as she trusts the witness. Whoever
+    told her loses her trust, everything they told her is re-weighed, and a rival held on their word goes free."""
+    guard, kael = w.npcs[C.GUARD], w.npcs[C.RIVAL]
+    sources = {e.source for e in belief.evidence if not e.against}
+    e = _event(w, "testify", wit, C.GUARD, guard.loc, belief.claim, happened(w, belief.claim))
+    w.beliefs.add_evidence(C.GUARD, belief.claim, C.conf_from_trust(guard.trust_in.get(wit, 0)), wit, e.id,
+                           w.phase, against=True)
+    for src in sorted(sources):
+        if src in guard.trust_in:
+            guard.trust_in[src] -= 3
+            w.beliefs.discredit(C.GUARD, src, C.conf_from_trust(guard.trust_in[src]))
+    voice.testimony(w, mind, wit, belief.claim, e)
+    if kael.frozen(w.phase):
+        kael.frozen_until = None
+        _event(w, "release", C.GUARD, C.RIVAL, guard.loc)
 
 
 def run_epilogue(w: World, brain: Brain | None = None, mind: Mind | None = None) -> list[Tick]:

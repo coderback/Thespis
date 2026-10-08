@@ -120,3 +120,7 @@ detain = "have the sergeant hold {who} for two phases"
 question = "ask {who} whether the claim about them is true"
 counter = "name your price: {who} coins, and not a coin less"
 refuse = "turn the offer down and hear no more offers for now"
+
+# The claim extractor's vocabulary (thespis.claims): the predicates, characters and places it may use.
+[claims]
+description = "Predicates (a and b are ids):\n- insulted(a, b); beat(a, b): a beat b in a duel; robbed(a, b): a robbed b or took b's purse; spared(a, b); lied(a, b): a lied about b\n- went_to(a, place); at(a, place): a is at place now; told(a, b): a told b something (a report, gossip or testimony); detained(a, b); paid(a, b): a paid b a fine or a bribe; took_relic(a, relic)\n- other: any other assertion about what happened, with b set to a short paraphrase\nCharacters: player (the one being spoken to, \"you\"), kael, brenna (the Captain), mags, odo. Places: tavern, market, guard_post, bridge, crypt."
