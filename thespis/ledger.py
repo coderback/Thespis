@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from typing import overload
 
 SCHEMA_VERSION = 1
@@ -10,20 +10,54 @@ SCHEMA_VERSION = 1
 
 @dataclass(frozen=True)
 class Claim:
-    """Something one character can believe about another, e.g. robbed(player, kael).
+    """Something one character can believe about the world, e.g. robbed(player, kael), or was_in(sable) in the study
+    at mid-morning.
 
-    The predicates are defined by the game adapter; the core never interprets them.
+    The predicates are defined by the game adapter; the core never interprets them. `a` is who the claim is about and
+    `b` whom or what it names, if anyone; `place` is where it held and `at` the phase it held, for a claim tied to a
+    time and place. `neg` denies it: the claim says this never happened. Unset fields are left out of the JSON, so a
+    claim with only a predicate and two names serialises as it always has.
     """
 
     pred: str
     a: str
-    b: str
+    b: str = ""
+    place: str | None = None
+    at: int | None = None
+    neg: bool = False
 
     def mentions(self, who: str) -> bool:
         return who in (self.a, self.b)
 
+    def negated(self) -> Claim:
+        """The same fact, denied (or affirmed, if this denies it)."""
+        return replace(self, neg=not self.neg)
+
+    def affirmed(self) -> Claim:
+        """The fact this claim affirms or denies, affirmed."""
+        return replace(self, neg=False) if self.neg else self
+
+    def same_fact(self, other: Claim) -> bool:
+        """Whether two claims are about the same fact, whether they affirm or deny it."""
+        return self.affirmed() == other.affirmed()
+
+    def label(self) -> str:
+        """The claim as it reads in a report: robbed(odo, kael), was_in(sable, kitchen@1), not robbed(odo, kael)."""
+        b = self.b or (f"{self.place}@{self.at}" if self.place is not None and self.at is not None else self.place or "")
+        text = f"{self.pred}({self.a}, {b})"
+        return f"not {text}" if self.neg else text
+
     def to_json(self) -> dict:
-        return {"pred": self.pred, "a": self.a, "b": self.b}
+        d: dict = {"pred": self.pred, "a": self.a}
+        if self.b:
+            d["b"] = self.b
+        if self.place is not None:
+            d["place"] = self.place
+        if self.at is not None:
+            d["at"] = self.at
+        if self.neg:
+            d["neg"] = True
+        return d
 
     @overload
     @classmethod
@@ -35,7 +69,9 @@ class Claim:
 
     @classmethod
     def from_json(cls, d: dict | None) -> Claim | None:
-        return None if d is None else cls(d["pred"], d["a"], d["b"])
+        if d is None:
+            return None
+        return cls(d["pred"], d["a"], d.get("b", ""), d.get("place"), d.get("at"), bool(d.get("neg", False)))
 
 
 @dataclass(frozen=True)
@@ -100,8 +136,11 @@ class Ledger:
         return [e for e in self._events if e.phase >= phase]
 
     def happened(self, claim: Claim) -> bool:
-        """Ground truth: did an event that really happened carry this claim?"""
-        return any(e.claim == claim and e.truth for e in self._events)
+        """Ground truth: did an event that really happened carry this claim? A denial is true when the fact it denies
+        never happened."""
+        fact = claim.affirmed()
+        held = any(e.claim == fact and e.truth for e in self._events)
+        return not held if claim.neg else held
 
     def to_json(self) -> list[dict]:
         return [e.to_json() for e in self._events]

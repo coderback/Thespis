@@ -38,6 +38,29 @@ def test_event_round_trip():
     assert Event.from_json(event.to_json()) == event
 
 
+def test_a_claim_with_only_two_names_serialises_as_it_always_has():
+    assert ROBBED.to_json() == {"pred": "robbed", "a": "player", "b": "kael"}
+    assert Claim.from_json({"pred": "robbed", "a": "player", "b": "kael"}) == ROBBED
+
+
+def test_typed_claims_carry_a_place_a_time_and_a_denial():
+    alibi = Claim("was_in", "sable", place="kitchen", at=1)
+    assert alibi.to_json() == {"pred": "was_in", "a": "sable", "place": "kitchen", "at": 1}
+    assert Claim.from_json(alibi.to_json()) == alibi and alibi.label() == "was_in(sable, kitchen@1)"
+    denial = ROBBED.negated()
+    assert denial.to_json() == {**ROBBED.to_json(), "neg": True} and Claim.from_json(denial.to_json()) == denial
+    assert denial != ROBBED and denial.same_fact(ROBBED) and denial.affirmed() == ROBBED
+    assert denial.label() == "not robbed(player, kael)"
+
+
+def test_a_denial_is_true_when_what_it_denies_never_happened():
+    ledger = Ledger()
+    ledger.append(0, "humiliate", "player", "kael", "tavern", ROBBED)
+    ledger.append(3, "tell_claim", "player", "brenna", "guard_post", LIE, truth=False)
+    assert not ledger.happened(ROBBED.negated())
+    assert ledger.happened(LIE.negated())  # told, but it never happened
+
+
 def test_beliefs_keep_every_piece_of_evidence_and_take_the_max():
     store = BeliefStore()
     belief, is_new = store.add_evidence("brenna", ROBBED, 0.9, "kael", "e0011", 2)

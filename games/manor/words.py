@@ -29,8 +29,8 @@ def claim_text(c: Claim, about: bool = False, speaker: str | None = None, start:
         case "took":
             return f"{a} took the signet ring"
         case "was_in":
-            room, phase = C.place(c)
-            return f"{a} {'were' if plural else 'was'} in {C.ROOM_NAMES[room]} at {C.PHASES[phase]}"
+            assert c.place is not None and c.at is not None  # content.was_in always sets both
+            return f"{a} {'were' if plural else 'was'} in {C.ROOM_NAMES[c.place]} at {C.PHASES[c.at]}"
     return f"{a} {c.pred.replace('_', ' ')} {c.b}"
 
 

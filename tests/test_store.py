@@ -91,3 +91,38 @@ def test_unknown_or_unsaved_sessions(tmp_path):
         store.load("nope")
     with pytest.raises(SessionNotFound):
         store.load(store.create_session(seed=1))  # created, but nothing saved yet
+
+
+def test_a_manor_session_saved_before_typed_claims_still_loads(tmp_path):
+    """Before typed claims the manor kept a room and a phase in one slot ("study@1"). Old rows stay as saved; the
+    loader reads both them and the snapshot through the upgrade, and saving again keeps them consistent."""
+    from games.manor import content as manor
+
+    def old_form(d):
+        if d.get("place") is not None:
+            return {k: v for k, v in d.items() if k not in ("place", "at")} | {"b": f"{d['place']}@{d['at']}"}
+        return d
+
+    path = tmp_path / "manor.sqlite"
+    store, world = Store(path), manor.new_world()
+    session = store.create_session(seed=1)
+    store.save(session, world)
+    with sqlite3.connect(path) as db:  # rewrite what was saved into the old form
+        for rowid, event in db.execute("SELECT rowid, event FROM ledger").fetchall():
+            e = json.loads(event)
+            if e["claim"]:
+                db.execute("UPDATE ledger SET event = ? WHERE rowid = ?",
+                           (json.dumps({**e, "claim": old_form(e["claim"])}), rowid))
+        snap = json.loads(db.execute("SELECT snapshot FROM sessions").fetchone()[0])
+        snap["ledger"] = [{**e, "claim": old_form(e["claim"])} if e["claim"] else e for e in snap["ledger"]]
+        snap["beliefs"] = [{**b, "claim": old_form(b["claim"])} for b in snap["beliefs"]]
+        db.execute("UPDATE sessions SET snapshot = ?", (json.dumps(snap),))
+    assert "study@1" in json.dumps(snap)
+
+    loaded = store.load(session, manor.upgrade_claim)
+    assert loaded.to_json() == world.to_json()
+    assert loaded.beliefs.get(manor.BUTLER, manor.THE_TRUTH) is not None
+    loaded.ledger.append(loaded.phase, "move", "player", "kitchen", "hall")
+    store.save(session, loaded)  # new rows in the new form beside old rows in the old one
+    assert store.load(session, manor.upgrade_claim).to_json() == loaded.to_json()
+

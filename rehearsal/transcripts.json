@@ -3476,7 +3476,7 @@
   ],
   "outcome": "lost@2",
   "refused": [],
-  "story": "649a940650a6092a",
+  "story": "467107fabd1498f9",
   "tellings": []
  },
  "manor/accuse_pell": {
@@ -3519,7 +3519,7 @@
   ],
   "outcome": "lost@5",
   "refused": [],
-  "story": "08167f7d86947018",
+  "story": "51d0e5ae49b95cd4",
   "tellings": []
  },
  "manor/explore": {
@@ -3611,7 +3611,7 @@
   ],
   "outcome": "won@5",
   "refused": [],
-  "story": "c45b32f45bedda34",
+  "story": "b94a8a88b17a7e4b",
   "tellings": []
  },
  "manor/solve": {
@@ -3656,7 +3656,7 @@
   "refused": [
    "claim check (hallucination: was_in(pell, hall@1))"
   ],
-  "story": "47f1082d5b6f5f7d",
+  "story": "f4940fd714e6fc7d",
   "tellings": []
  },
  "manor/watch": {
@@ -3713,7 +3713,7 @@
   ],
   "outcome": "won@5",
   "refused": [],
-  "story": "47f1082d5b6f5f7d",
+  "story": "f4940fd714e6fc7d",
   "tellings": []
  }
 }

@@ -60,7 +60,9 @@ class ClaimVocabulary:
     event_preds: Mapping[str, EventPred] = field(default_factory=dict)
     place_preds: frozenset[str] = frozenset({"at"})  # predicates whose b is a place
     fixed_b: Mapping[str, str] = field(default_factory=dict)  # predicates whose b is always the same, e.g. took: ring
-    timed_preds: frozenset[str] = frozenset()  # predicates whose b is PLACE@TIME, e.g. the manor's was_in
+    # Predicates tied to a place and a time, e.g. the manor's was_in. The extractor writes both in b, as PLACE@TIME;
+    # as_claim types them into the claim's place and at.
+    timed_preds: frozenset[str] = frozenset()
     aliases: Mapping[str, str] = field(default_factory=dict)  # other ways of naming a character or place
 
     @property
@@ -145,7 +147,8 @@ def _id(vocab: ClaimVocabulary, text: str, choices: tuple[str, ...]) -> str | No
 
 
 def normalize(vocab: ClaimVocabulary, claim: dict) -> dict:
-    """A claim with its arguments mapped to ids, or with its pred set to "other" when they can't be."""
+    """An extracted claim with its arguments mapped to ids, or with its pred set to "other" when they can't be. It
+    stays in the extractor's form; as_claim types it."""
     pred = claim.get("pred", "")
     a = _id(vocab, claim.get("a", ""), vocab.characters)
     if pred in vocab.fixed_b:
@@ -161,6 +164,19 @@ def normalize(vocab: ClaimVocabulary, claim: dict) -> dict:
     if pred not in vocab.preds or a is None or b is None:
         return {**claim, "pred": OTHER}
     return {**claim, "a": a, "b": b}
+
+
+def as_claim(vocab: ClaimVocabulary, claim: dict) -> Claim | None:
+    """A normalized claim as a typed Claim: a timed predicate's PLACE@TIME becomes its place and at, and
+    `happened: false` makes it a denial. None for a claim the vocabulary can't type ("other")."""
+    pred, a, b = str(claim.get("pred")), str(claim.get("a", "")), str(claim.get("b", ""))
+    if pred not in vocab.preds:
+        return None
+    neg = claim.get("happened", True) is False
+    if pred in vocab.timed_preds:
+        place, _, when = b.partition("@")
+        return Claim(pred, a, place=place, at=int(when), neg=neg)
+    return Claim(pred, a, b, neg=neg)
 
 
 # ---------------------------------------------------------------- what the speaker could know
@@ -197,11 +213,12 @@ def categorize(vocab: ClaimVocabulary, claim: dict, facts: Facts, asserting: boo
     action that states a claim the game offered (thespis.deception), so a false claim in it is a lie."""
     claim = normalize(vocab, claim)
     pred, a, b = str(claim.get("pred")), str(claim.get("a", "")), str(claim.get("b", ""))
+    typed = as_claim(vocab, claim)
     positive = claim.get("happened", True) is not False
     believes = dropped = False
 
-    if pred in vocab.ledger_preds:
-        c = Claim(pred, a, b)
+    if pred in vocab.ledger_preds and typed is not None:
+        c = typed.affirmed()
         true = facts.happened(facts.world, c)
         held = [x for x in facts.beliefs() if x.claim == c]
         believes = any(x.active for x in held)
@@ -250,9 +267,8 @@ def label(claim: dict) -> str:
 
 
 # ---------------------------------------------------------------- checking a line before anyone hears it
-def _states(claim: dict, c: Claim) -> bool:
-    return (claim.get("pred"), claim.get("a"), claim.get("b")) == (c.pred, c.a, c.b) and \
-        claim.get("happened", True) is not False
+def _states(vocab: ClaimVocabulary, claim: dict, c: Claim) -> bool:
+    return as_claim(vocab, claim) == c
 
 
 class ClaimCheck:
@@ -291,7 +307,7 @@ class ClaimCheck:
         facts, stated = self.facts(pack), False
         for claim in claims:
             n = normalize(self.vocab, claim)
-            if pack.asserted is not None and _states(n, pack.asserted):
+            if pack.asserted is not None and _states(self.vocab, n, pack.asserted):
                 stated = True  # the claim its action states, which code chose, true or not
                 continue
             if claim.get("attributed_to"):
@@ -300,7 +316,7 @@ class ClaimCheck:
             if category in BAD:
                 return f"{category}: {label(n)}"
         if pack.asserted is not None and not stated:
-            return f"doesn't state {label(pack.asserted.to_json())}"
+            return f"doesn't state {pack.asserted.label()}"
         return None
 
 
