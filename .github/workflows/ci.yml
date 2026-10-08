@@ -210,6 +210,9 @@ jobs:
         with:
           version-file: sdk/unity/Lantern/ProjectSettings/ProjectVersion.txt
           cache-installation: true
+          # Hub 3.20+ no longer installs under /opt, where the action looks (buildalon/unity-setup#57); the
+          # maintainer's workaround until the fix ships is a pre-3.20 Hub.
+          hub-version: "3.14.3"
       - name: A Personal licence, returned when the job ends
         if: env.HAS_LICENCE == 'true'
         uses: buildalon/activate-unity-license@e0d245d0787b7b9931b56ccbde3b508f6b70f1af # v2.2.2
