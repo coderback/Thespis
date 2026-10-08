@@ -174,7 +174,9 @@ export function worldMemory(state) {
   // Most telling first: exposed lies, then false beliefs still held, then the worst news.
   const weight = { robbed: 4, lied: 4, spared: 3, beat: 2, insulted: 1 };
   const score = (b) => (b.status === "retracted" ? 100 : 0) + (b.truth ? 0 : 50) + (weight[b.claim.pred] || 0) + (b.npc === "brenna" ? 5 : 0);
-  const strong = state.beliefs.filter((b) => b.conf >= ACTION_LINE && b.claim.a !== b.npc).sort((a, b) => score(b) - score(a));
+  // A retracted belief counts however low it has fallen: that someone stopped believing it is the story.
+  const strong = state.beliefs.filter((b) => (b.status === "retracted" || b.conf >= ACTION_LINE) && b.claim.a !== b.npc)
+    .sort((a, b) => score(b) - score(a));
   for (const b of strong.slice(0, 5)) {
     const verb = b.status === "retracted" ? "no longer believes" : "believes";
     lines.push(`${name(b.npc)} ${verb} ${claimText(b.claim, { lower: true })}${b.truth ? "" : " (a lie)"}`);

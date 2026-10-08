@@ -114,12 +114,12 @@ export class Inspector {
   beliefRow(b, isNew) {
     const mark = b.truth ? ["t", "✓", "True: the ledger shows it happened"] : ["f", "✗", "False: nothing in the ledger makes it true"];
     const how = (ev) => ev.source === "witnessed" ? "saw it" : ev.source === "self" ? "knows first-hand" : "told by " + esc(name(ev.source));
-    const src = (b.evidence || []).map((ev) => `<span class="chip">${how(ev)} · ${ev.conf.toFixed(1)}</span><span class="chip id" data-id="${esc(ev.event)}">${esc(ev.event)}</span>`).join(" ");
+    const src = (b.evidence || []).map((ev) => `<span class="chip${ev.against ? " against" : ""}">${ev.against ? "against, " : ""}${how(ev)} · ${ev.conf.toFixed(1)}</span><span class="chip id" data-id="${esc(ev.event)}">${esc(ev.event)}</span>`).join(" ");
     const cls = ["belief", b.status === "retracted" ? "retracted" : "", isNew ? "new" : "", this.highlight === b.id ? "ev hl" : ""].join(" ");
     return `<div class="${cls}" data-b="${esc(b.id)}">
       <span class="mark ${mark[0]}" title="${mark[2]}">${mark[1]}</span>
       <span class="claim">${esc(b.claim)}${b.status === "retracted" ? ' <span class="badge offline">retracted</span>' : ""}</span>
-      <div class="meter" title="confidence ${b.conf}"><i style="width:${b.conf * 100}%;background:var(--accent)"></i></div>
+      <div class="meter" title="confidence ${b.conf}${b.opinion && b.opinion.d > 0 ? `, doubt ${b.opinion.d}` : ""}"><i style="width:${b.conf * 100}%;background:var(--accent)"></i>${b.opinion && b.opinion.d > 0 ? `<i class="dis" style="width:${b.opinion.d * 100}%"></i>` : ""}</div>
       <div class="src"><span class="chip id" data-id="${esc(b.id)}">${esc(b.id)}</span> ${src}</div>
     </div>`;
   }
@@ -194,7 +194,7 @@ export class Inspector {
       const b = bel(c), e = ev(c);
       if (b) {
         const sub = b.evidence.map((x) => `${how(x)} in ${chip(x.event)}: ${esc(ev(x.event)?.text || "")} (${x.conf.toFixed(1)})`).join("<br>");
-        node("", `Belief ${chip(b.id)} · confidence ${b.conf}${b.status === "retracted" ? ' · <span class="badge offline">retracted</span>' : ""}`,
+        node("", `Belief ${chip(b.id)} · confidence ${b.conf}${b.opinion && b.opinion.d > 0 ? `, doubt ${b.opinion.d}` : ""}${b.status === "retracted" ? ' · <span class="badge offline">retracted</span>' : ""}`,
           `${esc(name(b.npc))} believes <b>${esc(b.claim)}</b>`, sub);
         for (const x of b.evidence) { const r = ev(x.event); if (r && r.claim) root(r); }
       } else if (e) {

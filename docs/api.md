@@ -109,7 +109,7 @@ one belief:
   ],
   "beliefs": [
     { "id": "b0010", "npc": "brenna", "claim": { "pred": "robbed", "a": "player", "b": "kael" },
-      "conf": 0.9, "status": "active", "truth": true,
+      "conf": 0.9, "status": "active", "opinion": { "b": 0.9, "d": 0.0, "u": 0.1 }, "truth": true,
       "evidence": [ { "source": "kael", "event": "e0011", "phase": 2, "conf": 0.9 } ] }
   ],
   "ledger_tail": [], "decisions_tail": []
@@ -122,8 +122,15 @@ one belief:
 - `frozen_until` is the last phase an NPC is detained (inclusive), or `null`.
 - `persona` is the persona the model voices for this NPC in this session, and `persona_edited` is `true` while it's a
   live edit from `POST /dev/persona` rather than the one in `cast.toml`.
-- `conf` is the highest confidence among the belief's `evidence`. `status` is `active` or `retracted`. `truth` says
-  whether the claim happened, and is for the inspector only: it never reaches the model.
+- `opinion` is how sure the NPC is, in subjective logic: belief `b`, disbelief `d` and uncertainty `u`, summing to 1
+  (rounded to 4 places). It fuses the belief's `evidence`, the strongest piece per source and side: one report of
+  confidence c is (c, 0, 1 - c), a piece with `"against": true` (testimony that it never happened) is (0, c, 1 - c),
+  independent sources add up, and what the NPC saw itself (c = 1) outweighs any report.
+- `conf` is the opinion's belief, `b`: with one report, that report's confidence. `status` is `retracted` when
+  disbelief outweighs belief (`d > b`), else `active`; a retracted belief is never acted on or shown to the model.
+  When an NPC stops trusting a source, every piece of evidence it holds from them is cut to its new trust, so `conf`
+  can fall on beliefs the contradiction never touched. `truth` says whether the claim happened, and is for the
+  inspector only: it never reaches the model.
 - `ledger_tail` and `decisions_tail` hold the last 50 of each, which covers a whole demo run.
 
 A ledger event:

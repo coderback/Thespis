@@ -252,6 +252,9 @@ Each phase ends at a gate Rehearsal can measure. The durations assume one engine
    - Gate: every route plays to the same outcome; the adapters at least halve.
    - **Status, 8 October 2026:** typed claims are in. A claim can carry a place, a time and a denial; the manor's
      "study@1" is now `place` and `at`, and sessions saved in the old form load through an upgrade.
+     Beliefs are subjective-logic opinions: evidence for and against fuses, a belief is retracted when disbelief
+     outweighs belief, and discrediting a source re-weighs everything it said. Every route on seeds 1, 2 and 4 and
+     every manor route ends exactly as before; only retracted beliefs' numbers moved.
 4. **Service and SDK (3–4 weeks).**
    - `/v1` API, tenants and keys, the async gateway, Postgres, OpenTelemetry, cost metering.
    - The Godot SDK and one example scene.
