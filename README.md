@@ -203,16 +203,19 @@ see [docs/models.md](docs/models.md)), and start the engine with `--env-file .en
 The tools that read the host's call log (`harness`, `smoke`, `warm_cache`, `manor_solve`) need the host's
 `ADMIN_TOKEN`; they read it from the environment or `.env`.
 
-**Dependencies** are pinned with hashes in `requirements.txt` and `requirements-dev.txt`, compiled by
-[uv](https://docs.astral.sh/uv/) from `requirements.in` and `requirements-dev.in`. To add or upgrade one, edit the
-`.in` file and recompile both (CI fails if they drift):
+**Dependencies** are pinned with hashes in `requirements.txt`, `requirements-server.txt` (what a hosted server
+adds: Postgres, sealed keys, traces) and `requirements-dev.txt`, compiled by [uv](https://docs.astral.sh/uv/) from
+their `.in` files. To add or upgrade one, edit the `.in` file and recompile all three (CI fails if they drift):
 
 ```bash
 uv pip compile requirements.in --universal --generate-hashes --python-version 3.12 -o requirements.txt
+uv pip compile requirements-server.in --universal --generate-hashes --python-version 3.12 -o requirements-server.txt
 uv pip compile requirements-dev.in --universal --generate-hashes --python-version 3.12 -o requirements-dev.txt
 ```
 
-CI also runs `ruff check .`, `pyright` and `pytest`, and builds and checks the image (`scripts/check-image.sh`).
+CI also runs `ruff check .`, `pyright` and `pytest` (the storage tests on SQLite and on Postgres), and builds and
+checks both images (`scripts/check-image.sh`, `scripts/check-serve-image.sh`). It builds the packaged runtime on
+Windows, macOS and Linux against its budgets (`tools/package.py`), and load-tests the server (`tools/loadtest.py`).
 
 ### Rehearsal
 
@@ -309,8 +312,11 @@ To work on the client with hot reload, run `npm run dev` in `client/` next to th
 | `python -m thespis models hardware` / `models serve` | What this machine can run locally, and run it (Gemma 4 E4B by default; [docs/models.md](docs/models.md#local-models-playing-offline)) |
 | `python -m thespis models probe <url> --out p.json` | Measure any model endpoint and write a profile for `LLM_PROFILE` |
 | `python -m tools.outcomes` | Plays all 35 routes with the brain off and shows what differs from `tests/outcomes.json`; `--update` records them |
-| `python -m thespis serve --game examples/tavern/game.toml` | The `/v1` protocol on localhost, for an engine ([docs/protocol.md](docs/protocol.md)) |
-| `python sdk/godot/spike/test/run.py --godot <path>` | The Godot spike's round trip, headless, against a scripted model |
+| `python -m thespis serve --game examples/tavern/game.toml` | The `/v1` protocol as a sidecar: localhost, sessions in SQLite, offline unless `--online` ([docs/serve.md](docs/serve.md)) |
+| `python -m thespis serve --server --db postgresql://...` | The `/v1` protocol as a server: projects with their own keys, caps and usage; `thespis projects create NAME` makes one |
+| `python tools/package.py` | Builds the runtime a game ships beside it (one folder, no Python needed), and checks its size and cold start |
+| `python tools/loadtest.py --players 200 --db <db>` | Many engines playing at once against one server: latency per route, errors, the gate |
+| `python sdk/godot/spike/test/run.py --godot <path> [--local gemma4-e4b]` | The Godot spike's round trip, headless, against a scripted model, or offline through a local one |
 | `python -m thespis openapi --out docs/openapi-v1.json` | Regenerates the `/v1` contract after a change to the API |
 | `python tools/manor_solve.py <host>` | Solves the manor mystery by script, and checks two wrong turns lose |
 | `python tools/exposure.py <host>` | Checks the host keeps its edges shut against a stranger: no call log, API docs or CORS, a body limit, security headers |
@@ -320,7 +326,9 @@ To work on the client with hot reload, run `npm run dev` in `client/` next to th
 
 ```
 thespis/            the core, which knows no game: the ledger, beliefs, perception, affordances, the tick,
-                    voice and expression, the gateway and the store; sessions and the /v1 server for engines
+                    voice and expression, the gateway and the store; sessions and the /v1 server for engines;
+                    the host (projects, keys, caps, usage), its storage (SQLite or Postgres), the offline guard
+docker/             the hosted server's image (serve.Dockerfile); the root Dockerfile is the demo's
 games/crypt_road/   the demo game as a Thespis adapter: its cast and words (cast.toml), rules, views, web app
 games/manor/        a second adapter: the manor mystery, served at /manor (its client is client/manor/)
 client/             the browser client for both games: The Crypt Road (index.html) and the manor (manor/)
@@ -328,7 +336,8 @@ docs/               the API contract (api.md), the protocol (protocol.md, openap
 examples/           the core alone (minimal_client.py), and the tavern: a whole game in one TOML file
 sdk/godot/spike/    the tavern in Godot 4 through /v1, its headless test, and the protocol friction it found
 fixtures/           real API responses along the demo route, for building the client
-tools/              the rules model, harness, cache warmer, model benchmark and fixture generator
+tools/              the rules model, harness, cache warmer, model benchmark and fixture generator; the packager
+                    and the server's load test, with its reports
 rehearsal/          scenarios, recordings and reports: the regression suite CI replays
 tests/              the pytest suite, run by CI on every pull request
 ```

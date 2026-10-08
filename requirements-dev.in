@@ -1,6 +1,6 @@
 # What tests, lint and type checks add. Edit this, not requirements-dev.txt, then recompile the locks.
 -c requirements.txt
--r requirements.in
+-r requirements-server.in
 pytest>=8
 ruff>=0.6
 pyright>=1.1.400

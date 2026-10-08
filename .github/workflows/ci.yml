@@ -13,6 +13,17 @@ jobs:
   engine:
     name: engine
     runs-on: ubuntu-latest
+    services:
+      postgres:  # the storage tests run on SQLite and on this
+        image: postgres:17-alpine
+        env:
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: thespis_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 2s --health-timeout 5s --health-retries 30
+    env:
+      THESPIS_TEST_POSTGRES: postgresql://postgres:ci@127.0.0.1:5432/thespis_test
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -26,8 +37,9 @@ jobs:
       - name: Lock files match their inputs
         run: |
           uv pip compile requirements.in --universal --generate-hashes --python-version 3.12 -o requirements.txt
+          uv pip compile requirements-server.in --universal --generate-hashes --python-version 3.12 -o requirements-server.txt
           uv pip compile requirements-dev.in --universal --generate-hashes --python-version 3.12 -o requirements-dev.txt
-          git diff --exit-code requirements.txt requirements-dev.txt
+          git diff --exit-code requirements.txt requirements-server.txt requirements-dev.txt
       - name: Lint
         run: ruff check .
       - name: Types
@@ -67,17 +79,76 @@ jobs:
       - name: Runs as non-root, logs JSON, keeps its volume
         run: sh scripts/check-image.sh thespis:ci
 
+  # The hosted runtime's image, run beside Postgres as a host would.
+  serve-image:
+    name: serve-image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: docker build -f docker/serve.Dockerfile -t thespis-serve:ci .
+      - name: Wants a key, keeps sessions in Postgres across a restart, runs as non-root
+        run: sh scripts/check-serve-image.sh thespis-serve:ci
+
+  # The runtime a game ships beside it, on each platform: built, held to its size and cold-start budgets, played.
+  package:
+    name: package (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install
+        run: pip install -r requirements.txt pyinstaller==6.22.3
+      - name: Build, check budgets, play a turn
+        run: python tools/package.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: thespis-${{ matrix.os }}
+          path: dist/thespis-*.zip
+          retention-days: 14
+
+  # The server under engines playing at once, on Postgres (docs/serve.md has the full-size run).
+  load:
+    name: load
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: thespis_load
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 2s --health-timeout 5s --health-retries 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install
+        run: pip install -r requirements-server.txt
+      - name: 100 engines at once, p95 within budget, no errors
+        run: python tools/loadtest.py --players 100 --rounds 2 --think 2 --db postgresql://postgres:ci@127.0.0.1:5432/thespis_load
+
   # The single required check for main. Do not rename without updating the ruleset.
   ci:
     name: ci
     if: always()
-    needs: [engine, client, image]
+    needs: [engine, client, image, serve-image, package, load]
     runs-on: ubuntu-latest
     steps:
       - name: All checks passed
         shell: bash
         run: |
           results="engine=${{ needs.engine.result }} client=${{ needs.client.result }} image=${{ needs.image.result }}"
+          results="$results serve-image=${{ needs.serve-image.result }} package=${{ needs.package.result }}"
+          results="$results load=${{ needs.load.result }}"
           for result in $results; do
             if [ "${result#*=}" != "success" ]; then
               echo "$results"
