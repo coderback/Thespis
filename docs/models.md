@@ -97,6 +97,36 @@ Reports are in [rehearsal/reports](../rehearsal/reports): `cloud-luna`, `local-g
 
 **One laptop, one run each:** these are single runs on one machine, with intervals several points wide. Run the same on yours: `models serve`, then `python -m rehearsal live` with `LLM_PROFILE=llamacpp` (and no cloud `LLM_*` set, so nothing else speaks).
 
+## Judging offline
+
+Rehearsal's judge only extracts the claims each line makes; code checks them against the world. A local judge can
+stand in for the reference (DeepSeek-V4-Pro) only as far as it agrees with it, so each one is calibrated: it
+re-judges lines the reference judged, and the two judges' verdicts are compared with Cohen's kappa.
+`python -m rehearsal calibrate` records this in [rehearsal/calibration](../rehearsal/calibration), and every report
+from a stand-in judge prints its kappa.
+
+On 147 lines spoken by the local Qwen 4B, 12 of them bad by the reference (8 Oct 2026):
+
+| Judge | Kappa on "is the line bad" [95%] | Lines it called bad | Of the reference's 12, missed | Added |
+| --- | --- | --- | --- | --- |
+| DeepSeek-V4-Pro, again (the ceiling) | **0.71** [0.43, 0.89] | 10 | 4 | 2 |
+| gemma4-e4b | 0.25 [0.12, 0.40] | 45 | 2 | 35 |
+| qwen3.5-4b | 0.15 [0.02, 0.29] | 49 | 4 | 41 |
+| gemma4-e4b with the checklist pass | 0.08 [-0.09, 0.30] | 13 | 10 | 11 |
+| qwen3.5-9b | not finished: about 30 s a line, and 5.7 GB of RAM on a 15 GB laptop | | | |
+
+- **No local judge that fits a 4 GB GPU can stand in for the reference.** The 4B-class models extract claims a line only implies: threats, guesses and questions get scored as hallucinations, so they flag three or four times as many lines.
+- **The checklist pass doesn't fix it.** That pass asks the judge, for each claim it would count against a line, "does the line state this?" ([rehearsal/measure.py](../rehearsal/measure.py) `verify`). It brings the count to the reference's, but mostly flags the wrong lines.
+- **The reference is noisy too.** Judging the same lines twice, it changed its mind on 6 of 147, which is why even its own kappa is 0.71.
+
+So offline Rehearsal measures everything but judged claims as well as an online run does:
+- refusals;
+- latency;
+- the judge-free checks (words in the player's mouth, who spoke in narration);
+- how provisional lines settle.
+
+Its claim rates come from a judge that doesn't agree with the reference, and the report says so. For a release, judge with the reference, or with a local judge on a GPU big enough for the 9B, once one is calibrated.
+
 ## Cost
 
 Under a tenth of a cent per run: $0.00065 for a run where every call goes to the model, about 11 calls of roughly 400 tokens in and 40 out ([results.md](../results.md)). Lines answered from the cache cost nothing.
