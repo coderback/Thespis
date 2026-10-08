@@ -121,7 +121,15 @@ int Done()
 {
     var pid = thespis.Sidecar?.Pid ?? -1;
     if (failures.Count > 0 && thespis.Sidecar != null)
+    {
+        if (!OperatingSystem.IsWindows() && pid > 0)
+        {
+            // Ask the runtime for every thread's stack (thespis serve registers faulthandler on SIGUSR1).
+            Process.Start("kill", $"-USR1 {pid}")?.WaitForExit();
+            System.Threading.Thread.Sleep(1000);
+        }
         Console.Error.WriteLine($"the sidecar's log:\n{thespis.Sidecar.Log}");
+    }
     thespis.StopAsync().GetAwaiter().GetResult();
     if (pid > 0)
     {

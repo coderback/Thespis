@@ -21,7 +21,7 @@ namespace Thespis
     public sealed class Sidecar : IDisposable
     {
         private const string UrlLine = "THESPIS_URL=";
-        private const int LogKeep = 8192;
+        private const int LogKeep = 32768;  // enough for a stack dump (kill -USR1) of every thread
 
         /// <summary>How to run the runtime: the executable, then its arguments.</summary>
         public IReadOnlyList<string> Command { get; set; } = new[] { "python", "-m", "thespis" };
