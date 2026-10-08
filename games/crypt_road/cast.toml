@@ -87,6 +87,63 @@ told = "Oh! Is that so? Dear me."
 testify = "Robbed? Me? By {culprit}? Captain, I've never been robbed in my life."
 insulted = "No need for that, friend. No need at all."
 
+# ---------------------------------------------------------------- choices (thespis.considerations)
+# What each NPC may do when it chooses, by the moment it chooses in: an action is open when every condition in `when`
+# holds and is worth its `utility`; the highest wins and the first listed wins a tie. {names} are bound by the rules.
+
+# Kael, each phase: walk on by ambition; take the relic once he's in the crypt; report you to the Captain when angry
+# enough and he has something to report; share a drink with you once he respects you.
+[[npc.kael.choices.tick]]
+do = "go_to"
+utility = [{ drive = "ambition" }]
+
+[[npc.kael.choices.tick]]
+do = "wait"
+utility = 0
+
+[[npc.kael.choices.tick]]
+do = "take_relic"
+utility = 100
+when = [{ at = "crypt" }]
+
+[[npc.kael.choices.tick]]
+do = "accuse:player"
+utility = [{ drive = "grudge", plus = 3 }]
+when = [{ with = "brenna" }, { drive = "grudge", gte = 4 }, { not_flag = "accused" },
+        { any = [{ believes = { pred = "robbed", a = "player", b = "self" } },
+                 { believes = { pred = "beat", a = "player", b = "self" } }] }]
+
+[[npc.kael.choices.tick]]
+do = "share_drink"
+utility = [{ drive = "respect", plus = 3 }]
+when = [{ drive = "respect", gte = 4 }, { with = "player" }, { not_flag = "drink" }]
+
+# Brenna, when she believes someone at her post committed a crime, when a witness who could speak to a claim is
+# there, and when the player offers less than her price (a lowball, under half, is more likely refused).
+[[npc.brenna.choices.crime_belief]]
+do = "detain:{culprit}"
+utility = 10
+
+[[npc.brenna.choices.crime_belief]]
+do = "wait"
+utility = 1
+
+[[npc.brenna.choices.witness_present]]
+do = "question:{witness}"
+utility = 8
+
+[[npc.brenna.choices.witness_present]]
+do = "wait"
+utility = 1
+
+[[npc.brenna.choices.bribe_offer]]
+do = "counter:{price}"
+utility = 5
+
+[[npc.brenna.choices.bribe_offer]]
+do = "refuse"
+utility = [3, { plus = 4, if = { bound = "lowball" } }]
+
 # What each event was, in words: the digest says them to the player, and state packs say them about the player.
 # {a} is the actor and {t} the target, {where} the stop it happened at, {to} where someone walked; words.py fills them.
 [words.events]

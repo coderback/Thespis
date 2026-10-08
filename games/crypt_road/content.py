@@ -10,6 +10,7 @@ from pathlib import Path
 
 from thespis.beliefs import credence
 from thespis.cast import Cast
+from thespis.considerations import declared
 from thespis.minds import NPC
 from thespis.world import World
 
@@ -56,6 +57,7 @@ def short_name(npc: str) -> str:
     return npc.capitalize()
 
 CAST = Cast(Path(__file__).with_name("cast.toml"))
+CHOICES = declared(CAST.data)  # what each NPC may choose, compiled from cast.toml
 
 
 def load_cast() -> dict:
