@@ -82,7 +82,7 @@ def test_a_grammar_provider_gets_the_constraints_in_its_request():
     assert reply is not None and reply.data["line"] == "Hm."
     schema = bodies[0]["response_format"]["json_schema"]["schema"]
     assert schema["properties"]["cites"]["minItems"] == 1
-    assert bodies[0]["chat_template_kwargs"] == {"enable_thinking": False}
+    assert bodies[0]["chat_template_kwargs"] == {"enable_thinking": False} and bodies[0]["max_tokens"] == 300
 
 
 def test_anthropic_speaks_through_a_tool_call():

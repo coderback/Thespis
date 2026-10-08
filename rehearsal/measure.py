@@ -138,7 +138,7 @@ def summary(samples: list[dict], calls: list, acts: list[tuple[float, int]], sce
         "refused": dict(reasons.most_common()),
         "claim_check": dict(Counter(checked(r) for r in reasons.elements() if r.startswith("claim check"))),
         "protocol_refusals": sum(n for r, n in reasons.items() if protocol(r)),
-        "calls": len(calls), "failed": dict(Counter(c.error for c in calls if not c.ok)),
+        "calls": len(calls), "failed": dict(Counter(f"{c.call_type}: {c.error}" for c in calls if not c.ok)),
         "call_latency": {k: {"p50": percentile(v, 50), "p95": percentile(v, 95), "n": len(v)}
                          for k, v in sorted(by_type.items())},
         "act_latency": {"p50": percentile(timed, 50), "p95": percentile(timed, 95), "n": len(timed)},

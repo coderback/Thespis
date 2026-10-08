@@ -62,7 +62,9 @@ class Profile:
         return cls(**{**d, "enforces": frozenset(d.get("enforces", ()))})
 
 
-_THINK_OFF = {"chat_template_kwargs": {"enable_thinking": False}}  # Qwen and other hybrid models on local servers
+# Local servers: thinking off (Qwen and other hybrid models), and room for a claim check's list of claims, which
+# 150 tokens cut off mid-JSON in live Rehearsal (the cloud deployments get 300 through LLM_EXTRA).
+_LOCAL = {"chat_template_kwargs": {"enable_thinking": False}, "max_tokens": 300}
 
 PROFILES: dict[str, Profile] = {p.name: p for p in (
     Profile("openai", base_url="https://api.openai.com/v1"),
@@ -73,11 +75,11 @@ PROFILES: dict[str, Profile] = {p.name: p for p in (
     Profile("gemini", base_url="https://generativelanguage.googleapis.com/v1beta/openai", timeout=6.0),
     Profile("anthropic", api="anthropic", base_url="https://api.anthropic.com/v1", schema="tool", timeout=6.0),
     Profile("vllm", base_url="http://127.0.0.1:8000/v1", schema="grammar", enforces=frozenset({"minItems"}),
-            timeout=10.0, key=False, extra=_THINK_OFF),
+            timeout=10.0, key=False, extra=_LOCAL),
     Profile("llamacpp", base_url="http://127.0.0.1:8080/v1", schema="grammar",
-            enforces=frozenset({"minItems", "maxLength"}), timeout=15.0, concurrency=2, key=False, extra=_THINK_OFF),
+            enforces=frozenset({"minItems", "maxLength"}), timeout=15.0, concurrency=2, key=False, extra=_LOCAL),
     Profile("ollama", base_url="http://127.0.0.1:11434/v1", schema="grammar", enforces=frozenset({"minItems"}),
-            timeout=15.0, concurrency=1, key=False),
+            timeout=15.0, concurrency=1, key=False, extra={"max_tokens": 300}),
 )}
 DEFAULT = PROFILES["openai"]
 

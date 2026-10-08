@@ -49,6 +49,11 @@ MODELS: dict[str, Model] = {m.id: m for m in (
     Model("qwen3.5-9b", _hf("unsloth/Qwen3.5-9B-GGUF", "Qwen3.5-9B-Q4_K_M.gguf",
                              "03b74727a860a56338e042c4420bb3f04b2fec5734175f4cb9fa853daf52b7e8", 5_680_522_464),
           "9B", "Q4_K_M", "Apache-2.0", vram_gb=6.2, ram_gb=8.5),  # estimated: 5.3 GiB of weights
+    # A candidate for the first tier, from another family: 4B effective, with per-layer embeddings that llama.cpp
+    # may keep in RAM. Google's quantisation-aware-trained Q4_0. Not a tier until live Rehearsal says so.
+    Model("gemma4-e4b", _hf("google/gemma-4-E4B-it-qat-q4_0-gguf", "gemma-4-E4B_q4_0-it.gguf",
+                             "676c35070db6dbe52f93e9c864ee0fba4eddea94b9c875d9cb10daff453fbaee", 5_154_941_280),
+          "E4B", "Q4_0 (QAT)", "Apache-2.0", vram_gb=5.0, ram_gb=7.0),  # estimated until measured
 )}
 
 # Tiers, smallest first: the probe picks the largest the machine can run (thespis.runtime.hardware.choose).
