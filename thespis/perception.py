@@ -7,7 +7,7 @@ event that delivered evidence it holds), or when it saw it.
 
 from __future__ import annotations
 
-from collections.abc import Callable, Collection
+from collections.abc import Callable, Collection, Mapping
 
 from thespis.ledger import Claim, Event
 from thespis.world import World
@@ -19,6 +19,11 @@ Give = Callable[[World, str, Claim, float, str, Event], None]  # (world, npc, cl
 def at_the_scene(w: World, npc: str, e: Event) -> bool:
     """The usual rule: an NPC sees what happens where it stands, and arrivals where it stands."""
     return w.npcs[npc].loc in (e.loc, e.target)
+
+
+def reported(witnesses: Mapping[str, Collection[str]]) -> Sees:
+    """The rule for a world the engine owns: an NPC saw an event when the engine said it did, by event id."""
+    return lambda w, npc, e: npc in witnesses.get(e.id, ())
 
 
 def knows(w: World, npc: str, event_id: str, sees: Sees = at_the_scene) -> bool:

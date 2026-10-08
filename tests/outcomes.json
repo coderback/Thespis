@@ -1,0 +1,10300 @@
+{
+ "crypt_road/duel_lost/1": {
+  "beliefs": {
+   "brenna {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    0.8,
+    "active"
+   ],
+   "kael {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "kael",
+    "insulted",
+    null
+   ],
+   [
+    "kael",
+    "victor",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "brenna",
+    "arrival",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ]
+  ],
+  "events": [
+   [
+    "insult",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "challenge",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "beat",
+    "kael",
+    "player",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "take_relic",
+    "kael",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "brenna": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 2,
+     "mags": 1,
+     "odo": 2,
+     "player": 0
+    }
+   },
+   "kael": {
+    "drives": {
+     "ambition": 6,
+     "fear": 1,
+     "grudge": 2,
+     "respect": 1
+    },
+    "frozen_until": null,
+    "loc": "crypt",
+    "trust": {}
+   },
+   "mags": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   },
+   "odo": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "market",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   }
+  },
+  "outcome": "lost@4",
+  "player": {
+   "coins": 10,
+   "loc": "crypt",
+   "outcome": null
+  }
+ },
+ "crypt_road/duel_lost/2": {
+  "beliefs": {
+   "brenna {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    0.8,
+    "active"
+   ],
+   "kael {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "kael",
+    "insulted",
+    null
+   ],
+   [
+    "kael",
+    "victor",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "brenna",
+    "arrival",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ]
+  ],
+  "events": [
+   [
+    "insult",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "challenge",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "beat",
+    "kael",
+    "player",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "take_relic",
+    "kael",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "brenna": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 2,
+     "mags": 1,
+     "odo": 2,
+     "player": 0
+    }
+   },
+   "kael": {
+    "drives": {
+     "ambition": 6,
+     "fear": 1,
+     "grudge": 2,
+     "respect": 1
+    },
+    "frozen_until": null,
+    "loc": "crypt",
+    "trust": {}
+   },
+   "mags": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   },
+   "odo": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "market",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   }
+  },
+  "outcome": "lost@4",
+  "player": {
+   "coins": 10,
+   "loc": "crypt",
+   "outcome": null
+  }
+ },
+ "crypt_road/duel_lost/4": {
+  "beliefs": {
+   "brenna {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    0.8,
+    "active"
+   ],
+   "kael {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "kael",
+    "insulted",
+    null
+   ],
+   [
+    "kael",
+    "victor",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "brenna",
+    "arrival",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ]
+  ],
+  "events": [
+   [
+    "insult",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "challenge",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "beat",
+    "kael",
+    "player",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "take_relic",
+    "kael",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "brenna": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 2,
+     "mags": 1,
+     "odo": 2,
+     "player": 0
+    }
+   },
+   "kael": {
+    "drives": {
+     "ambition": 6,
+     "fear": 1,
+     "grudge": 2,
+     "respect": 1
+    },
+    "frozen_until": null,
+    "loc": "crypt",
+    "trust": {}
+   },
+   "mags": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   },
+   "odo": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "market",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   }
+  },
+  "outcome": "lost@4",
+  "player": {
+   "coins": 10,
+   "loc": "crypt",
+   "outcome": null
+  }
+ },
+ "crypt_road/frame/1": {
+  "beliefs": {
+   "brenna {\"a\": \"kael\", \"b\": \"odo\", \"pred\": \"robbed\"}": [
+    0.0244,
+    "retracted"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    0.9,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"lied\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "kael",
+    "insulted",
+    null
+   ],
+   [
+    "kael",
+    "beaten",
+    null
+   ],
+   [
+    "kael",
+    "robbed",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "accuse:player"
+   ],
+   [
+    "brenna",
+    "arrival",
+    null
+   ],
+   [
+    "kael",
+    "shares_stop",
+    null
+   ],
+   [
+    "brenna",
+    "bribe",
+    null
+   ],
+   [
+    "brenna",
+    "bribe",
+    null
+   ],
+   [
+    "brenna",
+    "told",
+    null
+   ],
+   [
+    "kael",
+    "lied_about",
+    null
+   ],
+   [
+    "brenna",
+    "crime_belief",
+    "detain:kael"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "brenna",
+    "witness_present",
+    "question:odo"
+   ],
+   [
+    "odo",
+    "testify",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ]
+  ],
+  "events": [
+   [
+    "insult",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "challenge",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "beat",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "humiliate",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "accuse",
+    "kael",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "bribe",
+    "player",
+    "brenna",
+    true,
+    20
+   ],
+   [
+    "bribe",
+    "player",
+    "brenna",
+    true,
+    20
+   ],
+   [
+    "tell_claim",
+    "player",
+    "brenna",
+    false,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "detain",
+    "brenna",
+    "kael",
+    false,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "take_relic",
+    "player",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "testify",
+    "odo",
+    "brenna",
+    false,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "brenna": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 0,
+     "mags": 1,
+     "odo": 2,
+     "player": -1
+    }
+   },
+   "kael": {
+    "drives": {
+     "ambition": 6,
+     "fear": 1,
+     "grudge": 8,
+     "respect": 0
+    },
+    "frozen_until": 4,
+    "loc": "crypt",
+    "trust": {}
+   },
+   "mags": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   },
+   "odo": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "market",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   }
+  },
+  "outcome": "won@5",
+  "player": {
+   "coins": 0,
+   "loc": "crypt",
+   "outcome": null
+  }
+ },
+ "crypt_road/frame/2": {
+  "beliefs": {
+   "brenna {\"a\": \"kael\", \"b\": \"odo\", \"pred\": \"robbed\"}": [
+    0.0244,
+    "retracted"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    0.9,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"lied\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "kael",
+    "insulted",
+    null
+   ],
+   [
+    "kael",
+    "beaten",
+    null
+   ],
+   [
+    "kael",
+    "robbed",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "accuse:player"
+   ],
+   [
+    "brenna",
+    "arrival",
+    null
+   ],
+   [
+    "kael",
+    "shares_stop",
+    null
+   ],
+   [
+    "brenna",
+    "bribe",
+    null
+   ],
+   [
+    "brenna",
+    "bribe",
+    null
+   ],
+   [
+    "brenna",
+    "told",
+    null
+   ],
+   [
+    "kael",
+    "lied_about",
+    null
+   ],
+   [
+    "brenna",
+    "crime_belief",
+    "detain:kael"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "brenna",
+    "witness_present",
+    "question:odo"
+   ],
+   [
+    "odo",
+    "testify",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ]
+  ],
+  "events": [
+   [
+    "insult",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "challenge",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "beat",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "humiliate",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "accuse",
+    "kael",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "bribe",
+    "player",
+    "brenna",
+    true,
+    20
+   ],
+   [
+    "bribe",
+    "player",
+    "brenna",
+    true,
+    20
+   ],
+   [
+    "tell_claim",
+    "player",
+    "brenna",
+    false,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "detain",
+    "brenna",
+    "kael",
+    false,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "take_relic",
+    "player",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "testify",
+    "odo",
+    "brenna",
+    false,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "brenna": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 0,
+     "mags": 1,
+     "odo": 2,
+     "player": -1
+    }
+   },
+   "kael": {
+    "drives": {
+     "ambition": 6,
+     "fear": 1,
+     "grudge": 8,
+     "respect": 0
+    },
+    "frozen_until": 4,
+    "loc": "crypt",
+    "trust": {}
+   },
+   "mags": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   },
+   "odo": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "market",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   }
+  },
+  "outcome": "won@5",
+  "player": {
+   "coins": 0,
+   "loc": "crypt",
+   "outcome": null
+  }
+ },
+ "crypt_road/frame/4": {
+  "beliefs": {
+   "brenna {\"a\": \"kael\", \"b\": \"odo\", \"pred\": \"robbed\"}": [
+    0.0244,
+    "retracted"
+   ],
+   "brenna {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    0.8,
+    "active"
+   ],
+   "kael {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "kael",
+    "insulted",
+    null
+   ],
+   [
+    "kael",
+    "victor",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "brenna",
+    "arrival",
+    null
+   ],
+   [
+    "brenna",
+    "told",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "brenna",
+    "witness_present",
+    "question:odo"
+   ],
+   [
+    "odo",
+    "testify",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ]
+  ],
+  "events": [
+   [
+    "insult",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "challenge",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "beat",
+    "kael",
+    "player",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "tell_claim",
+    "player",
+    "brenna",
+    false,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "take_relic",
+    "kael",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "testify",
+    "odo",
+    "brenna",
+    false,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "brenna": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 2,
+     "mags": 1,
+     "odo": 2,
+     "player": -3
+    }
+   },
+   "kael": {
+    "drives": {
+     "ambition": 6,
+     "fear": 1,
+     "grudge": 2,
+     "respect": 1
+    },
+    "frozen_until": null,
+    "loc": "crypt",
+    "trust": {}
+   },
+   "mags": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   },
+   "odo": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "market",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   }
+  },
+  "outcome": "lost@4",
+  "player": {
+   "coins": 10,
+   "loc": "crypt",
+   "outcome": null
+  }
+ },
+ "crypt_road/haggle/1": {
+  "beliefs": {
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    0.9,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "kael",
+    "insulted",
+    null
+   ],
+   [
+    "kael",
+    "beaten",
+    null
+   ],
+   [
+    "kael",
+    "robbed",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "accuse:player"
+   ],
+   [
+    "brenna",
+    "arrival",
+    null
+   ],
+   [
+    "kael",
+    "shares_stop",
+    null
+   ],
+   [
+    "brenna",
+    "bribe_offer",
+    "counter:20"
+   ],
+   [
+    "brenna",
+    "bribe",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "shares_stop",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "shares_stop",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ]
+  ],
+  "events": [
+   [
+    "insult",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "challenge",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "beat",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "humiliate",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "accuse",
+    "kael",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "offer",
+    "player",
+    "brenna",
+    true,
+    10
+   ],
+   [
+    "counter",
+    "brenna",
+    "player",
+    true,
+    20
+   ],
+   [
+    "bribe",
+    "player",
+    "brenna",
+    true,
+    20
+   ],
+   [
+    "move",
+    "player",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "take_relic",
+    "player",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "brenna": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 2,
+     "mags": 1,
+     "odo": 2,
+     "player": 0
+    }
+   },
+   "kael": {
+    "drives": {
+     "ambition": 6,
+     "fear": 1,
+     "grudge": 6,
+     "respect": 0
+    },
+    "frozen_until": null,
+    "loc": "crypt",
+    "trust": {}
+   },
+   "mags": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   },
+   "odo": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "market",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   }
+  },
+  "outcome": "won@5",
+  "player": {
+   "coins": 20,
+   "loc": "crypt",
+   "outcome": null
+  }
+ },
+ "crypt_road/haggle/2": {
+  "beliefs": {
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    0.9,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "kael",
+    "insulted",
+    null
+   ],
+   [
+    "kael",
+    "beaten",
+    null
+   ],
+   [
+    "kael",
+    "robbed",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "accuse:player"
+   ],
+   [
+    "brenna",
+    "arrival",
+    null
+   ],
+   [
+    "kael",
+    "shares_stop",
+    null
+   ],
+   [
+    "brenna",
+    "bribe_offer",
+    "counter:20"
+   ],
+   [
+    "brenna",
+    "bribe",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "shares_stop",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "shares_stop",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ]
+  ],
+  "events": [
+   [
+    "insult",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "challenge",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "beat",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "humiliate",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "accuse",
+    "kael",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "offer",
+    "player",
+    "brenna",
+    true,
+    10
+   ],
+   [
+    "counter",
+    "brenna",
+    "player",
+    true,
+    20
+   ],
+   [
+    "bribe",
+    "player",
+    "brenna",
+    true,
+    20
+   ],
+   [
+    "move",
+    "player",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "take_relic",
+    "player",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "brenna": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 2,
+     "mags": 1,
+     "odo": 2,
+     "player": 0
+    }
+   },
+   "kael": {
+    "drives": {
+     "ambition": 6,
+     "fear": 1,
+     "grudge": 6,
+     "respect": 0
+    },
+    "frozen_until": null,
+    "loc": "crypt",
+    "trust": {}
+   },
+   "mags": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   },
+   "odo": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "market",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   }
+  },
+  "outcome": "won@5",
+  "player": {
+   "coins": 20,
+   "loc": "crypt",
+   "outcome": null
+  }
+ },
+ "crypt_road/haggle/4": {
+  "beliefs": {
+   "brenna {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    0.8,
+    "active"
+   ],
+   "kael {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "kael",
+    "insulted",
+    null
+   ],
+   [
+    "kael",
+    "victor",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "brenna",
+    "arrival",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ]
+  ],
+  "events": [
+   [
+    "insult",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "challenge",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "beat",
+    "kael",
+    "player",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "take_relic",
+    "kael",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "brenna": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 2,
+     "mags": 1,
+     "odo": 2,
+     "player": 0
+    }
+   },
+   "kael": {
+    "drives": {
+     "ambition": 6,
+     "fear": 1,
+     "grudge": 2,
+     "respect": 1
+    },
+    "frozen_until": null,
+    "loc": "crypt",
+    "trust": {}
+   },
+   "mags": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   },
+   "odo": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "market",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   }
+  },
+  "outcome": "lost@4",
+  "player": {
+   "coins": 10,
+   "loc": "crypt",
+   "outcome": null
+  }
+ },
+ "crypt_road/lie_unpaid/1": {
+  "beliefs": {
+   "brenna {\"a\": \"kael\", \"b\": \"odo\", \"pred\": \"robbed\"}": [
+    0.0244,
+    "retracted"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    0.9,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"lied\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "kael",
+    "insulted",
+    null
+   ],
+   [
+    "kael",
+    "beaten",
+    null
+   ],
+   [
+    "kael",
+    "robbed",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "accuse:player"
+   ],
+   [
+    "brenna",
+    "arrival",
+    null
+   ],
+   [
+    "kael",
+    "shares_stop",
+    null
+   ],
+   [
+    "brenna",
+    "told",
+    null
+   ],
+   [
+    "kael",
+    "lied_about",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "brenna",
+    "witness_present",
+    "question:odo"
+   ],
+   [
+    "odo",
+    "testify",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ]
+  ],
+  "events": [
+   [
+    "insult",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "challenge",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "beat",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "humiliate",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "accuse",
+    "kael",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "tell_claim",
+    "player",
+    "brenna",
+    false,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "take_relic",
+    "kael",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "testify",
+    "odo",
+    "brenna",
+    false,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "brenna": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 2,
+     "mags": 1,
+     "odo": 2,
+     "player": -5
+    }
+   },
+   "kael": {
+    "drives": {
+     "ambition": 6,
+     "fear": 1,
+     "grudge": 8,
+     "respect": 0
+    },
+    "frozen_until": null,
+    "loc": "crypt",
+    "trust": {}
+   },
+   "mags": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   },
+   "odo": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   }
+  },
+  "outcome": "lost@5",
+  "player": {
+   "coins": 40,
+   "loc": "guard_post",
+   "outcome": null
+  }
+ },
+ "crypt_road/lie_unpaid/2": {
+  "beliefs": {
+   "brenna {\"a\": \"kael\", \"b\": \"odo\", \"pred\": \"robbed\"}": [
+    0.0244,
+    "retracted"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    0.9,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"lied\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "kael",
+    "insulted",
+    null
+   ],
+   [
+    "kael",
+    "beaten",
+    null
+   ],
+   [
+    "kael",
+    "robbed",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "accuse:player"
+   ],
+   [
+    "brenna",
+    "arrival",
+    null
+   ],
+   [
+    "kael",
+    "shares_stop",
+    null
+   ],
+   [
+    "brenna",
+    "told",
+    null
+   ],
+   [
+    "kael",
+    "lied_about",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "brenna",
+    "witness_present",
+    "question:odo"
+   ],
+   [
+    "odo",
+    "testify",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ]
+  ],
+  "events": [
+   [
+    "insult",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "challenge",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "beat",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "humiliate",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "accuse",
+    "kael",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "tell_claim",
+    "player",
+    "brenna",
+    false,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "take_relic",
+    "kael",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "testify",
+    "odo",
+    "brenna",
+    false,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "brenna": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 2,
+     "mags": 1,
+     "odo": 2,
+     "player": -5
+    }
+   },
+   "kael": {
+    "drives": {
+     "ambition": 6,
+     "fear": 1,
+     "grudge": 8,
+     "respect": 0
+    },
+    "frozen_until": null,
+    "loc": "crypt",
+    "trust": {}
+   },
+   "mags": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   },
+   "odo": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   }
+  },
+  "outcome": "lost@5",
+  "player": {
+   "coins": 40,
+   "loc": "guard_post",
+   "outcome": null
+  }
+ },
+ "crypt_road/lie_unpaid/4": {
+  "beliefs": {
+   "brenna {\"a\": \"kael\", \"b\": \"odo\", \"pred\": \"robbed\"}": [
+    0.0244,
+    "retracted"
+   ],
+   "brenna {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    0.8,
+    "active"
+   ],
+   "kael {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "kael",
+    "insulted",
+    null
+   ],
+   [
+    "kael",
+    "victor",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "brenna",
+    "arrival",
+    null
+   ],
+   [
+    "brenna",
+    "told",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "brenna",
+    "witness_present",
+    "question:odo"
+   ],
+   [
+    "odo",
+    "testify",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ]
+  ],
+  "events": [
+   [
+    "insult",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "challenge",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "beat",
+    "kael",
+    "player",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "tell_claim",
+    "player",
+    "brenna",
+    false,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "take_relic",
+    "kael",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "testify",
+    "odo",
+    "brenna",
+    false,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "brenna": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 2,
+     "mags": 1,
+     "odo": 2,
+     "player": -3
+    }
+   },
+   "kael": {
+    "drives": {
+     "ambition": 6,
+     "fear": 1,
+     "grudge": 2,
+     "respect": 1
+    },
+    "frozen_until": null,
+    "loc": "crypt",
+    "trust": {}
+   },
+   "mags": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   },
+   "odo": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "market",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   }
+  },
+  "outcome": "lost@4",
+  "player": {
+   "coins": 10,
+   "loc": "crypt",
+   "outcome": null
+  }
+ },
+ "crypt_road/lowball/1": {
+  "beliefs": {
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    0.9,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "kael",
+    "insulted",
+    null
+   ],
+   [
+    "kael",
+    "beaten",
+    null
+   ],
+   [
+    "kael",
+    "robbed",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "accuse:player"
+   ],
+   [
+    "brenna",
+    "arrival",
+    null
+   ],
+   [
+    "kael",
+    "shares_stop",
+    null
+   ],
+   [
+    "brenna",
+    "bribe_offer",
+    "refuse"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "brenna",
+    "bribe",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ]
+  ],
+  "events": [
+   [
+    "insult",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "challenge",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "beat",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "humiliate",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "accuse",
+    "kael",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "offer",
+    "player",
+    "brenna",
+    true,
+    5
+   ],
+   [
+    "refuse",
+    "brenna",
+    "player",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ],
+   [
+    "bribe",
+    "player",
+    "brenna",
+    true,
+    20
+   ],
+   [
+    "move",
+    "player",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "take_relic",
+    "kael",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "brenna": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 2,
+     "mags": 1,
+     "odo": 2,
+     "player": 0
+    }
+   },
+   "kael": {
+    "drives": {
+     "ambition": 6,
+     "fear": 1,
+     "grudge": 6,
+     "respect": 0
+    },
+    "frozen_until": null,
+    "loc": "crypt",
+    "trust": {}
+   },
+   "mags": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   },
+   "odo": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   }
+  },
+  "outcome": "lost@5",
+  "player": {
+   "coins": 20,
+   "loc": "crypt",
+   "outcome": null
+  }
+ },
+ "crypt_road/lowball/2": {
+  "beliefs": {
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    0.9,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "kael",
+    "insulted",
+    null
+   ],
+   [
+    "kael",
+    "beaten",
+    null
+   ],
+   [
+    "kael",
+    "robbed",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "accuse:player"
+   ],
+   [
+    "brenna",
+    "arrival",
+    null
+   ],
+   [
+    "kael",
+    "shares_stop",
+    null
+   ],
+   [
+    "brenna",
+    "bribe_offer",
+    "refuse"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "brenna",
+    "bribe",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ]
+  ],
+  "events": [
+   [
+    "insult",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "challenge",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "beat",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "humiliate",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "accuse",
+    "kael",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "offer",
+    "player",
+    "brenna",
+    true,
+    5
+   ],
+   [
+    "refuse",
+    "brenna",
+    "player",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ],
+   [
+    "bribe",
+    "player",
+    "brenna",
+    true,
+    20
+   ],
+   [
+    "move",
+    "player",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "take_relic",
+    "kael",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "brenna": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 2,
+     "mags": 1,
+     "odo": 2,
+     "player": 0
+    }
+   },
+   "kael": {
+    "drives": {
+     "ambition": 6,
+     "fear": 1,
+     "grudge": 6,
+     "respect": 0
+    },
+    "frozen_until": null,
+    "loc": "crypt",
+    "trust": {}
+   },
+   "mags": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   },
+   "odo": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   }
+  },
+  "outcome": "lost@5",
+  "player": {
+   "coins": 20,
+   "loc": "crypt",
+   "outcome": null
+  }
+ },
+ "crypt_road/lowball/4": {
+  "beliefs": {
+   "brenna {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    0.8,
+    "active"
+   ],
+   "kael {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "kael",
+    "insulted",
+    null
+   ],
+   [
+    "kael",
+    "victor",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "brenna",
+    "arrival",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ]
+  ],
+  "events": [
+   [
+    "insult",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "challenge",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "beat",
+    "kael",
+    "player",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "take_relic",
+    "kael",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "brenna": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 2,
+     "mags": 1,
+     "odo": 2,
+     "player": 0
+    }
+   },
+   "kael": {
+    "drives": {
+     "ambition": 6,
+     "fear": 1,
+     "grudge": 2,
+     "respect": 1
+    },
+    "frozen_until": null,
+    "loc": "crypt",
+    "trust": {}
+   },
+   "mags": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   },
+   "odo": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "market",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   }
+  },
+  "outcome": "lost@4",
+  "player": {
+   "coins": 10,
+   "loc": "crypt",
+   "outcome": null
+  }
+ },
+ "crypt_road/provoke_no_pay/1": {
+  "beliefs": {
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    0.9,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "kael",
+    "insulted",
+    null
+   ],
+   [
+    "kael",
+    "beaten",
+    null
+   ],
+   [
+    "kael",
+    "robbed",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "accuse:player"
+   ],
+   [
+    "brenna",
+    "arrival",
+    null
+   ],
+   [
+    "kael",
+    "shares_stop",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ]
+  ],
+  "events": [
+   [
+    "insult",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "challenge",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "beat",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "humiliate",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "accuse",
+    "kael",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "take_relic",
+    "kael",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "brenna": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 2,
+     "mags": 1,
+     "odo": 2,
+     "player": -2
+    }
+   },
+   "kael": {
+    "drives": {
+     "ambition": 6,
+     "fear": 1,
+     "grudge": 6,
+     "respect": 0
+    },
+    "frozen_until": null,
+    "loc": "crypt",
+    "trust": {}
+   },
+   "mags": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   },
+   "odo": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   }
+  },
+  "outcome": "lost@5",
+  "player": {
+   "coins": 40,
+   "loc": "guard_post",
+   "outcome": null
+  }
+ },
+ "crypt_road/provoke_no_pay/2": {
+  "beliefs": {
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    0.9,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "kael",
+    "insulted",
+    null
+   ],
+   [
+    "kael",
+    "beaten",
+    null
+   ],
+   [
+    "kael",
+    "robbed",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "accuse:player"
+   ],
+   [
+    "brenna",
+    "arrival",
+    null
+   ],
+   [
+    "kael",
+    "shares_stop",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ]
+  ],
+  "events": [
+   [
+    "insult",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "challenge",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "beat",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "humiliate",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "accuse",
+    "kael",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "take_relic",
+    "kael",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "brenna": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 2,
+     "mags": 1,
+     "odo": 2,
+     "player": -2
+    }
+   },
+   "kael": {
+    "drives": {
+     "ambition": 6,
+     "fear": 1,
+     "grudge": 6,
+     "respect": 0
+    },
+    "frozen_until": null,
+    "loc": "crypt",
+    "trust": {}
+   },
+   "mags": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   },
+   "odo": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   }
+  },
+  "outcome": "lost@5",
+  "player": {
+   "coins": 40,
+   "loc": "guard_post",
+   "outcome": null
+  }
+ },
+ "crypt_road/provoke_no_pay/4": {
+  "beliefs": {
+   "brenna {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    0.8,
+    "active"
+   ],
+   "kael {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "kael",
+    "insulted",
+    null
+   ],
+   [
+    "kael",
+    "victor",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "brenna",
+    "arrival",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ]
+  ],
+  "events": [
+   [
+    "insult",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "challenge",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "beat",
+    "kael",
+    "player",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "take_relic",
+    "kael",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "brenna": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 2,
+     "mags": 1,
+     "odo": 2,
+     "player": 0
+    }
+   },
+   "kael": {
+    "drives": {
+     "ambition": 6,
+     "fear": 1,
+     "grudge": 2,
+     "respect": 1
+    },
+    "frozen_until": null,
+    "loc": "crypt",
+    "trust": {}
+   },
+   "mags": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   },
+   "odo": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "market",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   }
+  },
+  "outcome": "lost@4",
+  "player": {
+   "coins": 10,
+   "loc": "crypt",
+   "outcome": null
+  }
+ },
+ "crypt_road/provoke_pay/1": {
+  "beliefs": {
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    0.9,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "kael",
+    "insulted",
+    null
+   ],
+   [
+    "kael",
+    "beaten",
+    null
+   ],
+   [
+    "kael",
+    "robbed",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "accuse:player"
+   ],
+   [
+    "brenna",
+    "arrival",
+    null
+   ],
+   [
+    "kael",
+    "shares_stop",
+    null
+   ],
+   [
+    "brenna",
+    "bribe",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "shares_stop",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "shares_stop",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ]
+  ],
+  "events": [
+   [
+    "insult",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "challenge",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "beat",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "humiliate",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "accuse",
+    "kael",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "bribe",
+    "player",
+    "brenna",
+    true,
+    20
+   ],
+   [
+    "move",
+    "player",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "take_relic",
+    "player",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "brenna": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 2,
+     "mags": 1,
+     "odo": 2,
+     "player": 0
+    }
+   },
+   "kael": {
+    "drives": {
+     "ambition": 6,
+     "fear": 1,
+     "grudge": 6,
+     "respect": 0
+    },
+    "frozen_until": null,
+    "loc": "crypt",
+    "trust": {}
+   },
+   "mags": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   },
+   "odo": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "market",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   }
+  },
+  "outcome": "won@5",
+  "player": {
+   "coins": 20,
+   "loc": "crypt",
+   "outcome": null
+  }
+ },
+ "crypt_road/provoke_pay/2": {
+  "beliefs": {
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    0.9,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "kael",
+    "insulted",
+    null
+   ],
+   [
+    "kael",
+    "beaten",
+    null
+   ],
+   [
+    "kael",
+    "robbed",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "accuse:player"
+   ],
+   [
+    "brenna",
+    "arrival",
+    null
+   ],
+   [
+    "kael",
+    "shares_stop",
+    null
+   ],
+   [
+    "brenna",
+    "bribe",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "shares_stop",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "shares_stop",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ]
+  ],
+  "events": [
+   [
+    "insult",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "challenge",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "beat",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "humiliate",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "accuse",
+    "kael",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "bribe",
+    "player",
+    "brenna",
+    true,
+    20
+   ],
+   [
+    "move",
+    "player",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "take_relic",
+    "player",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "brenna": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 2,
+     "mags": 1,
+     "odo": 2,
+     "player": 0
+    }
+   },
+   "kael": {
+    "drives": {
+     "ambition": 6,
+     "fear": 1,
+     "grudge": 6,
+     "respect": 0
+    },
+    "frozen_until": null,
+    "loc": "crypt",
+    "trust": {}
+   },
+   "mags": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   },
+   "odo": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "market",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   }
+  },
+  "outcome": "won@5",
+  "player": {
+   "coins": 20,
+   "loc": "crypt",
+   "outcome": null
+  }
+ },
+ "crypt_road/provoke_pay/4": {
+  "beliefs": {
+   "brenna {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    0.8,
+    "active"
+   ],
+   "kael {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "kael",
+    "insulted",
+    null
+   ],
+   [
+    "kael",
+    "victor",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "brenna",
+    "arrival",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ]
+  ],
+  "events": [
+   [
+    "insult",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "challenge",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "beat",
+    "kael",
+    "player",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "take_relic",
+    "kael",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "brenna": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 2,
+     "mags": 1,
+     "odo": 2,
+     "player": 0
+    }
+   },
+   "kael": {
+    "drives": {
+     "ambition": 6,
+     "fear": 1,
+     "grudge": 2,
+     "respect": 1
+    },
+    "frozen_until": null,
+    "loc": "crypt",
+    "trust": {}
+   },
+   "mags": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   },
+   "odo": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "market",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   }
+  },
+  "outcome": "lost@4",
+  "player": {
+   "coins": 10,
+   "loc": "crypt",
+   "outcome": null
+  }
+ },
+ "crypt_road/provoke_wait/1": {
+  "beliefs": {
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    0.9,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "kael",
+    "insulted",
+    null
+   ],
+   [
+    "kael",
+    "beaten",
+    null
+   ],
+   [
+    "kael",
+    "robbed",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "accuse:player"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "brenna",
+    "arrival",
+    null
+   ],
+   [
+    "brenna",
+    "bribe",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ]
+  ],
+  "events": [
+   [
+    "insult",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "challenge",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "beat",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "humiliate",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "market",
+    true,
+    null
+   ],
+   [
+    "accuse",
+    "kael",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ],
+   [
+    "bribe",
+    "player",
+    "brenna",
+    true,
+    20
+   ],
+   [
+    "move",
+    "player",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "take_relic",
+    "kael",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "brenna": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 2,
+     "mags": 1,
+     "odo": 2,
+     "player": 0
+    }
+   },
+   "kael": {
+    "drives": {
+     "ambition": 6,
+     "fear": 1,
+     "grudge": 6,
+     "respect": 0
+    },
+    "frozen_until": null,
+    "loc": "crypt",
+    "trust": {}
+   },
+   "mags": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   },
+   "odo": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   }
+  },
+  "outcome": "lost@5",
+  "player": {
+   "coins": 20,
+   "loc": "crypt",
+   "outcome": null
+  }
+ },
+ "crypt_road/provoke_wait/2": {
+  "beliefs": {
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    0.9,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"robbed\"}": [
+    1.0,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "kael",
+    "insulted",
+    null
+   ],
+   [
+    "kael",
+    "beaten",
+    null
+   ],
+   [
+    "kael",
+    "robbed",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "accuse:player"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "brenna",
+    "arrival",
+    null
+   ],
+   [
+    "brenna",
+    "bribe",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ]
+  ],
+  "events": [
+   [
+    "insult",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "challenge",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "beat",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "humiliate",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "market",
+    true,
+    null
+   ],
+   [
+    "accuse",
+    "kael",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ],
+   [
+    "bribe",
+    "player",
+    "brenna",
+    true,
+    20
+   ],
+   [
+    "move",
+    "player",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "take_relic",
+    "kael",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "brenna": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 2,
+     "mags": 1,
+     "odo": 2,
+     "player": 0
+    }
+   },
+   "kael": {
+    "drives": {
+     "ambition": 6,
+     "fear": 1,
+     "grudge": 6,
+     "respect": 0
+    },
+    "frozen_until": null,
+    "loc": "crypt",
+    "trust": {}
+   },
+   "mags": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   },
+   "odo": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   }
+  },
+  "outcome": "lost@5",
+  "player": {
+   "coins": 20,
+   "loc": "crypt",
+   "outcome": null
+  }
+ },
+ "crypt_road/provoke_wait/4": {
+  "beliefs": {
+   "brenna {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    0.8,
+    "active"
+   ],
+   "kael {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "kael",
+    "insulted",
+    null
+   ],
+   [
+    "kael",
+    "victor",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "brenna",
+    "arrival",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ]
+  ],
+  "events": [
+   [
+    "insult",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "challenge",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "beat",
+    "kael",
+    "player",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "market",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "take_relic",
+    "kael",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "brenna": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 2,
+     "mags": 1,
+     "odo": 2,
+     "player": 0
+    }
+   },
+   "kael": {
+    "drives": {
+     "ambition": 6,
+     "fear": 1,
+     "grudge": 2,
+     "respect": 1
+    },
+    "frozen_until": null,
+    "loc": "crypt",
+    "trust": {}
+   },
+   "mags": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   },
+   "odo": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "market",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   }
+  },
+  "outcome": "lost@4",
+  "player": {
+   "coins": 10,
+   "loc": "bridge",
+   "outcome": null
+  }
+ },
+ "crypt_road/rush/1": {
+  "beliefs": {},
+  "decisions": [
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "brenna",
+    "arrival",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ]
+  ],
+  "events": [
+   [
+    "move",
+    "player",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ],
+   [
+    "take_relic",
+    "player",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "brenna": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 2,
+     "mags": 1,
+     "odo": 2,
+     "player": 0
+    }
+   },
+   "kael": {
+    "drives": {
+     "ambition": 6,
+     "fear": 1,
+     "grudge": 0,
+     "respect": 1
+    },
+    "frozen_until": null,
+    "loc": "crypt",
+    "trust": {}
+   },
+   "mags": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   },
+   "odo": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   }
+  },
+  "outcome": "won@4",
+  "player": {
+   "coins": 10,
+   "loc": "crypt",
+   "outcome": null
+  }
+ },
+ "crypt_road/rush/2": {
+  "beliefs": {},
+  "decisions": [
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "brenna",
+    "arrival",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ]
+  ],
+  "events": [
+   [
+    "move",
+    "player",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ],
+   [
+    "take_relic",
+    "player",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "brenna": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 2,
+     "mags": 1,
+     "odo": 2,
+     "player": 0
+    }
+   },
+   "kael": {
+    "drives": {
+     "ambition": 6,
+     "fear": 1,
+     "grudge": 0,
+     "respect": 1
+    },
+    "frozen_until": null,
+    "loc": "crypt",
+    "trust": {}
+   },
+   "mags": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   },
+   "odo": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   }
+  },
+  "outcome": "won@4",
+  "player": {
+   "coins": 10,
+   "loc": "crypt",
+   "outcome": null
+  }
+ },
+ "crypt_road/rush/4": {
+  "beliefs": {},
+  "decisions": [
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "brenna",
+    "arrival",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ]
+  ],
+  "events": [
+   [
+    "move",
+    "player",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ],
+   [
+    "take_relic",
+    "player",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "brenna": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 2,
+     "mags": 1,
+     "odo": 2,
+     "player": 0
+    }
+   },
+   "kael": {
+    "drives": {
+     "ambition": 6,
+     "fear": 1,
+     "grudge": 0,
+     "respect": 1
+    },
+    "frozen_until": null,
+    "loc": "crypt",
+    "trust": {}
+   },
+   "mags": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   },
+   "odo": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   }
+  },
+  "outcome": "won@4",
+  "player": {
+   "coins": 10,
+   "loc": "crypt",
+   "outcome": null
+  }
+ },
+ "crypt_road/spare/1": {
+  "beliefs": {
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    0.8,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"spared\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"spared\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"spared\"}": [
+    1.0,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "kael",
+    "insulted",
+    null
+   ],
+   [
+    "kael",
+    "beaten",
+    null
+   ],
+   [
+    "kael",
+    "spared",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "share_drink"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "brenna",
+    "arrival",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ]
+  ],
+  "events": [
+   [
+    "insult",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "challenge",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "beat",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "spare",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "take_relic",
+    "player",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "brenna": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 2,
+     "mags": 1,
+     "odo": 2,
+     "player": 0
+    }
+   },
+   "kael": {
+    "drives": {
+     "ambition": 6,
+     "fear": 1,
+     "grudge": 1,
+     "respect": 4
+    },
+    "frozen_until": null,
+    "loc": "crypt",
+    "trust": {}
+   },
+   "mags": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   },
+   "odo": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "market",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   }
+  },
+  "outcome": "won@5",
+  "player": {
+   "coins": 10,
+   "loc": "crypt",
+   "outcome": null
+  }
+ },
+ "crypt_road/spare/2": {
+  "beliefs": {
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    0.8,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"spared\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"spared\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"spared\"}": [
+    1.0,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "kael",
+    "insulted",
+    null
+   ],
+   [
+    "kael",
+    "beaten",
+    null
+   ],
+   [
+    "kael",
+    "spared",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "share_drink"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "brenna",
+    "arrival",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ]
+  ],
+  "events": [
+   [
+    "insult",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "challenge",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "beat",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "spare",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "take_relic",
+    "player",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "brenna": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 2,
+     "mags": 1,
+     "odo": 2,
+     "player": 0
+    }
+   },
+   "kael": {
+    "drives": {
+     "ambition": 6,
+     "fear": 1,
+     "grudge": 1,
+     "respect": 4
+    },
+    "frozen_until": null,
+    "loc": "crypt",
+    "trust": {}
+   },
+   "mags": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   },
+   "odo": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "market",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   }
+  },
+  "outcome": "won@5",
+  "player": {
+   "coins": 10,
+   "loc": "crypt",
+   "outcome": null
+  }
+ },
+ "crypt_road/spare/4": {
+  "beliefs": {
+   "brenna {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    0.8,
+    "active"
+   ],
+   "brenna {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    0.8,
+    "active"
+   ],
+   "kael {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "kael {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "mags {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"kael\", \"b\": \"player\", \"pred\": \"beat\"}": [
+    1.0,
+    "active"
+   ],
+   "odo {\"a\": \"player\", \"b\": \"kael\", \"pred\": \"insulted\"}": [
+    1.0,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "kael",
+    "insulted",
+    null
+   ],
+   [
+    "kael",
+    "victor",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "brenna",
+    "arrival",
+    null
+   ],
+   [
+    "kael",
+    "tick",
+    "go_to"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ],
+   [
+    "kael",
+    "tick",
+    "take_relic"
+   ]
+  ],
+  "events": [
+   [
+    "insult",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "challenge",
+    "player",
+    "kael",
+    true,
+    null
+   ],
+   [
+    "beat",
+    "kael",
+    "player",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "bridge",
+    true,
+    null
+   ],
+   [
+    "move",
+    "kael",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "tavern",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "crypt",
+    true,
+    null
+   ],
+   [
+    "take_relic",
+    "kael",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "guard_post",
+    true,
+    null
+   ],
+   [
+    "gossip",
+    "odo",
+    "brenna",
+    true,
+    null
+   ],
+   [
+    "move",
+    "odo",
+    "market",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "brenna": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "guard_post",
+    "trust": {
+     "kael": 2,
+     "mags": 1,
+     "odo": 2,
+     "player": 0
+    }
+   },
+   "kael": {
+    "drives": {
+     "ambition": 6,
+     "fear": 1,
+     "grudge": 2,
+     "respect": 1
+    },
+    "frozen_until": null,
+    "loc": "crypt",
+    "trust": {}
+   },
+   "mags": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "tavern",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   },
+   "odo": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "market",
+    "trust": {
+     "kael": 0,
+     "player": 0
+    }
+   }
+  },
+  "outcome": "lost@4",
+  "player": {
+   "coins": 10,
+   "loc": "crypt",
+   "outcome": null
+  }
+ },
+ "manor/accuse_early": {
+  "beliefs": {
+   "pell {\"a\": \"sable\", \"at\": 1, \"place\": \"study\", \"pred\": \"was_in\"}": [
+    1.0,
+    "active"
+   ],
+   "sable {\"a\": \"sable\", \"at\": 1, \"place\": \"study\", \"pred\": \"was_in\"}": [
+    1.0,
+    "active"
+   ],
+   "sable {\"a\": \"sable\", \"b\": \"ring\", \"pred\": \"took\"}": [
+    1.0,
+    "active"
+   ],
+   "vane {\"a\": \"sable\", \"at\": 1, \"place\": \"kitchen\", \"pred\": \"was_in\"}": [
+    0.9,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "vane",
+    "accused_sable",
+    null
+   ]
+  ],
+  "events": [
+   [
+    "take",
+    "sable",
+    "ring",
+    true,
+    null
+   ],
+   [
+    "leave",
+    "sable",
+    null,
+    true,
+    null
+   ],
+   [
+    "tell",
+    "sable",
+    "vane",
+    false,
+    null
+   ],
+   [
+    "arrive",
+    "player",
+    null,
+    true,
+    null
+   ],
+   [
+    "accuse",
+    "player",
+    "sable",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "pell": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "study",
+    "trust": {
+     "player": 0,
+     "sable": 1,
+     "vane": 4
+    }
+   },
+   "sable": {
+    "drives": {
+     "fear": 1
+    },
+    "frozen_until": null,
+    "loc": "kitchen",
+    "trust": {
+     "pell": 1,
+     "player": 0,
+     "vane": 2
+    }
+   },
+   "vane": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "hall",
+    "trust": {
+     "pell": 3,
+     "player": 0,
+     "sable": 2
+    }
+   }
+  },
+  "outcome": "lost@2",
+  "player": {
+   "asked": [],
+   "loc": "hall",
+   "outcome": "Lady Vane didn't believe you: as far as she knew, Sable was in the kitchen at mid-morning. Break the alibi first."
+  }
+ },
+ "manor/accuse_pell": {
+  "beliefs": {
+   "pell {\"a\": \"sable\", \"at\": 1, \"place\": \"study\", \"pred\": \"was_in\"}": [
+    1.0,
+    "active"
+   ],
+   "sable {\"a\": \"sable\", \"at\": 1, \"place\": \"study\", \"pred\": \"was_in\"}": [
+    1.0,
+    "active"
+   ],
+   "sable {\"a\": \"sable\", \"b\": \"ring\", \"pred\": \"took\"}": [
+    1.0,
+    "active"
+   ],
+   "vane {\"a\": \"sable\", \"at\": 1, \"place\": \"kitchen\", \"pred\": \"was_in\"}": [
+    0.0244,
+    "retracted"
+   ],
+   "vane {\"a\": \"sable\", \"at\": 1, \"place\": \"study\", \"pred\": \"was_in\"}": [
+    0.9,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "sable",
+    "asked_morning",
+    "deceive:alibi"
+   ],
+   [
+    "pell",
+    "asked_morning",
+    null
+   ],
+   [
+    "pell",
+    "testify",
+    null
+   ],
+   [
+    "vane",
+    "questioned",
+    null
+   ],
+   [
+    "vane",
+    "accused_pell",
+    null
+   ]
+  ],
+  "events": [
+   [
+    "take",
+    "sable",
+    "ring",
+    true,
+    null
+   ],
+   [
+    "leave",
+    "sable",
+    null,
+    true,
+    null
+   ],
+   [
+    "tell",
+    "sable",
+    "vane",
+    false,
+    null
+   ],
+   [
+    "arrive",
+    "player",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "kitchen",
+    true,
+    null
+   ],
+   [
+    "tell",
+    "sable",
+    "player",
+    false,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "study",
+    true,
+    null
+   ],
+   [
+    "tell",
+    "pell",
+    "player",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "hall",
+    true,
+    null
+   ],
+   [
+    "question",
+    "vane",
+    "pell",
+    true,
+    null
+   ],
+   [
+    "testify",
+    "pell",
+    "vane",
+    true,
+    null
+   ],
+   [
+    "accuse",
+    "player",
+    "pell",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "pell": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "study",
+    "trust": {
+     "player": 0,
+     "sable": 1,
+     "vane": 4
+    }
+   },
+   "sable": {
+    "drives": {
+     "fear": 3
+    },
+    "frozen_until": null,
+    "loc": "kitchen",
+    "trust": {
+     "pell": 1,
+     "player": 0,
+     "vane": 2
+    }
+   },
+   "vane": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "hall",
+    "trust": {
+     "pell": 3,
+     "player": 0,
+     "sable": -1
+    }
+   }
+  },
+  "outcome": "lost@5",
+  "player": {
+   "asked": [
+    "pell:morning",
+    "sable:morning"
+   ],
+   "loc": "hall",
+   "outcome": "Pell didn't take the ring, and Lady Vane knew it."
+  }
+ },
+ "manor/explore": {
+  "beliefs": {
+   "pell {\"a\": \"sable\", \"at\": 1, \"place\": \"study\", \"pred\": \"was_in\"}": [
+    1.0,
+    "active"
+   ],
+   "sable {\"a\": \"sable\", \"at\": 1, \"place\": \"study\", \"pred\": \"was_in\"}": [
+    1.0,
+    "active"
+   ],
+   "sable {\"a\": \"sable\", \"b\": \"ring\", \"pred\": \"took\"}": [
+    1.0,
+    "active"
+   ],
+   "vane {\"a\": \"sable\", \"at\": 1, \"place\": \"kitchen\", \"pred\": \"was_in\"}": [
+    0.0244,
+    "retracted"
+   ],
+   "vane {\"a\": \"sable\", \"at\": 1, \"place\": \"study\", \"pred\": \"was_in\"}": [
+    0.9,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "vane",
+    "asked_ring",
+    null
+   ],
+   [
+    "vane",
+    "asked_morning",
+    null
+   ],
+   [
+    "sable",
+    "asked_ring",
+    null
+   ],
+   [
+    "sable",
+    "asked_morning",
+    "deceive:alibi"
+   ],
+   [
+    "pell",
+    "asked_ring",
+    null
+   ],
+   [
+    "pell",
+    "asked_morning",
+    null
+   ],
+   [
+    "sable",
+    "asked_morning",
+    "deceive:alibi"
+   ],
+   [
+    "vane",
+    "questioned_sable",
+    null
+   ],
+   [
+    "pell",
+    "testify",
+    null
+   ],
+   [
+    "vane",
+    "questioned",
+    null
+   ],
+   [
+    "vane",
+    "asked_morning",
+    null
+   ],
+   [
+    "vane",
+    "accused_sable",
+    null
+   ]
+  ],
+  "events": [
+   [
+    "take",
+    "sable",
+    "ring",
+    true,
+    null
+   ],
+   [
+    "leave",
+    "sable",
+    null,
+    true,
+    null
+   ],
+   [
+    "tell",
+    "sable",
+    "vane",
+    false,
+    null
+   ],
+   [
+    "arrive",
+    "player",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "kitchen",
+    true,
+    null
+   ],
+   [
+    "tell",
+    "sable",
+    "player",
+    false,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "study",
+    true,
+    null
+   ],
+   [
+    "tell",
+    "pell",
+    "player",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "hall",
+    true,
+    null
+   ],
+   [
+    "question",
+    "vane",
+    "sable",
+    true,
+    null
+   ],
+   [
+    "tell",
+    "sable",
+    "vane",
+    false,
+    null
+   ],
+   [
+    "question",
+    "vane",
+    "pell",
+    true,
+    null
+   ],
+   [
+    "testify",
+    "pell",
+    "vane",
+    true,
+    null
+   ],
+   [
+    "accuse",
+    "player",
+    "sable",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "pell": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "study",
+    "trust": {
+     "player": 0,
+     "sable": 1,
+     "vane": 4
+    }
+   },
+   "sable": {
+    "drives": {
+     "fear": 6
+    },
+    "frozen_until": null,
+    "loc": "kitchen",
+    "trust": {
+     "pell": 1,
+     "player": 0,
+     "vane": 2
+    }
+   },
+   "vane": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "hall",
+    "trust": {
+     "pell": 3,
+     "player": 0,
+     "sable": -1
+    }
+   }
+  },
+  "outcome": "won@5",
+  "player": {
+   "asked": [
+    "pell:morning",
+    "pell:ring",
+    "sable:morning",
+    "sable:ring",
+    "vane:morning",
+    "vane:ring"
+   ],
+   "loc": "hall",
+   "outcome": "Solved. Sable took the ring, and Lady Vane believed Pell's testimony over Sable's alibi."
+  }
+ },
+ "manor/solve": {
+  "beliefs": {
+   "pell {\"a\": \"sable\", \"at\": 1, \"place\": \"study\", \"pred\": \"was_in\"}": [
+    1.0,
+    "active"
+   ],
+   "sable {\"a\": \"sable\", \"at\": 1, \"place\": \"study\", \"pred\": \"was_in\"}": [
+    1.0,
+    "active"
+   ],
+   "sable {\"a\": \"sable\", \"b\": \"ring\", \"pred\": \"took\"}": [
+    1.0,
+    "active"
+   ],
+   "vane {\"a\": \"sable\", \"at\": 1, \"place\": \"kitchen\", \"pred\": \"was_in\"}": [
+    0.0244,
+    "retracted"
+   ],
+   "vane {\"a\": \"sable\", \"at\": 1, \"place\": \"study\", \"pred\": \"was_in\"}": [
+    0.9,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "sable",
+    "asked_morning",
+    "deceive:alibi"
+   ],
+   [
+    "pell",
+    "asked_morning",
+    null
+   ],
+   [
+    "pell",
+    "testify",
+    null
+   ],
+   [
+    "vane",
+    "questioned",
+    null
+   ],
+   [
+    "vane",
+    "accused_sable",
+    null
+   ]
+  ],
+  "events": [
+   [
+    "take",
+    "sable",
+    "ring",
+    true,
+    null
+   ],
+   [
+    "leave",
+    "sable",
+    null,
+    true,
+    null
+   ],
+   [
+    "tell",
+    "sable",
+    "vane",
+    false,
+    null
+   ],
+   [
+    "arrive",
+    "player",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "kitchen",
+    true,
+    null
+   ],
+   [
+    "tell",
+    "sable",
+    "player",
+    false,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "study",
+    true,
+    null
+   ],
+   [
+    "tell",
+    "pell",
+    "player",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "hall",
+    true,
+    null
+   ],
+   [
+    "question",
+    "vane",
+    "pell",
+    true,
+    null
+   ],
+   [
+    "testify",
+    "pell",
+    "vane",
+    true,
+    null
+   ],
+   [
+    "accuse",
+    "player",
+    "sable",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "pell": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "study",
+    "trust": {
+     "player": 0,
+     "sable": 1,
+     "vane": 4
+    }
+   },
+   "sable": {
+    "drives": {
+     "fear": 3
+    },
+    "frozen_until": null,
+    "loc": "kitchen",
+    "trust": {
+     "pell": 1,
+     "player": 0,
+     "vane": 2
+    }
+   },
+   "vane": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "hall",
+    "trust": {
+     "pell": 3,
+     "player": 0,
+     "sable": -1
+    }
+   }
+  },
+  "outcome": "won@5",
+  "player": {
+   "asked": [
+    "pell:morning",
+    "sable:morning"
+   ],
+   "loc": "hall",
+   "outcome": "Solved. Sable took the ring, and Lady Vane believed Pell's testimony over Sable's alibi."
+  }
+ },
+ "manor/watch": {
+  "beliefs": {
+   "pell {\"a\": \"sable\", \"at\": 1, \"place\": \"study\", \"pred\": \"was_in\"}": [
+    1.0,
+    "active"
+   ],
+   "sable {\"a\": \"sable\", \"at\": 1, \"place\": \"study\", \"pred\": \"was_in\"}": [
+    1.0,
+    "active"
+   ],
+   "sable {\"a\": \"sable\", \"b\": \"ring\", \"pred\": \"took\"}": [
+    1.0,
+    "active"
+   ],
+   "vane {\"a\": \"sable\", \"at\": 1, \"place\": \"kitchen\", \"pred\": \"was_in\"}": [
+    0.0244,
+    "retracted"
+   ],
+   "vane {\"a\": \"sable\", \"at\": 1, \"place\": \"study\", \"pred\": \"was_in\"}": [
+    0.9,
+    "active"
+   ]
+  },
+  "decisions": [
+   [
+    "vane",
+    "asked_ring",
+    null
+   ],
+   [
+    "vane",
+    "asked_morning",
+    null
+   ],
+   [
+    "sable",
+    "asked_morning",
+    "deceive:alibi"
+   ],
+   [
+    "pell",
+    "asked_morning",
+    null
+   ],
+   [
+    "pell",
+    "testify",
+    null
+   ],
+   [
+    "vane",
+    "questioned",
+    null
+   ],
+   [
+    "vane",
+    "accused_sable",
+    null
+   ]
+  ],
+  "events": [
+   [
+    "take",
+    "sable",
+    "ring",
+    true,
+    null
+   ],
+   [
+    "leave",
+    "sable",
+    null,
+    true,
+    null
+   ],
+   [
+    "tell",
+    "sable",
+    "vane",
+    false,
+    null
+   ],
+   [
+    "arrive",
+    "player",
+    null,
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "kitchen",
+    true,
+    null
+   ],
+   [
+    "tell",
+    "sable",
+    "player",
+    false,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "study",
+    true,
+    null
+   ],
+   [
+    "tell",
+    "pell",
+    "player",
+    true,
+    null
+   ],
+   [
+    "move",
+    "player",
+    "hall",
+    true,
+    null
+   ],
+   [
+    "question",
+    "vane",
+    "pell",
+    true,
+    null
+   ],
+   [
+    "testify",
+    "pell",
+    "vane",
+    true,
+    null
+   ],
+   [
+    "accuse",
+    "player",
+    "sable",
+    true,
+    null
+   ]
+  ],
+  "npcs": {
+   "pell": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "study",
+    "trust": {
+     "player": 0,
+     "sable": 1,
+     "vane": 4
+    }
+   },
+   "sable": {
+    "drives": {
+     "fear": 3
+    },
+    "frozen_until": null,
+    "loc": "kitchen",
+    "trust": {
+     "pell": 1,
+     "player": 0,
+     "vane": 2
+    }
+   },
+   "vane": {
+    "drives": {},
+    "frozen_until": null,
+    "loc": "hall",
+    "trust": {
+     "pell": 3,
+     "player": 0,
+     "sable": -1
+    }
+   }
+  },
+  "outcome": "won@5",
+  "player": {
+   "asked": [
+    "pell:morning",
+    "sable:morning",
+    "vane:morning",
+    "vane:ring"
+   ],
+   "loc": "hall",
+   "outcome": "Solved. Sable took the ring, and Lady Vane believed Pell's testimony over Sable's alibi."
+  }
+ }
+}

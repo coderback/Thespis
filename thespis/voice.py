@@ -156,19 +156,22 @@ class Voice:
         text, ids = telling(events), [e.id for e in events]
         if not events or mind is None or not mind.active:
             return text, ids, "fallback"
+        u = mind.narrate(self.narration(events, setting, telling), Utterance(None, text, ids, "fallback"))
+        return u.line or text, u.cites, u.source
+
+    def narration(self, events: list[Event], setting: str, telling: Callable[[list[Event]], str]) -> StatePack:
+        """The narrator's state pack for `events`: each told in the code's words, and only their names to use."""
         cast = self.cast.data["narrator"]
         names = set(self.places)
         for e in events:
             names |= {e.actor, e.target}
             if e.claim:
                 names |= {e.claim.a, e.claim.b}
-        pack = StatePack(
+        return StatePack(
             npc="narrator", name=cast["name"], persona=cast["persona"], goal="Tell the story so far, truthfully",
             situation="Tell the player what happened since they last looked.", here=[], drives={}, trust_in={},
             beliefs=[], events=[{"id": e.id, "what": telling([e])} for e in events],
             names={x for x in names if x and x != "player"}, setting=setting, stakes=True)
-        u = mind.narrate(pack, Utterance(None, text, ids, "fallback"))
-        return u.line or text, u.cites, u.source
 
 
 def reply(d: Decision) -> dict:

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 
 DECIDE, REACT = "decide", "react"
 
@@ -37,6 +37,12 @@ class DecisionLog:
         decision = Decision(f"d{len(self._decisions) + 1:04d}", kind, npc, phase, trigger, **fields)
         self._decisions.append(decision)
         return decision
+
+    def settle(self, decision_id: str, **fields) -> Decision:
+        """Replace a recorded decision's line once the model has answered for it (a provisional line made final)."""
+        i = int(decision_id[1:]) - 1
+        self._decisions[i] = settled = replace(self._decisions[i], **fields)
+        return settled
 
     def __len__(self) -> int:
         return len(self._decisions)

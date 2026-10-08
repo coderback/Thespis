@@ -18,13 +18,12 @@ from dataclasses import dataclass, field
 from games.crypt_road import claims, voice
 from games.crypt_road import content as C
 from thespis import perception
-from thespis.affordances import Affordance, decide, options
+from thespis.affordances import decide
 from thespis.brain import Brain, UtilityBrain
 from thespis.claims import ClaimChecking
 from thespis.expression import Mind, Observer, ReplyCache
 from thespis.gateway import ModelGateway
 from thespis.ledger import Claim, Event
-from thespis.minds import NPC
 from thespis.moderation import Moderator
 from thespis.play import NotAllowed, Verbs, check, count_calls, open_mind
 from thespis.tick import Tick, gossip, run_tick, walk, walks
@@ -221,7 +220,7 @@ def _offer(w: World, mind: Mind, brain: Brain, amount: int) -> dict | None:
         _event(w, "bribe", "player", C.GUARD, loc, amount=amount)
         return None
     offer = _event(w, "offer", "player", C.GUARD, loc, amount=amount)
-    choices = {f"counter:{price}": 5, "refuse": 7 if amount * 2 < price else 3}  # a lowball is more likely refused
+    choices = C.CHOICES[C.GUARD, "bribe_offer"].options(w, View(loc), price=price, lowball=amount * 2 < price)
     d = decide(w, mind, voice.VOICE, brain, C.GUARD, "bribe_offer", choices,
                lambda ch: voice.haggle_line(ch, offer, amount, price),
                f"The player offers you {amount} coins to forget the trouble. You won't take less than {price}.",
@@ -287,24 +286,8 @@ def _tell(w: World, listener: str, c: Claim) -> None:
 
 
 # ---------------------------------------------------------------- the tick
-# What Kael may do each phase, by utility; the first declared wins a tie.
+# What Kael and Brenna may choose is declared in cast.toml ([[npc.*.choices.*]]); the rules apply the choice.
 ROBBED, BEATEN = Claim("robbed", "player", C.RIVAL), Claim("beat", "player", C.RIVAL)
-
-
-def _can_accuse(w: World, kael: NPC, view: View) -> bool:
-    """At the guard post, angry enough, not yet done, and with something to report."""
-    return (kael.loc == w.npcs[C.GUARD].loc and kael.drives["grudge"] >= 4 and not kael.flags.get("accused")
-            and bool(w.beliefs.conf(C.RIVAL, ROBBED) or w.beliefs.conf(C.RIVAL, BEATEN)))
-
-
-KAEL = (
-    Affordance("go_to", lambda w, n, v: n.drives["ambition"]),
-    Affordance("wait", lambda w, n, v: 0),
-    Affordance("take_relic", lambda w, n, v: 100, when=lambda w, n, v: n.loc == "crypt"),
-    Affordance("accuse:player", lambda w, n, v: n.drives["grudge"] + 3, when=_can_accuse),
-    Affordance("share_drink", lambda w, n, v: n.drives["respect"] + 3,
-               when=lambda w, n, v: n.drives["respect"] >= 4 and n.loc == v.player_at and not n.flags.get("drink")),
-)
 
 
 def end_phase(w: World, action: str, brain: Brain | None = None, mind: Mind | None = None) -> Tick:
@@ -339,7 +322,8 @@ def end_phase(w: World, action: str, brain: Brain | None = None, mind: Mind | No
                 c = Claim.from_json(cj)
                 detained = guard.flags.setdefault("detained_for", [])
                 if c.a == C.RIVAL and w.beliefs.conf(C.GUARD, c) >= C.CRIME_CONF and cj not in detained:
-                    chosen = choose(C.GUARD, "crime_belief", {f"detain:{C.RIVAL}": 10, "wait": 1},
+                    chosen = choose(C.GUARD, "crime_belief", C.CHOICES[C.GUARD, "crime_belief"].options(
+                                        w, view, culprit=C.RIVAL),
                                     lambda ch, c=c: voice.decision_line(w, C.GUARD, ch, c, view),
                                     f"You believe {voice._about(c)}. {C.short_name(c.a)} is here at your post.",
                                     "believes a robbery at 0.5 or more")
@@ -355,7 +339,8 @@ def end_phase(w: World, action: str, brain: Brain | None = None, mind: Mind | No
                     continue
                 if all(e.source == wit for e in belief.evidence):
                     continue
-                chosen = choose(C.GUARD, "witness_present", {f"question:{wit}": 8, "wait": 1},
+                chosen = choose(C.GUARD, "witness_present", C.CHOICES[C.GUARD, "witness_present"].options(
+                                    w, view, witness=wit),
                                 lambda ch, c=belief.claim: voice.decision_line(w, C.GUARD, ch, c, view),
                                 f"{C.short_name(wit)} is here. You were told that {voice._about(belief.claim)}; "
                                 f"{C.short_name(wit)} would know whether it happened.",
@@ -367,7 +352,7 @@ def end_phase(w: World, action: str, brain: Brain | None = None, mind: Mind | No
         nonlocal kael_to
         if kael.frozen(p):
             return
-        choices = options(w, C.RIVAL, KAEL, view)
+        choices = C.CHOICES[C.RIVAL, "tick"].options(w, view)
         grievance = ROBBED if w.beliefs.conf(C.RIVAL, ROBBED) else BEATEN
         # Voice the choice only when it matters: an option beyond the default walk, or a drive past a threshold.
         ask = voice.crossed_threshold(w, C.RIVAL) or len(choices) > 2

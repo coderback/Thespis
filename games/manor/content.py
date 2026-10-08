@@ -10,6 +10,7 @@ from pathlib import Path
 
 from thespis.beliefs import credence
 from thespis.cast import Cast
+from thespis.considerations import declared
 from thespis.deception import log_statement
 from thespis.ledger import Claim
 from thespis.minds import NPC
@@ -25,10 +26,10 @@ OWNER, BUTLER, MAID = "vane", "pell", "sable"
 SUSPECTS = (BUTLER, MAID)
 ITEM = "ring"
 TOPICS = {"morning": "this morning", "ring": "the ring"}
-FEAR_TO_LIE = 3  # Sable may lie once her fear reaches this
 CONTRADICTED = 3  # how far Lady Vane's trust falls in someone caught lying to her
 BELIEVED = 0.5  # beliefs below this are held but never acted on
 CAST = Cast(Path(__file__).with_name("cast.toml"))
+CHOICES = declared(CAST.data)  # what each NPC may choose, compiled from cast.toml
 
 
 def load_cast() -> dict:

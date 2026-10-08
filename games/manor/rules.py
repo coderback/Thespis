@@ -15,7 +15,7 @@ from dataclasses import dataclass, field
 from games.manor import claims, voice
 from games.manor import content as C
 from games.manor.voice import Speech
-from thespis.affordances import Affordance, decide, options
+from thespis.affordances import decide
 from thespis.beliefs import Belief, credence, reconcile
 from thespis.brain import UtilityBrain
 from thespis.claims import ClaimChecking
@@ -119,12 +119,6 @@ def _ask(w: World, mind: Mind, npc: str, topic: str) -> list[dict]:
     return _say(w, mind, C.OWNER, "asked_morning", key, [cite], "vane_asked_morning")  # morning_doubt: what broke it
 
 
-# Asked about the morning, Sable lies once she is frightened enough, and deflects before that.
-SABLE = (Affordance("deceive:alibi", lambda w, n, v: n.drives["fear"] + 2,
-                    when=lambda w, n, v: n.drives.get("fear", 0) >= C.FEAR_TO_LIE),
-         Affordance("deflect", lambda w, n, v: 3))
-
-
 def _sable_answers(w: World, mind: Mind, listener: str, loc: str) -> dict:
     """Where Sable says she was at mid-morning. A lie is an action code chose, logged false."""
     knows = _held(w, C.MAID, C.THE_TRUTH)  # she knows where she really was
@@ -143,9 +137,11 @@ def _sable_answers(w: World, mind: Mind, listener: str, loc: str) -> dict:
             _hear(w, listener, C.THE_ALIBI, C.MAID, told)
         return {"cites": cites, "asserted": told.id}
 
-    choices = options(w, C.MAID, SABLE, voice.VOICE.view(w))
+    # Asked about the morning, she lies once she is frightened enough and deflects before that (cast.toml).
+    sable = C.CHOICES[C.MAID, "asked_morning"]
+    choices = sable.options(w, voice.VOICE.view(w))
     d = decide(w, mind, voice.VOICE, UtilityBrain(), C.MAID, "asked_morning", choices, line_for,
-               C.CAST.text("situations", "sable_asked_morning", asker=asker), asserts={"deceive:alibi": C.THE_ALIBI},
+               C.CAST.text("situations", "sable_asked_morning", asker=asker), asserts=sable.asserts(),
                scores="pulls", settle=settle)
     return voice.reply(d)
 

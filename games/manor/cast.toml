@@ -46,6 +46,18 @@ deceive = "Me? I was in the kitchen at mid-morning, scrubbing pots, all on my ow
 deflect = "I couldn't say, I'm sure. It's been such a busy day."
 ring = "Her ladyship's ring? I'm sure I wouldn't know where she keeps her things."
 
+# Asked where she was at mid-morning, Sable lies once she is frightened enough, and deflects before that. What an
+# action is open to and worth (thespis.considerations); the highest wins and the first listed wins a tie.
+[[npc.sable.choices.asked_morning]]
+do = "deceive:alibi"
+utility = [{ drive = "fear", plus = 2 }]
+when = [{ drive = "fear", gte = 3 }]
+asserts = { pred = "was_in", a = "self", place = "kitchen", at = 1 }
+
+[[npc.sable.choices.asked_morning]]
+do = "deflect"
+utility = 3
+
 # The situation each line is spoken in, from the speaker's point of view, as the model reads it: by trigger, or by
 # speaker and trigger where people see the same moment differently.
 [situations]

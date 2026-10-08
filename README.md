@@ -132,6 +132,11 @@ The core owns the mind loop; a game supplies its content and the rules only it h
 | Verbs, refusals and the Mind per action (`play.py`) | Its verbs and what they do |
 | Claim checks (`claims.py`) | Its claim vocabulary |
 | Content loading (`cast.py`) | `cast.toml`: personas, template lines, event sentences, situations |
+| Choices as data, compiled to affordances (`considerations.py`) | `[[npc.<id>.choices.<moment>]]`: conditions and utilities |
+
+A game whose world lives in an engine supplies only the TOML: [docs/protocol.md](docs/protocol.md) covers the calls
+(observe, decide, react, narrate, tick, snapshot, restore) in the library (`thespis.api`) and over `/v1` HTTP
+(`python -m thespis serve`), and [examples/tavern/game.toml](examples/tavern/game.toml) is a complete game.
 
 ## Same core, a different game: the manor mystery
 
@@ -258,6 +263,9 @@ To work on the client with hot reload, run `npm run dev` in `client/` next to th
 | `python tools/warm_cache.py <host>` | Plays the client's autoplay route until the cache answers it all |
 | `python tools/bench_models.py` | Each configured model alone on real state packs: latency and valid picks |
 | `python tools/make_fixtures.py` | Regenerates `fixtures/` from the real API |
+| `python -m tools.outcomes` | Plays all 35 routes with the brain off and shows what differs from `tests/outcomes.json`; `--update` records them |
+| `python -m thespis serve --game examples/tavern/game.toml` | The `/v1` protocol on localhost, for an engine ([docs/protocol.md](docs/protocol.md)) |
+| `python -m thespis openapi --out docs/openapi-v1.json` | Regenerates the `/v1` contract after a change to the API |
 | `python tools/manor_solve.py <host>` | Solves the manor mystery by script, and checks two wrong turns lose |
 | `python tools/exposure.py <host>` | Checks the host keeps its edges shut against a stranger: no call log, API docs or CORS, a body limit, security headers |
 | `DEMO_HOST=<host> pytest tests/demo_test.py` | The demo script's checks, beat by beat, against a live host |
@@ -266,11 +274,12 @@ To work on the client with hot reload, run `npm run dev` in `client/` next to th
 
 ```
 thespis/            the core, which knows no game: the ledger, beliefs, perception, affordances, the tick,
-                    voice and expression, the gateway and the store
+                    voice and expression, the gateway and the store; sessions and the /v1 server for engines
 games/crypt_road/   the demo game as a Thespis adapter: its cast and words (cast.toml), rules, views, web app
 games/manor/        a second adapter: the manor mystery, served at /manor (its client is client/manor/)
 client/             the browser client for both games: The Crypt Road (index.html) and the manor (manor/)
-docs/               the API contract (api.md), models.md, and the design docs
+docs/               the API contract (api.md), the protocol (protocol.md, openapi-v1.json), models.md, design docs
+examples/           the core alone (minimal_client.py), and the tavern: a whole game in one TOML file
 fixtures/           real API responses along the demo route, for building the client
 tools/              the rules model, harness, cache warmer, model benchmark and fixture generator
 rehearsal/          scenarios, recordings and reports: the regression suite CI replays
@@ -284,7 +293,7 @@ tests/              the pytest suite, run by CI on every pull request
 | **Cast** | NPC minds: ledger, beliefs, drives, validator, model voice | Built for this hackathon |
 | **Rehearsal** | Regression suite and benchmark | v1: `python -m rehearsal`, replayed in CI; `tools/harness.py` for a host |
 | **Director** | Story sifting, pacing, quests from the ledger | Planned; the registry is in `thespis/director.py` |
-| **Stage** | Game adapters and engine SDKs | Planned; The Crypt Road is the first adapter |
+| **Stage** | Game adapters and engine SDKs | The `/v1` protocol and the library (`thespis.api`); engine SDKs planned |
 
 ## Deploy
 
