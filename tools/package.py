@@ -54,7 +54,10 @@ def build() -> Path:
     entry.write_text("from thespis.__main__ import main\n\nraise SystemExit(main())\n", encoding="utf-8")
     args = [sys.executable, "-m", "PyInstaller", "--onedir", "--name", "thespis", "--paths", str(ROOT),
             "--distpath", str(DIST), "--workpath", str(BUILD / "work"), "--specpath", str(BUILD), "--noconfirm",
-            "--log-level", "ERROR", *[a for m in EXCLUDE for a in ("--exclude-module", m)], str(entry)]
+            "--log-level", "ERROR", *[a for m in EXCLUDE for a in ("--exclude-module", m)],
+            # Linux's shared libraries carry their debug symbols; stripped, the archive halves. (macOS signs its
+            # binaries, and stripping after would break the signature; Windows has nothing to strip.)
+            *(["--strip"] if sys.platform.startswith("linux") else []), str(entry)]
     subprocess.run(args, check=True, cwd=ROOT)
     folder = DIST / "thespis"
     archive = DIST / f"thespis-{platform_name()}.zip"
@@ -124,9 +127,11 @@ def check(archive: Path) -> dict:
         assert status == 200 and line["text"], line
     finally:
         stop(proc)
+    largest = sorted((f for f in (DIST / "thespis").rglob("*") if f.is_file()), key=lambda f: -f.stat().st_size)[:8]
     result = {"platform": platform_name(), "archive_mb": round(size, 1), "size_budget_mb": SIZE_MB,
               "cold_start_s": round(cold, 2), "first_start_s": round(starts[0], 2), "cold_budget_s": COLD_S,
-              "played": f"garrick: {line['action']}, {line['text']!r}"}
+              "played": f"garrick: {line['action']}, {line['text']!r}",
+              "largest_mb": {str(f.relative_to(DIST / "thespis")): round(f.stat().st_size / 1e6, 1) for f in largest}}
     result["ok"] = size <= SIZE_MB and cold <= COLD_S
     return result
 
