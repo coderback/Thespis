@@ -214,9 +214,20 @@ class LocalModel:
         raise TimeoutError(f"{self.model.id} wasn't ready in {READY_TIMEOUT:.0f} s; see {self.log_path}")
 
     def warm(self) -> None:
-        """One tiny call, so the first real line doesn't pay for the first use of the weights."""
-        httpx.post(f"{self.url}/chat/completions", timeout=120,
-                   json={"model": self.model.id, "max_tokens": 1, "messages": [{"role": "user", "content": "Hi"}]})
+        """Calls shaped like play's, small to large, so the first real lines don't pay for first use. On Vulkan
+        that cost is real: a GPU compiles its kernels for each new size of prompt it meets, and in live Rehearsal the
+        first lines of a run met them at 1 to 3 tokens a second, 14 to 32 seconds a call, where warm ones ran at 755.
+        A two-word warm-up never reached those sizes."""
+        schema = {"type": "object", "required": ["cites", "line"], "additionalProperties": False,
+                  "properties": {"cites": {"type": "array", "minItems": 1, "items": {"type": "string",
+                                                                                    "enum": ["e1", "e2"]}},
+                                 "line": {"type": "string", "maxLength": 160}}}
+        event = "e{}: Someone walked from the market to the tavern, where the innkeeper was polishing the bar. "
+        for n in (2, 12, 40):  # roughly 60, 300 and 900 prompt tokens: a short reply, a state pack, a long one
+            content = "".join(event.format(i) for i in range(1, n + 1)) + "Say one line, citing an event."
+            httpx.post(f"{self.url}/chat/completions", timeout=180, json={
+                "model": self.model.id, "max_tokens": 24, "messages": [{"role": "user", "content": content}],
+                "response_format": {"type": "json_schema", "json_schema": {"name": "warm", "schema": schema}}})
 
     def log_tail(self, n: int = 20) -> str:
         try:
