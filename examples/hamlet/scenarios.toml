@@ -1,0 +1,67 @@
+# Rehearsal scenarios for Thornby (rehearsal/sessions.py): two players, gossip along ties, feelings that fade, a
+# denial, and a player who joins mid-scene.
+#   python -m rehearsal live --game examples/hamlet/game.toml --scenarios examples/hamlet/scenarios.toml
+
+[[scenario]]
+name = "two_players_one_miller"
+steps = [
+  { call = "observe", verb = "cheat", actor = "ada", target = "osric", witnesses = ["bram"], claim = { pred = "cheated", a = "ada", b = "osric" } },
+  { call = "react", npc = "osric", trigger = "cheated" },
+  { call = "wait", seconds = 2.0 },
+  { call = "decide", npc = "osric", moment = "meet", bindings = { who = "ada" } },
+  { call = "wait", seconds = 2.0 },
+  { call = "update", npc = "bram", loc = "mill" },
+  { call = "decide", npc = "osric", moment = "meet", bindings = { who = "bram" } },
+  { call = "wait", seconds = 2.0 },
+  { call = "narrate", since = 0, to = "bram" },
+  { call = "wait", seconds = 2.0 },
+]
+
+[[scenario]]
+name = "the_story_travels"
+steps = [
+  { call = "observe", verb = "cheat", actor = "ada", target = "osric", claim = { pred = "cheated", a = "ada", b = "osric" } },
+  { call = "tick" },
+  { call = "react", npc = "hild", trigger = "told" },
+  { call = "react", npc = "maud", trigger = "told" },
+  { call = "wait", seconds = 2.0 },
+  { call = "tick" },
+  { call = "react", npc = "aldo", trigger = "told" },
+  { call = "wait", seconds = 2.0 },
+]
+
+[[scenario]]
+name = "a_denial_at_the_forge"
+steps = [
+  { call = "observe", verb = "cheat", actor = "ada", target = "osric", claim = { pred = "cheated", a = "ada", b = "osric" } },
+  { call = "tick" },
+  { call = "update", npc = "ada", loc = "forge" },
+  { call = "observe", verb = "tell", actor = "ada", target = "hild", said = true, claim = { pred = "cheated", a = "ada", b = "osric", neg = true } },
+  { call = "react", npc = "hild", trigger = "denied" },
+  { call = "wait", seconds = 2.0 },
+]
+
+[[scenario]]
+name = "a_stranger_joins"
+steps = [
+  { call = "join", player = "cara", name = "Cara", at = "green" },
+  { call = "observe", verb = "help", actor = "cara", target = "maud", claim = { pred = "helped", a = "cara", b = "maud" }, witnesses = ["bram"] },
+  { call = "react", npc = "maud", trigger = "thanked" },
+  { call = "wait", seconds = 2.0 },
+  { call = "narrate", since = 0, to = "cara" },
+  { call = "wait", seconds = 2.0 },
+]
+
+[[scenario]]
+name = "a_grudge_fades"
+steps = [
+  { call = "observe", verb = "cheat", actor = "bram", target = "osric", claim = { pred = "cheated", a = "bram", b = "osric" } },
+  { call = "update", npc = "bram", loc = "mill" },
+  { call = "decide", npc = "osric", moment = "meet", bindings = { who = "bram" } },
+  { call = "wait", seconds = 2.0 },
+  { call = "tick" },
+  { call = "tick" },
+  { call = "tick" },
+  { call = "react", npc = "osric", trigger = "talk" },
+  { call = "wait", seconds = 2.0 },
+]

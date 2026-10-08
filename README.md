@@ -333,7 +333,8 @@ games/crypt_road/   the demo game as a Thespis adapter: its cast and words (cast
 games/manor/        a second adapter: the manor mystery, served at /manor (its client is client/manor/)
 client/             the browser client for both games: The Crypt Road (index.html) and the manor (manor/)
 docs/               the API contract (api.md), the protocol (protocol.md, openapi-v1.json), models.md, design docs
-examples/           the core alone (minimal_client.py), and the tavern: a whole game in one TOML file
+examples/           the core alone (minimal_client.py), the tavern (a whole game in one TOML file), and Thornby
+                    (two players, ties, feelings that fade), each with its Rehearsal scenarios
 sdk/godot/spike/    the tavern in Godot 4 through /v1, its headless test, and the protocol friction it found
 fixtures/           real API responses along the demo route, for building the client
 tools/              the rules model, harness, cache warmer, model benchmark and fixture generator; the packager

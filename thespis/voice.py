@@ -86,6 +86,7 @@ class Voice:
         others = [n.id for n in w.npcs_at(npc.loc) if n.id != npc_id]
         if view.player_at == npc.loc:
             others.append("player")
+        others += [pid for pid, p in w.players.items() if p.get("loc") == npc.loc]  # the other players present
         beliefs = self.retriever.beliefs(w.beliefs, npc_id)  # active only: a retracted belief is never offered
         events = known(w, npc_id, self.events, self.sees, view.hidden)
         doing = {"id": action, "does": self.describe(w, npc_id, action)} if action else None
@@ -159,8 +160,10 @@ class Voice:
         u = mind.narrate(self.narration(events, setting, telling), Utterance(None, text, ids, "fallback"))
         return u.line or text, u.cites, u.source
 
-    def narration(self, events: list[Event], setting: str, telling: Callable[[list[Event]], str]) -> StatePack:
-        """The narrator's state pack for `events`: each told in the code's words, and only their names to use."""
+    def narration(self, events: list[Event], setting: str, telling: Callable[[list[Event]], str],
+                  audience: str | None = None) -> StatePack:
+        """The narrator's state pack for `events`: each told in the code's words, and only their names to use.
+        `audience` names the one player it is told to, when there are several."""
         cast = self.cast.data["narrator"]
         names = set(self.places)
         for e in events:
@@ -169,7 +172,8 @@ class Voice:
                 names |= {e.claim.a, e.claim.b}
         return StatePack(
             npc="narrator", name=cast["name"], persona=cast["persona"], goal="Tell the story so far, truthfully",
-            situation="Tell the player what happened since they last looked.", here=[], drives={}, trust_in={},
+            situation=f"Tell {audience or 'the player'} what happened since they last looked.", here=[], drives={},
+            trust_in={},
             beliefs=[], events=[{"id": e.id, "what": telling([e])} for e in events],
             names={x for x in names if x and x != "player"}, setting=setting, stakes=True)
 

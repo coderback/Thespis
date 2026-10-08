@@ -299,6 +299,44 @@
         "title": "HealthOut",
         "type": "object"
       },
+      "JoinIn": {
+        "properties": {
+          "at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Where they are",
+            "title": "At"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What NPCs and the narrator call them",
+            "title": "Name"
+          },
+          "player": {
+            "description": "A new player's id (not 'player', which every game has, nor an NPC's)",
+            "title": "Player",
+            "type": "string"
+          }
+        },
+        "required": [
+          "player"
+        ],
+        "title": "JoinIn",
+        "type": "object"
+      },
       "LineOut": {
         "properties": {
           "action": {
@@ -415,6 +453,18 @@
             "description": "Tell the story from this phase on",
             "title": "Since",
             "type": "integer"
+          },
+          "to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Tell it to this player: only what they took part in or saw",
+            "title": "To"
           },
           "wait": {
             "default": false,
@@ -1839,6 +1889,76 @@
           }
         },
         "summary": "Observe"
+      }
+    },
+    "/v1/sessions/{sid}/players": {
+      "post": {
+        "description": "A player joins, or one already here is renamed or moves: an agent NPCs see, hear and hold beliefs\nabout by id. Move them later with update (npc = their id, loc).",
+        "operationId": "join_v1_sessions__sid__players_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sid",
+            "required": true,
+            "schema": {
+              "title": "Sid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Bearer <the project's key, or the sidecar's token>",
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer <the project's key, or the sidecar's token>",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JoinIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Join V1 Sessions  Sid  Players Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Join"
       }
     },
     "/v1/sessions/{sid}/react": {

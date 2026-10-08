@@ -7,7 +7,6 @@
 name = "insult_and_answer"
 steps = [
   { call = "observe", verb = "insult", actor = "player", target = "garrick", witnesses = ["wren"], claim = { pred = "insulted", a = "player", b = "garrick" } },
-  { call = "update", npc = "garrick", nudge = { grudge = 4 } },
   { call = "react", npc = "garrick", trigger = "insulted" },
   { call = "react", npc = "wren", trigger = "insulted" },
   { call = "wait", seconds = 2.0 },
@@ -52,7 +51,6 @@ steps = [
 name = "the_engine_does_not_wait"
 steps = [
   { call = "observe", verb = "insult", actor = "player", target = "garrick", witnesses = ["wren"], claim = { pred = "insulted", a = "player", b = "garrick" } },
-  { call = "update", npc = "garrick", nudge = { grudge = 4 } },
   { call = "decide", npc = "garrick", moment = "turn" },
   { call = "tick" },
   { call = "react", npc = "wren", trigger = "talk" },

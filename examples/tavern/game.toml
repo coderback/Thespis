@@ -24,6 +24,10 @@ drives = { grudge = 0, respect = 1, ambition = 5 }
 trust_in = { player = 0, wren = 2 }
 settle = { grudge = 0 }  # each tick, a drive moves one step back towards its resting value
 
+[npc.garrick.feels]  # when he comes to believe something was done to him, his drives move (scaled by how sure he is)
+insulted = { grudge = 4 }
+helped = { respect = 2 }
+
 [npc.garrick.lines]
 leave = "The road won't wait. Neither will I."
 wait = "I'll finish this first."
