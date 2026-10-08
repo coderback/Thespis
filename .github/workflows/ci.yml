@@ -138,11 +138,34 @@ jobs:
       - name: 100 engines at once, p95 within budget, no errors
         run: python tools/loadtest.py --players 100 --rounds 2 --think 2 --db postgresql://postgres:ci@127.0.0.1:5432/thespis_load
 
+  # The Godot addon's example, headless, against a sidecar the addon starts and a hosted-mode server (sdk/godot).
+  godot:
+    name: godot
+    runs-on: ubuntu-latest
+    env:
+      GODOT_ZIP: Godot_v4.7.2-stable_linux.x86_64.zip
+      GODOT_SHA512: 9aa00f7a605200940bce3027a567b782f49bd8e940dd06ae9e987bd65aee1b1467edd56ed84fcdcbdd44354bf613bdbb4e5d2913e925850368e150c59ed54c65
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install
+        run: pip install -r requirements-server.txt
+      - name: Godot 4.7.2, checked against its published SHA-512
+        run: |
+          curl -fsSLo "$RUNNER_TEMP/$GODOT_ZIP" "https://github.com/godotengine/godot/releases/download/4.7.2-stable/$GODOT_ZIP"
+          echo "$GODOT_SHA512  $RUNNER_TEMP/$GODOT_ZIP" | sha512sum -c -
+          unzip -q "$RUNNER_TEMP/$GODOT_ZIP" -d "$RUNNER_TEMP/godot"
+          echo "GODOT=$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" >> "$GITHUB_ENV"
+      - name: The example plays through a sidecar and a server, unchanged
+        run: python sdk/godot/test/run.py
+
   # The single required check for main. Do not rename without updating the ruleset.
   ci:
     name: ci
     if: always()
-    needs: [engine, client, image, serve-image, package, load]
+    needs: [engine, client, image, serve-image, package, load, godot]
     runs-on: ubuntu-latest
     steps:
       - name: All checks passed
@@ -150,7 +173,7 @@ jobs:
         run: |
           results="engine=${{ needs.engine.result }} client=${{ needs.client.result }} image=${{ needs.image.result }}"
           results="$results serve-image=${{ needs.serve-image.result }} package=${{ needs.package.result }}"
-          results="$results load=${{ needs.load.result }}"
+          results="$results load=${{ needs.load.result }} godot=${{ needs.godot.result }}"
           for result in $results; do
             if [ "${result#*=}" != "success" ]; then
               echo "$results"
