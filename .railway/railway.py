@@ -33,7 +33,7 @@ def main(ctx=None):
         build={"builder": "DOCKERFILE", "dockerfilePath": "Dockerfile"},
         healthcheck="/health",
         healthcheckTimeout=60,
-        deploy={"restartPolicyType": "ON_FAILURE"},
+        # Restarts on failure: Railway's default, which it stores as unset, so declaring it would never settle.
         # SQLite lives on this one volume, so there must only ever be one replica.
         replicas=1,
         # The volume holds both games' databases (README, Deploy: back it up before a risky deploy).
