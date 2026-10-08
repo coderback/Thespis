@@ -42,7 +42,7 @@ def models(args: argparse.Namespace) -> int:
     if args.action == "list":
         for m in MODELS.values():
             tier = f"tier {TIERS.index(m.id) + 1}" if m.id in TIERS else ""
-            print(f"{m.id:12} {m.params:>4} {m.quant:7} {m.artifact.size / 1e9:5.2f} GB  {m.licence:11} {tier}")
+            print(f"{m.id:12} {m.params:>4} {m.quant:11} {m.artifact.size / 1e9:5.2f} GB  {m.licence:11} {tier}")
         return 0
     if args.action == "hardware":
         m = machine(engine("metal" if sys.platform == "darwin" else "vulkan", _progress))

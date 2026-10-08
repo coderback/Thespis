@@ -103,19 +103,27 @@ def test_a_discrete_gpu_is_preferred_whatever_its_order():
     assert m.gpu is not None and m.gpu.id == "Vulkan1" and m.accelerator == "vulkan"
 
 
+TWO = ("qwen3.5-4b", "qwen3.5-9b")  # two tiers, to show how the choice works
+
+
 @pytest.mark.parametrize("free_mb, ram, expected", [
     (12000, 32, ("qwen3.5-9b", True)),  # the largest tier that fits whole
     (3367, 15.3, ("qwen3.5-4b", True)),  # a 4 GB laptop GPU with the desktop's share taken
     (2500, 15.3, ("qwen3.5-4b", False)),  # nothing fits whole: the smallest, partly in RAM
 ])
 def test_the_tier_is_the_largest_that_fits_and_speed_wins_otherwise(free_mb, ram, expected):
-    plan = choose(Machine("linux", "x64", ram, (Device("Vulkan0", "NVIDIA RTX", free_mb, free_mb),)))
+    plan = choose(Machine("linux", "x64", ram, (Device("Vulkan0", "NVIDIA RTX", free_mb, free_mb),)), TWO)
     assert (plan.model, plan.whole) == expected and plan.device is not None
 
 
 def test_with_no_gpu_it_runs_the_smallest_tier_on_the_cpu():
-    plan = choose(Machine("linux", "x64", 8, ()))
+    plan = choose(Machine("linux", "x64", 8, ()), TWO)
     assert (plan.model, plan.device) == ("qwen3.5-4b", None)
+
+
+def test_the_measured_tier_is_the_default():
+    plan = choose(Machine("windows", "x64", 15.3, parse_devices(LISTED)))
+    assert (plan.model, plan.whole, plan.device and plan.device.id) == ("gemma4-e4b", True, "Vulkan1")
 
 
 def bare(device: Device | None, os: str = "windows") -> LocalModel:

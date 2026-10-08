@@ -43,21 +43,24 @@ def _hf(repo: str, file: str, sha256: str, size: int) -> Artifact:
 
 
 MODELS: dict[str, Model] = {m.id: m for m in (
+    # The first tier, by live Rehearsal (docs/models.md): as few errors as the cloud baseline, on a 4 GB laptop GPU.
+    # 4B effective; its per-layer embeddings stay in RAM, so it needs no more GPU memory than the Qwen 4B.
+    # Google's quantisation-aware-trained Q4_0.
+    Model("gemma4-e4b", _hf("google/gemma-4-E4B-it-qat-q4_0-gguf", "gemma-4-E4B_q4_0-it.gguf",
+                             "676c35070db6dbe52f93e9c864ee0fba4eddea94b9c875d9cb10daff453fbaee", 5_154_941_280),
+          "E4B", "Q4_0 (QAT)", "Apache-2.0", vram_gb=3.0, ram_gb=7.0),  # measured: 3,042 MiB at 2 x 4096
+    # Measured and not chosen: about twice the cloud's error rate. Available by name.
     Model("qwen3.5-4b", _hf("unsloth/Qwen3.5-4B-GGUF", "Qwen3.5-4B-Q4_K_M.gguf",
                              "00fe7986ff5f6b463e62455821146049db6f9313603938a70800d1fb69ef11a4", 2_740_937_888),
           "4B", "Q4_K_M", "Apache-2.0", vram_gb=3.0, ram_gb=5.0),  # measured: 3,048 MiB at 2 x 4096 on Vulkan
     Model("qwen3.5-9b", _hf("unsloth/Qwen3.5-9B-GGUF", "Qwen3.5-9B-Q4_K_M.gguf",
                              "03b74727a860a56338e042c4420bb3f04b2fec5734175f4cb9fa853daf52b7e8", 5_680_522_464),
-          "9B", "Q4_K_M", "Apache-2.0", vram_gb=6.2, ram_gb=8.5),  # estimated; on a 4 GB GPU it ran partly in RAM at 8-13 s a line
-    # A candidate for the first tier, from another family: 4B effective, with per-layer embeddings that llama.cpp
-    # may keep in RAM. Google's quantisation-aware-trained Q4_0. Not a tier until live Rehearsal says so.
-    Model("gemma4-e4b", _hf("google/gemma-4-E4B-it-qat-q4_0-gguf", "gemma-4-E4B_q4_0-it.gguf",
-                             "676c35070db6dbe52f93e9c864ee0fba4eddea94b9c875d9cb10daff453fbaee", 5_154_941_280),
-          "E4B", "Q4_0 (QAT)", "Apache-2.0", vram_gb=3.0, ram_gb=7.0),  # measured: 3,042 MiB at 2 x 4096
+          "9B", "Q4_K_M", "Apache-2.0", vram_gb=6.2, ram_gb=8.5),  # estimated; on a 4 GB GPU, 8-13 s a line
 )}
 
-# Tiers, smallest first: the probe picks the largest the machine can run (thespis.runtime.hardware.choose).
-TIERS = ("qwen3.5-4b", "qwen3.5-9b")
+# Tiers, smallest first: the probe picks the largest the machine can run (thespis.runtime.hardware.choose). Only a
+# model that passed live Rehearsal is a tier; the 9B's quality is unmeasured, so it is run only when asked for.
+TIERS = ("gemma4-e4b",)
 
 # llama.cpp, pinned: one build for every platform, so a fix or a regression lands for everyone at once.
 LLAMA_CPP = "b11172"  # 2026-09-24
