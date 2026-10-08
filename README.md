@@ -102,14 +102,14 @@ are model-judged: GPT-5.4 nano read 50 of Luna's lines beside the state packs th
 
 | Measure | Value |
 | --- | --- |
-| NPC turns decided by code alone, with no model call | 87% |
-| Model replies blocked by the validator | 0 of 70 |
-| Model call latency on the host, p50 / p95 | 910 ms / 1427 ms |
-| An action that calls the model, p50 / p95 | 1.0 s / 2.0 s |
-| An action that doesn't | 40 ms |
-| Cost per run, every call to the model | $0.00065 |
+| NPC turns played by code alone, with no model call | 87% |
+| Model replies blocked by the validator | 0 of 91 |
+| Model call latency on the host, p50 / p95 | 1131 ms / 1704 ms |
+| An action that calls the model, p50 / p95 | 1.6 s / 2.2 s |
+| An action that doesn't | 34 ms |
+| Cost per run, every call to the model | $0.00071 |
 | Routes ending as the rules model predicts | 10 of 10 |
-| Lines stating only what the NPC knew (model-judged) | 49 of 50 |
+| Lines stating only what the NPC knew (model-judged) | 43 of 50 |
 | Lines in character (model-judged) | 50 of 50 |
 
 Which models and why: [docs/models.md](docs/models.md).
@@ -271,7 +271,11 @@ tests/              the pytest suite, run by CI on every pull request
 One Docker image serves the engine API and the built client from one URL (`Dockerfile`). It's hosted on Railway,
 which rebuilds and redeploys every merge to `main`.
 
-- **Settings:** `railway.toml` sets the Dockerfile build, a `/health` check and one replica.
+- **Settings:** `.railway/railway.py` declares the service: the Dockerfile build, a `/health` check, one replica,
+  the volume, and the names of its variables. Railway doesn't read it on deploy. A change reaches the live service
+  only through `railway config plan` and then `railway config apply`, which need `railway-sdk` (a dev dependency).
+  Apply removes whatever the file leaves out, so add a new variable's name there before setting it in the
+  dashboard, and read the plan before every apply.
 - **Volume:** mounted at `/data`. The database is `/data/thespis.sqlite`, set by the image. Don't set `DB_PATH` on
   Railway: with a volume attached, the app ignores any path off it and logs a warning.
 - **Model keys:** Railway variables, never in the repo.

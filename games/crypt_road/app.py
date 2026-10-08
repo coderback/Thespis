@@ -49,10 +49,13 @@ CLIENT_DIST = ROOT / "client" / "dist"
 
 LOCKS = SessionLocks()  # one request at a time per session
 
+# Configured on import, not at startup: uvicorn imports the app before its first lines ("Started server process"),
+# which would otherwise go to stderr unformatted, and Railway shows stderr as errors.
+configure_logging()
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    configure_logging()
     path = db_path()
     app.state.store = Store(path)
     app.state.admin_token = os.environ.get("ADMIN_TOKEN", "").strip()  # unset: the admin endpoints don't exist

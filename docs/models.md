@@ -33,7 +33,7 @@ Reasoning is off for speed. `max_tokens` is replaced by `max_completion_tokens`,
 | gpt-6-luna | 20 (5) | 100% | 1384 ms | 1622 ms | 1695 ms |
 | gpt-5.4-nano | 20 (5) | 100% | 1403 ms | 1673 ms | 2066 ms |
 
-**The primary on the host**, from [results.md](../results.md): 70 calls inside the hosted engine, 910 ms p50 / 1427 ms p95, and 0 of 70 replies blocked by the validator. The backup answered once, when Luna didn't (1 of 70 calls in the last run). Both deployments share one key, and the benchmark shows it works for both.
+**The primary on the host**, from [results.md](../results.md): 91 calls inside the hosted engine, 1131 ms p50 / 1704 ms p95, and 0 of 91 replies blocked by the validator. That is slower than before Phase 2 (910 ms / 1427 ms): calls now use strict structured outputs, which cost Luna about 0.46 s a call in the spike behind #93, and in exchange the model can't cite outside its pack. Luna answered every call in the last run, so the backup wasn't needed. Both deployments share one key, and the benchmark shows it works for both.
 
 ## Why these two
 

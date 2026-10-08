@@ -59,3 +59,9 @@ def test_each_model_call_logs_its_numbers(caplog):
     r = next(r for r in caplog.records if r.name == "thespis.gateway")
     assert (r.call_type, r.provider, r.ok, r.error) == ("react", "primary", True, None)
     assert isinstance(r.latency_ms, int)
+
+
+def test_httpx_logs_only_warnings_since_the_gateway_logs_each_call():
+    hosting.configure_logging("text")
+    assert logging.getLogger("httpx").getEffectiveLevel() == logging.WARNING
+    assert logging.getLogger("thespis.gateway").getEffectiveLevel() == logging.INFO

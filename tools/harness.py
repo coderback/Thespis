@@ -230,7 +230,7 @@ def report(results: dict, host: str, commit: str) -> str:
         "",
         "| Measure | Value |",
         "| --- | --- |",
-        f"| NPC turns decided by code alone, with no model call | **{s['code_only']:.0%}** "
+        f"| NPC turns played by code alone, with no model call | **{s['code_only']:.0%}** "
         f"({s['turns'] - s['asked']} of {s['turns']}) |",
         f"| Invalid model replies blocked by the validator | **{s['blocked_total']}** of {s['answered']} replies |",
         f"| Model call latency, p50 / p95 (on the host) | **{_ms(s['call_p50'])} / {_ms(s['call_p95'])}** "
@@ -248,9 +248,9 @@ def report(results: dict, host: str, commit: str) -> str:
         "",
         "## How each number is counted",
         "",
-        "- **NPC turns:** one per NPC per phase that ran, epilogue included (4 NPCs). A turn counts as a model turn when "
-        "the model was asked to choose the NPC's action: a decision from the model or the cache, or a fallback the model "
-        "caused. Spoken lines are counted separately below.",
+        "- **NPC turns:** one per NPC per phase that ran, epilogue included (4 NPCs). Code chooses every action; a turn "
+        "counts as a model turn when the model was asked to voice the action code chose: a line from the model or the "
+        "cache, or a fallback the model caused. Spoken lines are counted separately below.",
         "- **Blocked replies:** model replies the validator rejected, so the NPC used its code choice and template line "
         "instead. Out of every reply the model returned.",
         "- **Model call latency:** each call's time inside the host's gateway, from its own log (`GET /dev/calls`), "
