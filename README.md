@@ -139,8 +139,8 @@ Any model can speak: OpenAI-compatible endpoints, Anthropic, or a local model on
 A game whose world lives in an engine supplies only the TOML: [docs/protocol.md](docs/protocol.md) covers the calls
 (observe, decide, react, narrate, tick, snapshot, restore) in the library (`thespis.api`) and over `/v1` HTTP
 (`python -m thespis serve`), and [examples/tavern/game.toml](examples/tavern/game.toml) is a complete game.
-[sdk/godot](sdk/godot/README.md) is the Godot 4 addon, and its example plays the tavern offline through a sidecar
-or online through a server, with no change to the scene.
+[sdk/godot](sdk/godot/README.md) is the Godot 4 addon and [sdk/unity](sdk/unity/README.md) the Unity package. Each one's
+example plays the tavern offline through a sidecar or online through a server, with no change to the scene.
 
 ## Same core, a different game: the manor mystery
 
@@ -318,7 +318,8 @@ To work on the client with hot reload, run `npm run dev` in `client/` next to th
 | `python tools/package.py` | Builds the runtime a game ships beside it (one folder, no Python needed), and checks its size and cold start |
 | `python tools/loadtest.py --players 200 --db <db>` | Many engines playing at once against one server: latency per route, errors, the gate |
 | `python sdk/godot/test/run.py --godot <path>` | The Godot addon's example, headless, against a sidecar the addon starts and a hosted-mode server; `--mode sidecar --local gemma4-e4b` plays it offline |
-| `python tools/sdk_gen.py godot` | Regenerates the Godot addon's typed layer from `docs/openapi-v1.json` (`--check` in CI) |
+| `python sdk/unity/test/run.py [--unity <Unity.exe>]` | The Unity package's example under .NET, and with `--unity` the scene in the editor, against a sidecar and a server |
+| `python tools/sdk_gen.py all` | Regenerates the SDKs' typed layers (Godot's `api.gd`, Unity's `Api.g.cs`) from `docs/openapi-v1.json` (`--check` in CI) |
 | `python -m thespis openapi --out docs/openapi-v1.json` | Regenerates the `/v1` contract after a change to the API |
 | `python tools/manor_solve.py <host>` | Solves the manor mystery by script, and checks two wrong turns lose |
 | `python tools/exposure.py <host>` | Checks the host keeps its edges shut against a stranger: no call log, API docs or CORS, a body limit, security headers |
@@ -338,6 +339,7 @@ docs/               the API contract (api.md), the protocol (protocol.md, openap
 examples/           the core alone (minimal_client.py), the tavern (a whole game in one TOML file), and Thornby
                     (two players, ties, feelings that fade), each with its Rehearsal scenarios
 sdk/godot/          the Godot 4 addon (addons/thespis), its example (the Lantern) and its headless test
+sdk/unity/          the Unity package (com.thespis.client), its example project (Lantern) and its tests
 fixtures/           real API responses along the demo route, for building the client
 tools/              the rules model, harness, cache warmer, model benchmark and fixture generator; the packager
                     and the server's load test, with its reports

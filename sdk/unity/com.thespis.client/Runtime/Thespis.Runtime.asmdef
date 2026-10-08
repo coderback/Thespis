@@ -1,0 +1,13 @@
+{
+    "name": "Thespis.Runtime",
+    "rootNamespace": "Thespis",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": ["WebGL"],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

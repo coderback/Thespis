@@ -1,0 +1,14 @@
+{
+  "name": "com.thespis.client",
+  "version": "0.1.0",
+  "displayName": "Thespis",
+  "description": "NPC minds through the Thespis /v1 protocol: beliefs, choices and lines, offline through a sidecar or online through a server.",
+  "unity": "6000.0",
+  "author": {
+    "name": "Thespis"
+  },
+  "keywords": ["npc", "ai", "dialogue", "llm"],
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "3.2.1"
+  }
+}

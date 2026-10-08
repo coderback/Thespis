@@ -1,0 +1,13 @@
+{
+    "name": "Lantern.Editor",
+    "rootNamespace": "Lantern.Editor",
+    "references": ["Lantern", "Thespis.Runtime"],
+    "includePlatforms": ["Editor"],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

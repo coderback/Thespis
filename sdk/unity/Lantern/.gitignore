@@ -1,0 +1,10 @@
+# Unity's caches and builds, rebuilt on open
+/Library/
+/Temp/
+/Logs/
+/UserSettings/
+/Obj/
+/Build/
+/Builds/
+*.csproj
+*.sln
