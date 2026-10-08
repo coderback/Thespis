@@ -29,6 +29,8 @@ thespis serve --game game.toml --port 0 --db saves/thespis.sqlite --parent <the 
   programs on the machine out. A launcher makes one up per start.
 - `--db` is where sessions are kept: a SQLite file (the runtime's cache folder if left out), or `:memory:` for none.
 - A game can send its definition instead of a path: `PUT /v1/games/{id}` with `{"toml": "..."}`.
+- `--embed local` also starts the embedding model for memory by meaning (BGE small, on the CPU), for games that
+  declare `[memory]`. `EMBED_*` points at any other.
 
 **Offline is enforced, not assumed.** A sidecar refuses, inside its own process, every name lookup and connection
 that isn't to this machine ([thespis/offline.py](../thespis/offline.py)):

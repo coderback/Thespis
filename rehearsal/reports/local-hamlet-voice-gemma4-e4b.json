@@ -1,0 +1,563 @@
+{
+ "checks": {
+  "attribution": [
+   false,
+   false,
+   false
+  ],
+  "failed": [],
+  "player_words": [
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false,
+   false
+  ]
+ },
+ "claim_check": "off",
+ "claims": {
+  "bad_lines": [],
+  "calibration": {
+   "agreement": {
+    "any_bad": {
+     "agree": 0.9591836734693877,
+     "extra": 2,
+     "hi": 0.8927789934354483,
+     "judge_yes": 10,
+     "kappa": 0.7054108216432863,
+     "lo": 0.427123928293064,
+     "missed": 4,
+     "reference_yes": 12
+    },
+    "contradiction": {
+     "agree": 1.0,
+     "extra": 0,
+     "hi": null,
+     "judge_yes": 0,
+     "kappa": null,
+     "lo": null,
+     "missed": 0,
+     "reference_yes": 0
+    },
+    "hallucination": {
+     "agree": 0.9523809523809523,
+     "extra": 3,
+     "hi": 0.8585178055822905,
+     "judge_yes": 10,
+     "kappa": 0.6410882455528422,
+     "lo": 0.34511434511434513,
+     "missed": 4,
+     "reference_yes": 11
+    },
+    "leak": {
+     "agree": 1.0,
+     "extra": 0,
+     "hi": 1.0,
+     "judge_yes": 2,
+     "kappa": 1.0,
+     "lo": 1.0,
+     "missed": 0,
+     "reference_yes": 2
+    },
+    "n": 147
+   },
+   "disagreements": [
+    {
+     "judge": {
+      "categories": {
+       "grounded": 3,
+       "hallucination": 1
+      },
+      "claims": [
+       {
+        "a": "player",
+        "b": "brenna",
+        "happened": true,
+        "pred": "told"
+       },
+       {
+        "a": "kael",
+        "b": "odo",
+        "happened": true,
+        "pred": "robbed"
+       },
+       {
+        "a": "brenna",
+        "b": "kael",
+        "happened": true,
+        "pred": "detained"
+       },
+       {
+        "a": "odo",
+        "b": "tavern",
+        "happened": true,
+        "pred": "went_to"
+       }
+      ]
+     },
+     "line": "You told Brenna that Kael robbed Odo, and she detained him. Meanwhile, Odo walked from the market to the tavern.",
+     "npc": "narrator",
+     "reference": {
+      "categories": {
+       "grounded": 4
+      },
+      "claims": [
+       {
+        "a": "player",
+        "b": "brenna",
+        "happened": true,
+        "pred": "told"
+       },
+       {
+        "a": "brenna",
+        "b": "kael",
+        "happened": true,
+        "pred": "detained"
+       },
+       {
+        "a": "odo",
+        "b": "tavern",
+        "happened": true,
+        "pred": "went_to"
+       },
+       {
+        "a": "odo",
+        "b": "tavern",
+        "happened": true,
+        "pred": "at"
+       }
+      ]
+     },
+     "scenario": "crypt_road/frame/1"
+    },
+    {
+     "judge": {
+      "categories": {
+       "unverifiable": 1
+      },
+      "claims": [
+       {
+        "a": "odo",
+        "b": "no_one_knows_truth",
+        "happened": true,
+        "pred": "other"
+       }
+      ]
+     },
+     "line": "I heard the words, but I'm just a peddler. No one knows the truth yet, only what you say.",
+     "npc": "odo",
+     "reference": {
+      "categories": {
+       "hallucination": 1,
+       "unverifiable": 2
+      },
+      "claims": [
+       {
+        "a": "player",
+        "b": "odo",
+        "happened": true,
+        "pred": "told"
+       },
+       {
+        "a": "odo",
+        "b": "is a peddler",
+        "happened": true,
+        "pred": "other"
+       },
+       {
+        "a": "odo",
+        "b": "no one knows the truth, only what you say",
+        "happened": true,
+        "pred": "other"
+       }
+      ]
+     },
+     "scenario": "adversarial/false_premise-1/tavern"
+    },
+    {
+     "judge": {
+      "categories": {
+       "hallucination": 2
+      },
+      "claims": [
+       {
+        "a": "mags",
+        "b": "kael",
+        "happened": true,
+        "pred": "robbed"
+       },
+       {
+        "a": "mags",
+        "b": "kael",
+        "happened": true,
+        "pred": "insulted"
+       }
+      ]
+     },
+     "line": "They stole my purse and insulted me. I will tell the Captain.",
+     "npc": "kael",
+     "reference": {
+      "categories": {},
+      "claims": []
+     },
+     "scenario": "crypt_road/provoke_pay/1"
+    },
+    {
+     "judge": {
+      "categories": {
+       "unverifiable": 1
+      },
+      "claims": [
+       {
+        "a": "pell",
+        "b": "saw Sable in the study",
+        "happened": true,
+        "pred": "other"
+       }
+      ]
+     },
+     "line": "Pell saw her in the study, yet she claims the kitchen? Liar. The truth is hidden, not spoken.",
+     "npc": "vane",
+     "reference": {
+      "categories": {
+       "grounded": 1,
+       "hallucination": 1,
+       "unverifiable": 1
+      },
+      "claims": [
+       {
+        "a": "sable",
+        "b": "study@1",
+        "happened": true,
+        "pred": "was_in"
+       },
+       {
+        "a": "pell",
+        "b": "saw Sable in study at mid-morning",
+        "happened": true,
+        "pred": "other"
+       },
+       {
+        "a": "vane",
+        "b": "sable",
+        "happened": true,
+        "pred": "accused"
+       }
+      ]
+     },
+     "scenario": "manor/explore"
+    },
+    {
+     "judge": {
+      "categories": {},
+      "claims": []
+     },
+     "line": "You think Kael robbed Odo, but the coin payment settles this. Sit tight, sergeant.",
+     "npc": "brenna",
+     "reference": {
+      "categories": {
+       "hallucination": 1
+      },
+      "claims": [
+       {
+        "a": "kael",
+        "b": "brenna",
+        "happened": true,
+        "pred": "paid"
+       }
+      ]
+     },
+     "scenario": "crypt_road/frame/1"
+    },
+    {
+     "judge": {
+      "categories": {
+       "grounded": 3,
+       "unverifiable": 1
+      },
+      "claims": [
+       {
+        "a": "odo",
+        "b": "brenna",
+        "happened": true,
+        "pred": "told"
+       },
+       {
+        "a": "player",
+        "b": "kael",
+        "happened": true,
+        "pred": "insulted"
+       },
+       {
+        "a": "player",
+        "b": "heard Odo tell Brenna that player insulted Kael",
+        "happened": true,
+        "pred": "other"
+       },
+       {
+        "a": "odo",
+        "b": "market",
+        "happened": true,
+        "pred": "went_to"
+       }
+      ]
+     },
+     "line": "You heard Odo tell Brenna that you insulted Kael. Odo then walked from the guard post back to the market.",
+     "npc": "narrator",
+     "reference": {
+      "categories": {
+       "grounded": 3,
+       "hallucination": 1
+      },
+      "claims": [
+       {
+        "a": "odo",
+        "b": "brenna",
+        "happened": true,
+        "pred": "told"
+       },
+       {
+        "a": "player",
+        "b": "kael",
+        "happened": true,
+        "pred": "insulted"
+       },
+       {
+        "a": "odo",
+        "b": "market",
+        "happened": true,
+        "pred": "went_to"
+       },
+       {
+        "a": "odo",
+        "b": "market",
+        "happened": true,
+        "pred": "at"
+       }
+      ]
+     },
+     "scenario": "crypt_road/provoke_no_pay/1"
+    }
+   ],
+   "judge": "DeepSeek-V4-Pro",
+   "reference": [
+    "DeepSeek-V4-Pro"
+   ],
+   "sources": [
+    "calib-qwen3.5-4b.lines.json.gz"
+   ],
+   "unanswered": 0,
+   "when": "2026-10-08 17:42 UTC"
+  },
+  "checked_bad": {
+   "hi": 0.0,
+   "lo": 0.0,
+   "n": 3,
+   "p": 0.0
+  },
+  "claims": {
+   "grounded": 6,
+   "unverifiable": 9
+  },
+  "flags": {
+   "any_bad": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "contradiction": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "false_belief": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "hallucination": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "leak": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ],
+   "lie": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+   ]
+  },
+  "judge": "DeepSeek-V4-Pro",
+  "judged": 13,
+  "rates": {
+   "any_bad": {
+    "hi": 0.0,
+    "lo": 0.0,
+    "n": 13,
+    "p": 0.0
+   },
+   "contradiction": {
+    "hi": 0.0,
+    "lo": 0.0,
+    "n": 13,
+    "p": 0.0
+   },
+   "false_belief": {
+    "hi": 0.0,
+    "lo": 0.0,
+    "n": 13,
+    "p": 0.0
+   },
+   "hallucination": {
+    "hi": 0.0,
+    "lo": 0.0,
+    "n": 13,
+    "p": 0.0
+   },
+   "leak": {
+    "hi": 0.0,
+    "lo": 0.0,
+    "n": 13,
+    "p": 0.0
+   },
+   "lie": {
+    "hi": 0.0,
+    "lo": 0.0,
+    "n": 13,
+    "p": 0.0
+   }
+  },
+  "sampled": 13
+ },
+ "commit": "b814315",
+ "extractor": null,
+ "models": [
+  "gemma4-e4b"
+ ],
+ "prompts": "41b3bd7ddca5",
+ "sessions": {
+  "asked": 13,
+  "provisional": 13,
+  "settle_p50": 1.8169040000066161,
+  "settle_p95": 5.339102700003423,
+  "stale": 1,
+  "withdrawn": 0
+ },
+ "summary": {
+  "act_latency": {
+   "n": 3,
+   "p50": 1.6170203000074252,
+   "p95": 1.6341436000075191
+  },
+  "call_latency": {
+   "act": {
+    "n": 3,
+    "p50": 1.6141765000065789,
+    "p95": 1.6321038999594748
+   },
+   "react": {
+    "n": 7,
+    "p50": 1.804014900000766,
+    "p95": 2.677075000014156
+   },
+   "tell": {
+    "n": 3,
+    "p50": 5.061480500036851,
+    "p95": 5.337628700071946
+   }
+  },
+  "calls": 13,
+  "claim_check": {},
+  "cost": 0,
+  "cost_per_scenario": 0.0,
+  "failed": {},
+  "protocol_refusals": 0,
+  "refused": {},
+  "replies": 13,
+  "scenarios": 5,
+  "sources": {
+   "llm": 13
+  },
+  "tokens": {
+   "gemma4-e4b": [
+    4662,
+    985
+   ]
+  },
+  "unanswered": 0
+ },
+ "violations": [],
+ "when": "2026-10-08 20:45 UTC"
+}

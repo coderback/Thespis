@@ -97,6 +97,38 @@ Reports are in [rehearsal/reports](../rehearsal/reports): `cloud-luna`, `local-g
 
 **One laptop, one run each:** these are single runs on one machine, with intervals several points wide. Run the same on yours: `models serve`, then `python -m rehearsal live` with `LLM_PROFILE=llamacpp` (and no cloud `LLM_*` set, so nothing else speaks).
 
+**Embeddings, for memory by meaning** ([protocol.md](protocol.md#players-feelings-ties)): **BGE small** (`bge-small`,
+Q8_0, 37 MB, MIT), pinned like the rest. It runs on the CPU, beside a chat model that has the GPU:
+- `thespis serve --embed local` starts it for a sidecar;
+- `python -m rehearsal live --embed local` starts it for a run;
+- `models serve bge-small` runs it on its own and prints the `EMBED_*` settings.
+
+**Thornby, spoken by Gemma** (`examples/hamlet`: two players, ties, feelings, a told scene, memory by meaning,
+judged by DeepSeek), on the same laptop:
+
+| | 4.5a: plain narration, the usual memory | **4.5b: told scenes, memory by meaning** |
+| --- | --- | --- |
+| Lines with a leak, hallucination or contradiction | 1 of 12 | **0 of 13** |
+| Words in the player's mouth; narration naming a speaker who didn't speak | 0; 0 | 0; 0 |
+| Protocol refusals | 0 | 0 |
+| A told scene, p50 / p95 | | 5.1 / 5.3 s (a plain narration: 1.6 s) |
+
+Reports: `local-hamlet-gemma4-e4b` (4.5a) and `local-hamlet-voice-gemma4-e4b` (4.5b). These are a dozen lines each,
+so they show the new parts work in play; they don't measure rates.
+
+**Getting there took five runs, and each fixed something:**
+1. **A refused scene.** The narrator couldn't name the player it was telling.
+2. **Reference ids in the words.** Gemma wrote "…at the mill, e1." Now that fails a scene, and the prompt says ids
+   go only in `cites`.
+3. **A question nobody asked.** Gemma opened "You asked what had transpired, Bram." The checks that need no judge
+   caught it each time. The cause was the situation line, "Tell Bram what happened", which reads like Bram asking.
+4. **An invitation to invent.** Thornby's narrator persona said to end on what the hamlet was whispering, so the
+   endings invented whispers.
+
+**Gemma still never quotes a character.** It tells every scene in the narrator's voice, even where Osric's words
+could be quoted. Speaker segments are tested (`tests/test_minds_v3.py`), but a model that uses them is still to be
+seen. A told scene's longer reply also makes it a slower line: about 5 s on this GPU.
+
 ## Judging offline
 
 Rehearsal's judge only extracts the claims each line makes; code checks them against the world. A local judge can

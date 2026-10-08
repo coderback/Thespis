@@ -107,6 +107,30 @@ below `keep` of the peak:
 everyone who hears it, weighted by their trust in whoever denied it. A barely trusted denial dents a kinsman's
 report; a trusted one can overturn it.
 
+**A told scene.** With `[narrator] structured = true`, `narrate` returns the telling as `segments`, in order: each
+`{speaker, line, cites}`. Each segment is the narrator's own words, or what one character said, quoted.
+- **Attribution is by construction.** The narrator's pack says which NPC did each event, and a character may speak
+  only in a segment that cites an event it did. No quote is pinned on someone who never said it.
+- **Each segment is checked on its own:** cites, names, length, no reference ids in the words, and the claim check.
+  A scene that fails any check falls back to the code's telling, one narrator segment per event.
+- **The line's `text`** joins the segments and names the speakers: `Osric: "Hild, she cheated me!"`.
+- **Its own prompt and hash.** It's a call type of its own, `tell`, so turning it on changes no other call's cache
+  keys.
+
+**Memory by meaning.** With `[memory] recall = "meaning"` and an embedder, what an NPC's pack holds is chosen by how
+well each memory bears on the moment, instead of its five surest beliefs and five latest events
+([thespis/recall.py](../thespis/recall.py)):
+- **Only what it knows.** The candidates are filtered first, so nothing the NPC never knew can be recalled, however
+  close in meaning.
+- **The score** is meaning (cosine to the situation) plus recency (halving every `half_life` ticks), plus salience (a
+  claim's weight in `salient`), plus confidence. The weights are `meaning`, `recency`, `salience` and `confidence`.
+- **Stable.** Embeddings are cached by text, so the same moment recalls the same memories and keeps the same cache
+  key.
+- **Without an embedder,** or if it fails, the pack is the usual one.
+
+The embedder is any OpenAI-compatible `/embeddings` endpoint (`EMBED_BASE_URL`, `EMBED_MODEL`, `EMBED_API_KEY`), or
+the local runtime's BGE small (`thespis serve --embed local`).
+
 ## The calls
 
 | Library (`Session`) | HTTP | What it does |
@@ -180,4 +204,3 @@ These are still to come in Phase 4:
 
 - Lines are polled. The Godot spike (4.1b) found long-polling (`?wait=2`) natural in GDScript, where server-sent events
   would mean driving `HTTPClient` by hand, so SSE waits until an engine needs it ([sdk/godot/spike](../sdk/godot/spike/README.md)).
-- Multi-speaker narration and retrieval by meaning (4.5b).
