@@ -179,11 +179,53 @@ jobs:
       - name: The Lantern plays through a sidecar and a server, unchanged
         run: python sdk/unity/test/run.py --runner dotnet
 
+  # The Lantern scene in the Unity editor, in batch mode, against a sidecar and a hosted-mode server (sdk/unity).
+  # The editor runs on the runner itself, so the Python sidecar and server run beside it. It signs in with a Unity
+  # Personal licence (secrets UNITY_USERNAME, UNITY_PASSWORD) and hands the seat back when the job ends; without the
+  # secrets (a fork's pull request) it skips. Runs queue rather than overlap: a Personal licence has few seats.
+  unity-editor:
+    name: unity-editor
+    runs-on: ubuntu-latest
+    concurrency:
+      group: unity-licence
+      cancel-in-progress: false
+    env:
+      HAS_LICENCE: ${{ secrets.UNITY_USERNAME != '' && secrets.UNITY_PASSWORD != '' }}
+    steps:
+      - name: No Unity licence here
+        if: env.HAS_LICENCE != 'true'
+        run: echo "UNITY_USERNAME and UNITY_PASSWORD aren't set, so the scene isn't played in the editor."
+      - uses: actions/checkout@v4
+        if: env.HAS_LICENCE == 'true'
+      - uses: actions/setup-python@v5
+        if: env.HAS_LICENCE == 'true'
+        with:
+          python-version: "3.13"
+      - name: Install
+        if: env.HAS_LICENCE == 'true'
+        run: pip install -r requirements-server.txt
+      - name: Unity, the version the project names
+        if: env.HAS_LICENCE == 'true'
+        uses: buildalon/unity-setup@30fcbcb56c10ea5d64298e970d952b8d29bc268b # v2.6.0
+        with:
+          version-file: sdk/unity/Lantern/ProjectSettings/ProjectVersion.txt
+          cache-installation: true
+      - name: A Personal licence, returned when the job ends
+        if: env.HAS_LICENCE == 'true'
+        uses: buildalon/activate-unity-license@e0d245d0787b7b9931b56ccbde3b508f6b70f1af # v2.2.2
+        with:
+          license: personal
+          username: ${{ secrets.UNITY_USERNAME }}
+          password: ${{ secrets.UNITY_PASSWORD }}
+      - name: The scene plays through a sidecar and a server, unchanged
+        if: env.HAS_LICENCE == 'true'
+        run: python sdk/unity/test/run.py --runner unity --unity "$UNITY_EDITOR_PATH"
+
   # The single required check for main. Do not rename without updating the ruleset.
   ci:
     name: ci
     if: always()
-    needs: [engine, client, image, serve-image, package, load, godot, unity]
+    needs: [engine, client, image, serve-image, package, load, godot, unity, unity-editor]
     runs-on: ubuntu-latest
     steps:
       - name: All checks passed
@@ -192,7 +234,7 @@ jobs:
           results="engine=${{ needs.engine.result }} client=${{ needs.client.result }} image=${{ needs.image.result }}"
           results="$results serve-image=${{ needs.serve-image.result }} package=${{ needs.package.result }}"
           results="$results load=${{ needs.load.result }} godot=${{ needs.godot.result }}"
-          results="$results unity=${{ needs.unity.result }}"
+          results="$results unity=${{ needs.unity.result }} unity-editor=${{ needs.unity-editor.result }}"
           for result in $results; do
             if [ "${result#*=}" != "success" ]; then
               echo "$results"
