@@ -88,17 +88,25 @@ Check(telling.Npc == "narrator" && telling.IsFinal && telling.Words().Length > 0
 var many = await Task.WhenAll(Enumerable.Range(0, 8).Select(i => thespis.ReactAsync(i % 2 == 0 ? "garrick" : "wren", "talk")));
 Check(many.All(r => r.Ok), "eight lines asked for at once all come back", string.Join("; ", many.Where(r => !r.Ok)));
 
+clock.Restart();
 var choice = await thespis.DecideAsync("garrick", "turn", new DecideIn { Wait = true });  // an hour cooled him
+Check(choice.Ok, $"he decides again, waiting for the model's line ({clock.ElapsedMilliseconds} ms)", choice);
+clock.Restart();
 var beforeSave = await thespis.SnapshotAsync();
+Check(beforeSave.Ok, $"a snapshot ({clock.ElapsedMilliseconds} ms)", beforeSave);
+clock.Restart();
 var save = await game.SaveAsync();
-Check(save.Ok && save.Value!.Contains("\"minds\":\"{"), "the save holds the minds as text", save);
+Check(save.Ok && save.Value!.Contains("\"minds\":\"{"), $"the save holds the minds as text ({clock.ElapsedMilliseconds} ms)",
+    save);
+if (!(choice.Ok && beforeSave.Ok && save.Ok))
+    return Done();
 var loaded = await game.LoadAsync(save.Value!);
 Check(loaded.Ok && game.PipAt == "taproom" && game.Phase == 1, "loading the save restores the session and the game", loaded);
 var afterLoad = await thespis.SnapshotAsync();
-Check(JToken.DeepEquals(JObject.Parse(afterLoad.Value!)["world"], JObject.Parse(beforeSave.Value!)["world"]),
+Check(afterLoad.Ok && JToken.DeepEquals(JObject.Parse(afterLoad.Value!)["world"], JObject.Parse(beforeSave.Value!)["world"]),
     "the restored minds are the saved ones");
 var again = await thespis.DecideAsync("garrick", "turn", new DecideIn { Wait = true });
-var why = again.Value!.Reason.Split(';')[0];
+var why = again.Ok ? again.Value!.Reason.Split(';')[0] : again.ToString();
 Check(why == choice.Value!.Reason.Split(';')[0] && !why.Contains(".0"), "the restored mind decides as before, in whole numbers",
     why);
 
@@ -112,6 +120,8 @@ return Done();
 int Done()
 {
     var pid = thespis.Sidecar?.Pid ?? -1;
+    if (failures.Count > 0 && thespis.Sidecar != null)
+        Console.Error.WriteLine($"the sidecar's log:\n{thespis.Sidecar.Log}");
     thespis.StopAsync().GetAwaiter().GetResult();
     if (pid > 0)
     {
