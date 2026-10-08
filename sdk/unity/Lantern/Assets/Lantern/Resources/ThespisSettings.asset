@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 355f85e53ddb9c24992d81b591b65332, type: 3}
+  m_Name: ThespisSettings
+  m_EditorClassIdentifier: Thespis.Runtime::Thespis.ThespisSettings
+  server: 
+  key: 
+  game: {fileID: 2811297602134710623, guid: 2170763f67a9412408030825efbedf3a, type: 3}
+  sidecarCommand: []
+  sidecarModel: 
+  sidecarOnline: 0
+  sidecarStartTimeout: 120

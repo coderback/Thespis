@@ -161,11 +161,29 @@ jobs:
       - name: The example plays through a sidecar and a server, unchanged
         run: python sdk/godot/test/run.py
 
+  # The Unity package's core and example under .NET, against a sidecar and a hosted-mode server (sdk/unity). The
+  # scene itself plays in the Unity editor, which needs a licence: run sdk/unity/test/run.py --unity locally.
+  unity:
+    name: unity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - name: Install
+        run: pip install -r requirements-server.txt
+      - name: The Lantern plays through a sidecar and a server, unchanged
+        run: python sdk/unity/test/run.py --runner dotnet
+
   # The single required check for main. Do not rename without updating the ruleset.
   ci:
     name: ci
     if: always()
-    needs: [engine, client, image, serve-image, package, load, godot]
+    needs: [engine, client, image, serve-image, package, load, godot, unity]
     runs-on: ubuntu-latest
     steps:
       - name: All checks passed
@@ -174,6 +192,7 @@ jobs:
           results="engine=${{ needs.engine.result }} client=${{ needs.client.result }} image=${{ needs.image.result }}"
           results="$results serve-image=${{ needs.serve-image.result }} package=${{ needs.package.result }}"
           results="$results load=${{ needs.load.result }} godot=${{ needs.godot.result }}"
+          results="$results unity=${{ needs.unity.result }}"
           for result in $results; do
             if [ "${result#*=}" != "success" ]; then
               echo "$results"

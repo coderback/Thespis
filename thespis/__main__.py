@@ -25,8 +25,10 @@ taken on the command line: `projects model` reads the API key from the variable 
 from __future__ import annotations
 
 import argparse
+import faulthandler
 import json
 import os
+import signal
 import socket
 import sys
 import time
@@ -253,6 +255,8 @@ def serve(args: argparse.Namespace) -> int:
                 token=os.environ.get("THESPIS_TOKEN") or None if mode == SIDECAR else None,
                 vault=Vault.from_env() if mode == SERVER else None, cache=not args.no_cache,
                 allow_private_models=args.allow_private_models, embedder=embedder)
+    if sys.platform != "win32":  # kill -USR1 <pid>: every thread's stack to stderr, for a runtime that seems stuck
+        faulthandler.register(signal.SIGUSR1, all_threads=True)
     if tracing.configure():
         print("tracing to $OTEL_EXPORTER_OTLP_ENDPOINT", file=sys.stderr)
 

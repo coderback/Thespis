@@ -1,0 +1,19 @@
+<!-- The package's core (Runtime/Core) built as Unity builds it: netstandard2.1, C# 9. Nothing in it may touch UnityEngine. -->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <RootNamespace>Thespis</RootNamespace>
+    <AssemblyName>Thespis.Runtime</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../com.thespis.client/Runtime/Core/**/*.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Unity's com.unity.nuget.newtonsoft-json 3.2 is Newtonsoft.Json 13.0. -->
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+</Project>

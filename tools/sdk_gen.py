@@ -1,7 +1,8 @@
 """Generate the SDKs' typed layer from the /v1 contract (docs/openapi-v1.json).
 
     python tools/sdk_gen.py godot            # writes sdk/godot/addons/thespis/api.gd
-    python tools/sdk_gen.py godot --check    # fails if the committed file isn't what the spec makes
+    python tools/sdk_gen.py unity            # writes sdk/unity/com.thespis.client/Runtime/Core/Api.g.cs
+    python tools/sdk_gen.py all --check      # fails if a committed file isn't what the spec makes
 
 What's generated is the part that must match the server exactly: one class per schema, with typed fields, and the
 table of routes (method, path, request and reply types). The engine-idiomatic API around it is written by hand, so
@@ -18,6 +19,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SPEC = ROOT / "docs" / "openapi-v1.json"
 GODOT_OUT = ROOT / "sdk" / "godot" / "addons" / "thespis" / "api.gd"
+UNITY_OUT = ROOT / "sdk" / "unity" / "com.thespis.client" / "Runtime" / "Core" / "Api.g.cs"
 SKIP = {"HTTPValidationError", "ValidationError"}
 
 # GDScript words a JSON field can't be named as; such a field gets a trailing underscore (ObserveIn's `true`).
@@ -43,6 +45,21 @@ def _unwrap(schema: dict) -> tuple[dict, bool]:
 
 def route_name(operation_id: str) -> str:
     return operation_id.split("_v1_", 1)[0]
+
+
+def routes(spec: dict) -> list[tuple[str, str, str, str, str]]:
+    """Each route: (name, METHOD, path, request schema or "", reply schema or ""). A list's reply is its items'."""
+    out = []
+    for path, ops in spec["paths"].items():
+        for method, op in ops.items():
+            body = op.get("requestBody", {}).get("content", {}).get("application/json", {}).get("schema", {})
+            reply = ""
+            for code, r in op["responses"].items():
+                if code.startswith("2"):
+                    sch = r.get("content", {}).get("application/json", {}).get("schema", {})
+                    reply = _ref(sch) or _ref(sch.get("items", {})) or ""
+            out.append((route_name(op["operationId"]), method.upper(), path, _ref(body) or "", reply))
+    return out
 
 
 # ---------------------------------------------------------------------------------------------------- Godot
@@ -111,16 +128,8 @@ def godot(spec: dict) -> str:
         "## Each route: [method, path, request class name or \"\", reply class name or \"\"]. Paths keep their {params}.",
         "const ROUTES := {",
     ]
-    for path, ops in spec["paths"].items():
-        for method, op in ops.items():
-            body = op.get("requestBody", {}).get("content", {}).get("application/json", {}).get("schema", {})
-            reply = ""
-            for code, r in op["responses"].items():
-                if code.startswith("2"):
-                    sch = r.get("content", {}).get("application/json", {}).get("schema", {})
-                    reply = _ref(sch) or _ref(sch.get("items", {})) or ""
-            out.append(f'\t"{route_name(op["operationId"])}": ["{method.upper()}", "{path}", "{_ref(body) or ""}", '
-                       f'"{reply}"],')
+    for name, method, path, body, reply in routes(spec):
+        out.append(f'\t"{name}": ["{method}", "{path}", "{body}", "{reply}"],')
     out.append("}")
     names = [n for n in spec["components"]["schemas"] if n not in SKIP]
     out += ["", "", "## A new, empty instance of the class with this name, or null.", "static func make(name: String):",
@@ -148,23 +157,137 @@ def godot(spec: dict) -> str:
     return "\n".join(out) + "\n"
 
 
+# ---------------------------------------------------------------------------------------------------- Unity (C#)
+
+_CS_SCALAR = {"string": "string", "integer": "int", "number": "double", "boolean": "bool"}
+
+
+def _pascal(name: str) -> str:
+    return "".join(part[:1].upper() + part[1:] for part in name.split("_"))
+
+
+def _cs_type(schema: dict) -> str:
+    """A schema's C# type, without nullability."""
+    ref = _ref(schema)
+    if ref:
+        return ref
+    kind = schema.get("type")
+    if kind in _CS_SCALAR:
+        return _CS_SCALAR[kind]
+    if kind == "array":
+        return f"List<{_cs_type(schema.get('items', {}))}>"
+    if kind == "object" or "additionalProperties" in schema:
+        extra = schema.get("additionalProperties", True)
+        if not isinstance(extra, dict):
+            return "JObject"
+        if "anyOf" in extra:  # one of several scalars: a choice's bindings, a template's fill
+            return "Dictionary<string, object>"
+        return f"Dictionary<string, {_cs_type(extra)}>"
+    return "JToken"
+
+
+def _cs_field(name: str, schema: dict) -> list[str]:
+    inner, nullable = _unwrap(schema)
+    typ = _cs_type(inner)
+    doc = schema.get("description") or inner.get("description") or ""
+    lines = [f"        /// <summary>{doc}</summary>"] if doc else []
+    if nullable:
+        lines.append(f'        [JsonProperty("{name}", NullValueHandling = NullValueHandling.Ignore)]')
+        lines.append(f"        public {typ}? {_pascal(name)} {{ get; set; }}")
+        return lines
+    default = schema.get("default", inner.get("default"))
+    if default is not None and typ in ("string", "int", "bool"):
+        init = json.dumps(default)
+    elif default is not None and typ == "double":
+        init = repr(float(default))
+    elif typ == "string":
+        init = '""'
+    elif typ in ("int", "double", "bool"):
+        init = ""
+    else:
+        init = "new()"
+    lines.append(f'        [JsonProperty("{name}")]')
+    lines.append(f"        public {typ} {_pascal(name)} {{ get; set; }}" + (f" = {init};" if init else ""))
+    return lines
+
+
+def unity(spec: dict) -> str:
+    out = [
+        "// Generated by tools/sdk_gen.py from docs/openapi-v1.json: don't edit it; change the server, then regenerate.",
+        "//",
+        "// The /v1 contract in C#: a class per schema, with typed properties named as C# names them and serialised as",
+        "// the server names them, and the route table the client calls through. Nothing here touches UnityEngine, so",
+        "// it builds under plain .NET as well (netstandard2.1, C# 9).",
+        "#nullable enable",
+        "using System.Collections.Generic;",
+        "using Newtonsoft.Json;",
+        "using Newtonsoft.Json.Linq;",
+        "",
+        "namespace Thespis.Api",
+        "{",
+        "    /// <summary>A /v1 route: its method and path (with {params}), and its request and reply schemas.</summary>",
+        "    public sealed class Route",
+        "    {",
+        "        public string Method { get; }",
+        "        public string Path { get; }",
+        "        public string Request { get; }",
+        "        public string Reply { get; }",
+        "",
+        "        public Route(string method, string path, string request, string reply)",
+        "        {",
+        "            Method = method;",
+        "            Path = path;",
+        "            Request = request;",
+        "            Reply = reply;",
+        "        }",
+        "    }",
+        "",
+        "    public static class Routes",
+        "    {",
+        f'        public const string Version = "{spec["info"]["version"]}";',
+    ]
+    for name, method, path, body, reply in routes(spec):
+        out.append(f'        public static readonly Route {_pascal(name)} = new Route("{method}", "{path}", "{body}", '
+                   f'"{reply}");')
+    out.append("    }")
+    for name, schema in spec["components"]["schemas"].items():
+        if name in SKIP:
+            continue
+        out.append("")
+        if schema.get("description"):
+            out.append(f"    /// <summary>{schema['description'].splitlines()[0]}</summary>")
+        out += [f"    public class {name}", "    {"]
+        fields = [_cs_field(k, v) for k, v in schema.get("properties", {}).items()]
+        for i, lines in enumerate(fields):
+            out += ([""] if i else []) + lines
+        out.append("    }")
+    out.append("}")
+    return "\n".join(out) + "\n"
+
+
+TARGETS = {"godot": (godot, GODOT_OUT), "unity": (unity, UNITY_OUT)}
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("target", choices=["godot"])
+    parser.add_argument("target", choices=[*TARGETS, "all"])
     parser.add_argument("--check", action="store_true", help="fail if the committed file differs from the spec's")
     args = parser.parse_args()
     spec = json.loads(SPEC.read_text(encoding="utf-8"))
-    text, out = godot(spec), GODOT_OUT
-    if args.check:
-        current = out.read_text(encoding="utf-8") if out.exists() else ""
-        if current != text:
-            print(f"{out.relative_to(ROOT)} is stale: python tools/sdk_gen.py {args.target}", file=sys.stderr)
-            return 1
-        return 0
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_bytes(text.encode())
-    print(f"wrote {out.relative_to(ROOT)}")
-    return 0
+    stale = 0
+    for target in TARGETS if args.target == "all" else [args.target]:
+        make, out = TARGETS[target]
+        text = make(spec)
+        if args.check:
+            current = out.read_text(encoding="utf-8") if out.exists() else ""
+            if current != text:
+                print(f"{out.relative_to(ROOT)} is stale: python tools/sdk_gen.py {target}", file=sys.stderr)
+                stale = 1
+            continue
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_bytes(text.encode())
+        print(f"wrote {out.relative_to(ROOT)}")
+    return stale
 
 
 if __name__ == "__main__":
