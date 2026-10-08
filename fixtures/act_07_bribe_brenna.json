@@ -119,6 +119,11 @@
           "b": "kael"
         },
         "status": "active",
+        "opinion": {
+          "b": 1.0,
+          "d": 0.0,
+          "u": 0.0
+        },
         "evidence": [
           {
             "source": "witnessed",
@@ -139,6 +144,11 @@
           "b": "kael"
         },
         "status": "active",
+        "opinion": {
+          "b": 1.0,
+          "d": 0.0,
+          "u": 0.0
+        },
         "evidence": [
           {
             "source": "witnessed",
@@ -159,6 +169,11 @@
           "b": "kael"
         },
         "status": "active",
+        "opinion": {
+          "b": 1.0,
+          "d": 0.0,
+          "u": 0.0
+        },
         "evidence": [
           {
             "source": "self",
@@ -179,6 +194,11 @@
           "b": "kael"
         },
         "status": "active",
+        "opinion": {
+          "b": 1.0,
+          "d": 0.0,
+          "u": 0.0
+        },
         "evidence": [
           {
             "source": "witnessed",
@@ -199,6 +219,11 @@
           "b": "kael"
         },
         "status": "active",
+        "opinion": {
+          "b": 1.0,
+          "d": 0.0,
+          "u": 0.0
+        },
         "evidence": [
           {
             "source": "witnessed",
@@ -219,6 +244,11 @@
           "b": "kael"
         },
         "status": "active",
+        "opinion": {
+          "b": 1.0,
+          "d": 0.0,
+          "u": 0.0
+        },
         "evidence": [
           {
             "source": "self",
@@ -239,6 +269,11 @@
           "b": "kael"
         },
         "status": "active",
+        "opinion": {
+          "b": 1.0,
+          "d": 0.0,
+          "u": 0.0
+        },
         "evidence": [
           {
             "source": "witnessed",
@@ -259,6 +294,11 @@
           "b": "kael"
         },
         "status": "active",
+        "opinion": {
+          "b": 1.0,
+          "d": 0.0,
+          "u": 0.0
+        },
         "evidence": [
           {
             "source": "witnessed",
@@ -279,6 +319,11 @@
           "b": "kael"
         },
         "status": "active",
+        "opinion": {
+          "b": 1.0,
+          "d": 0.0,
+          "u": 0.0
+        },
         "evidence": [
           {
             "source": "self",
@@ -299,6 +344,11 @@
           "b": "kael"
         },
         "status": "active",
+        "opinion": {
+          "b": 0.9,
+          "d": 0.0,
+          "u": 0.1
+        },
         "evidence": [
           {
             "source": "kael",
@@ -319,6 +369,11 @@
           "b": "kael"
         },
         "status": "active",
+        "opinion": {
+          "b": 0.8,
+          "d": 0.0,
+          "u": 0.2
+        },
         "evidence": [
           {
             "source": "odo",

@@ -236,24 +236,32 @@ def _credit(w: World, npc: str, belief) -> int:
 
 
 def _reconcile(w: World, npc: str, claim: Claim) -> list:
-    """Two places at once can't both be true: the NPC drops whichever it has from the less trusted source, and
-    trusts whoever told it that one less. Returns the beliefs it retracted."""
+    """Two places at once can't both be true. The one the NPC has from the less trusted source loses: what the more
+    trusted one said counts against it, and whoever told it the loser is trusted less, so everything they said is
+    re-weighed. Returns the beliefs that ended retracted."""
     new = w.beliefs.get(npc, claim)
     if new is None or not new.active:
         return []
     retracted = []
+    trust = w.npcs[npc].trust_in
     for old in w.beliefs.for_npc(npc):
         if old is new or not old.active or not C.contradicts(old.claim, new.claim):
             continue
-        loser = old if _credit(w, npc, new) > _credit(w, npc, old) else new if _credit(w, npc, old) > _credit(
-            w, npc, new) else None
-        if loser is None:
+        if _credit(w, npc, new) > _credit(w, npc, old):
+            loser, winner = old, new
+        elif _credit(w, npc, old) > _credit(w, npc, new):
+            loser, winner = new, old
+        else:
             continue
-        w.beliefs.retract(loser)
-        retracted.append(loser)
-        for src in {e.source for e in loser.evidence}:
-            if src in w.npcs[npc].trust_in:
-                w.npcs[npc].trust_in[src] -= C.CONTRADICTED
+        sources = {e.source for e in loser.evidence if not e.against}
+        best = max(winner.evidence, key=lambda e: e.conf)
+        w.beliefs.add_evidence(npc, loser.claim, best.conf, best.source, best.event, w.phase, against=True)
+        for src in sorted(sources):
+            if src in trust:
+                trust[src] -= C.CONTRADICTED
+                w.beliefs.discredit(npc, src, C.conf_from_trust(trust[src]))
+        if not loser.active:
+            retracted.append(loser)
     return retracted
 
 

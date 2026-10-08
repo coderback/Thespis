@@ -7,9 +7,12 @@ Use it three ways:
   2. import it in the harness and diff the real engine's state against it after each step
   3. generate client fixtures: run the demo route and dump snapshot() after each beat
 
-Rules follow the v2 design doc: evidence-based beliefs (confidence = max of evidence),
-trust-scaled claims, crime -> trust -2, gossip worst-news-first at x0.8, testimony
-retraction, detain once per claim for 2 phases, gate at guard_post -> bridge,
+Rules follow the v2 design doc: evidence-based beliefs (confidence = the belief mass of the
+evidence's cumulative fusion, subjective logic, strongest piece per source and side),
+trust-scaled claims, crime -> trust -2, gossip worst-news-first at x0.8, testimony as
+evidence against weighted by trust in the witness, then every source of the belief trusted
+3 less and re-weighed (discredit); retracted = disbelief outweighs belief; detain once per
+claim for 2 phases, gate at guard_post -> bridge,
 tick order: player action, decisions (Brenna then Kael), gossip, moves, fear decay.
 """
 import hashlib
@@ -28,6 +31,23 @@ def dice(seed, event_id):
     """Deterministic uniform [0, 1) from (seed, event_id)."""
     h = hashlib.sha256(f"{seed}:{event_id}".encode()).hexdigest()
     return int(h[:8], 16) / 0x100000000
+
+
+def fuse(evidence):
+    """Cumulative fusion of the strongest piece per (source, against), as (b, d, u), rounded to 4 places."""
+    strongest = {}
+    for e in evidence:
+        key = (e["source"], e.get("against", False))
+        strongest[key] = max(strongest.get(key, 0.0), e["conf"])
+    b, d, u = 0.0, 0.0, 1.0
+    for (_, against), c in sorted(strongest.items()):
+        b2, d2, u2 = (0.0, c, 1.0 - c) if against else (c, 0.0, 1.0 - c)
+        if u == 0.0 and u2 == 0.0:
+            b, d, u = (b + b2) / 2, (d + d2) / 2, 0.0
+        else:
+            k = u + u2 - u * u2
+            b, d, u = (b * u2 + b2 * u) / k, (d * u2 + d2 * u) / k, u * u2 / k
+    return round(b, 4), round(d, 4), round(u, 4)
 
 
 def conf_from_trust(trust):
@@ -78,19 +98,31 @@ class World:
         b = self.beliefs[npc].get(claim)
         if not b or b["status"] != "active":
             return 0.0
-        return max(e["conf"] for e in b["evidence"])
+        return fuse(b["evidence"])[0]
 
-    def add_evidence(self, npc, claim, conf, source, eid):
+    @staticmethod
+    def refresh(b):
+        bel, dis, _ = fuse(b["evidence"])
+        b["status"] = "retracted" if dis > bel else "active"
+
+    def add_evidence(self, npc, claim, conf, source, eid, against=False):
         b = self.beliefs[npc].setdefault(claim, {"evidence": [], "status": "active"})
-        if b["status"] == "retracted":
-            return
-        b["evidence"].append({"source": source, "event": eid, "phase": self.phase, "conf": conf})
+        b["evidence"].append({"source": source, "event": eid, "phase": self.phase, "conf": conf, "against": against})
+        self.refresh(b)
         if npc == "brenna" and claim[0] == "robbed" and self.conf(npc, claim) >= 0.5 \
                 and claim not in self.brenna["crimes"]:
             self.brenna["crimes"].add(claim)
             self.brenna["trust"][claim[1]] -= 2
             self.log.append(f"p{self.phase}: Brenna believes {claim} ({self.conf(npc, claim):.1f} via {source}); "
                             f"trust[{claim[1]}] = {self.brenna['trust'][claim[1]]}")
+
+    def discredit(self, npc, source, conf):
+        """Cap every piece of evidence npc holds from source at conf, and re-weigh."""
+        for b in self.beliefs[npc].values():
+            for e in b["evidence"]:
+                if e["source"] == source and e["conf"] > conf:
+                    e["conf"] = conf
+            self.refresh(b)
 
     def witness(self, claim, actor, target, eid):
         for n in self.at(self.player["loc"]):
@@ -228,11 +260,13 @@ class World:
                 if all(e["source"] == w for e in bel["evidence"]):
                     continue
                 if not self.happened(claim):       # the witness knows it never happened to them
-                    bel["status"] = "retracted"
-                    for src in {e["source"] for e in bel["evidence"]}:
+                    sources = {e["source"] for e in bel["evidence"] if not e["against"]}
+                    eid = self.event("testify", w, "brenna", claim, self.happened(claim), loc="guard_post")
+                    self.add_evidence("brenna", claim, conf_from_trust(b["trust"][w]), w, eid, against=True)
+                    for src in sorted(sources):
                         if src in b["trust"]:
                             b["trust"][src] -= 3
-                    self.event("testify", w, "brenna", claim, self.happened(claim), loc="guard_post")
+                            self.discredit("brenna", src, conf_from_trust(b["trust"][src]))
                     self.log.append(f"p{p}: {w} testifies; Brenna RETRACTS {claim}; trust = {b['trust']}")
                     if k["frozen_until"] >= p:
                         k["frozen_until"] = p - 1

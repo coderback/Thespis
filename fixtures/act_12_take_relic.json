@@ -285,6 +285,11 @@
           "b": "kael"
         },
         "status": "active",
+        "opinion": {
+          "b": 1.0,
+          "d": 0.0,
+          "u": 0.0
+        },
         "evidence": [
           {
             "source": "witnessed",
@@ -305,6 +310,11 @@
           "b": "kael"
         },
         "status": "active",
+        "opinion": {
+          "b": 1.0,
+          "d": 0.0,
+          "u": 0.0
+        },
         "evidence": [
           {
             "source": "witnessed",
@@ -325,6 +335,11 @@
           "b": "kael"
         },
         "status": "active",
+        "opinion": {
+          "b": 1.0,
+          "d": 0.0,
+          "u": 0.0
+        },
         "evidence": [
           {
             "source": "self",
@@ -345,6 +360,11 @@
           "b": "kael"
         },
         "status": "active",
+        "opinion": {
+          "b": 1.0,
+          "d": 0.0,
+          "u": 0.0
+        },
         "evidence": [
           {
             "source": "witnessed",
@@ -365,6 +385,11 @@
           "b": "kael"
         },
         "status": "active",
+        "opinion": {
+          "b": 1.0,
+          "d": 0.0,
+          "u": 0.0
+        },
         "evidence": [
           {
             "source": "witnessed",
@@ -385,6 +410,11 @@
           "b": "kael"
         },
         "status": "active",
+        "opinion": {
+          "b": 1.0,
+          "d": 0.0,
+          "u": 0.0
+        },
         "evidence": [
           {
             "source": "self",
@@ -405,6 +435,11 @@
           "b": "kael"
         },
         "status": "active",
+        "opinion": {
+          "b": 1.0,
+          "d": 0.0,
+          "u": 0.0
+        },
         "evidence": [
           {
             "source": "witnessed",
@@ -425,6 +460,11 @@
           "b": "kael"
         },
         "status": "active",
+        "opinion": {
+          "b": 1.0,
+          "d": 0.0,
+          "u": 0.0
+        },
         "evidence": [
           {
             "source": "witnessed",
@@ -445,6 +485,11 @@
           "b": "kael"
         },
         "status": "active",
+        "opinion": {
+          "b": 1.0,
+          "d": 0.0,
+          "u": 0.0
+        },
         "evidence": [
           {
             "source": "self",
@@ -465,6 +510,11 @@
           "b": "kael"
         },
         "status": "active",
+        "opinion": {
+          "b": 0.9,
+          "d": 0.0,
+          "u": 0.1
+        },
         "evidence": [
           {
             "source": "kael",
@@ -485,6 +535,11 @@
           "b": "kael"
         },
         "status": "active",
+        "opinion": {
+          "b": 0.8,
+          "d": 0.0,
+          "u": 0.2
+        },
         "evidence": [
           {
             "source": "odo",
@@ -505,15 +560,27 @@
           "b": "odo"
         },
         "status": "retracted",
+        "opinion": {
+          "b": 0.0244,
+          "d": 0.878,
+          "u": 0.0976
+        },
         "evidence": [
           {
             "source": "player",
             "event": "e0016",
             "phase": 3,
-            "conf": 0.9
+            "conf": 0.2
+          },
+          {
+            "source": "odo",
+            "event": "e0025",
+            "phase": 6,
+            "conf": 0.9,
+            "against": true
           }
         ],
-        "conf": 0.9,
+        "conf": 0.0244,
         "truth": false
       },
       {
@@ -525,6 +592,11 @@
           "b": "kael"
         },
         "status": "active",
+        "opinion": {
+          "b": 1.0,
+          "d": 0.0,
+          "u": 0.0
+        },
         "evidence": [
           {
             "source": "self",
@@ -545,6 +617,11 @@
           "b": "kael"
         },
         "status": "active",
+        "opinion": {
+          "b": 0.8,
+          "d": 0.0,
+          "u": 0.2
+        },
         "evidence": [
           {
             "source": "odo",
