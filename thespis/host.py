@@ -37,6 +37,7 @@ from urllib.parse import urlparse
 from thespis.considerations import DefinitionError
 from thespis.expression import Mind, StatePack, Utterance
 from thespis.gateway import MAX_CONCURRENT, Call, ModelGateway, ModelReply, NoModel, gateway_from_env
+from thespis.recall import Embedder
 from thespis.session import Game, Line, Session, Unknown
 from thespis.storage import LOCAL, Caps, Conflict, Project, SqliteStorage, Storage, Usage
 from thespis.vault import Vault, VaultError
@@ -153,7 +154,7 @@ class Host:
     def __init__(self, storage: Storage | None = None, games: Mapping[str, Game] | None = None,
                  gateway: ModelGateway | None = None, mode: str = MEMORY, max_sessions: int = 256,
                  token: str | None = None, vault: Vault | None = None, cache: bool = True,
-                 allow_private_models: bool = False, live: int = LIVE):
+                 allow_private_models: bool = False, live: int = LIVE, embedder: Embedder | None = None):
         """`games` every project can play; `gateway` speaks for projects with no models of their own (and for the
         sidecar's one project). `token`, for a sidecar, is what callers must present."""
         if mode not in (MEMORY, SIDECAR, SERVER):
@@ -163,6 +164,7 @@ class Host:
         self.gateway = gateway or NoModel()
         self.mode, self.token, self.vault, self.cache = mode, token, vault, cache
         self.allow_private_models = allow_private_models
+        self.embedder = embedder  # recall by meaning, for games that declare it
         self._live: OrderedDict[str, Live] = OrderedDict()
         self._live_max = live
         self._lock = threading.Lock()
@@ -312,7 +314,8 @@ class Host:
         observer = self._observer(project.id, sid)
         mind = Mind(metered, game.voice.validator, cache=ProjectCache(self.storage, project.id) if self.cache else None,
                     observer=observer)
-        return Session.restore(game, snapshot, mind=mind) if snapshot else Session.new(game, seed, mind=mind)
+        return Session.restore(game, snapshot, mind=mind, embedder=self.embedder) if snapshot else \
+            Session.new(game, seed, mind=mind, embedder=self.embedder)
 
     def _observer(self, project: str, sid: str) -> Callable[[str, StatePack, ModelReply | None, Utterance], None]:
         def seen(kind: str, pack: StatePack, reply: ModelReply | None, u: Utterance) -> None:

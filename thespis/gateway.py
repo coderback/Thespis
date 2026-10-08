@@ -57,6 +57,7 @@ CONNECT_TIMEOUT = 1.0  # 1 s to connect, and the rest to send the request and re
 ANTHROPIC_VERSION = "2023-06-01"
 PLAYER_FACING = frozenset({"act", "react", "narrate", "extract", "check"})  # call types a player is waiting for
 MAX_TOKENS = 150
+LONGER = {"tell": 450}  # call types whose replies need more room: a told scene is several lines
 TEMPERATURE = 0.6
 MAX_CONCURRENT = 4  # threads one complete_many uses; each provider's own limit is its profile's `concurrency`
 COOLDOWN = {401: 600.0, 402: 600.0, 403: 600.0, 429: 30.0}  # seconds to skip a provider after these answers
@@ -116,6 +117,10 @@ class Provider:
             body = {"model": self.model, "messages": messages, "max_tokens": MAX_TOKENS, "temperature": TEMPERATURE,
                     "response_format": fmt}
         body = {**body, **self.profile.extra, **self.extra}
+        if name in LONGER:  # at least that much room, whatever the profile or extra cap a line at
+            for k in ("max_tokens", "max_completion_tokens"):
+                if isinstance(body.get(k), int):
+                    body[k] = max(body[k], LONGER[name])
         return {k: v for k, v in body.items() if v is not None}  # null in extra removes a field
 
     def read(self, body: dict) -> tuple[dict | None, str | None, dict]:

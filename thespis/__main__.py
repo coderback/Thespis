@@ -232,6 +232,14 @@ def serve(args: argparse.Namespace) -> int:
         env = {k: v for k, v in env.items() if not k.startswith("LLM_")} | local.env()
         print(f"speaking through {local.plan.describe()} at {local.url}", file=sys.stderr)
     gateway = gateway_from_env(env)
+    embed = None
+    if args.embed == "local":  # recall by meaning through BGE small, on the CPU beside the chat model
+        from thespis.runtime.local import LocalModel
+        embed = LocalModel("bge-small", device=None, progress=_progress).start()
+        env |= embed.env()
+        print(f"recalling through {embed.model.id} at {embed.url}", file=sys.stderr)
+    from thespis.recall import embedder_from_env
+    embedder = embedder_from_env(env)
     if not online:
         far = [p.name for p in getattr(gateway, "providers", ()) if not offline.local(_hostname(p.base_url))]
         if far:
@@ -244,7 +252,7 @@ def serve(args: argparse.Namespace) -> int:
     host = Host(db, games, gateway, mode=mode, max_sessions=args.max_sessions,
                 token=os.environ.get("THESPIS_TOKEN") or None if mode == SIDECAR else None,
                 vault=Vault.from_env() if mode == SERVER else None, cache=not args.no_cache,
-                allow_private_models=args.allow_private_models)
+                allow_private_models=args.allow_private_models, embedder=embedder)
     if tracing.configure():
         print("tracing to $OTEL_EXPORTER_OTLP_ENDPOINT", file=sys.stderr)
 
@@ -270,6 +278,8 @@ def serve(args: argparse.Namespace) -> int:
         host.shutdown()
         if local:
             local.stop()
+        if embed:
+            embed.stop()
         if offline.refused:
             print(f"offline, refused {len(offline.refused)}: {'; '.join(sorted(set(offline.refused)))}",
                   file=sys.stderr)
@@ -292,6 +302,8 @@ def main(argv: list[str] | None = None) -> int:
     serve_p.add_argument("--port", type=int, default=7878, help="0 picks a free one (printed as THESPIS_URL)")
     serve_p.add_argument("--local", nargs="?", const="auto", help="speak through a local model: auto, or a model id")
     serve_p.add_argument("--online", action="store_true", help="a sidecar may use the network")
+    serve_p.add_argument("--embed", choices=["local"], help="recall by meaning through a local embedding model "
+                                                            "(else EMBED_* if set)")
     serve_p.add_argument("--parent", type=int, help="stop when this process ends")
     serve_p.add_argument("--max-sessions", type=int, default=256, help="a sidecar's open sessions at most")
     serve_p.add_argument("--no-cache", action="store_true", help="don't reuse model replies")

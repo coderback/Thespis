@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Collection, Mapping, Sequence
 from dataclasses import dataclass, field
+from typing import Any
 
 from thespis import perception
 from thespis.beliefs import Belief
@@ -20,7 +21,7 @@ from thespis.deception import asserting
 from thespis.decisions import REACT, Decision
 from thespis.expression import Mind, StatePack, Utterance, Validator
 from thespis.ledger import Claim, Event
-from thespis.perception import Sees, at_the_scene, known
+from thespis.perception import Sees, at_the_scene, known, latest
 from thespis.retriever import Retriever, TopKRetriever
 from thespis.world import World
 
@@ -66,6 +67,7 @@ class Voice:
     stakes: Collection[str] = ()  # actions (by id or kind) and triggers whose lines have consequences
     retriever: Retriever = field(default_factory=lambda: TopKRetriever(5))
     events: int = 5  # how many known events a pack shows
+    recall: Any = None  # a thespis.recall.MeaningRetriever: memories chosen by meaning, for a game that declares it
 
     def view(self, w: World, view: View | None = None) -> View:
         return view or View(w.player["loc"])
@@ -87,8 +89,16 @@ class Voice:
         if view.player_at == npc.loc:
             others.append("player")
         others += [pid for pid, p in w.players.items() if p.get("loc") == npc.loc]  # the other players present
-        beliefs = self.retriever.beliefs(w.beliefs, npc_id)  # active only: a retracted belief is never offered
-        events = known(w, npc_id, self.events, self.sees, view.hidden)
+        recalled = None
+        if self.recall is not None:  # by meaning, to the moment; with nothing to say it by, the newest it knows
+            last = latest(w, npc_id, self.sees)
+            query = situation.strip() or (self.sentence(w.ledger.get(last)) if last else "")
+            recalled = self.recall.recall(w, npc_id, query, self.sees, view.hidden)
+        if recalled is not None:
+            beliefs, events = recalled
+        else:
+            beliefs = self.retriever.beliefs(w.beliefs, npc_id)  # active only: a retracted belief is never offered
+            events = known(w, npc_id, self.events, self.sees, view.hidden)
         doing = {"id": action, "does": self.describe(w, npc_id, action)} if action else None
         if doing and asserts:
             doing = asserting(doing, self.claim_text(asserts))
@@ -161,21 +171,27 @@ class Voice:
         return u.line or text, u.cites, u.source
 
     def narration(self, events: list[Event], setting: str, telling: Callable[[list[Event]], str],
-                  audience: str | None = None) -> StatePack:
+                  audience: str | None = None, structured: bool = False, to: str | None = None) -> StatePack:
         """The narrator's state pack for `events`: each told in the code's words, and only their names to use.
-        `audience` names the one player it is told to, when there are several."""
+        `audience` names the one player it is told to, when there are several. A `structured` pack is for a told
+        scene: each event says which NPC did it ("by"), who may then speak in a segment citing it."""
         cast = self.cast.data["narrator"]
-        names = set(self.places)
+        names = set(self.places) | ({to} if to else set())  # the one told may be named
         for e in events:
             names |= {e.actor, e.target}
             if e.claim:
                 names |= {e.claim.a, e.claim.b}
+        # Told to one player of several, the situation says only who is told: "Tell Bram what happened" read to the
+        # model as Bram asking, and it opened with "You asked what had transpired" (live Rehearsal).
+        situation = (f"The story is told to {audience}, unprompted, as they come back to it." if audience else
+                     "Tell the player what happened since they last looked.")
         return StatePack(
             npc="narrator", name=cast["name"], persona=cast["persona"], goal="Tell the story so far, truthfully",
-            situation=f"Tell {audience or 'the player'} what happened since they last looked.", here=[], drives={},
-            trust_in={},
-            beliefs=[], events=[{"id": e.id, "what": telling([e])} for e in events],
-            names={x for x in names if x and x != "player"}, setting=setting, stakes=True)
+            situation=situation, here=[], drives={}, trust_in={},
+            beliefs=[], events=[{"id": e.id, "what": telling([e]),
+                                 **({"by": e.actor} if structured and e.actor in self.cast.data["npc"] else {})}
+                                for e in events],
+            names={x for x in names if x and x != "player"}, setting=setting, stakes=True, structured=structured)
 
 
 def reply(d: Decision) -> dict:

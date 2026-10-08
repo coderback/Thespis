@@ -165,6 +165,9 @@ class LineOut(BaseModel):
     action: str | None = Field(None, description="What the NPC decided to do, for decide")
     reason: str = ""
     event: str | None = Field(None, description="The statement its action logged, if it states a claim")
+    segments: list[dict[str, Any]] | None = Field(
+        None, description="A told scene, for a game whose narrator is structured: in order, each the narrator's "
+                          "words or one speaker's ({speaker, line, cites})")
 
 
 class TickOut(BaseModel):

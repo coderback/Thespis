@@ -3,7 +3,8 @@ before it counts.
 
 The model makes no choices. It took the strongest drive pull in 86 of 86 decisions it was offered (paper-m1,
 docs/cast-review.md), so code chooses every action and the model only words it: what the NPC says as it does what
-code decided (`act`), a line in reply to something (`react`), or the narrator's telling (`narrate`).
+code decided (`act`), a line in reply to something (`react`), or the narrator's telling (`narrate`), which a game
+may ask for as a scene of segments, each the narrator's or one speaker's (`tell`).
 
 The state pack is the only thing the model sees: persona, goal, drives and trust, the five strongest beliefs and
 the last five events the NPC knows, who is here, what just happened and, for an action, what the NPC is doing.
@@ -71,6 +72,24 @@ NARRATE_PROMPT = ("You are {name}. {persona}\n" + _RULES +
 PROMPTS = {"act": ACT_PROMPT, "react": REACT_PROMPT, "narrate": NARRATE_PROMPT}
 LIMITS = dict(LINE_LIMITS)  # characters per line, by call type
 
+# The narrator's telling as a scene (`[narrator] structured = true`): segments in order, each the narrator's words or
+# what one character said, quoted. Attribution is by construction: a character may speak only in a segment that cites
+# an event it did, so no quote is pinned on someone who never said it, and every segment is checked on its own.
+TELL_PROMPT = ("You are {name}. {persona}\n" + _RULES +
+               "Tell what happened as a short scene, 2 to 5 segments in order, to the one the situation names, "
+               "addressing them as \"you\": if they took part in an event, they are \"you\" in it. Never say what "
+               "they said, asked or thought unless an event shows it. Each segment is "
+               "your own telling (speaker \"narrator\"), in the past tense, or a character's own words. Where a "
+               "character told someone something, give what they said as a segment of their own, quoted in their "
+               "voice (speaker: their id), citing that event. A character may speak only in a segment that cites an "
+               "event they did (its \"by\"), and says only what that event shows. Every segment cites the events "
+               "it tells, in \"cites\" only: never write an id such as e1 in a line.\n"
+               'Reply with JSON only: {{"segments": [{{"speaker": "...", "cites": ["..."], "line": "..."}}]}}')
+TELL_SEGMENTS = (1, 6)  # how many segments a telling may have
+TELL_SEGMENT = 200  # characters per segment
+TELL_LIMIT = 600  # characters in all
+REF = re.compile(r"\b[be]\d+\b")  # a pack reference (b1, e2), which belongs in cites, not in the words
+
 
 def schema_for(refs: list[str]) -> dict:
     """A reply's JSON schema: cites from `refs`, then the line. In the subset strict structured outputs accept, which
@@ -80,9 +99,24 @@ def schema_for(refs: list[str]) -> dict:
                            "line": {"type": "string"}}}
 
 
+def tell_schema(refs: list[str], speakers: list[str]) -> dict:
+    """A told scene's JSON schema: segments, each with a speaker from `speakers` or the narrator, its cites, its
+    words."""
+    segment = {"type": "object", "additionalProperties": False, "required": ["speaker", "cites", "line"],
+               "properties": {"speaker": {"type": "string", "enum": ["narrator", *speakers]},
+                              "cites": {"type": "array", "items": {"type": "string", "enum": refs}},
+                              "line": {"type": "string"}}}
+    return {"type": "object", "additionalProperties": False, "required": ["segments"],
+            "properties": {"segments": {"type": "array", "items": segment}}}
+
+
 # Part of every cache key (#18): any change to the prompts, the schemas' shape or the limits gives new keys.
 PROMPT_HASH = hashlib.sha256(json.dumps({"prompts": PROMPTS, "schema": schema_for(["<ref>"]), "limits": LIMITS},
                                         sort_keys=True).encode("utf-8")).hexdigest()[:12]
+# A told scene's own, so adding it left every other call's keys, and the recordings replayed from them, as they were.
+TELL_HASH = hashlib.sha256(json.dumps({"prompt": TELL_PROMPT, "schema": tell_schema(["<ref>"], ["<npc>"]),
+                                       "limits": [TELL_SEGMENTS, TELL_SEGMENT, TELL_LIMIT]},
+                                      sort_keys=True).encode("utf-8")).hexdigest()[:12]
 
 
 @dataclass
@@ -103,6 +137,12 @@ class StatePack:
     untrusted: list[str] = field(default_factory=list)  # text a player wrote that the pack carries, for moderation
     stakes: bool = False  # a line with consequences, so it meets the claim check; not shown to the model
     asserted: Claim | None = None  # the claim its action states, typed, for the claim check; not shown either
+    structured: bool = False  # a told scene (`tell`): its events say who did them ("by"), and its reply is segments
+
+    @property
+    def speakers(self) -> list[str]:
+        """Who may speak in a told scene: whoever did an event it tells, in pack order."""
+        return list(dict.fromkeys(e["by"] for e in self.events if e.get("by")))
 
     @property
     def asserts(self) -> bool:
@@ -134,18 +174,20 @@ class StatePack:
         return data
 
     def messages(self, kind: str) -> list[dict]:
-        return [{"role": "system", "content": PROMPTS[kind].format(name=self.name, persona=self.persona)},
+        prompt = TELL_PROMPT if kind == "tell" else PROMPTS[kind]
+        return [{"role": "system", "content": prompt.format(name=self.name, persona=self.persona)},
                 {"role": "user", "content": json.dumps(self.payload(), ensure_ascii=False)}]
 
     def schema(self) -> dict:
         """The reply's JSON schema: it may cite exactly the references this pack holds."""
-        return schema_for(list(self.refs))
+        return tell_schema(list(self.refs), self.speakers) if self.structured else schema_for(list(self.refs))
 
     def cache_key(self, model: str, kind: str, checked: bool = False) -> str:
         """sha256 of the model, the prompts' hash, the call type and everything the model is shown, canonically. A
         line that met the claim check is kept under its own key, so turning the check on never serves an unchecked
         line from the cache."""
-        key = {"model": model, "prompts": PROMPT_HASH, "call": kind, "name": self.name, "persona": self.persona,
+        key = {"model": model, "prompts": TELL_HASH if kind == "tell" else PROMPT_HASH, "call": kind,
+               "name": self.name, "persona": self.persona,
                "pack": self.payload()}
         if checked:
             key["checked"] = True
@@ -160,6 +202,7 @@ class Utterance:
     cites: list[str]  # belief and ledger ids, and "said" for the claim an action states
     source: str  # "llm", "cache" or "fallback"
     note: str = ""  # why the fallback was used, or which model spoke
+    segments: list[dict] | None = None  # a told scene's: {"speaker", "line", "cites"}, cites as ids
 
 
 class ReplyCache(Protocol):
@@ -188,6 +231,8 @@ class Validator:
 
     def problem(self, data: dict, pack: StatePack, kind: str) -> str | None:
         """Why a model reply (citing the pack's references) can't be used, or None if it passes."""
+        if kind == "tell":
+            return self._scene(data, pack)
         line = data.get("line")
         if not isinstance(line, str) or not line.strip():
             return "no line"
@@ -203,6 +248,33 @@ class Validator:
         absent = self.named(line) - pack.names
         if absent:
             return f"names {', '.join(sorted(absent))}, absent from its state pack"
+        return None
+
+    def _scene(self, data: dict, pack: StatePack) -> str | None:
+        """A told scene passes when every segment would pass as a line on its own, its speaker did an event it
+        cites (or it is the narrator's), and the whole is within its length."""
+        segments = data.get("segments")
+        low, high = TELL_SEGMENTS
+        if not isinstance(segments, list) or not low <= len(segments) <= high:
+            return f"segments: {low} to {high} of them"
+        by = {f"e{i}": e.get("by") for i, e in enumerate(pack.events, 1)}
+        total = 0
+        for i, s in enumerate(segments, 1):
+            if not isinstance(s, dict):
+                return f"segment {i} is not an object"
+            problem = self.problem({"line": s.get("line"), "cites": s.get("cites")}, pack, "narrate")
+            if problem:
+                return f"segment {i}: {problem}"
+            if len(s["line"]) > TELL_SEGMENT:
+                return f"segment {i} is {len(s['line'])} characters, over {TELL_SEGMENT}"
+            if ref := REF.search(s["line"]):  # live Rehearsal: "...at Osric's mill, e1." It belongs in cites
+                return f"segment {i} shows a reference ({ref.group(0)}) in its words"
+            speaker = s.get("speaker")
+            if speaker != "narrator" and not any(by.get(c) == speaker for c in s["cites"]):
+                return f"segment {i}: {speaker!r} speaks, but did none of the events it cites"
+            total += len(s["line"])
+        if total > TELL_LIMIT:
+            return f"the scene is {total} characters, over {TELL_LIMIT}"
         return None
 
 
@@ -259,6 +331,10 @@ class Mind:
     def narrate(self, pack: StatePack, fallback: Utterance) -> Utterance:
         """The narrator's telling of the events in the pack: 2 or 3 sentences that cite them."""
         return self._speak("narrate", [(pack, fallback)])[0]
+
+    def tell(self, pack: StatePack, fallback: Utterance) -> Utterance:
+        """The narrator's telling as a scene: segments, the narrator's or a speaker's, each checked on its own."""
+        return self._speak("tell", [(pack, fallback)])[0]
 
     def react_many(self, items: list[tuple[StatePack, Utterance]]) -> list[Utterance]:
         """Several reply lines at once: the calls the cache can't answer run in parallel."""
@@ -318,11 +394,16 @@ class Mind:
             due = due[:allowed]
         if not due:
             return
-        self.asked += len(due)
-        for i, problem in zip(due, self.checker.problems([(items[i][0], spoken[i].line) for i in due])):
-            if problem:
-                log.info("claim check refused a line", extra={"npc": items[i][0].npc, "why": problem})
-                spoken[i] = _fell_back(items[i][1], f"model reply rejected: claim check ({problem})")
+        # A told scene's segments are checked one by one: each is a line someone says, the narrator or a speaker.
+        asks = [(i, s["line"]) for i in due for s in (spoken[i].segments or [{"line": spoken[i].line}])]
+        self.asked += len(asks)
+        found: dict[int, str] = {}
+        for (i, _), problem in zip(asks, self.checker.problems([(items[i][0], line) for i, line in asks])):
+            if problem and i not in found:
+                found[i] = problem
+        for i, problem in found.items():
+            log.info("claim check refused a line", extra={"npc": items[i][0].npc, "why": problem})
+            spoken[i] = _fell_back(items[i][1], f"model reply rejected: claim check ({problem})")
 
     def _screen(self, items: list[tuple[StatePack, Utterance]], missing: list[int], spoken: list) -> list[int]:
         """Moderation in: a pack carrying player text the moderator flags falls back without a model call."""
@@ -380,6 +461,11 @@ class Mind:
 def _spoken(data: dict, pack: StatePack, fallback: Utterance, source: str, provider: str) -> Utterance:
     """A reply the validator passed, its references mapped to ids. The action is always code's."""
     refs = pack.refs
+    if pack.structured:
+        segments = [{"speaker": s["speaker"], "line": s["line"].strip(),
+                     "cites": [refs[c] for c in dict.fromkeys(s["cites"])]} for s in data["segments"]]
+        cites = list(dict.fromkeys(c for s in segments for c in s["cites"]))
+        return Utterance(fallback.action, " ".join(s["line"] for s in segments), cites, source, provider, segments)
     cites = [refs[c] for c in dict.fromkeys(data["cites"])]
     if pack.asserts and SAID not in cites:
         cites.append(SAID)
@@ -387,4 +473,4 @@ def _spoken(data: dict, pack: StatePack, fallback: Utterance, source: str, provi
 
 
 def _fell_back(fallback: Utterance, why: str) -> Utterance:
-    return Utterance(fallback.action, fallback.line, fallback.cites, "fallback", why)
+    return Utterance(fallback.action, fallback.line, fallback.cites, "fallback", why, fallback.segments)

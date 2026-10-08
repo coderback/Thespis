@@ -99,11 +99,12 @@ class Played:
 
 
 def play(game: Game, gateway, chosen: list[Scenario], recorder: SessionRecorder, settle: float = SETTLE,
-         pace: float = 1.0) -> Played:
-    """Play `chosen` as an engine would. `pace` scales the scenarios' waits (0: no pauses, for a quick check)."""
+         pace: float = 1.0, embedder=None) -> Played:
+    """Play `chosen` as an engine would. `pace` scales the scenarios' waits (0: no pauses, for a quick check);
+    `embedder` serves recall by meaning, for a game that declares it."""
     played = Played()
     for sc in chosen:
-        s = Session.new(game, sc.seed, mind=Mind(gateway, game.voice.validator, observer=recorder))
+        s = Session.new(game, sc.seed, mind=Mind(gateway, game.voice.validator, observer=recorder), embedder=embedder)
         recorder.session, recorder.scenario, recorder.game = s, sc.name, game.id
         s.on_pack = recorder.saw_pack
         asked: list[tuple[str, str, float, str]] = []  # (line id, call, asked at, status when returned)

@@ -112,12 +112,23 @@ def live(args) -> int:
         args.claim_check, args.record = "off", False
         print(f"playing {len(chosen_sessions)} {gid} scenarios through sessions with {', '.join(speaker.models)}")
         recorder = sessions.SessionRecorder()
+        embed = None
+        if args.embed == "local":
+            from thespis.runtime.local import LocalModel
+            embed = LocalModel("bge-small", device=None).start()
+            env |= embed.env()
+        from thespis.recall import embedder_from_env
+        embedder = embedder_from_env(env)
+        if embedder is not None:
+            print(f"recalling by meaning through {env['EMBED_MODEL']}")
         try:
-            played = sessions.play(measure.SESSION_GAMES[gid], speaker, chosen_sessions, recorder)
+            played = sessions.play(measure.SESSION_GAMES[gid], speaker, chosen_sessions, recorder, embedder=embedder)
         finally:
             speaker.close()
             if local is not None:
                 local.stop()
+            if embed is not None:
+                embed.stop()
         acts, n_scenarios, transcripts = played.acts, len(chosen_sessions), {}
     else:
         chosen = _pick(args.only)
@@ -294,6 +305,8 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--claim-check", default="consequential", choices=("consequential", "all", "off"),
                    help="which lines meet the claim check, as CLAIM_CHECK on the host")
     p.add_argument("--local", help="speak through this registry model on this machine (thespis.runtime)")
+    p.add_argument("--embed", choices=["local"], help="--game: recall by meaning through a local embedding model "
+                                                      "(else EMBED_* if set)")
     p.add_argument("--verify", action="store_true", help="the judge checks each claim it counts against a line")
     p.add_argument("--game", help="any game.toml, played through sessions (needs --scenarios)")
     p.add_argument("--scenarios", help="the scenario file for --game (rehearsal/sessions.py)")

@@ -391,6 +391,22 @@
             "title": "Reason",
             "type": "string"
           },
+          "segments": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A told scene, for a game whose narrator is structured: in order, each the narrator's words or one speaker's ({speaker, line, cites})",
+            "title": "Segments"
+          },
           "source": {
             "description": "llm, cache or fallback (the game's template line)",
             "title": "Source",
