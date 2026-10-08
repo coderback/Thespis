@@ -233,3 +233,13 @@ def test_a_told_scene_gets_room_to_speak():
     p = Provider("local", "http://127.0.0.1:1/v1", "", "m", profile=profile("llamacpp"))
     assert p.body([{"role": "user", "content": "x"}], None, "react")["max_tokens"] == 300
     assert p.body([{"role": "user", "content": "x"}], None, "tell")["max_tokens"] == 450
+
+
+def test_the_one_told_may_be_named():
+    s = gossiped()
+    s.update("bram", loc="mill")
+    s.observe("help", "bram", "osric", claim={"pred": "helped", "a": "bram", "b": "osric"})
+    pack = s.voice.narration([s.world.ledger.get("e0004")], "", lambda es: "x", audience="Bram", structured=True,
+                             to="bram")
+    seg = {"speaker": "narrator", "cites": ["e1"], "line": "Bram, you helped Osric."}
+    assert HAMLET.voice.validator.problem({"segments": [seg]}, pack, "tell") is None

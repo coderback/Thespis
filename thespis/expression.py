@@ -76,11 +76,13 @@ LIMITS = dict(LINE_LIMITS)  # characters per line, by call type
 # what one character said, quoted. Attribution is by construction: a character may speak only in a segment that cites
 # an event it did, so no quote is pinned on someone who never said it, and every segment is checked on its own.
 TELL_PROMPT = ("You are {name}. {persona}\n" + _RULES +
-               "Tell the player what happened as a short scene, 2 to 5 segments in order. Each segment is either "
-               "your own telling (speaker \"narrator\"), in the past tense, speaking to the player as \"you\"; or "
-               "the words of a character, quoted in their voice (speaker: their id). A character may speak only in a "
-               "segment that cites an event they did (its \"by\"), and says only what that event shows. Every "
-               "segment cites the events it tells.\n"
+               "Tell what happened as a short scene, 2 to 5 segments in order, to the one the situation names, "
+               "addressing them as \"you\": if they took part in an event, they are \"you\" in it. Each segment is "
+               "your own telling (speaker \"narrator\"), in the past tense, or a character's own words. Where a "
+               "character told someone something, give what they said as a segment of their own, quoted in their "
+               "voice (speaker: their id), citing that event. A character may speak only in a segment that cites an "
+               "event they did (its \"by\"), and says only what that event shows. Every segment cites the events "
+               "it tells.\n"
                'Reply with JSON only: {{"segments": [{{"speaker": "...", "cites": ["..."], "line": "..."}}]}}')
 TELL_SEGMENTS = (1, 6)  # how many segments a telling may have
 TELL_SEGMENT = 200  # characters per segment

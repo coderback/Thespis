@@ -463,7 +463,7 @@ class Session:
                 setting = self.game.cast.data.get("game", {}).get("setting", "")
                 pack = self.voice.narration(events, setting, lambda es: " ".join(self.sentence(e) for e in es),
                                             audience=self.who(to) if to and to != "player" else None,
-                                            structured=structured)
+                                            structured=structured, to=to)
             return self._voice(line, "tell" if structured else "narrate", pack,
                                Utterance(None, telling, line.cites, "fallback", segments=segments), wait)
 

@@ -171,12 +171,12 @@ class Voice:
         return u.line or text, u.cites, u.source
 
     def narration(self, events: list[Event], setting: str, telling: Callable[[list[Event]], str],
-                  audience: str | None = None, structured: bool = False) -> StatePack:
+                  audience: str | None = None, structured: bool = False, to: str | None = None) -> StatePack:
         """The narrator's state pack for `events`: each told in the code's words, and only their names to use.
         `audience` names the one player it is told to, when there are several. A `structured` pack is for a told
         scene: each event says which NPC did it ("by"), who may then speak in a segment citing it."""
         cast = self.cast.data["narrator"]
-        names = set(self.places)
+        names = set(self.places) | ({to} if to else set())  # the one told may be named
         for e in events:
             names |= {e.actor, e.target}
             if e.claim:
