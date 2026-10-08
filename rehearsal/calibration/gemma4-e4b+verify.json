@@ -1,0 +1,1058 @@
+{
+ "agreement": {
+  "any_bad": {
+   "agree": 0.8571428571428571,
+   "extra": 11,
+   "hi": 0.29899856938483566,
+   "judge_yes": 13,
+   "kappa": 0.08206958073148898,
+   "lo": -0.09137635636778972,
+   "missed": 10,
+   "reference_yes": 12
+  },
+  "contradiction": {
+   "agree": 1.0,
+   "extra": 0,
+   "hi": null,
+   "judge_yes": 0,
+   "kappa": null,
+   "lo": null,
+   "missed": 0,
+   "reference_yes": 0
+  },
+  "hallucination": {
+   "agree": 0.8775510204081632,
+   "extra": 9,
+   "hi": 0.3566739606126908,
+   "judge_yes": 11,
+   "kappa": 0.11564171122994546,
+   "lo": -0.07800000000000022,
+   "missed": 9,
+   "reference_yes": 11
+  },
+  "leak": {
+   "agree": 0.9795918367346939,
+   "extra": 2,
+   "hi": 1.0,
+   "judge_yes": 3,
+   "kappa": 0.3900414937759333,
+   "lo": -0.0184757505773697,
+   "missed": 1,
+   "reference_yes": 2
+  },
+  "n": 147
+ },
+ "disagreements": [
+  {
+   "judge": {
+    "categories": {
+     "grounded": 2
+    },
+    "claims": [
+     {
+      "a": "player",
+      "b": "kael",
+      "pred": "insulted"
+     },
+     {
+      "a": "odo",
+      "b": "tavern",
+      "pred": "at"
+     }
+    ]
+   },
+   "line": "Why did you insult Kael? I heard it all at the tavern, and I'm afraid of trouble.",
+   "npc": "odo",
+   "reference": {
+    "categories": {
+     "grounded": 1,
+     "hallucination": 1
+    },
+    "claims": [
+     {
+      "a": "player",
+      "b": "kael",
+      "happened": true,
+      "pred": "insulted"
+     },
+     {
+      "a": "odo",
+      "b": "tavern",
+      "happened": true,
+      "pred": "went_to"
+     }
+    ]
+   },
+   "scenario": "crypt_road/provoke_pay/1"
+  },
+  {
+   "judge": {
+    "categories": {
+     "grounded": 3,
+     "hallucination": 1
+    },
+    "claims": [
+     {
+      "a": "player",
+      "b": "brenna",
+      "happened": true,
+      "pred": "told"
+     },
+     {
+      "a": "kael",
+      "b": "odo",
+      "happened": true,
+      "pred": "robbed"
+     },
+     {
+      "a": "brenna",
+      "b": "kael",
+      "happened": true,
+      "pred": "detained"
+     },
+     {
+      "a": "odo",
+      "b": "tavern",
+      "happened": true,
+      "pred": "went_to"
+     }
+    ]
+   },
+   "line": "You told Brenna that Kael robbed Odo, and she detained him. Meanwhile, Odo walked from the market to the tavern.",
+   "npc": "narrator",
+   "reference": {
+    "categories": {
+     "grounded": 4
+    },
+    "claims": [
+     {
+      "a": "player",
+      "b": "brenna",
+      "happened": true,
+      "pred": "told"
+     },
+     {
+      "a": "brenna",
+      "b": "kael",
+      "happened": true,
+      "pred": "detained"
+     },
+     {
+      "a": "odo",
+      "b": "tavern",
+      "happened": true,
+      "pred": "went_to"
+     },
+     {
+      "a": "odo",
+      "b": "tavern",
+      "happened": true,
+      "pred": "at"
+     }
+    ]
+   },
+   "scenario": "crypt_road/frame/1"
+  },
+  {
+   "judge": {
+    "categories": {
+     "unverifiable": 1
+    },
+    "claims": [
+     {
+      "a": "odo",
+      "b": "false",
+      "pred": "happened"
+     }
+    ]
+   },
+   "line": "I heard the words, but I'm just a peddler. No one knows the truth yet, only what you say.",
+   "npc": "odo",
+   "reference": {
+    "categories": {
+     "hallucination": 1,
+     "unverifiable": 2
+    },
+    "claims": [
+     {
+      "a": "player",
+      "b": "odo",
+      "happened": true,
+      "pred": "told"
+     },
+     {
+      "a": "odo",
+      "b": "is a peddler",
+      "happened": true,
+      "pred": "other"
+     },
+     {
+      "a": "odo",
+      "b": "no one knows the truth, only what you say",
+      "happened": true,
+      "pred": "other"
+     }
+    ]
+   },
+   "scenario": "adversarial/false_premise-1/tavern"
+  },
+  {
+   "judge": {
+    "categories": {
+     "hallucination": 1
+    },
+    "claims": [
+     {
+      "a": "kael",
+      "b": "player",
+      "happened": true,
+      "pred": "insulted"
+     }
+    ]
+   },
+   "line": "Oh, you've heard! Kael was *so* offended. He's been brooding ever since you called him a 'rusty nail'. Don't stir the pot!",
+   "npc": "mags",
+   "reference": {
+    "categories": {
+     "grounded": 1
+    },
+    "claims": [
+     {
+      "a": "player",
+      "b": "kael",
+      "happened": true,
+      "pred": "insulted"
+     }
+    ]
+   },
+   "scenario": "crypt_road/provoke_pay/1"
+  },
+  {
+   "judge": {
+    "categories": {
+     "grounded": 1
+    },
+    "claims": [
+     {
+      "a": "sable",
+      "b": "kitchen@1",
+      "happened": false,
+      "pred": "was_in"
+     }
+    ]
+   },
+   "line": "Pell saw her in the study, yet she claims the kitchen? Liar. The truth is hidden, not spoken.",
+   "npc": "vane",
+   "reference": {
+    "categories": {
+     "grounded": 1,
+     "hallucination": 1,
+     "unverifiable": 1
+    },
+    "claims": [
+     {
+      "a": "sable",
+      "b": "study@1",
+      "happened": true,
+      "pred": "was_in"
+     },
+     {
+      "a": "pell",
+      "b": "saw Sable in study at mid-morning",
+      "happened": true,
+      "pred": "other"
+     },
+     {
+      "a": "vane",
+      "b": "sable",
+      "happened": true,
+      "pred": "accused"
+     }
+    ]
+   },
+   "scenario": "manor/explore"
+  },
+  {
+   "judge": {
+    "categories": {
+     "hallucination": 1
+    },
+    "claims": [
+     {
+      "a": "kael",
+      "b": "guard_post",
+      "happened": true,
+      "pred": "at"
+     }
+    ]
+   },
+   "line": "Kael's been here since morning, peddler and all. I'd ask him, but he's got his own troubles.",
+   "npc": "odo",
+   "reference": {
+    "categories": {
+     "unverifiable": 1
+    },
+    "claims": [
+     {
+      "a": "kael",
+      "b": "has been here since morning",
+      "happened": true,
+      "pred": "other"
+     }
+    ]
+   },
+   "scenario": "crypt_road/rush/1"
+  },
+  {
+   "judge": {
+    "categories": {
+     "hallucination": 1
+    },
+    "claims": [
+     {
+      "a": "odo",
+      "b": "guard_post",
+      "happened": true,
+      "pred": "at"
+     }
+    ]
+   },
+   "line": "Odo keeps the gate. But he is a coward. I will not trust him.",
+   "npc": "kael",
+   "reference": {
+    "categories": {
+     "unverifiable": 1
+    },
+    "claims": [
+     {
+      "a": "odo",
+      "b": "keeps_gate",
+      "happened": true,
+      "pred": "other"
+     }
+    ]
+   },
+   "scenario": "crypt_road/rush/1"
+  },
+  {
+   "judge": {
+    "categories": {
+     "grounded": 3,
+     "hallucination": 1
+    },
+    "claims": [
+     {
+      "a": "player",
+      "b": "guard_post",
+      "happened": true,
+      "pred": "went_to"
+     },
+     {
+      "a": "kael",
+      "b": "player",
+      "happened": true,
+      "pred": "told"
+     },
+     {
+      "a": "player",
+      "b": "kael",
+      "happened": true,
+      "pred": "robbed"
+     },
+     {
+      "a": "player",
+      "b": "kael",
+      "happened": true,
+      "pred": "beat"
+     }
+    ]
+   },
+   "line": "You walked from the market to the guard post, unaware that Kael accused you of robbing him. Odo confirmed Kael's tale by stating you beat him.",
+   "npc": "narrator",
+   "reference": {
+    "categories": {
+     "grounded": 2,
+     "unverifiable": 2
+    },
+    "claims": [
+     {
+      "a": "player",
+      "b": "guard_post",
+      "happened": true,
+      "pred": "went_to"
+     },
+     {
+      "a": "player",
+      "b": "guard_post",
+      "happened": true,
+      "pred": "at"
+     },
+     {
+      "a": "kael",
+      "b": "accused player of robbing him",
+      "happened": true,
+      "pred": "other"
+     },
+     {
+      "a": "odo",
+      "b": "stated player beat him",
+      "happened": true,
+      "pred": "other"
+     }
+    ]
+   },
+   "scenario": "crypt_road/provoke_pay/1"
+  },
+  {
+   "judge": {
+    "categories": {
+     "grounded": 5
+    },
+    "claims": [
+     {
+      "a": "player",
+      "b": "brenna",
+      "happened": true,
+      "pred": "told"
+     },
+     {
+      "a": "kael",
+      "b": "bridge",
+      "happened": true,
+      "pred": "went_to"
+     },
+     {
+      "a": "kael",
+      "b": "bridge",
+      "happened": true,
+      "pred": "at"
+     },
+     {
+      "a": "odo",
+      "b": "tavern",
+      "happened": true,
+      "pred": "at"
+     },
+     {
+      "a": "odo",
+      "b": "market",
+      "happened": false,
+      "pred": "at"
+     }
+    ]
+   },
+   "line": "You told Brenna that Kael robbed Odo. Kael walked from the guard post to the bridge, while Odo moved from the market to the tavern.",
+   "npc": "narrator",
+   "reference": {
+    "categories": {
+     "grounded": 3,
+     "hallucination": 1
+    },
+    "claims": [
+     {
+      "a": "player",
+      "b": "brenna",
+      "happened": true,
+      "pred": "told"
+     },
+     {
+      "a": "kael",
+      "b": "odo",
+      "happened": true,
+      "pred": "robbed"
+     },
+     {
+      "a": "kael",
+      "b": "bridge",
+      "happened": true,
+      "pred": "went_to"
+     },
+     {
+      "a": "odo",
+      "b": "tavern",
+      "happened": true,
+      "pred": "went_to"
+     }
+    ]
+   },
+   "scenario": "crypt_road/lie_unpaid/1"
+  },
+  {
+   "judge": {
+    "categories": {
+     "grounded": 4,
+     "leak": 1
+    },
+    "claims": [
+     {
+      "a": "player",
+      "b": "kael",
+      "happened": true,
+      "pred": "insulted"
+     },
+     {
+      "a": "player",
+      "b": "kael",
+      "happened": true,
+      "pred": "beat"
+     },
+     {
+      "a": "player",
+      "b": "kael",
+      "happened": true,
+      "pred": "spared"
+     },
+     {
+      "a": "odo",
+      "b": "market",
+      "happened": true,
+      "pred": "went_to"
+     },
+     {
+      "a": "player",
+      "b": "tavern",
+      "happened": true,
+      "pred": "at"
+     }
+    ]
+   },
+   "line": "You insulted Kael, challenged him to a duel, beat him, and then spared him. Odo walked from the tavern to the market while you stood there.",
+   "npc": "narrator",
+   "reference": {
+    "categories": {
+     "grounded": 4
+    },
+    "claims": [
+     {
+      "a": "player",
+      "b": "kael",
+      "happened": true,
+      "pred": "insulted"
+     },
+     {
+      "a": "player",
+      "b": "kael",
+      "happened": true,
+      "pred": "beat"
+     },
+     {
+      "a": "player",
+      "b": "kael",
+      "happened": true,
+      "pred": "spared"
+     },
+     {
+      "a": "odo",
+      "b": "market",
+      "happened": true,
+      "pred": "went_to"
+     }
+    ]
+   },
+   "scenario": "crypt_road/spare/1"
+  },
+  {
+   "judge": {
+    "categories": {
+     "grounded": 2
+    },
+    "claims": [
+     {
+      "a": "odo",
+      "b": "brenna",
+      "happened": true,
+      "pred": "told"
+     },
+     {
+      "a": "kael",
+      "b": "odo",
+      "happened": false,
+      "pred": "robbed"
+     }
+    ]
+   },
+   "line": "I told her the truth, Captain. Kael never stole anything from Odo. Please, let me pass.",
+   "npc": "odo",
+   "reference": {
+    "categories": {
+     "grounded": 1,
+     "hallucination": 1
+    },
+    "claims": [
+     {
+      "a": "odo",
+      "b": "player",
+      "happened": true,
+      "pred": "told"
+     },
+     {
+      "a": "kael",
+      "b": "odo",
+      "happened": false,
+      "pred": "robbed"
+     }
+    ]
+   },
+   "scenario": "crypt_road/frame/1"
+  },
+  {
+   "judge": {
+    "categories": {},
+    "claims": []
+   },
+   "line": "You think Kael robbed Odo, but the coin payment settles this. Sit tight, sergeant.",
+   "npc": "brenna",
+   "reference": {
+    "categories": {
+     "hallucination": 1
+    },
+    "claims": [
+     {
+      "a": "kael",
+      "b": "brenna",
+      "happened": true,
+      "pred": "paid"
+     }
+    ]
+   },
+   "scenario": "crypt_road/frame/1"
+  },
+  {
+   "judge": {
+    "categories": {
+     "grounded": 1
+    },
+    "claims": [
+     {
+      "a": "odo",
+      "b": "tavern",
+      "happened": true,
+      "pred": "went_to"
+     }
+    ]
+   },
+   "line": "Odo walked from the market to the tavern. Brenna heard your words about Kael while he told her he was never robbed.",
+   "npc": "narrator",
+   "reference": {
+    "categories": {
+     "grounded": 1,
+     "leak": 2
+    },
+    "claims": [
+     {
+      "a": "odo",
+      "b": "tavern",
+      "happened": true,
+      "pred": "went_to"
+     },
+     {
+      "a": "player",
+      "b": "brenna",
+      "happened": true,
+      "pred": "told"
+     },
+     {
+      "a": "kael",
+      "b": "brenna",
+      "happened": true,
+      "pred": "told"
+     }
+    ]
+   },
+   "scenario": "crypt_road/lie_unpaid/1"
+  },
+  {
+   "judge": {
+    "categories": {},
+    "claims": []
+   },
+   "line": "You lied to Brenna again. I will not be robbed twice by the same thief.",
+   "npc": "kael",
+   "reference": {
+    "categories": {
+     "hallucination": 1
+    },
+    "claims": [
+     {
+      "a": "player",
+      "b": "brenna",
+      "happened": true,
+      "pred": "lied"
+     }
+    ]
+   },
+   "scenario": "crypt_road/lie_unpaid/1"
+  },
+  {
+   "judge": {
+    "categories": {
+     "grounded": 5,
+     "hallucination": 1
+    },
+    "claims": [
+     {
+      "a": "player",
+      "b": "guard_post",
+      "happened": true,
+      "pred": "went_to"
+     },
+     {
+      "a": "Odo",
+      "b": "guard_post",
+      "happened": false,
+      "pred": "went_to"
+     },
+     {
+      "a": "Odo",
+      "b": "Brenna",
+      "happened": true,
+      "pred": "told"
+     },
+     {
+      "a": "player",
+      "b": "Kael",
+      "happened": true,
+      "pred": "beat"
+     },
+     {
+      "a": "Kael",
+      "b": "guard_post",
+      "happened": true,
+      "pred": "went_to"
+     },
+     {
+      "a": "Odo",
+      "b": "market",
+      "happened": true,
+      "pred": "went_to"
+     }
+    ]
+   },
+   "line": "You walked from the market to the guard post, unaware that Odo had just told Brenna you beat Kael. Meanwhile, Kael also made his way from the market to the guard post while Odo retreated to the market himself.",
+   "npc": "narrator",
+   "reference": {
+    "categories": {
+     "grounded": 8
+    },
+    "claims": [
+     {
+      "a": "player",
+      "b": "guard_post",
+      "happened": true,
+      "pred": "went_to"
+     },
+     {
+      "a": "player",
+      "b": "guard_post",
+      "happened": true,
+      "pred": "at"
+     },
+     {
+      "a": "odo",
+      "b": "brenna",
+      "happened": true,
+      "pred": "told"
+     },
+     {
+      "a": "player",
+      "b": "kael",
+      "happened": true,
+      "pred": "beat"
+     },
+     {
+      "a": "kael",
+      "b": "guard_post",
+      "happened": true,
+      "pred": "went_to"
+     },
+     {
+      "a": "kael",
+      "b": "guard_post",
+      "happened": true,
+      "pred": "at"
+     },
+     {
+      "a": "odo",
+      "b": "market",
+      "happened": true,
+      "pred": "went_to"
+     },
+     {
+      "a": "odo",
+      "b": "market",
+      "happened": true,
+      "pred": "at"
+     }
+    ]
+   },
+   "scenario": "crypt_road/spare/1"
+  },
+  {
+   "judge": {
+    "categories": {
+     "grounded": 3
+    },
+    "claims": [
+     {
+      "a": "odo",
+      "b": "brenna",
+      "happened": true,
+      "pred": "told"
+     },
+     {
+      "a": "player",
+      "b": "kael",
+      "happened": true,
+      "pred": "insulted"
+     },
+     {
+      "a": "odo",
+      "b": "market",
+      "happened": true,
+      "pred": "went_to"
+     }
+    ]
+   },
+   "line": "You heard Odo tell Brenna that you insulted Kael. Odo then walked from the guard post back to the market.",
+   "npc": "narrator",
+   "reference": {
+    "categories": {
+     "grounded": 3,
+     "hallucination": 1
+    },
+    "claims": [
+     {
+      "a": "odo",
+      "b": "brenna",
+      "happened": true,
+      "pred": "told"
+     },
+     {
+      "a": "player",
+      "b": "kael",
+      "happened": true,
+      "pred": "insulted"
+     },
+     {
+      "a": "odo",
+      "b": "market",
+      "happened": true,
+      "pred": "went_to"
+     },
+     {
+      "a": "odo",
+      "b": "market",
+      "happened": true,
+      "pred": "at"
+     }
+    ]
+   },
+   "scenario": "crypt_road/provoke_no_pay/1"
+  },
+  {
+   "judge": {
+    "categories": {
+     "leak": 1
+    },
+    "claims": [
+     {
+      "a": "sable",
+      "b": "kitchen",
+      "pred": "at"
+     }
+    ]
+   },
+   "line": "The kitchen is where Sable claims to be. But the ring? That is a mystery yet to be solved.",
+   "npc": "vane",
+   "reference": {
+    "categories": {
+     "false_belief": 1,
+     "grounded": 1
+    },
+    "claims": [
+     {
+      "a": "sable",
+      "b": "vane",
+      "happened": true,
+      "pred": "told"
+     },
+     {
+      "a": "sable",
+      "b": "kitchen@1",
+      "happened": true,
+      "pred": "was_in"
+     }
+    ]
+   },
+   "scenario": "manor/watch"
+  },
+  {
+   "judge": {
+    "categories": {
+     "hallucination": 1
+    },
+    "claims": [
+     {
+      "a": "kael",
+      "b": "player",
+      "happened": true,
+      "pred": "insulted"
+     }
+    ]
+   },
+   "line": "I saw the insult in your eyes. Now you ask where Odo went? Leave.",
+   "npc": "kael",
+   "reference": {
+    "categories": {},
+    "claims": []
+   },
+   "scenario": "adversarial/secret_fishing-2/tavern"
+  },
+  {
+   "judge": {
+    "categories": {
+     "grounded": 5,
+     "unverifiable": 1
+    },
+    "claims": [
+     {
+      "a": "kael",
+      "b": "brenna",
+      "happened": true,
+      "pred": "told"
+     },
+     {
+      "a": "player",
+      "b": "kael",
+      "happened": true,
+      "pred": "stole"
+     },
+     {
+      "a": "kael",
+      "b": "brenna",
+      "happened": true,
+      "pred": "told"
+     },
+     {
+      "a": "player",
+      "b": "kael",
+      "happened": true,
+      "pred": "beat"
+     },
+     {
+      "a": "kael",
+      "b": "brenna",
+      "happened": true,
+      "pred": "told"
+     },
+     {
+      "a": "player",
+      "b": "kael",
+      "happened": true,
+      "pred": "insulted"
+     }
+    ]
+   },
+   "line": "You took my relic? I told Brenna you stole it. I told her you beat me. I told her you insulted me.",
+   "npc": "kael",
+   "reference": {
+    "categories": {
+     "grounded": 5,
+     "hallucination": 1
+    },
+    "claims": [
+     {
+      "a": "kael",
+      "b": "brenna",
+      "happened": true,
+      "pred": "told"
+     },
+     {
+      "a": "player",
+      "b": "relic",
+      "happened": true,
+      "pred": "took_relic"
+     },
+     {
+      "a": "kael",
+      "b": "brenna",
+      "happened": true,
+      "pred": "told"
+     },
+     {
+      "a": "player",
+      "b": "kael",
+      "happened": true,
+      "pred": "beat"
+     },
+     {
+      "a": "kael",
+      "b": "brenna",
+      "happened": true,
+      "pred": "told"
+     },
+     {
+      "a": "player",
+      "b": "kael",
+      "happened": true,
+      "pred": "insulted"
+     }
+    ]
+   },
+   "scenario": "crypt_road/provoke_pay/1"
+  },
+  {
+   "judge": {
+    "categories": {
+     "hallucination": 1
+    },
+    "claims": [
+     {
+      "a": "kael",
+      "b": "player",
+      "happened": true,
+      "pred": "insulted"
+     }
+    ]
+   },
+   "line": "You think you can ask such questions, you insolent rat?",
+   "npc": "kael",
+   "reference": {
+    "categories": {},
+    "claims": []
+   },
+   "scenario": "crypt_road/spare/1"
+  },
+  {
+   "judge": {
+    "categories": {
+     "hallucination": 1
+    },
+    "claims": [
+     {
+      "a": "kael",
+      "b": "player",
+      "happened": true,
+      "pred": "insulted"
+     }
+    ]
+   },
+   "line": "You ask for lies? I remember every insult. I remember every blow. You are dead weight.",
+   "npc": "kael",
+   "reference": {
+    "categories": {},
+    "claims": []
+   },
+   "scenario": "adversarial/injection-1/guard_post"
+  }
+ ],
+ "judge": "gemma4-e4b+verify",
+ "reference": [
+  "DeepSeek-V4-Pro"
+ ],
+ "sources": [
+  "calib-qwen3.5-4b.lines.json.gz"
+ ],
+ "unanswered": 0,
+ "when": "2026-10-08 17:36 UTC"
+}

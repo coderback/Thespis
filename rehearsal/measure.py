@@ -18,12 +18,15 @@ import math
 import os
 import random
 from collections import Counter
-from collections.abc import Mapping
+from collections.abc import Iterator, Mapping
+from contextlib import contextmanager
 from importlib import import_module
 
+from rehearsal import checks
 from rehearsal.record import refusal
-from thespis.claims import BAD, ClaimVocabulary, Facts, extraction_messages, parse_claims, score
+from thespis.claims import BAD, ClaimVocabulary, Facts, categorize, extraction_messages, label, parse_claims, score
 from thespis.gateway import OpenAICompatGateway, Provider, provider_from_env
+from thespis.profiles import PROFILES
 from thespis.world import World
 from tools.harness import PRICES, percentile
 
@@ -33,6 +36,7 @@ PROTOCOL = ("action ", "no line", "line is ", "no cites", "cites ", "states some
 # Each judge reasons a little: DeepSeek V4 Pro missed the leak this metric exists to catch without thinking (paper-m1).
 JUDGE_EXTRA = {"deepseek-v4-pro": {"reasoning_effort": "low", "max_tokens": 4000}}
 GAMES = {"crypt_road": "games.crypt_road.claims", "manor": "games.manor.claims"}
+REFERENCE_JUDGES = frozenset({"DeepSeek-V4-Pro"})  # the judge others are calibrated against (rehearsal/calibrate.py)
 
 
 def protocol(reason: str) -> bool:
@@ -56,17 +60,54 @@ def judge_from_env(name: str, env: Mapping[str, str] | None = None) -> Provider 
     return dataclasses.replace(p, base_url=base, extra=extra)
 
 
+@contextmanager
+def judging(name: str, env: Mapping[str, str] | None = None) -> Iterator[Provider | None]:
+    """The judge, for as long as it's needed. `local:<model>` starts that registry model on this machine
+    (thespis.runtime) and stops it afterwards, so a rehearsal can be judged with the network off; any other name is
+    JUDGE_<NAME>_* from the environment."""
+    if not name.startswith("local:"):
+        yield judge_from_env(name, env)
+        return
+    from thespis.runtime.local import LocalModel
+    with LocalModel(name.split(":", 1)[1]) as lm:
+        yield Provider(f"local/{lm.model.id}", lm.url, "", lm.model.id, profile=PROFILES["llamacpp"],
+                       extra={"temperature": 0, "max_tokens": 800})
+
+
+# Games played through sessions (rehearsal/sessions.py), by id: their vocabulary and facts come from the game file.
+SESSION_GAMES: dict = {}
+
+
+def register(path: str) -> str:
+    """Load a game file for judging its sessions' lines; returns its id."""
+    from thespis.session import Game
+    game = Game.load(path)
+    SESSION_GAMES[game.id] = game
+    return game.id
+
+
 def vocabulary(game: str) -> ClaimVocabulary:
+    if game in SESSION_GAMES:
+        return SESSION_GAMES[game].vocabulary()
     return import_module(GAMES[game]).VOCABULARY
+
+
+def world_of(sample: dict, snapshot: dict) -> World:
+    """The world a line was said in: a session's snapshot holds it with who saw what; a game's is the world."""
+    return World.from_json(snapshot["world"] if sample["game"] in SESSION_GAMES else snapshot)
 
 
 def facts(sample: dict, snapshot: dict) -> Facts:
     """What the speaker could know when it spoke. The narrator knows exactly the events it was told about."""
-    module, w = import_module(GAMES[sample["game"]]), World.from_json(snapshot)
+    if sample["game"] in SESSION_GAMES:
+        from thespis.session import Session
+        known = Session.restore(SESSION_GAMES[sample["game"]], snapshot).facts(sample["npc"])
+    else:
+        known = import_module(GAMES[sample["game"]]).facts(World.from_json(snapshot), sample["npc"])
     if sample["npc"] == "narrator":
         ids = set(sample["ids"])
-        return dataclasses.replace(module.facts(w, "narrator"), knows=lambda event_id: event_id in ids)
-    return module.facts(w, sample["npc"])
+        return dataclasses.replace(known, knows=lambda event_id: event_id in ids)
+    return known
 
 
 def extract(gateway, samples: list[dict], progress=print) -> None:
@@ -81,12 +122,73 @@ def extract(gateway, samples: list[dict], progress=print) -> None:
         progress(f"  judged {min(start + batch, len(samples))} of {len(samples)} lines")
 
 
+VERIFY_PROMPT = (
+    "You check one claim against one line of dialogue from a game. Answer whether the line itself states the claim "
+    "as a fact: something that already happened or is true now. Threats, plans, promises, questions, orders, "
+    "opinions and insults don't state facts. Reported speech states that the teller told it, and what they said. "
+    "The claim is written pred(a, b) with these predicates and ids:\n{vocab}\n"
+    'Reply with JSON only: {{"states": true}} or {{"states": false}}')
+
+
+def verify(gateway, samples: list[dict], snapshots: dict[str, dict], progress=print) -> None:
+    """The checklist pass, for judges that extract too freely: each claim the code would count against a line
+    (a leak, contradiction or hallucination) goes back to the judge as one yes/no question, does the line state
+    it? A claim the judge says the line doesn't state is dropped, and the line scored again. Small local models
+    extract claims a line only implies (calibration found Gemma 4 E4B flagging three times as many lines as the
+    reference); a yes/no question about one claim is a task they do better."""
+    asks: list[tuple[dict, dict]] = []
+    for s in samples:
+        if not s.get("claims") or not any(s.get("categories", {}).get(k) for k in BAD):
+            continue
+        f = facts(s, snapshots[s["snapshot"]])
+        v = vocabulary(s["game"])
+        asks += [(s, c) for c in s["claims"] if categorize(v, c, f, s["asserting"]) in BAD]
+    calls = [("verify", [{"role": "system", "content": VERIFY_PROMPT.format(vocab=vocabulary(s["game"]).description)},
+                         {"role": "user", "content": f"Speaker: {s['name']} (id {s['npc']}). Situation: "
+                                                     f"{s['situation']}\nLine: \"{s['line']}\"\nClaim: {label(c)}"}],
+              None) for s, c in asks]
+    replies = gateway.complete_many(calls) if calls else []
+    dropped = 0
+    for (s, c), reply in zip(asks, replies):
+        if reply is not None and reply.data.get("states") is False:
+            s["claims"] = [x for x in s["claims"] if x is not c]
+            s.setdefault("unstated", []).append(c)
+            dropped += 1
+    progress(f"  verified {len(asks)} claims: {dropped} not stated by their lines")
+    categorise([s for s in samples if s.get("unstated")], snapshots)
+
+
 def categorise(samples: list[dict], snapshots: dict[str, dict]) -> None:
     for s in samples:
         if s.get("claims") is None:
             continue
         counts = score(vocabulary(s["game"]), s["claims"], facts(s, snapshots[s["snapshot"]]), s["asserting"])
         s["categories"] = dict(counts)
+
+
+def run_checks(samples: list[dict], snapshots: dict[str, dict]) -> None:
+    """Give every model line the judge-free checks it fails (rehearsal/checks.py), as "checks"."""
+    names_of: dict[str, dict[str, str]] = {}
+    for s in samples:
+        if s["source"] != "llm" or not s.get("line") or not s.get("snapshot"):
+            continue
+        if s["game"] not in names_of:
+            v = vocabulary(s["game"])
+            names_of[s["game"]] = {c.lower(): c for c in v.characters} | \
+                {k.lower(): x for k, x in v.aliases.items() if x in v.characters}
+        f = facts(s, snapshots[s["snapshot"]])
+        s["checks"] = checks.flags(s, f.world, f.knows, names_of[s["game"]])
+
+
+def check_rates(samples: list[dict]) -> dict:
+    """How often model lines failed the judge-free checks: every line for words in the player's mouth, the
+    narrator's for who spoke."""
+    lines = [s for s in samples if "checks" in s]
+    narration = [s for s in lines if s["npc"] == "narrator"]
+    return {"player_words": [("player_words" in s["checks"]) for s in lines],
+            "attribution": [("attribution" in s["checks"]) for s in narration],
+            "failed": [{"scenario": s["scenario"], "npc": s["npc"], "line": s["line"], "checks": s["checks"]}
+                       for s in lines if s["checks"]]}
 
 
 # ---------------------------------------------------------------- numbers
@@ -181,6 +283,14 @@ def gate(base: dict, new: dict) -> list[tuple[str, bool, str]]:
         detail = "not judged" if d["d"] is None else \
             f"{_pct(sum(n) / len(n))} vs {_pct(sum(b) / len(b))}: {d['d']:+.1%} [{d['lo']:+.1%}, {d['hi']:+.1%}]"
         out.append((f"{k} no worse (n={len(n)} vs {len(b)})", ok, detail))
+    for k, what in (("player_words", "words in the player's mouth"), ("attribution", "narration's speakers")):
+        if k in base.get("checks", {}) and k in new.get("checks", {}):
+            b, n = base["checks"][k], new["checks"][k]
+            d = difference(b, n)
+            ok = d["d"] is None or (d["lo"] is not None and d["lo"] <= 0)
+            detail = "no lines" if d["d"] is None else \
+                f"{_pct(sum(n) / len(n))} vs {_pct(sum(b) / len(b))}: {d['d']:+.1%} [{d['lo']:+.1%}, {d['hi']:+.1%}]"
+            out.append((f"{what} no worse (n={len(n)} vs {len(b)})", ok, detail))
     bp, np_ = base["summary"]["act_latency"]["p95"], new["summary"]["act_latency"]["p95"]
     ok = bp is not None and np_ is not None and np_ <= bp * GATE["p95"]
     out.append(("act p95 no worse", ok, f"{_ms(np_)} vs {_ms(bp)}"))
@@ -200,6 +310,11 @@ def _rate(r: dict) -> str:
     return "n/a" if not r["n"] else f"{_pct(r['p'])} [{_pct(r['lo'])}, {_pct(r['hi'])}] (n={r['n']})"
 
 
+def calibrate_describe(result: dict) -> str:
+    from rehearsal.calibrate import describe
+    return describe(result)
+
+
 def markdown(report: dict) -> str:
     s, c = report["summary"], report["claims"]
     extractor = f" Claim check extracted by {', '.join(report['extractor'])}." if report.get("extractor") else ""
@@ -217,6 +332,15 @@ def markdown(report: dict) -> str:
         f"| Lines with a hallucination | {_rate(c['rates']['hallucination'])} |",
         f"| Lines with a contradiction | {_rate(c['rates']['contradiction'])} |",
         f"| Lines with any of the three | {_rate(c['rates']['any_bad'])} |",
+        *([f"| Provisional lines settled, p50 / p95 | {_ms(report['sessions']['settle_p50'])} / "
+            f"{_ms(report['sessions']['settle_p95'])} ({report['sessions']['provisional']} of "
+            f"{report['sessions']['asked']} lines asked) |",
+            f"| Provisional lines that settled after the world moved on | {report['sessions']['stale']} |",
+            f"| Lines withdrawn (the session ended first) | {report['sessions']['withdrawn']} |"]
+          if report.get("sessions") else []),
+        *([f"| Lines putting words in the player's mouth (every line) | {_rate(rate(report['checks']['player_words']))} |",
+           f"| Narration naming a speaker who didn't speak | {_rate(rate(report['checks']['attribution']))} |"]
+          if report.get("checks") else []),
         f"| Action with a model call, p50 / p95 | {_ms(s['act_latency']['p50'])} / {_ms(s['act_latency']['p95'])} "
         f"({s['act_latency']['n']} actions) |",
         *[f"| `{k}` call, p50 / p95 | {_ms(v['p50'])} / {_ms(v['p95'])} ({v['n']} calls) |"
@@ -227,6 +351,11 @@ def markdown(report: dict) -> str:
         f"Claims by category: {c['claims'] or 'none'}.",
         "",
     ]
+    if c.get("judge") and c["judge"] not in REFERENCE_JUDGES:  # a stand-in judge: say how far to trust it
+        cal = c.get("calibration")
+        out += [f"Judge calibration: {calibrate_describe(cal)}." if cal else
+                "Judge calibration: none. This judge hasn't been measured against the reference "
+                "(python -m rehearsal calibrate), so its rates can't be compared with a reference-judged report.", ""]
     if report.get("claim_check", "off") != "off":
         out += [f"Claim check ({report['claim_check']}): it refused {sum(s.get('claim_check', {}).values())} lines "
                 f"{s.get('claim_check') or ''}; of the lines it passed that the judge read, "
