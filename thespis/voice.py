@@ -181,10 +181,13 @@ class Voice:
             names |= {e.actor, e.target}
             if e.claim:
                 names |= {e.claim.a, e.claim.b}
+        # Told to one player of several, the situation says only who is told: "Tell Bram what happened" read to the
+        # model as Bram asking, and it opened with "You asked what had transpired" (live Rehearsal).
+        situation = (f"The story is told to {audience}, unprompted, as they come back to it." if audience else
+                     "Tell the player what happened since they last looked.")
         return StatePack(
             npc="narrator", name=cast["name"], persona=cast["persona"], goal="Tell the story so far, truthfully",
-            situation=f"Tell {audience or 'the player'} what happened since they last looked.", here=[], drives={},
-            trust_in={},
+            situation=situation, here=[], drives={}, trust_in={},
             beliefs=[], events=[{"id": e.id, "what": telling([e]),
                                  **({"by": e.actor} if structured and e.actor in self.cast.data["npc"] else {})}
                                 for e in events],
