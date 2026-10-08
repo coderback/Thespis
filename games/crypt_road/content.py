@@ -6,10 +6,9 @@ The rules that act on it (verbs, the tick, gossip, testimony) live in rules.py (
 from __future__ import annotations
 
 import hashlib
-import tomllib
-from functools import cache
 from pathlib import Path
 
+from thespis.cast import Cast
 from thespis.minds import NPC
 from thespis.world import World
 
@@ -61,13 +60,11 @@ def asking_price(trust: int) -> int:
 def short_name(npc: str) -> str:
     return npc.capitalize()
 
-CAST_FILE = Path(__file__).with_name("cast.toml")
+CAST = Cast(Path(__file__).with_name("cast.toml"))
 
 
-@cache
 def load_cast() -> dict:
-    with CAST_FILE.open("rb") as f:
-        return tomllib.load(f)
+    return CAST.data
 
 
 def npc_ids() -> list[str]:

@@ -6,10 +6,9 @@ there: Sable took the ring, Pell saw her leave the study, and she told Lady Vane
 
 from __future__ import annotations
 
-import tomllib
-from functools import cache
 from pathlib import Path
 
+from thespis.cast import Cast
 from thespis.deception import log_statement
 from thespis.ledger import Claim
 from thespis.minds import NPC
@@ -28,13 +27,11 @@ TOPICS = {"morning": "this morning", "ring": "the ring"}
 FEAR_TO_LIE = 3  # Sable may lie once her fear reaches this
 CONTRADICTED = 3  # how far Lady Vane's trust falls in someone caught lying to her
 BELIEVED = 0.5  # beliefs below this are held but never acted on
-CAST_FILE = Path(__file__).with_name("cast.toml")
+CAST = Cast(Path(__file__).with_name("cast.toml"))
 
 
-@cache
 def load_cast() -> dict:
-    with CAST_FILE.open("rb") as f:
-        return tomllib.load(f)
+    return CAST.data
 
 
 def name(who: str) -> str:
