@@ -666,11 +666,18 @@ class Session:
         if self._pool is None:
             self._pool = ThreadPoolExecutor(WORKERS, thread_name_prefix="thespis-line")
         lid = line.id
+
+        def speak() -> None:
+            # The line settles in the worker, before its future completes: whoever waits on the future (line(),
+            # the HTTP long poll) then finds it settled, and close() never withdraws a line whose answer is in.
+            try:
+                u = self._call(kind, pack, fallback)
+            except Exception:
+                u = fallback
+            self._settle(lid, u, d, statement)
+
         # The model call runs in the caller's context, so its trace span joins the request's (thespis.tracing).
-        fut = self._pool.submit(contextvars.copy_context().run, self._call, kind, pack, fallback)
-        self._pending[lid] = fut
-        fut.add_done_callback(lambda f: self._settle(lid, f.result(), d, statement) if not f.cancelled() and
-                              f.exception() is None else self._settle(lid, fallback, d, statement))
+        self._pending[lid] = self._pool.submit(contextvars.copy_context().run, speak)
         return replace(line)
 
     def _call(self, kind: str, pack: StatePack, fallback: Utterance) -> Utterance:
