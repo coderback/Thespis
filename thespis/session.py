@@ -1,0 +1,479 @@
+"""Sessions: one playthrough of a game whose world an engine owns, through the calls every runtime shares.
+
+The engine owns the world; Thespis owns the minds. The engine reports what happened and who saw it (`observe`), where
+people are and how they feel when its own rules change that (`update`), and asks what an NPC does (`decide`) or says
+(`react`), and for the story so far (`narrate`). `tick` runs the minds' own time: scheduled walks, gossip, and drives
+settling back towards rest. `snapshot` and `restore` carry the minds in and out of the engine's own save files.
+
+A game is one TOML file (examples/tavern/game.toml): its cast, places, choices (thespis.considerations), lines and
+words. Everything in it is checked when it loads.
+
+Every call that speaks returns its line at once. With no model, or when the caller waits, the line is final.
+Otherwise it is the template line, `provisional`, and the model's follows: `line(id)` returns it `final` once the
+model has answered (its words, or the template's when its reply failed a check), or `withdrawn` if the session closed
+first. A line needs something to cite, as everywhere in Thespis: an NPC that knows nothing yet says nothing.
+
+The library calls these methods; the HTTP API (thespis.http) calls the same ones.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import threading
+from collections.abc import Mapping, Sequence
+from concurrent.futures import Future, ThreadPoolExecutor
+from dataclasses import asdict, dataclass, field, replace
+from functools import cached_property
+from pathlib import Path
+
+from thespis.beliefs import credence
+from thespis.brain import Brain, UtilityBrain
+from thespis.cast import Cast
+from thespis.considerations import DefinitionError, declared
+from thespis.deception import SAID, log_statement
+from thespis.decisions import DECIDE, REACT, Decision
+from thespis.expression import Mind, StatePack, Utterance, Validator
+from thespis.gateway import ModelGateway
+from thespis.ledger import Claim, Event
+from thespis.minds import NPC
+from thespis.perception import at_the_scene, reported
+from thespis.tick import Tick, gossip, run_tick, walks
+from thespis.voice import View, Voice
+from thespis.world import World
+
+SNAPSHOT_VERSION = 1
+PROVISIONAL, FINAL, WITHDRAWN = "provisional", "final", "withdrawn"
+DRIVES, TRUST = (0, 10), (-5, 5)
+WORKERS = 4  # model calls one session has in flight at once
+
+
+class Unknown(LookupError):
+    """A call named an NPC, moment or line the game or session doesn't have."""
+
+
+class _Fill(dict):
+    """Template values; a placeholder nothing fills stays as written instead of failing mid-game."""
+
+    def __missing__(self, key: str) -> str:
+        return "{" + key + "}"
+
+
+def _clamp(v: int, bounds: tuple[int, int]) -> int:
+    return max(bounds[0], min(bounds[1], v))
+
+
+class Game:
+    """A game definition, compiled and checked: load once, play many sessions."""
+
+    def __init__(self, cast: Cast):
+        self.cast = cast
+        d = cast.data
+        self.id = str(d.get("game", {}).get("id") or cast.path.stem)
+        self.name = str(d.get("game", {}).get("name", self.id))
+        self.places: dict[str, str] = dict(d.get("places", {}))
+        self.choices = declared(d)
+        self._check()
+        vocabulary = {**{k.lower(): k for k in self.places}, **{v.lower(): k for k, v in self.places.items()}}
+        for npc, t in d["npc"].items():
+            vocabulary |= {npc.lower(): npc, str(t["name"]).lower(): npc,
+                           **{str(a).lower(): npc for a in t.get("aliases", [])}}
+        stakes = {c.do.partition(":")[0] for cs in self.choices.values() for c in cs.choices if c.asserts}
+        self.voice = Voice(cast=cast, validator=Validator(vocabulary), claim_text=self.claim_text,
+                           sentence=self.sentence, who=self.who, setting=self.setting, describe=self.describe,
+                           places=tuple(self.places), stakes=stakes)
+
+    @classmethod
+    def load(cls, path: str | Path) -> Game:
+        return cls(Cast(Path(path)))
+
+    @cached_property
+    def digest(self) -> str:
+        """A fingerprint of the definition, saved in snapshots so a restore can tell the game changed under it."""
+        return hashlib.sha256(self.cast.path.read_bytes()).hexdigest()[:16]
+
+    def _check(self) -> None:
+        d = self.cast.data
+        npcs = d.get("npc")
+        if not isinstance(npcs, dict) or not npcs:
+            raise DefinitionError("a game needs at least one [npc.<id>]")
+        for npc, t in npcs.items():
+            for key in ("name", "persona", "goal", "start"):
+                if not isinstance(t.get(key), str):
+                    raise DefinitionError(f"npc.{npc}: needs {key} = \"...\"")
+            for place in (t["start"], *t.get("walk", [])):
+                if self.places and place not in self.places:
+                    raise DefinitionError(f"npc.{npc}: {place!r} is not in [places]")
+        for who in d.get("gossip", {}).get("gossips", []):
+            if who not in npcs:
+                raise DefinitionError(f"gossip.gossips: {who!r} is not an npc")
+        start = d.get("player", {}).get("start")
+        if self.places and start is not None and start not in self.places:
+            raise DefinitionError(f"player.start: {start!r} is not in [places]")
+
+    # ------------------------------------------------------------ words, as the model reads them
+    def who(self, x: str | None) -> str:
+        if not x:
+            return ""
+        if x == "player":
+            return "the player"
+        if x in self.cast.data["npc"]:
+            return self.cast.npc(x)["name"]
+        return self.places.get(x, x)
+
+    def claim_text(self, c: Claim) -> str:
+        template = self.cast.data.get("words", {}).get("claims", {}).get(c.pred)
+        fmt = _Fill(a=self.who(c.a), b=self.who(c.b), place=self.who(c.place), at=c.at)
+        text = template.format_map(fmt) if template else " ".join(
+            x for x in (self.who(c.a), c.pred.replace("_", " "), self.who(c.b)) if x)
+        return f"it is not true that {text}" if c.neg else text
+
+    def sentence(self, e: Event) -> str:
+        template = self.cast.data.get("words", {}).get("events", {}).get(e.verb)
+        fmt = _Fill(a=self.who(e.actor), t=self.who(e.target), where=self.who(e.loc), to=self.who(e.target),
+                    claim=self.claim_text(e.claim) if e.claim else "", amount=e.amount)
+        text = template.format_map(fmt) if template else " ".join(
+            x for x in (fmt["a"], e.verb.replace("_", " "), fmt["t"]) if x) + "."
+        return text[:1].upper() + text[1:]
+
+    def setting(self, w: World, npc: str) -> str:
+        here = f"You are at {self.who(w.npcs[npc].loc)}."
+        setting = self.cast.data.get("game", {}).get("setting")
+        return f"{setting} {here}" if setting else here
+
+    def describe(self, w: World, npc: str, action: str) -> str:
+        kind, _, arg = action.partition(":")
+        template = self.cast.data.get("actions", {}).get(kind)
+        return template.format_map(_Fill(who=self.who(arg))) if template else kind.replace("_", " ")
+
+    def situation(self, key: str, fill: Mapping) -> str:
+        template = self.cast.data.get("situations", {}).get(key)
+        return template.format_map(_Fill(fill)) if template else ""
+
+
+@dataclass
+class Line:
+    """What an NPC (or the narrator) says, as every runtime returns it."""
+    id: str | None  # the decision it is recorded as ("d0007"), or the narration ("n0002"); None when silent
+    npc: str
+    text: str | None  # None: nothing to say
+    cites: list[str] = field(default_factory=list)
+    status: str = FINAL  # provisional, final or withdrawn
+    source: str = "fallback"  # llm, cache or fallback
+    action: str | None = None  # what it decided to do, for decide
+    reason: str = ""
+    event: str | None = None  # the statement its action logged, if it states a claim
+
+    def to_json(self) -> dict:
+        return asdict(self)
+
+
+class Session:
+    """One playthrough's minds: the world they live in, what each saw, and the lines still on their way."""
+
+    def __init__(self, game: Game, world: World, witnesses: dict[str, list[str]] | None = None,
+                 gateway: ModelGateway | None = None, mind: Mind | None = None, brain: Brain | None = None):
+        self.game, self.world = game, world
+        self.witnesses: dict[str, list[str]] = witnesses if witnesses is not None else {}
+        self.voice = replace(game.voice, sees=reported(self.witnesses))
+        self.mind = mind or Mind(gateway, self.voice.validator)
+        self.brain = brain or UtilityBrain()
+        self._lines: dict[str, Line] = {}
+        self._pending: dict[str, Future] = {}
+        self._lock = threading.RLock()
+        self._pool: ThreadPoolExecutor | None = None
+
+    @classmethod
+    def new(cls, game: Game, seed: int = 0, **kw) -> Session:
+        d = game.cast.data
+        npcs = {i: NPC(i, t["start"], dict(t.get("drives", {})), dict(t.get("trust_in", {})))
+                for i, t in d["npc"].items()}
+        player = {"loc": d.get("player", {}).get("start", "")}
+        return cls(game, World(seed=seed, player=player, npcs=npcs), **kw)
+
+    # ------------------------------------------------------------ the world, as the engine reports it
+    def observe(self, verb: str, actor: str, target: str | None = None, at: str | None = None,
+                claim: Claim | Mapping | None = None, witnesses: Sequence[str] = (), said: bool = False,
+                true: bool | None = None, amount: int | None = None) -> Event:
+        """Something happened. `witnesses` saw it; the actor and target took part. A claim it carries is believed:
+        a deed (`said` false) by everyone who saw it, for certain; a statement (`said`) by everyone who heard it, as
+        far as each trusts the speaker. Its truth, unless the engine says, is whether the ledger shows it happened."""
+        with self._lock:
+            w = self.world
+            c = claim if isinstance(claim, Claim) or claim is None else Claim.from_json(dict(claim))
+            unknown = [n for n in witnesses if n not in w.npcs and n != "player"]
+            if unknown:
+                raise Unknown(f"no npc {', '.join(unknown)}")
+            where = at or self._where(actor)
+            truth = true if true is not None else (w.ledger.happened(c) if said and c else True)
+            e = w.ledger.append(w.phase, verb, actor, target, where, c, truth, amount)
+            seen = [n for n in dict.fromkeys(witnesses) if n in w.npcs and n not in (actor, target)]
+            if seen:
+                self.witnesses[e.id] = seen
+            if c is not None:
+                if said:
+                    for n in dict.fromkeys([target, *seen]):
+                        if n in w.npcs and n != actor:
+                            trust = w.npcs[n].trust_in.get(actor, 0)
+                            w.beliefs.add_evidence(n, c, credence(trust), actor, e.id, w.phase)
+                else:
+                    for n in seen:
+                        w.beliefs.add_evidence(n, c, 1.0, "witnessed", e.id, w.phase)
+                    for n in dict.fromkeys([actor, target]):
+                        if n in w.npcs:
+                            w.beliefs.add_evidence(n, c, 1.0, "self", e.id, w.phase)
+            return e
+
+    def update(self, npc: str, loc: str | None = None, drives: Mapping[str, int] | None = None,
+               nudge: Mapping[str, int] | None = None, flags: Mapping | None = None,
+               trust_in: Mapping[str, int] | None = None) -> dict:
+        """The engine's rules changed an NPC: where it is, its drives (set, or `nudge`d by a step), its flags, its
+        trust. Drives stay within 0 to 10 and trust within -5 to 5. "player" takes only `loc`."""
+        with self._lock:
+            if npc == "player":
+                if loc is not None:
+                    self.world.player["loc"] = loc
+                return dict(self.world.player)
+            n = self._npc(npc)
+            if loc is not None:
+                n.loc = loc
+            for k, v in (drives or {}).items():
+                n.drives[k] = _clamp(int(v), DRIVES)
+            for k, v in (nudge or {}).items():
+                n.drives[k] = _clamp(n.drives.get(k, 0) + int(v), DRIVES)
+            for k, v in (trust_in or {}).items():
+                n.trust_in[k] = _clamp(int(v), TRUST)
+            for k, v in (flags or {}).items():
+                if v is None:
+                    n.flags.pop(k, None)
+                else:
+                    n.flags[k] = v
+            return n.to_json()
+
+    # ------------------------------------------------------------ the minds
+    def decide(self, npc: str, moment: str, bindings: Mapping | None = None, situation: str | None = None,
+               to: str | None = None, wait: bool = True) -> Line:
+        """What `npc` does at `moment`, among the choices the game declares for it, and its line. The choice is
+        recorded with its reason. An action that states a claim logs the statement, told `to` someone."""
+        with self._lock:
+            w, b = self.world, dict(bindings or {})
+            self._npc(npc)
+            cs = self.game.choices.get((npc, moment))
+            if cs is None:
+                raise Unknown(f"{npc} has no choices for {moment!r}")
+            view = View(w.player["loc"])
+            choices = cs.options(w, view, **b)
+            if not choices:
+                return Line(None, npc, None)
+            choice = self.brain.choose(npc, choices)
+            claim = cs.asserts(**b).get(choice)
+            said = self._template(npc, choice.partition(":")[0], [SAID] if claim else [], b, choice)
+            text, cites = said or (None, [])
+            statement = None
+            if claim is not None:
+                statement, cites = log_statement(w, "tell", npc, to, w.npcs[npc].loc, claim, cites)
+                self._overheard(statement)
+                if to in w.npcs:
+                    w.beliefs.add_evidence(to, claim, credence(w.npcs[to].trust_in.get(npc, 0)), npc, statement.id,
+                                           w.phase)
+            situation = situation if situation is not None else self.game.situation(moment, b)
+            pack = self.voice.pack(w, npc, situation, choice, claim, view) if self.mind.active else None
+            d = w.decisions.record(DECIDE, npc, w.phase, moment, allowed=list(choices), chosen=choice, line=text,
+                                   cites=cites, reason=f"{choice} scores {choices[choice]}", source="fallback",
+                                   asserted=statement.id if statement else None)
+            return self._speak("act", d, pack, Utterance(choice, text, cites, "fallback"), wait, statement)
+
+    def react(self, npc: str, trigger: str, situation: str | None = None, cites: Sequence[str] = (),
+              fill: Mapping | None = None, wait: bool = True) -> Line:
+        """`npc`'s line in reply to `trigger`: its template line, voiced by the model if there is one. It cites
+        `cites`, or the latest event it knows; with no template or nothing to cite it stays silent."""
+        with self._lock:
+            w = self.world
+            self._npc(npc)
+            said = self._template(npc, trigger, list(cites) or [self.voice.latest(w, npc)], dict(fill or {}))
+            if said is None:
+                return Line(None, npc, None)
+            situation = situation if situation is not None else self.game.situation(trigger, fill or {})
+            pack = self.voice.pack(w, npc, situation, stakes=trigger in self.voice.stakes) \
+                if self.mind.active else None
+            d = w.decisions.record(REACT, npc, w.phase, trigger, line=said[0], cites=said[1], reason=trigger,
+                                   source="fallback")
+            return self._speak("react", d, pack, Utterance(None, said[0], said[1], "fallback"), wait)
+
+    def narrate(self, since: int = 0, wait: bool = True) -> Line:
+        """The story since phase `since`, told by the narrator from the ledger, citing every event it tells."""
+        with self._lock:
+            w = self.world
+            events = w.ledger.since(since)
+            if not events:
+                return Line(None, "narrator", None)
+            telling = " ".join(self.sentence(e) for e in events)
+            w.counters["narrations"] = n = w.counters.get("narrations", 0) + 1
+            line = Line(f"n{n:04d}", "narrator", telling, [e.id for e in events], reason=f"since phase {since}")
+            pack = None
+            if self.mind.active and "narrator" in self.game.cast.data:
+                setting = self.game.cast.data.get("game", {}).get("setting", "")
+                pack = self.voice.narration(events, setting, lambda es: " ".join(self.sentence(e) for e in es))
+            return self._voice(line, "narrate", pack, Utterance(None, telling, line.cites, "fallback"), wait)
+
+    def tick(self, steps: int = 1) -> Tick:
+        """The minds' own time, `steps` phases of it: scheduled walks, then gossip, then drives settling, then the
+        next phase. Everyone at the scene of what it does sees it."""
+        with self._lock:
+            w, d = self.world, self.game.cast.data
+            g = d.get("gossip")
+
+            def walking(t: Tick) -> None:
+                walks(w, t, lambda npc: d["npc"][npc].get("walk"))
+
+            def hear(w: World, npc: str, c: Claim, conf: float, source: str, e: Event) -> None:
+                w.beliefs.add_evidence(npc, c, conf, source, e.id, w.phase)
+
+            def grapevine(t: Tick) -> None:
+                if g:
+                    gossip(w, g.get("gossips", []), g.get("about", ["player"]), g.get("priority", {}),
+                           g.get("threshold", 0.5), g.get("decay", 0.8), lambda w, c: w.ledger.happened(c), hear)
+
+            def settling(t: Tick) -> None:
+                for npc, rest in ((n, d["npc"][n].get("settle", {})) for n in w.npcs):
+                    drives = w.npcs[npc].drives
+                    for k, r in rest.items():
+                        v = drives.get(k, int(r))
+                        drives[k] = v - 1 if v > r else v + 1 if v < r else v
+
+            def advance(t: Tick) -> None:
+                w.phase += 1
+
+            start = len(w.ledger)
+            tick = run_tick(w, [step for _ in range(max(0, steps)) for step in (walking, grapevine, settling,
+                                                                                advance)])
+            for e in list(w.ledger)[start:]:
+                self._overheard(e)
+            return tick
+
+    # ------------------------------------------------------------ lines on their way
+    def line(self, line_id: str, wait: float = 0) -> Line:
+        """A line by id, as it stands now. With `wait`, up to that many seconds for a provisional one to settle."""
+        fut = self._pending.get(line_id)
+        if fut is not None and wait > 0:
+            try:
+                fut.result(timeout=wait)
+            except TimeoutError:
+                pass
+        with self._lock:
+            if line_id not in self._lines:
+                raise Unknown(f"no line {line_id!r}")
+            return replace(self._lines[line_id])
+
+    def close(self) -> None:
+        """Stop: every line still provisional is withdrawn, and its model call's answer is dropped."""
+        with self._lock:
+            for lid in list(self._pending):
+                self._lines[lid].status = WITHDRAWN
+            self._pending.clear()
+        if self._pool:
+            self._pool.shutdown(wait=False, cancel_futures=True)
+            self._pool = None
+
+    # ------------------------------------------------------------ saves
+    def snapshot(self) -> dict:
+        """The minds, for the engine's save file. Lines still provisional are saved as their template words."""
+        with self._lock:
+            return {"thespis": SNAPSHOT_VERSION, "game": self.game.id, "digest": self.game.digest,
+                    "world": self.world.to_json(), "witnesses": {k: list(v) for k, v in self.witnesses.items()}}
+
+    @classmethod
+    def restore(cls, game: Game, snapshot: Mapping, **kw) -> Session:
+        """A session from a snapshot of this game. A snapshot from a newer Thespis, or of another game, is refused."""
+        if snapshot.get("thespis") != SNAPSHOT_VERSION:
+            raise DefinitionError(f"snapshot version {snapshot.get('thespis')!r}; this Thespis reads "
+                                  f"{SNAPSHOT_VERSION}")
+        if snapshot.get("game") != game.id:
+            raise DefinitionError(f"snapshot of {snapshot.get('game')!r}, not {game.id!r}")
+        world = World.from_json(dict(snapshot["world"]))
+        return cls(game, world, {k: list(v) for k, v in dict(snapshot.get("witnesses", {})).items()}, **kw)
+
+    def inspect(self, npc: str) -> dict:
+        """One NPC's mind as it stands: its state and every belief, retracted ones included, with their evidence."""
+        with self._lock:
+            n = self._npc(npc)
+            return {"npc": n.to_json(), "beliefs": [b.to_json() for b in self.world.beliefs.for_npc(npc)]}
+
+    def sentence(self, e: Event) -> str:
+        return self.game.sentence(e)
+
+    # ------------------------------------------------------------ inside
+    def _npc(self, npc: str) -> NPC:
+        if npc not in self.world.npcs:
+            raise Unknown(f"no npc {npc!r}")
+        return self.world.npcs[npc]
+
+    def _where(self, who: str) -> str:
+        return self.world.player["loc"] if who == "player" else self.world.npcs[who].loc \
+            if who in self.world.npcs else ""
+
+    def _overheard(self, e: Event) -> None:
+        """Everyone at the scene of an event Thespis itself wrote saw it."""
+        seen = [n for n in self.world.npcs if n not in (e.actor, e.target) and at_the_scene(self.world, n, e)]
+        if seen:
+            self.witnesses[e.id] = seen
+
+    def _template(self, npc: str, key: str, cites: list[str | None], fill: dict,
+                  action: str | None = None) -> tuple[str, list[str]] | None:
+        """The NPC's template line for `key`, filled, and what it cites; None with no template or nothing to cite."""
+        text, known = self.game.cast.template(npc, key), [c for c in cites if c]
+        if text is None:
+            return None
+        if not any(c != SAID for c in known):
+            latest = self.voice.latest(self.world, npc)
+            known += [latest] if latest else []
+        if not known:
+            return None
+        arg = action.partition(":")[2] if action else ""
+        return text.format_map(_Fill({"who": self.game.who(arg), **fill})), list(dict.fromkeys(known))
+
+    def _speak(self, kind: str, d: Decision, pack: StatePack | None, fallback: Utterance, wait: bool,
+               statement: Event | None = None) -> Line:
+        line = Line(d.id, d.npc, d.line, list(d.cites), action=d.chosen, reason=d.reason,
+                    event=statement.id if statement else None)
+        return self._voice(line, kind, pack, fallback, wait, d, statement)
+
+    def _voice(self, line: Line, kind: str, pack: StatePack | None, fallback: Utterance, wait: bool,
+               d: Decision | None = None, statement: Event | None = None) -> Line:
+        """Settle the line now (no model, or the caller waits), or return it provisional and let the model follow."""
+        assert line.id is not None
+        self._lines[line.id] = line
+        if pack is None:
+            return replace(line)
+        if wait:
+            self._settle(line.id, self._call(kind, pack, fallback), d, statement)
+            return replace(self._lines[line.id])
+        line.status = PROVISIONAL
+        if self._pool is None:
+            self._pool = ThreadPoolExecutor(WORKERS, thread_name_prefix="thespis-line")
+        lid = line.id
+        fut = self._pool.submit(self._call, kind, pack, fallback)
+        self._pending[lid] = fut
+        fut.add_done_callback(lambda f: self._settle(lid, f.result(), d, statement) if not f.cancelled() and
+                              f.exception() is None else self._settle(lid, fallback, d, statement))
+        return replace(line)
+
+    def _call(self, kind: str, pack: StatePack, fallback: Utterance) -> Utterance:
+        if kind == "act":
+            return self.mind.act(pack, fallback)
+        if kind == "narrate":
+            return self.mind.narrate(pack, fallback)
+        return self.mind.react_many([(pack, fallback)])[0]
+
+    def _settle(self, lid: str, u: Utterance, d: Decision | None, statement: Event | None) -> None:
+        with self._lock:
+            line = self._lines[lid]
+            if line.status == WITHDRAWN:
+                return
+            self._pending.pop(lid, None)
+            cites = [statement.id if c == SAID and statement else c for c in u.cites]
+            line.text = u.line if u.line is not None else line.text  # the model's words, or the template's
+            line.cites, line.source, line.status = cites, u.source, FINAL
+            if u.note:
+                line.reason = f"{line.reason}; {u.note}"
+            if d is not None:
+                self.world.decisions.settle(d.id, line=line.text, cites=cites, reason=line.reason, source=u.source)

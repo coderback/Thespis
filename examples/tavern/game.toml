@@ -1,0 +1,118 @@
+# The Lantern: a one-room tavern scene, the smallest game an engine can play through Thespis (thespis.session).
+# The engine owns the world: it reports what happened and who saw it, and asks what an NPC does and says. Everything
+# Thespis needs to know about the minds is here. Drives run 0 to 10; trust runs -5 to 5.
+
+[game]
+id = "tavern"
+name = "The Lantern"
+setting = "A roadside tavern on the north road, an hour before dusk."
+
+[places]
+taproom = "the Lantern's taproom"
+yard = "the stable yard"
+road = "the north road"
+
+[player]
+start = "taproom"
+
+[npc.garrick]
+name = "Garrick"
+start = "taproom"
+goal = "Ride north before dark with his pride intact"
+persona = "A sellsword with a reputation to protect: proud, quick to anger and slow to forgive. He speaks in short, cutting sentences."
+drives = { grudge = 0, respect = 1, ambition = 5 }
+trust_in = { player = 0, wren = 2 }
+settle = { grudge = 0 }  # each tick, a drive moves one step back towards its resting value
+
+[npc.garrick.lines]
+leave = "The road won't wait. Neither will I."
+wait = "I'll finish this first."
+confront = "You. Say it again, to my face."
+share_drink = "Sit. One drink, and a tip: Wren hears everything."
+talk = "Speak quickly. I have a road to run."
+insulted = "Careful, stranger."
+
+[npc.wren]
+name = "Wren"
+start = "taproom"
+goal = "Keep the taproom calm"
+persona = "The Lantern's barkeep: warm, nosy, and misses nothing under her roof. She trades gossip like coin."
+drives = {}
+trust_in = { player = 0, garrick = 1 }
+
+[npc.wren.lines]
+talk = "What'll it be, love?"
+told = "Is that so? I'll keep it in mind."
+insulted = "Mind your manners under my roof."
+
+[npc.pip]
+name = "Pip"
+start = "yard"
+goal = "Mind the horses and stay out of trouble"
+persona = "The stable boy: eager, honest to a fault and bad at keeping secrets."
+drives = {}
+trust_in = { player = 0, wren = 2 }
+walk = ["yard", "taproom", "yard", "road"]  # where he is by tick, round and round
+
+[npc.pip.lines]
+talk = "Need your horse, sir?"
+told = "Really? Wait till Wren hears."
+
+# ---------------------------------------------------------------- choices (thespis.considerations)
+# Garrick, each turn: ride on by ambition; confront the player once angry enough and he knows why; share a drink once
+# he respects them. The highest utility wins and the first listed wins a tie.
+[[npc.garrick.choices.turn]]
+do = "leave"
+utility = [{ drive = "ambition" }]
+when = [{ not_flag = "gone" }]
+
+[[npc.garrick.choices.turn]]
+do = "wait"
+utility = 0
+
+[[npc.garrick.choices.turn]]
+do = "confront:player"
+utility = [{ drive = "grudge", plus = 3 }]
+when = [{ with = "player" }, { drive = "grudge", gte = 4 },
+        { believes = { pred = "insulted", a = "player", b = "self" } }]
+
+[[npc.garrick.choices.turn]]
+do = "share_drink:player"
+utility = [{ drive = "respect", plus = 3 }]
+when = [{ with = "player" }, { drive = "respect", gte = 4 }, { not_flag = "drink" }]
+
+# ---------------------------------------------------------------- the grapevine
+# Each tick, a gossip tells each listener where she stands one thing it hasn't heard about the player: worst news
+# first. The listener believes it at her confidence times `decay`.
+[gossip]
+gossips = ["wren", "pip"]
+about = ["player"]
+priority = { insulted = 2 }
+threshold = 0.5
+decay = 0.8
+
+# ---------------------------------------------------------------- words
+# A claim, an event and an action in words, as the model reads them. {a} and {b} are a claim's two sides; {a} and {t}
+# an event's actor and target, {where} where it happened, {to} where someone went, {claim} what was said.
+[words.claims]
+insulted = "{a} insulted {b}"
+paid = "{a} paid {b}"
+helped = "{a} helped {b}"
+
+[words.events]
+insult = "{a} insulted {t} in {where}."
+pay = "{a} paid {t}."
+help = "{a} helped {t}."
+tell = "{a} told {t} that {claim}."
+gossip = "{a} told {t} that {claim}."
+move = "{a} walked from {where} to {to}."
+
+[actions]
+leave = "set off up the north road"
+wait = "stay where you are for now"
+confront = "confront {who} about what they did"
+share_drink = "share a drink with {who} and tell them something useful"
+
+[narrator]
+name = "The Narrator"
+persona = "A wry storyteller who recounts only what happened and ends every telling with a hook."

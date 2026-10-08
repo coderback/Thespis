@@ -1,0 +1,1336 @@
+{
+  "components": {
+    "schemas": {
+      "ClaimIn": {
+        "properties": {
+          "a": {
+            "description": "Who it is about, by id; 'player' is the player",
+            "title": "A",
+            "type": "string"
+          },
+          "at": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "At"
+          },
+          "b": {
+            "default": "",
+            "title": "B",
+            "type": "string"
+          },
+          "neg": {
+            "default": false,
+            "description": "A denial: the claim that this did not happen",
+            "title": "Neg",
+            "type": "boolean"
+          },
+          "place": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Place"
+          },
+          "pred": {
+            "description": "What is claimed, from the game's predicates: insulted, paid, was_in",
+            "title": "Pred",
+            "type": "string"
+          }
+        },
+        "required": [
+          "pred",
+          "a"
+        ],
+        "title": "ClaimIn",
+        "type": "object"
+      },
+      "DecideIn": {
+        "properties": {
+          "bindings": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "boolean"
+                }
+              ]
+            },
+            "description": "Values the choices name: {culprit}",
+            "title": "Bindings",
+            "type": "object"
+          },
+          "moment": {
+            "description": "Which of the NPC's declared choice sets: [[npc.<id>.choices.<moment>]]",
+            "title": "Moment",
+            "type": "string"
+          },
+          "npc": {
+            "title": "Npc",
+            "type": "string"
+          },
+          "situation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What just happened, from the NPC's side, for the model",
+            "title": "Situation"
+          },
+          "to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whom an action that states a claim tells it to",
+            "title": "To"
+          },
+          "wait": {
+            "default": false,
+            "description": "Wait for the model's line instead of returning it provisional",
+            "title": "Wait",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "npc",
+          "moment"
+        ],
+        "title": "DecideIn",
+        "type": "object"
+      },
+      "EventOut": {
+        "properties": {
+          "actor": {
+            "title": "Actor",
+            "type": "string"
+          },
+          "amount": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount"
+          },
+          "claim": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClaimIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "loc": {
+            "title": "Loc",
+            "type": "string"
+          },
+          "phase": {
+            "title": "Phase",
+            "type": "integer"
+          },
+          "target": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target"
+          },
+          "truth": {
+            "title": "Truth",
+            "type": "boolean"
+          },
+          "verb": {
+            "title": "Verb",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "phase",
+          "verb",
+          "actor",
+          "target",
+          "loc",
+          "claim",
+          "truth"
+        ],
+        "title": "EventOut",
+        "type": "object"
+      },
+      "GameOut": {
+        "properties": {
+          "choices": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "description": "Each NPC's choice sets, by moment",
+            "title": "Choices",
+            "type": "object"
+          },
+          "digest": {
+            "title": "Digest",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "npcs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Npcs",
+            "type": "array"
+          },
+          "places": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Places",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "digest",
+          "npcs",
+          "places",
+          "choices"
+        ],
+        "title": "GameOut",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "LineOut": {
+        "properties": {
+          "action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What the NPC decided to do, for decide",
+            "title": "Action"
+          },
+          "cites": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Cites",
+            "type": "array"
+          },
+          "event": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The statement its action logged, if it states a claim",
+            "title": "Event"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Poll it at /lines/{id}; null when the NPC had nothing to say",
+            "title": "Id"
+          },
+          "npc": {
+            "title": "Npc",
+            "type": "string"
+          },
+          "reason": {
+            "default": "",
+            "title": "Reason",
+            "type": "string"
+          },
+          "source": {
+            "description": "llm, cache or fallback (the game's template line)",
+            "title": "Source",
+            "type": "string"
+          },
+          "status": {
+            "description": "provisional (more to come), final, or withdrawn (don't show it)",
+            "title": "Status",
+            "type": "string"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          }
+        },
+        "required": [
+          "id",
+          "npc",
+          "text",
+          "cites",
+          "status",
+          "source"
+        ],
+        "title": "LineOut",
+        "type": "object"
+      },
+      "NarrateIn": {
+        "properties": {
+          "since": {
+            "default": 0,
+            "description": "Tell the story from this phase on",
+            "title": "Since",
+            "type": "integer"
+          },
+          "wait": {
+            "default": false,
+            "title": "Wait",
+            "type": "boolean"
+          }
+        },
+        "title": "NarrateIn",
+        "type": "object"
+      },
+      "NpcOut": {
+        "properties": {
+          "beliefs": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Beliefs",
+            "type": "array"
+          },
+          "npc": {
+            "additionalProperties": true,
+            "title": "Npc",
+            "type": "object"
+          }
+        },
+        "required": [
+          "npc",
+          "beliefs"
+        ],
+        "title": "NpcOut",
+        "type": "object"
+      },
+      "ObserveIn": {
+        "properties": {
+          "actor": {
+            "title": "Actor",
+            "type": "string"
+          },
+          "amount": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount"
+          },
+          "at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Where it happened; the actor's place if left out",
+            "title": "At"
+          },
+          "claim": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClaimIn"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What it shows, or, with said, what was said"
+          },
+          "said": {
+            "default": false,
+            "description": "The actor stated the claim: hearers believe it by their trust in them",
+            "title": "Said",
+            "type": "boolean"
+          },
+          "target": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target"
+          },
+          "true": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whether the claim is true; left out, the ledger decides",
+            "title": "True"
+          },
+          "verb": {
+            "description": "What happened: the game's own word for it, as [words.events] names it",
+            "title": "Verb",
+            "type": "string"
+          },
+          "witnesses": {
+            "description": "NPCs who saw it, besides the actor and target",
+            "items": {
+              "type": "string"
+            },
+            "title": "Witnesses",
+            "type": "array"
+          }
+        },
+        "required": [
+          "verb",
+          "actor"
+        ],
+        "title": "ObserveIn",
+        "type": "object"
+      },
+      "ReactIn": {
+        "properties": {
+          "cites": {
+            "description": "Event or belief ids the line rests on",
+            "items": {
+              "type": "string"
+            },
+            "title": "Cites",
+            "type": "array"
+          },
+          "fill": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "boolean"
+                }
+              ]
+            },
+            "description": "Values for the template's {placeholders}",
+            "title": "Fill",
+            "type": "object"
+          },
+          "npc": {
+            "title": "Npc",
+            "type": "string"
+          },
+          "situation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Situation"
+          },
+          "trigger": {
+            "description": "The line's key in [npc.<id>.lines]",
+            "title": "Trigger",
+            "type": "string"
+          },
+          "wait": {
+            "default": false,
+            "title": "Wait",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "npc",
+          "trigger"
+        ],
+        "title": "ReactIn",
+        "type": "object"
+      },
+      "SessionIn": {
+        "properties": {
+          "game": {
+            "description": "A game the server loaded, by its id",
+            "title": "Game",
+            "type": "string"
+          },
+          "seed": {
+            "default": 0,
+            "title": "Seed",
+            "type": "integer"
+          },
+          "snapshot": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Restore this snapshot instead of starting fresh",
+            "title": "Snapshot"
+          }
+        },
+        "required": [
+          "game"
+        ],
+        "title": "SessionIn",
+        "type": "object"
+      },
+      "SessionOut": {
+        "properties": {
+          "game": {
+            "title": "Game",
+            "type": "string"
+          },
+          "phase": {
+            "title": "Phase",
+            "type": "integer"
+          },
+          "session": {
+            "title": "Session",
+            "type": "string"
+          }
+        },
+        "required": [
+          "session",
+          "game",
+          "phase"
+        ],
+        "title": "SessionOut",
+        "type": "object"
+      },
+      "TickIn": {
+        "properties": {
+          "steps": {
+            "default": 1,
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "title": "Steps",
+            "type": "integer"
+          }
+        },
+        "title": "TickIn",
+        "type": "object"
+      },
+      "TickOut": {
+        "properties": {
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/EventOut"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "moves": {
+            "items": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "title": "Moves",
+            "type": "array"
+          },
+          "phase": {
+            "title": "Phase",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "phase",
+          "moves",
+          "events"
+        ],
+        "title": "TickOut",
+        "type": "object"
+      },
+      "UpdateIn": {
+        "properties": {
+          "drives": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "integer"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Drives to set, 0 to 10",
+            "title": "Drives"
+          },
+          "flags": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Flags to set; null removes one",
+            "title": "Flags"
+          },
+          "loc": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Loc"
+          },
+          "npc": {
+            "description": "An NPC id, or 'player' (which takes only loc)",
+            "title": "Npc",
+            "type": "string"
+          },
+          "nudge": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "integer"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Drives to move by a step, kept within 0 to 10",
+            "title": "Nudge"
+          },
+          "trust_in": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "integer"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Trust to set, -5 to 5",
+            "title": "Trust In"
+          }
+        },
+        "required": [
+          "npc"
+        ],
+        "title": "UpdateIn",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "The /v1 HTTP API: the session calls (thespis.session), one route each, for engines that aren't Python.\n\nAn engine opens a session on a game the server loaded, reports events and changes, and asks for decisions and lines.\nLines come back provisional by default and are polled until final (`GET .../lines/{id}?wait=2`). The routes mirror\nthe library's calls one for one, and the generated OpenAPI spec, committed as docs/openapi-v1.json, is the SDKs'\ncontract: tests fail when the two drift apart.\n\nErrors carry `{error, reason}`: 400 for a malformed body or a definition the call breaks, 404 for an unknown game,\nsession, NPC, moment or line, 409 for a call the game doesn't allow now, 503 when the server holds its limit of\nsessions. Sessions live in memory here; the sidecar and server runtimes (Phase 4.4) keep them in a store.\n",
+    "title": "Thespis",
+    "version": "v1"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/v1/games": {
+      "get": {
+        "operationId": "list_games_v1_games_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/GameOut"
+                  },
+                  "title": "Response List Games V1 Games Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Games"
+      }
+    },
+    "/v1/health": {
+      "get": {
+        "operationId": "health_v1_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "boolean"
+                  },
+                  "title": "Response Health V1 Health Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health"
+      }
+    },
+    "/v1/sessions": {
+      "post": {
+        "operationId": "open_session_v1_sessions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Open Session"
+      }
+    },
+    "/v1/sessions/{sid}": {
+      "delete": {
+        "operationId": "close_session_v1_sessions__sid__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sid",
+            "required": true,
+            "schema": {
+              "title": "Sid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Close Session"
+      }
+    },
+    "/v1/sessions/{sid}/decide": {
+      "post": {
+        "operationId": "decide_v1_sessions__sid__decide_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sid",
+            "required": true,
+            "schema": {
+              "title": "Sid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecideIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LineOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Decide"
+      }
+    },
+    "/v1/sessions/{sid}/lines/{lid}": {
+      "get": {
+        "operationId": "line_v1_sessions__sid__lines__lid__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sid",
+            "required": true,
+            "schema": {
+              "title": "Sid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "lid",
+            "required": true,
+            "schema": {
+              "title": "Lid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "wait",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "maximum": 10,
+              "minimum": 0,
+              "title": "Wait",
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LineOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Line"
+      }
+    },
+    "/v1/sessions/{sid}/narrate": {
+      "post": {
+        "operationId": "narrate_v1_sessions__sid__narrate_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sid",
+            "required": true,
+            "schema": {
+              "title": "Sid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NarrateIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LineOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Narrate"
+      }
+    },
+    "/v1/sessions/{sid}/npcs/{npc}": {
+      "get": {
+        "operationId": "inspect_v1_sessions__sid__npcs__npc__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sid",
+            "required": true,
+            "schema": {
+              "title": "Sid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "npc",
+            "required": true,
+            "schema": {
+              "title": "Npc",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NpcOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Inspect"
+      }
+    },
+    "/v1/sessions/{sid}/observe": {
+      "post": {
+        "operationId": "observe_v1_sessions__sid__observe_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sid",
+            "required": true,
+            "schema": {
+              "title": "Sid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObserveIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Observe"
+      }
+    },
+    "/v1/sessions/{sid}/react": {
+      "post": {
+        "operationId": "react_v1_sessions__sid__react_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sid",
+            "required": true,
+            "schema": {
+              "title": "Sid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReactIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LineOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "React"
+      }
+    },
+    "/v1/sessions/{sid}/snapshot": {
+      "get": {
+        "operationId": "snapshot_v1_sessions__sid__snapshot_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sid",
+            "required": true,
+            "schema": {
+              "title": "Sid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Snapshot V1 Sessions  Sid  Snapshot Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Snapshot"
+      }
+    },
+    "/v1/sessions/{sid}/tick": {
+      "post": {
+        "operationId": "tick_v1_sessions__sid__tick_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sid",
+            "required": true,
+            "schema": {
+              "title": "Sid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TickIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TickOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Tick"
+      }
+    },
+    "/v1/sessions/{sid}/update": {
+      "post": {
+        "operationId": "update_v1_sessions__sid__update_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sid",
+            "required": true,
+            "schema": {
+              "title": "Sid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Update V1 Sessions  Sid  Update Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update"
+      }
+    }
+  }
+}
