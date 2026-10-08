@@ -11,6 +11,7 @@ import json
 import secrets
 import sqlite3
 import time
+from collections.abc import Callable
 from contextlib import closing
 from pathlib import Path
 
@@ -87,7 +88,9 @@ class Store:
                        (json.dumps(world.to_json()), time.time(), session_id))
         self._run(write)
 
-    def load(self, session_id: str) -> World:
+    def load(self, session_id: str, upgrade_claim: Callable[[dict], dict] | None = None) -> World:
+        """The session's world as last saved. `upgrade_claim` rewrites claims saved in an older form, in the snapshot
+        and the ledger rows alike, before they are compared: the rows are never rewritten, so they stay as saved."""
         def read(db):
             run = self._run_of(db, session_id)
             snapshot = db.execute("SELECT snapshot FROM sessions WHERE id = ?", (session_id,)).fetchone()[0]
@@ -98,6 +101,8 @@ class Store:
         if snapshot is None:
             raise SessionNotFound(f"{session_id} has no saved state yet")
         data = json.loads(snapshot)
+        if upgrade_claim is not None:
+            data, rows = _upgraded(data, upgrade_claim), [_upgraded_event(r, upgrade_claim) for r in rows]
         if data["ledger"] != rows:
             raise LedgerMismatch(f"{session_id}: snapshot holds {len(data['ledger'])} events, "
                                  f"ledger table {len(rows)}, or they differ")
@@ -164,3 +169,12 @@ class Store:
             db.execute("INSERT OR REPLACE INTO meta VALUES ('boots', ?)", (str(count + 1),))
             return count + 1
         return self._run(bump)
+
+
+def _upgraded_event(event: dict, upgrade_claim: Callable[[dict], dict]) -> dict:
+    return {**event, "claim": upgrade_claim(event["claim"])} if event.get("claim") else event
+
+
+def _upgraded(data: dict, upgrade_claim: Callable[[dict], dict]) -> dict:
+    return {**data, "ledger": [_upgraded_event(e, upgrade_claim) for e in data["ledger"]],
+            "beliefs": [{**b, "claim": upgrade_claim(b["claim"])} for b in data["beliefs"]]}

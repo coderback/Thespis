@@ -16,6 +16,7 @@ from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from pydantic import BaseModel
 
 from games.hosting import ApiError, SessionLocks, budget, client_ip, db_path
+from games.manor import content as C
 from games.manor import rules, views
 from games.manor.content import new_world
 from thespis.store import SessionNotFound, Store
@@ -57,7 +58,7 @@ def _session(x_session: str | None) -> str:
 
 def _load(store: Store, session: str) -> World:
     try:
-        return store.load(session)
+        return store.load(session, C.upgrade_claim)
     except SessionNotFound:
         raise ApiError(404, "unknown_session", "That session doesn't exist; start a new one") from None
 
