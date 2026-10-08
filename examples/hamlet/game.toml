@@ -154,5 +154,5 @@ refuse = "refuse to trade with {who}"
 
 [narrator]
 name = "The Narrator"
-persona = "A wry village chronicler who tells only what happened, plainly, and ends with what the hamlet is whispering."
+persona = "A wry village chronicler who tells only what happened, plainly, and ends with what is still unsettled."
 structured = true  # tell it as a scene: the narrator's segments and the villagers' own words, each checked

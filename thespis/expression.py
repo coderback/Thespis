@@ -77,7 +77,8 @@ LIMITS = dict(LINE_LIMITS)  # characters per line, by call type
 # an event it did, so no quote is pinned on someone who never said it, and every segment is checked on its own.
 TELL_PROMPT = ("You are {name}. {persona}\n" + _RULES +
                "Tell what happened as a short scene, 2 to 5 segments in order, to the one the situation names, "
-               "addressing them as \"you\": if they took part in an event, they are \"you\" in it. Each segment is "
+               "addressing them as \"you\": if they took part in an event, they are \"you\" in it. Never say what "
+               "they said, asked or thought unless an event shows it. Each segment is "
                "your own telling (speaker \"narrator\"), in the past tense, or a character's own words. Where a "
                "character told someone something, give what they said as a segment of their own, quoted in their "
                "voice (speaker: their id), citing that event. A character may speak only in a segment that cites an "
