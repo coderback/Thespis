@@ -10,7 +10,6 @@ Pell (his testimony breaks the alibi), then accuse Sable before evening.
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 from dataclasses import dataclass, field
 
 from games.manor import claims, voice
@@ -21,7 +20,7 @@ from thespis.brain import UtilityBrain
 from thespis.claims import ClaimChecking
 from thespis.deception import SAID, log_statement
 from thespis.decisions import DECIDE
-from thespis.expression import Mind, Observer, ReplyCache, Utterance
+from thespis.expression import Mind, Observer, ReplyCache
 from thespis.gateway import ModelGateway
 from thespis.ledger import Claim, Event
 from thespis.moderation import Moderator
@@ -30,13 +29,7 @@ from thespis.world import LOST, PLAYING, WON, World
 
 __all__ = ["NotAllowed"]
 
-OUTCOMES = {
-    "won": "Solved. Sable took the ring, and Lady Vane believed Pell's testimony over Sable's alibi.",
-    "lost_alibi": "Lady Vane didn't believe you: as far as she knew, Sable was in the kitchen at mid-morning. "
-                  "Break the alibi first.",
-    "lost_innocent": "Pell didn't take the ring, and Lady Vane knew it.",
-    "constable": "Evening came with the case unsolved, and Lady Vane sent for the constable.",
-}
+OUTCOMES = C.CAST.data["outcomes"]
 
 
 @dataclass
@@ -95,6 +88,15 @@ def act(w: World, verb: str, target: str | None = None, topic: str | None = None
     return ActResult(list(w.ledger)[start:], replies, count_calls(w, mind))
 
 
+def _speech(npc: str, trigger: str, key: str, cites: list, situation: str | None = None, **fmt) -> Speech:
+    """`npc`'s template `key`, citing `cites`, in the situation cast.toml gives for `situation` (or the trigger)."""
+    return Speech(npc, trigger, voice.line(npc, key, cites), C.CAST.text("situations", situation or trigger, **fmt))
+
+
+def _say(w: World, mind: Mind, *speech, **fmt) -> list[dict]:
+    return voice.deliver(w, mind, [_speech(*speech, **fmt)])
+
+
 def _ask(w: World, mind: Mind, npc: str, topic: str) -> list[dict]:
     w.player["asked"] = sorted({*w.player["asked"], f"{npc}:{topic}"})
     if npc == C.MAID:
@@ -102,31 +104,19 @@ def _ask(w: World, mind: Mind, npc: str, topic: str) -> list[dict]:
         sable.drives["fear"] = min(10, sable.drives.get("fear", 0) + (2 if topic == "morning" else 1))
         if topic == "morning":
             return [_sable_answers(w, mind, "player", sable.loc)]
-        return voice.deliver(w, mind, [Speech(C.MAID, "asked_ring", voice.line(C.MAID, "ring", [_latest(w, C.MAID)]),
-                                              "The player asks you about Lady Vane's missing signet ring.")])
+        return _say(w, mind, C.MAID, "asked_ring", "ring", [_latest(w, C.MAID)])
     if npc == C.BUTLER:
         if topic == "morning":
             told, _ = log_statement(w, "tell", C.BUTLER, "player", w.npcs[C.BUTLER].loc, C.THE_TRUTH, [])
             saw = _held(w, C.BUTLER, C.THE_TRUTH)
-            said = voice.line(C.BUTLER, "morning", [told.id, saw.id])
-            return voice.deliver(w, mind, [Speech(C.BUTLER, "asked_morning", said,
-                                                  "The player asks what you saw this morning. You always tell the "
-                                                  "truth.")])
-        return voice.deliver(w, mind, [Speech(C.BUTLER, "asked_ring", voice.line(C.BUTLER, "ring", [_latest(w, C.BUTLER)]),
-                                              "The player asks you about Lady Vane's missing signet ring.")])
+            return _say(w, mind, C.BUTLER, "asked_morning", "morning", [told.id, saw.id], "pell_asked_morning")
+        return _say(w, mind, C.BUTLER, "asked_ring", "ring", [_latest(w, C.BUTLER)])
     # Lady Vane tells what she believes.
     if topic == "ring":
-        said = voice.line(C.OWNER, "ring", [_latest(w, C.OWNER)])
-        return voice.deliver(w, mind, [Speech(C.OWNER, "asked_ring", said,
-                                              "The player, who has come to find your missing signet ring, asks you "
-                                              "about it.")])
+        return _say(w, mind, C.OWNER, "asked_ring", "ring", [_latest(w, C.OWNER)], "vane_asked_ring")
     alibi = _held(w, C.OWNER, C.THE_ALIBI)
-    if alibi.active:
-        said = voice.line(C.OWNER, "morning", [alibi.id])
-    else:
-        said = voice.line(C.OWNER, "morning_doubt", [_held(w, C.OWNER, C.THE_TRUTH).id])  # what broke the alibi
-    return voice.deliver(w, mind, [Speech(C.OWNER, "asked_morning", said,
-                                          "The player asks what you know of this morning.")])
+    key, cite = ("morning", alibi.id) if alibi.active else ("morning_doubt", _held(w, C.OWNER, C.THE_TRUTH).id)
+    return _say(w, mind, C.OWNER, "asked_morning", key, [cite], "vane_asked_morning")  # morning_doubt: what broke it
 
 
 def _sable_answers(w: World, mind: Mind, listener: str, loc: str) -> dict:
@@ -137,15 +127,16 @@ def _sable_answers(w: World, mind: Mind, listener: str, loc: str) -> dict:
     options = {"deflect": 3}
     if sable.drives.get("fear", 0) >= C.FEAR_TO_LIE:
         options = {"deceive:alibi": sable.drives["fear"] + 2, "deflect": 3}
-    asker = "The player asks" if listener == "player" else "Lady Vane asks you, in front of the player,"
-    situation = f"{asker} where you were at mid-morning."
+    asker = C.CAST.text("situations", "asker_player" if listener == "player" else "asker_vane")
+    situation = C.CAST.text("situations", "sable_asked_morning", asker=asker)
 
     def line_for(choice: str):
         if choice.startswith("deceive"):
             return voice.line(C.MAID, "deceive", [SAID, knows.id])
         return voice.line(C.MAID, "deflect", [knows.id])
 
-    u = _decide(w, mind, C.MAID, options, line_for, situation, {"deceive:alibi": C.THE_ALIBI})
+    choice = UtilityBrain().choose(C.MAID, options)
+    u = voice.VOICE.act(w, mind, C.MAID, choice, line_for, situation, C.THE_ALIBI if choice == "deceive:alibi" else None)
     assert u.action is not None  # a decision always carries one of the options
     reason = f"{u.action} pulls {options[u.action]}" + (f"; {u.note}" if u.note else "")
     if u.action == "deceive:alibi":
@@ -168,16 +159,6 @@ def _held(w: World, npc: str, claim) -> Belief:
     return belief
 
 
-def _decide(w: World, mind: Mind, npc: str, options: Mapping[str, float], line_for, situation: str,
-            asserts: dict[str, Claim]) -> Utterance:
-    """The utility brain's choice, voiced by the model if its reply passes, else by the template line."""
-    choice = UtilityBrain().choose(npc, options)
-    line, cites = line_for(choice) or (None, [])
-    fallback = Utterance(choice, line, cites, "fallback")
-    pack = voice.pack_for(w, npc, situation, choice, asserts.get(choice))
-    return mind.act(pack, fallback) if mind.active else fallback
-
-
 def _question(w: World, mind: Mind, npc: str) -> list[dict]:
     """Lady Vane questions someone before the player. Pell's testimony can break Sable's alibi."""
     w.ledger.append(w.phase, "question", C.OWNER, npc, "hall")
@@ -185,20 +166,12 @@ def _question(w: World, mind: Mind, npc: str) -> list[dict]:
         testified, _ = log_statement(w, "testify", C.BUTLER, C.OWNER, "hall", C.THE_TRUTH, [])
         _hear(w, C.OWNER, C.THE_TRUTH, C.BUTLER, testified)
         saw, heard = _held(w, C.BUTLER, C.THE_TRUTH), _held(w, C.OWNER, C.THE_TRUTH)
-        return voice.deliver(w, mind, [
-            Speech(C.BUTLER, "testify", voice.line(C.BUTLER, "testify", [testified.id, saw.id]),
-                   "Lady Vane asks you, in front of the player, what you saw this morning. You always tell the truth."),
-            Speech(C.OWNER, "questioned", voice.line(C.OWNER, "questioned", [heard.id, testified.id]),
-                   "You have just questioned Pell in front of the player, and he told you he saw Sable leave the study "
-                   "at mid-morning. Sable told you she was in the kitchen then, so she lied to you, and you no longer "
-                   "believe her. Say so to the player."),
-        ])
+        return voice.deliver(w, mind, [_speech(C.BUTLER, "testify", "testify", [testified.id, saw.id]),
+                                       _speech(C.OWNER, "questioned", "questioned", [heard.id, testified.id])])
     sable = w.npcs[C.MAID]
     sable.drives["fear"] = min(10, sable.drives.get("fear", 0) + 2)
     replies = [_sable_answers(w, mind, C.OWNER, "hall")]
-    return replies + voice.deliver(w, mind, [Speech(C.OWNER, "questioned_sable",
-                                                    voice.line(C.OWNER, "questioned_sable", [_latest(w, C.OWNER)]),
-                                                    "You have just questioned Sable about this morning.")])
+    return replies + _say(w, mind, C.OWNER, "questioned_sable", "questioned_sable", [_latest(w, C.OWNER)])
 
 
 def _hear(w: World, npc: str, claim: Claim, source: str, event: Event) -> list:
@@ -252,19 +225,12 @@ def _accuse(w: World, mind: Mind, npc: str) -> list[dict]:
     w.status, w.ended_at = (WON if solved else LOST), w.phase
     if solved:
         key, cites = "won", [_held(w, C.OWNER, C.THE_TRUTH).id, accused.id]  # solved means she believes it
-        situation = ("The player accuses Sable of taking your ring. Pell saw her leave the study at mid-morning, so "
-                     "she lied to you about the kitchen. You accept the accusation: order Sable to give back your "
-                     "ring.")
     elif npc == C.MAID:
         key, cites = "lost_alibi", [alibi.id, accused.id]
-        situation = ("The player accuses Sable of taking your ring, but as far as you know she was in the kitchen at "
-                     "mid-morning. You reject the accusation and dismiss the player.")
     else:
         key, cites = "lost_innocent", [accused.id]
-        situation = ("The player accuses Pell, your butler of thirty years, of taking your ring. You reject the "
-                     "accusation and dismiss the player.")
     w.player["outcome"] = OUTCOMES[key]
-    return voice.deliver(w, mind, [Speech(C.OWNER, f"accused_{npc}", voice.line(C.OWNER, key, cites), situation)])
+    return _say(w, mind, C.OWNER, f"accused_{npc}", key, cites, key)
 
 
 def _move(w: World, mind: Mind, room: str) -> list[dict]:
@@ -279,11 +245,9 @@ def _move(w: World, mind: Mind, room: str) -> list[dict]:
     w.player["outcome"] = OUTCOMES["constable"]
     if room != "hall":
         return []
-    return voice.deliver(w, mind, [Speech(C.OWNER, "constable", voice.line(C.OWNER, "constable", [sent.id]),
-                                          "Evening has come and your ring is still missing; you have sent for the "
-                                          "constable.")])
+    return _say(w, mind, C.OWNER, "constable", "constable", [sent.id])
 
 
 def _latest(w: World, npc: str) -> str | None:
     """The most recent event the NPC knows, for a line with nothing better to cite."""
-    return next((e.id for e in reversed(list(w.ledger)) if voice.knows(w, npc, e.id)), None)
+    return voice.VOICE.latest(w, npc)

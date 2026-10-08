@@ -94,17 +94,11 @@ def describe(w: World, npc: str, option: str) -> str:
     """One line on what an action does, for the model."""
     kind, _, who = option.partition(":")
     nxt = C.next_stop(w.npcs[npc].loc)
-    return {
-        "go_to": f"walk on towards the relic, to {C.STOP_NAMES[nxt]}" if nxt else "walk on",
-        "wait": "stay where you are and do nothing this phase",
-        "take_relic": "take the relic and win the race",
-        "accuse": "tell the Captain what the player did to you; she trusts you and will stop them at the gate",
-        "share_drink": "stay this phase to share a drink with the player and tell them something useful",
-        "detain": f"have the sergeant hold {C.short_name(who)} for two phases",
-        "question": f"ask {C.short_name(who)} whether the claim about them is true",
-        "counter": f"name your price: {who} coins, and not a coin less",
-        "refuse": "turn the offer down and hear no more offers for now",
-    }.get(kind, option.replace("_", " "))
+    kind = "go_to_end" if kind == "go_to" and not nxt else kind
+    if not C.CAST.has("actions", kind):
+        return option.replace("_", " ")
+    return C.CAST.text("actions", kind, next=C.STOP_NAMES.get(nxt or "", ""),
+                       who=who if kind == "counter" else C.short_name(who))
 
 
 VOICE = Voice(

@@ -45,3 +45,41 @@ trust_in = { vane = 2, pell = 1, player = 0 }
 deceive = "Me? I was in the kitchen at mid-morning, scrubbing pots, all on my own."
 deflect = "I couldn't say, I'm sure. It's been such a busy day."
 ring = "Her ladyship's ring? I'm sure I wouldn't know where she keeps her things."
+
+# The situation each line is spoken in, from the speaker's point of view, as the model reads it: by trigger, or by
+# speaker and trigger where people see the same moment differently.
+[situations]
+asked_ring = "The player asks you about Lady Vane's missing signet ring."
+vane_asked_ring = "The player, who has come to find your missing signet ring, asks you about it."
+pell_asked_morning = "The player asks what you saw this morning. You always tell the truth."
+vane_asked_morning = "The player asks what you know of this morning."
+sable_asked_morning = "{asker} where you were at mid-morning."
+asker_player = "The player asks"
+asker_vane = "Lady Vane asks you, in front of the player,"
+testify = "Lady Vane asks you, in front of the player, what you saw this morning. You always tell the truth."
+questioned = "You have just questioned Pell in front of the player, and he told you he saw Sable leave the study at mid-morning. Sable told you she was in the kitchen then, so she lied to you, and you no longer believe her. Say so to the player."
+questioned_sable = "You have just questioned Sable about this morning."
+won = "The player accuses Sable of taking your ring. Pell saw her leave the study at mid-morning, so she lied to you about the kitchen. You accept the accusation: order Sable to give back your ring."
+lost_alibi = "The player accuses Sable of taking your ring, but as far as you know she was in the kitchen at mid-morning. You reject the accusation and dismiss the player."
+lost_innocent = "The player accuses Pell, your butler of thirty years, of taking your ring. You reject the accusation and dismiss the player."
+constable = "Evening has come and your ring is still missing; you have sent for the constable."
+
+# How the case ended, for the end card.
+[outcomes]
+won = "Solved. Sable took the ring, and Lady Vane believed Pell's testimony over Sable's alibi."
+lost_alibi = "Lady Vane didn't believe you: as far as she knew, Sable was in the kitchen at mid-morning. Break the alibi first."
+lost_innocent = "Pell didn't take the ring, and Lady Vane knew it."
+constable = "Evening came with the case unsolved, and Lady Vane sent for the constable."
+
+# What each event was, in words. {a} is the actor and {t} the target, {room} where it happened, {to} where someone
+# walked, and {claim} what someone said; words.py fills them.
+[words.events]
+take = "{a} took the signet ring from {room}."
+leave = "{a} left {room}."
+tell = "{a} told {t} that {claim}."
+testify = "{a} told {t} that {claim}."
+arrive = "{a} arrived at the manor."
+move = "{a} walked from {room} to {to}."
+question = "{a} questioned {t} in {room}."
+accuse = "{a} accused {t} before Lady Vane."
+constable = "{a} sent for the constable."
