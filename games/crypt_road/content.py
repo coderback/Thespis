@@ -8,6 +8,7 @@ from __future__ import annotations
 import hashlib
 from pathlib import Path
 
+from thespis.beliefs import credence
 from thespis.cast import Cast
 from thespis.minds import NPC
 from thespis.world import World
@@ -38,13 +39,7 @@ def dice(seed: int, key: str) -> float:
     return int(h[:8], 16) / 0x100000000
 
 
-def conf_from_trust(trust: int) -> float:
-    """How strongly a listener believes a claim, from its trust in the speaker."""
-    if trust >= 2:
-        return 0.9
-    if trust >= 0:
-        return 0.4
-    return 0.2
+conf_from_trust = credence  # how strongly a listener believes a claim, from its trust in the speaker
 
 
 def asking_price(trust: int) -> int:

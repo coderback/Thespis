@@ -329,6 +329,12 @@ class ClaimChecking:
     gateway: ModelGateway | None = None
 
 
+def check_for(checking: ClaimChecking, gateway: ModelGateway, vocab: ClaimVocabulary,
+              facts: Callable[[StatePack], Facts]) -> ClaimCheck:
+    """A game's claim check, through the checking's own gateway or the one the lines came from."""
+    return ClaimCheck(checking.gateway or gateway, vocab, facts, every=checking.mode == "all")
+
+
 def checking_from_env(env: Mapping[str, str]) -> ClaimChecking | None:
     """CLAIM_CHECK (off, consequential or all) and an optional LLM_CHECK_* provider for the extractor.
 

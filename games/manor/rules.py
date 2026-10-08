@@ -25,7 +25,10 @@ from thespis.expression import Mind, Observer, ReplyCache, Utterance
 from thespis.gateway import ModelGateway
 from thespis.ledger import Claim, Event
 from thespis.moderation import Moderator
+from thespis.play import NotAllowed, Verbs, check, count_calls, open_mind
 from thespis.world import LOST, PLAYING, WON, World
+
+__all__ = ["NotAllowed"]
 
 OUTCOMES = {
     "won": "Solved. Sable took the ring, and Lady Vane believed Pell's testimony over Sable's alibi.",
@@ -34,14 +37,6 @@ OUTCOMES = {
     "lost_innocent": "Pell didn't take the ring, and Lady Vane knew it.",
     "constable": "Evening came with the case unsolved, and Lady Vane sent for the constable.",
 }
-
-
-class NotAllowed(Exception):
-    """The verb isn't allowed right now. `reason` is readable by a player."""
-
-    def __init__(self, reason: str):
-        super().__init__(reason)
-        self.reason = reason
 
 
 @dataclass
@@ -56,13 +51,8 @@ def allowed(w: World) -> list[dict]:
     """Every verb the player could use now; disabled ones carry a reason."""
     loc = w.player["loc"]
     here = [n.id for n in w.npcs_at(loc)]
-    closed = "The case is closed" if w.status != PLAYING else None
-    out: list[dict] = []
-
-    def add(verb, target, label, args, ends_phase, ok=True, why=None):
-        reason = closed or (None if ok else why)
-        out.append({"verb": verb, "target": target, "label": label, "args": args, "ends_phase": ends_phase,
-                    "enabled": reason is None, "reason": reason})
+    verbs = Verbs("The case is closed" if w.status != PLAYING else None)
+    add = verbs.add
 
     topics = [{"id": k, "label": v} for k, v in C.TOPICS.items()]
     for n in here:
@@ -76,16 +66,7 @@ def allowed(w: World) -> list[dict]:
     for room in C.ROOMS:
         if room != loc:
             add("move", room, f"Go to {C.ROOM_NAMES[room]}", {"to": room}, True)
-    return out
-
-
-def _check(w: World, verb: str, target: str | None) -> None:
-    for option in allowed(w):
-        if option["verb"] == verb and option["target"] == target:
-            if not option["enabled"]:
-                raise NotAllowed(option["reason"])
-            return
-    raise NotAllowed(f"You can't {verb.replace('_', ' ')} {target or ''} here".strip())
+    return verbs.options
 
 
 # ---------------------------------------------------------------- acting
@@ -95,11 +76,11 @@ def act(w: World, verb: str, target: str | None = None, topic: str | None = None
         checking: ClaimChecking | None = None) -> ActResult:
     """Apply one player verb. Code makes every choice; with a gateway and the brain on, the model words what the people
     say, and anything it gets wrong, or can't answer, falls back to the template lines."""
-    _check(w, verb, target)
+    check(allowed(w), verb, target)
     if verb == "ask" and topic not in C.TOPICS:
         raise NotAllowed("Ask about this morning or the ring")
-    mind = Mind(gateway if w.brain_mode == "model" else None, voice.VALIDATOR, cache, replay, budget, moderator,
-                observer, claims.check(w, checking, gateway) if checking and gateway else None)
+    mind = open_mind(w, voice.VALIDATOR, gateway, cache, replay, budget, moderator, observer,
+                     claims.check(w, checking, gateway) if checking and gateway else None)
     start = len(w.ledger)
     assert target is not None  # every manor verb names someone or somewhere, and _check found it
     if verb == "ask":
@@ -111,9 +92,7 @@ def act(w: World, verb: str, target: str | None = None, topic: str | None = None
         replies = _accuse(w, mind, target)
     else:
         replies = _move(w, mind, target)
-    if mind.asked:
-        w.counters["model_calls"] = w.counters.get("model_calls", 0) + mind.asked
-    return ActResult(list(w.ledger)[start:], replies, mind.asked)
+    return ActResult(list(w.ledger)[start:], replies, count_calls(w, mind))
 
 
 def _ask(w: World, mind: Mind, npc: str, topic: str) -> list[dict]:

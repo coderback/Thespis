@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from thespis.beliefs import credence
 from thespis.cast import Cast
 from thespis.deception import log_statement
 from thespis.ledger import Claim
@@ -60,13 +61,7 @@ def upgrade_claim(d: dict) -> dict:
     return d
 
 
-def conf_from_trust(trust: int) -> float:
-    """How strongly a listener believes a claim, from its trust in the speaker."""
-    if trust >= 2:
-        return 0.9
-    if trust >= 0:
-        return 0.4
-    return 0.2
+conf_from_trust = credence  # how strongly a listener believes a claim, from its trust in the speaker
 
 
 THE_TRUTH = was_in(MAID, "study", 1)

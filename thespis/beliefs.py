@@ -124,6 +124,15 @@ class Belief:
         return belief
 
 
+def credence(trust: int) -> float:
+    """How strongly a listener believes what it's told, from its trust in the teller (-5 to 5)."""
+    if trust >= 2:
+        return 0.9
+    if trust >= 0:
+        return 0.4
+    return 0.2
+
+
 class BeliefStore:
     """Every NPC's beliefs, one record per (npc, claim), in the order they were first formed."""
 
