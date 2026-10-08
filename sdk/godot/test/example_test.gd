@@ -111,14 +111,14 @@ func _run() -> void:
 	# The minds go into the game's own save file as text, and come back as they were.
 	var path := "user://lantern_test.save"
 	var choice: ThespisResult = await thespis.decide("garrick", "turn", {"wait": true})  # an hour cooled him: 3 now
-	var before_save: ThespisResult = await thespis.snapshot()
 	var saved: ThespisResult = await scene.save_game(path)
 	check(saved.ok and saved.value is String, "the save holds the minds as text", saved)
 	var loaded: ThespisResult = await scene.load_game(path)
 	check(loaded.ok and loaded.value is ThespisApi.SessionOut and scene.pip_at == "taproom",
 			"loading the save restores the session and the scene", loaded)
 	var after_load: ThespisResult = await thespis.snapshot()
-	check(_world(after_load.value) == _world(before_save.value), "the restored minds are the saved ones")
+	# Against the save itself: a line still settling in the background may change the minds just before it.
+	check(_world(after_load.value) == _world(saved.value), "the restored minds are the saved ones")
 	var again: ThespisResult = await thespis.decide("garrick", "turn", {"wait": true})
 	var why: String = again.value.reason.get_slice(";", 0)
 	check(why == choice.value.reason.get_slice(";", 0) and not ".0" in why,

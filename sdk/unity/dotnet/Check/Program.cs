@@ -103,7 +103,9 @@ if (!(choice.Ok && beforeSave.Ok && save.Ok))
 var loaded = await game.LoadAsync(save.Value!);
 Check(loaded.Ok && game.PipAt == "taproom" && game.Phase == 1, "loading the save restores the session and the game", loaded);
 var afterLoad = await thespis.SnapshotAsync();
-Check(afterLoad.Ok && JToken.DeepEquals(JObject.Parse(afterLoad.Value!)["world"], JObject.Parse(beforeSave.Value!)["world"]),
+// Against the save itself: a line still settling in the background may change the minds just before it.
+var savedMinds = JObject.Parse((string)JObject.Parse(save.Value!)["minds"]!);
+Check(afterLoad.Ok && JToken.DeepEquals(JObject.Parse(afterLoad.Value!)["world"], savedMinds["world"]),
     "the restored minds are the saved ones");
 var again = await thespis.DecideAsync("garrick", "turn", new DecideIn { Wait = true });
 var why = again.Ok ? again.Value!.Reason.Split(';')[0] : again.ToString();

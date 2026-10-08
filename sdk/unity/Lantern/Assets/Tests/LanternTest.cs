@@ -151,8 +151,6 @@ namespace Lantern.Tests
 
             var choice = thespis.DecideAsync("garrick", "turn", new DecideIn { Wait = true });
             yield return Wait(choice);
-            var beforeSave = thespis.SnapshotAsync();
-            yield return Wait(beforeSave);
             var save = game.SaveAsync();
             yield return Wait(save);
             Check(save.Result.Ok && save.Result.Value.Contains("\"minds\":\"{"), "the save holds the minds as text");
@@ -161,7 +159,9 @@ namespace Lantern.Tests
             Check(loaded.Result.Ok && game.PipAt == "taproom", "loading the save restores the session and the game", loaded.Result);
             var afterLoad = thespis.SnapshotAsync();
             yield return Wait(afterLoad);
-            Check(JToken.DeepEquals(JObject.Parse(afterLoad.Result.Value)["world"], JObject.Parse(beforeSave.Result.Value)["world"]),
+            // Against the save itself: a line still settling in the background may change the minds just before it.
+            var savedMinds = JObject.Parse((string)JObject.Parse(save.Result.Value)["minds"]);
+            Check(JToken.DeepEquals(JObject.Parse(afterLoad.Result.Value)["world"], savedMinds["world"]),
                 "the restored minds are the saved ones");
             var again = thespis.DecideAsync("garrick", "turn", new DecideIn { Wait = true });
             yield return Wait(again);
