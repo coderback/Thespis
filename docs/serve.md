@@ -199,6 +199,10 @@ python sdk/godot/spike/test/run.py --godot <Godot console build> [--local gemma4
 | --- | --- | --- | --- |
 | `python -m thespis serve` | scripted, on localhost | 13 of 13 | 0 |
 | The packaged runtime (`dist/thespis/thespis.exe`) | scripted, on localhost | 13 of 13 | 0 |
+| `python -m thespis serve --local gemma4-e4b` | Gemma 4 E4B on the laptop's GPU | 13 of 13 (the model's line after 1.8 s) | 0 |
+| The packaged runtime, `--local gemma4-e4b` | Gemma 4 E4B on the laptop's GPU | 13 of 13 (the model's line after 1.3 s) | 0 |
+
+The template line shows in under 30 ms either way, and the model's words replace it when they come.
 
 ## Not yet
 
