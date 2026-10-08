@@ -28,6 +28,8 @@ steps = [
   { call = "tick" },
   { call = "react", npc = "aldo", trigger = "told" },
   { call = "wait", seconds = 2.0 },
+  { call = "narrate", since = 0 },
+  { call = "wait", seconds = 3.0 },
 ]
 
 [[scenario]]
