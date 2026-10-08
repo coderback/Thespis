@@ -30,6 +30,7 @@ from thespis.runtime.hardware import Device, Plan, choose, machine, this_arch, t
 from thespis.runtime.registry import ENGINES, LLAMA_CPP, MODELS
 
 READY_TIMEOUT = 300.0  # seconds to load a model: a cold disk and a large file on a laptop
+CACHE_RAM_MB = 512  # llama-server's prompt cache in RAM (its default, 8 GiB, starved a 15 GB laptop)
 
 
 def free_port() -> int:
@@ -165,8 +166,11 @@ class LocalModel:
         processed prompts 75 times faster than llama.cpp's own --fit, which held back layers for safety, and loaded
         in 18 s rather than 162 s. One that doesn't fit is placed by --fit."""
         dev = self.plan.device
+        # --cache-ram: llama-server keeps past prompts in RAM to reuse their prefixes, up to 8 GiB by default. Over a
+        # live Rehearsal it grew to 7.5 GB on a 15 GB laptop and starved the machine; a game needs that memory.
         args = [str(self.server), "-m", str(path), "--host", "127.0.0.1", "--port", str(self.port),
-                "-c", str(self.ctx * self.parallel), "-np", str(self.parallel), "--reasoning", "off", "--no-webui"]
+                "-c", str(self.ctx * self.parallel), "-np", str(self.parallel), "--reasoning", "off", "--no-webui",
+                "--cache-ram", str(CACHE_RAM_MB)]
         if self.machine.os != "macos":
             if dev is None:
                 args += ["-dev", "none", "-ngl", "0"]

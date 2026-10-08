@@ -131,6 +131,7 @@ def test_the_server_runs_on_the_chosen_device_with_thinking_off():
     args = bare(Device("Vulkan1", "NVIDIA", 4000, 3367)).args(Path("m.gguf"))  # it fits: every layer on the GPU
     assert args[args.index("-dev") + 1] == "Vulkan1" and args[args.index("-ngl") + 1] == "99"
     assert args[args.index("--reasoning") + 1] == "off" and args[args.index("-c") + 1] == "16384"
+    assert args[args.index("--cache-ram") + 1] == "512"  # not llama-server's 8 GiB beside a game
     tight = bare(Device("Vulkan1", "NVIDIA", 4000, 2000)).args(Path("m.gguf"))  # it doesn't: llama.cpp places it
     assert "--fit" in tight and "-ngl" not in tight
     cpu = bare(None).args(Path("m.gguf"))
