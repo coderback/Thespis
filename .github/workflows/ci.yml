@@ -104,7 +104,9 @@ jobs:
         with:
           python-version: "3.13"
       - name: Install
-        run: pip install -r requirements.txt pyinstaller==6.22.3
+        run: |
+          pip install -r requirements.txt
+          pip install pyinstaller==6.22.3
       - name: Build, check budgets, play a turn
         run: python tools/package.py
       - uses: actions/upload-artifact@v4
