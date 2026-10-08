@@ -677,7 +677,7 @@ class Session:
         if self.on_pack is not None:
             self.on_pack(pack)
         if wait:
-            self._settle(line.id, self._call(kind, pack, fallback), d, statement)
+            self._settle(line.id, self._call(kind, pack, fallback), d, statement, notify=False)
             return replace(self._lines[line.id])
         line.status = PROVISIONAL
         if self._pool is None:
@@ -706,7 +706,11 @@ class Session:
             return self.mind.tell(pack, fallback)
         return self.mind.react_many([(pack, fallback)])[0]
 
-    def _settle(self, lid: str, u: Utterance, d: Decision | None, statement: Event | None) -> None:
+    def _settle(self, lid: str, u: Utterance, d: Decision | None, statement: Event | None,
+                notify: bool = True) -> None:
+        """The line's final words. `notify` tells on_settle (a store), for a line that was provisional; a line the
+        caller waited for wasn't, and settles while the caller holds the session's lock, where a store taking its own
+        lock and then this one would deadlock with it (the caller's own save stores it instead)."""
         with self._lock:
             line = self._lines[lid]
             if line.status == WITHDRAWN:
@@ -725,5 +729,5 @@ class Session:
             if d is not None:
                 self.world.decisions.settle(d.id, line=line.text, cites=cites, reason=line.reason, source=u.source)
             settled = replace(line)
-        if self.on_settle is not None:
+        if notify and self.on_settle is not None:
             self.on_settle(settled)
