@@ -96,13 +96,16 @@ Every call that speaks returns its line at once:
 | `withdrawn` | The session closed before the model answered | Drops it |
 
 With no model configured, or with `wait`, a line is final at once (the library waits by default; HTTP doesn't).
-A line needs something to cite: an NPC that knows nothing yet says nothing (`id: null`, `text: null`).
+A line needs something to cite: an NPC that knows nothing yet says nothing (`text: null`), and no model is asked,
+since its reply could only be rejected.
 
 ### Saves
 
 `snapshot()` is plain JSON: the world, every belief and its evidence, the ledger, the decisions, and who witnessed
 what. Restoring it gives the same minds, which go on to play the same: a test plays a scene on from both copies and
-compares them. A snapshot of another game, or from a newer Thespis, is refused.
+compares them. A snapshot of another game, or from a newer Thespis, is refused. Store it as the text you were sent:
+an engine with one number type (GDScript reads every JSON number as a float) can still hand it back parsed, and it
+restores the same, but there's no reason to unpack it.
 
 ### Errors
 
@@ -121,5 +124,6 @@ These are still to come in Phase 4:
 
 - Sessions are held in memory. The sidecar keeps them in SQLite and the server in Postgres (4.4).
 - Model keys come from the server's environment. Keys per project come with the server runtime (4.4).
-- Lines are polled; server-sent events may follow if the Godot spike (4.1b) shows polling is awkward.
+- Lines are polled. The Godot spike (4.1b) found long-polling (`?wait=2`) natural in GDScript, where server-sent events
+  would mean driving `HTTPClient` by hand, so SSE waits until an engine needs it ([sdk/godot/spike](../sdk/godot/spike/README.md)).
 - Multi-speaker narration, many players, relationship ties and retrieval by meaning (4.5).
