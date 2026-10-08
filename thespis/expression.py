@@ -82,7 +82,7 @@ TELL_PROMPT = ("You are {name}. {persona}\n" + _RULES +
                "character told someone something, give what they said as a segment of their own, quoted in their "
                "voice (speaker: their id), citing that event. A character may speak only in a segment that cites an "
                "event they did (its \"by\"), and says only what that event shows. Every segment cites the events "
-               "it tells.\n"
+               "it tells, in \"cites\" only: never write an id such as e1 in a line.\n"
                'Reply with JSON only: {{"segments": [{{"speaker": "...", "cites": ["..."], "line": "..."}}]}}')
 TELL_SEGMENTS = (1, 6)  # how many segments a telling may have
 TELL_SEGMENT = 200  # characters per segment
