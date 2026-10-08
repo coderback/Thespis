@@ -15,13 +15,21 @@ from thespis.world import World
 
 
 class Cast:
-    def __init__(self, path: Path):
-        self.path = path
+    def __init__(self, path: Path, text: str | None = None):
+        """The cast in the TOML file at `path`, or in `text` when it came some other way (a game an engine sent);
+        `path` then only names it."""
+        self.path, self.inline = path, text
 
     @cached_property
     def data(self) -> dict:
+        if self.inline is not None:
+            return tomllib.loads(self.inline)
         with self.path.open("rb") as f:
             return tomllib.load(f)
+
+    @cached_property
+    def source(self) -> bytes:
+        return self.inline.encode() if self.inline is not None else self.path.read_bytes()
 
     def npc(self, npc: str) -> dict:
         return self.data["npc"][npc]

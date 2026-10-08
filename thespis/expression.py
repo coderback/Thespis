@@ -49,6 +49,7 @@ from thespis.gateway import ModelGateway, ModelReply
 from thespis.ledger import Claim
 from thespis.moderation import Moderator, NoModeration
 from thespis.profiles import LINE_LIMITS
+from thespis.tracing import span
 
 log = logging.getLogger("thespis.moderation")
 
@@ -267,7 +268,9 @@ class Mind:
         if self.gateway is None:
             return [fallback for _, fallback in items]
         replies: dict[int, ModelReply | None] = {}
-        spoken = self._settle(kind, items, replies)
+        with span(f"thespis.mind.{kind}", lines=len(items), npcs=",".join(p.npc for p, _ in items)) as s:
+            spoken = self._settle(kind, items, replies)
+            s.set_attribute("sources", ",".join(u.source for u in spoken))
         if self.observer is not None:
             for i, (pack, _) in enumerate(items):
                 self.observer(kind, pack, replies.get(i), spoken[i])

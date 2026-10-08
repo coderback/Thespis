@@ -1,41 +1,48 @@
 """The /v1 HTTP API: the session calls (thespis.session), one route each, for engines that aren't Python.
 
-An engine opens a session on a game the server loaded, reports events and changes, and asks for decisions and lines.
-Lines come back provisional by default and are polled until final (`GET .../lines/{id}?wait=2`). The routes mirror
-the library's calls one for one, and the generated OpenAPI spec, committed as docs/openapi-v1.json, is the SDKs'
-contract: tests fail when the two drift apart.
+An engine opens a session on a game the server loaded or the project sent, reports events and changes, and asks for
+decisions and lines. Lines come back provisional by default and are polled until final (`GET .../lines/{id}?wait=2`).
+The routes mirror the library's calls one for one, and the generated OpenAPI spec, committed as docs/openapi-v1.json,
+is the SDKs' contract: tests fail when the two drift apart.
 
-Errors carry `{error, reason}`: 400 for a malformed body or a definition the call breaks, 404 for an unknown game,
-session, NPC, moment or line, 409 for a call the game doesn't allow now, 503 when the server holds its limit of
-sessions. Sessions live in memory here; the sidecar and server runtimes (Phase 4.4) keep them in a store.
+A server (`thespis serve --server`) wants the project's key on every call: `Authorization: Bearer tsk_...`. A sidecar
+wants the token its launcher gave it, if it was given one. Projects send their own games (`PUT /v1/games/{id}`), set
+their own model keys on a server (`PUT /v1/project/model`), and export their usage (`GET /v1/usage`).
+
+Errors carry `{error, reason}`: 400 for a malformed body or a definition the call breaks, 401 without the right key,
+404 for an unknown game, session, NPC, moment or line, 409 for a call the game doesn't allow now (or a session another
+instance moved on), 413 for a game too large, 429 over a project's cap, 503 when the project holds its limit of
+sessions. Sessions are kept by the host (thespis.host): in memory, in a sidecar's SQLite file, or in a server's
+database.
 """
 
 from __future__ import annotations
 
-import secrets
-import threading
+import asyncio
+import csv
+import io
 from collections.abc import Mapping
-from typing import Any
+from typing import Annotated, Any
 
-from fastapi import FastAPI, Query, Request
+from fastapi import Depends, FastAPI, Header, Query, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field
 
+from thespis import offline
 from thespis.considerations import DefinitionError
 from thespis.gateway import ModelGateway
+from thespis.host import MEMORY, Host, HostError
 from thespis.ledger import Event
 from thespis.play import NotAllowed
 from thespis.session import Game, Session, Unknown
+from thespis.storage import USAGE_FIELDS, Project
+from thespis.tracing import span
+from thespis.vault import VaultError
 
 VERSION = "v1"
 MAX_SESSIONS = 256
 Scalar = str | int | float | bool
-
-
-class ApiError(Exception):
-    def __init__(self, status: int, error: str, reason: str):
-        self.status, self.error, self.reason = status, error, reason
 
 
 # ---------------------------------------------------------------- bodies
@@ -102,6 +109,26 @@ class TickIn(BaseModel):
     steps: int = Field(1, ge=1, le=100)
 
 
+class GameIn(BaseModel):
+    toml: str = Field(description="The game's definition, as in a game.toml")
+
+
+class ProviderIn(BaseModel):
+    profile: str = Field("", description="A provider profile: openai, azure, anthropic, gemini, groq, ...")
+    base_url: str = Field("", description="The endpoint; the profile's if left out")
+    model: str
+    api_key: str = Field("", description="Kept sealed; never sent back")
+    timeout: float | None = Field(None, gt=0, le=120)
+    extra: dict[str, Any] | None = None
+    api_version: str = ""
+    structured: bool = True
+
+
+class ModelIn(BaseModel):
+    primary: ProviderIn
+    backup: ProviderIn | None = None
+
+
 # ---------------------------------------------------------------- replies
 class SessionOut(BaseModel):
     session: str
@@ -153,19 +180,88 @@ class NpcOut(BaseModel):
     beliefs: list[dict[str, Any]]
 
 
+class HealthOut(BaseModel):
+    ok: bool
+    offline: bool = Field(description="It refuses every connection off this machine (a sidecar, unless --online)")
+    refused: int = Field(description="Connections off this machine it has refused since it started")
+
+
+class ProjectOut(BaseModel):
+    id: str
+    name: str
+    caps: dict[str, int] = Field(description="0 means no cap")
+    today: dict[str, int] = Field(description="Model calls and tokens so far today (UTC)")
+    sessions: int = Field(description="Sessions open now")
+    model: dict[str, Any] | None = Field(None, description="Its own model settings, keys left out; null: the host's")
+
+
+class UsageOut(BaseModel):
+    project: str
+    session: str | None
+    kind: str = Field(description="call (a model call), line (a line settled) or capped (a call the caps refused)")
+    call_type: str
+    ok: bool
+    provider: str | None
+    source: str | None = Field(description="For a line: llm, cache or fallback. For capped: which cap")
+    latency_ms: int | None
+    prompt_tokens: int | None
+    completion_tokens: int | None
+    at: float
+
+
 def _event(e: Event) -> EventOut:
     return EventOut(**{**e.to_json(), "claim": e.claim.to_json() if e.claim else None})
 
 
-def create_app(games: Mapping[str, Game], gateway: ModelGateway | None = None,
-               max_sessions: int = MAX_SESSIONS) -> FastAPI:
-    """The API over `games`, by id. Every session speaks through `gateway`, or uses template lines without one."""
-    app = FastAPI(title="Thespis", version=VERSION, description=__doc__ or "")
-    sessions: dict[str, Session] = {}
-    lock = threading.Lock()
+async def _caller(request: Request, authorization: Annotated[
+        str | None, Header(description="Bearer <the project's key, or the sidecar's token>")] = None) -> Project:
+    host: Host = request.app.state.host
+    return host.known(authorization) or await asyncio.to_thread(host.authenticate, authorization)
 
-    @app.exception_handler(ApiError)
-    async def api_error(request: Request, exc: ApiError):
+
+class _Traced:
+    """A span for each request (thespis.tracing), as plain ASGI: Starlette's BaseHTTPMiddleware costs every request
+    a task and a stream, which a busy server notices."""
+
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http":
+            return await self.app(scope, receive, send)
+        with span("thespis.http", method=scope["method"]) as s:
+            async def sent(message):
+                if message["type"] == "http.response.start":
+                    s.set_attribute("http.status_code", message["status"])
+                await send(message)
+            await self.app(scope, receive, sent)
+            route = scope.get("route")
+            s.set_attribute("http.route", getattr(route, "path", scope["path"]))
+
+
+Caller = Annotated[Project, Depends(_caller)]
+
+
+def _game(g: Game) -> GameOut:
+    moments: dict[str, list[str]] = {}
+    for npc, moment in g.choices:
+        moments.setdefault(npc, []).append(moment)
+    return GameOut(id=g.id, name=g.name, digest=g.digest, npcs=list(g.cast.ids()), places=list(g.places),
+                   choices=moments)
+
+
+def create_app(games: Mapping[str, Game] | None = None, gateway: ModelGateway | None = None,
+               max_sessions: int = MAX_SESSIONS, host: Host | None = None) -> FastAPI:
+    """The API over `host`; without one, over `games` (by id) in memory, every session speaking through `gateway`,
+    or using template lines without one."""
+    host = host or Host(games=games, gateway=gateway, mode=MEMORY, max_sessions=max_sessions)
+    app = FastAPI(title="Thespis", version=VERSION, description=__doc__ or "")
+    app.state.host = host
+
+    app.add_middleware(_Traced)
+
+    @app.exception_handler(HostError)
+    async def host_error(request: Request, exc: HostError):
         return JSONResponse({"error": exc.error, "reason": exc.reason}, status_code=exc.status)
 
     @app.exception_handler(RequestValidationError)
@@ -176,99 +272,125 @@ def create_app(games: Mapping[str, Game], gateway: ModelGateway | None = None,
                             status_code=400)
 
     for error, status, kind in ((Unknown, 404, "unknown"), (DefinitionError, 400, "bad_definition"),
-                                (NotAllowed, 409, "not_allowed")):
+                                (NotAllowed, 409, "not_allowed"), (VaultError, 500, "vault")):
         def handler(request: Request, exc: Exception, status=status, kind=kind):
             return JSONResponse({"error": kind, "reason": getattr(exc, "reason", None) or str(exc)},
                                 status_code=status)
         app.add_exception_handler(error, handler)
 
-    def game(gid: str) -> Game:
-        if gid not in games:
-            raise Unknown(f"no game {gid!r}")
-        return games[gid]
-
-    def session(sid: str) -> Session:
-        s = sessions.get(sid)
-        if s is None:
-            raise Unknown(f"no session {sid!r}")
-        return s
+    def call(p: Project, sid: str, fn, saves: bool = True):
+        return host.call(p, sid, fn, saves)
 
     @app.get(f"/{VERSION}/health")
-    def health() -> dict[str, bool]:
-        return {"ok": True}
+    def health() -> HealthOut:
+        """Up, and whether it is offline (thespis.offline): a game promising offline play can check it is."""
+        return HealthOut(ok=True, offline=offline.active(), refused=len(offline.refused))
 
     @app.get(f"/{VERSION}/games")
-    def list_games() -> list[GameOut]:
-        out = []
-        for g in games.values():
-            moments: dict[str, list[str]] = {}
-            for npc, moment in g.choices:
-                moments.setdefault(npc, []).append(moment)
-            out.append(GameOut(id=g.id, name=g.name, digest=g.digest, npcs=list(g.cast.ids()), places=list(g.places),
-                               choices=moments))
-        return out
+    def list_games(p: Caller) -> list[GameOut]:
+        return [_game(g) for g in host.games(p).values()]
+
+    @app.put(f"/{VERSION}/games/{{gid}}")
+    def put_game(p: Caller, gid: str, body: GameIn) -> GameOut:
+        """Send a game: the project's own, which shadows the host's game of the same id."""
+        return _game(host.put_game(p, gid, body.toml))
+
+    @app.delete(f"/{VERSION}/games/{{gid}}", status_code=204)
+    def delete_game(p: Caller, gid: str) -> None:
+        host.delete_game(p, gid)
 
     @app.post(f"/{VERSION}/sessions", status_code=201)
-    def open_session(body: SessionIn) -> SessionOut:
-        g = game(body.game)
-        s = Session.restore(g, body.snapshot, gateway=gateway) if body.snapshot else \
-            Session.new(g, body.seed, gateway=gateway)
-        with lock:
-            if len(sessions) >= max_sessions:
-                raise ApiError(503, "full", "The server holds as many sessions as it can; close one first")
-            sid = secrets.token_urlsafe(12)
-            sessions[sid] = s
-        return SessionOut(session=sid, game=g.id, phase=s.world.phase)
+    def open_session(p: Caller, body: SessionIn) -> SessionOut:
+        sid, live = host.open(p, body.game, body.seed, body.snapshot)
+        return SessionOut(session=sid, game=live.game, phase=live.session.world.phase)
 
     @app.delete(f"/{VERSION}/sessions/{{sid}}", status_code=204)
-    def close_session(sid: str) -> None:
-        with lock:
-            s = sessions.pop(sid, None)
-        if s is None:
-            raise Unknown(f"no session {sid!r}")
-        s.close()
+    def close_session(p: Caller, sid: str) -> None:
+        host.close(p, sid)
 
     @app.post(f"/{VERSION}/sessions/{{sid}}/observe", status_code=201)
-    def observe(sid: str, body: ObserveIn) -> EventOut:
+    def observe(p: Caller, sid: str, body: ObserveIn) -> EventOut:
         claim = body.claim.model_dump() if body.claim else None
-        e = session(sid).observe(body.verb, body.actor, body.target, body.at, claim, body.witnesses, body.said,
-                                 body.true, body.amount)
-        return _event(e)
+        return _event(call(p, sid, lambda s: s.observe(body.verb, body.actor, body.target, body.at, claim,
+                                                       body.witnesses, body.said, body.true, body.amount)))
 
     @app.post(f"/{VERSION}/sessions/{{sid}}/update")
-    def update(sid: str, body: UpdateIn) -> dict[str, Any]:
-        return session(sid).update(body.npc, body.loc, body.drives, body.nudge, body.flags, body.trust_in)
+    def update(p: Caller, sid: str, body: UpdateIn) -> dict[str, Any]:
+        return call(p, sid, lambda s: s.update(body.npc, body.loc, body.drives, body.nudge, body.flags,
+                                               body.trust_in))
 
     @app.post(f"/{VERSION}/sessions/{{sid}}/decide")
-    def decide(sid: str, body: DecideIn) -> LineOut:
-        line = session(sid).decide(body.npc, body.moment, body.bindings, body.situation, body.to, body.wait)
+    def decide(p: Caller, sid: str, body: DecideIn) -> LineOut:
+        line = call(p, sid, lambda s: s.decide(body.npc, body.moment, body.bindings, body.situation, body.to,
+                                               body.wait))
         return LineOut(**line.to_json())
 
     @app.post(f"/{VERSION}/sessions/{{sid}}/react")
-    def react(sid: str, body: ReactIn) -> LineOut:
-        line = session(sid).react(body.npc, body.trigger, body.situation, body.cites, body.fill, body.wait)
+    def react(p: Caller, sid: str, body: ReactIn) -> LineOut:
+        line = call(p, sid, lambda s: s.react(body.npc, body.trigger, body.situation, body.cites, body.fill,
+                                              body.wait))
         return LineOut(**line.to_json())
 
     @app.post(f"/{VERSION}/sessions/{{sid}}/narrate")
-    def narrate(sid: str, body: NarrateIn) -> LineOut:
-        return LineOut(**session(sid).narrate(body.since, body.wait).to_json())
+    def narrate(p: Caller, sid: str, body: NarrateIn) -> LineOut:
+        return LineOut(**call(p, sid, lambda s: s.narrate(body.since, body.wait)).to_json())
 
     @app.post(f"/{VERSION}/sessions/{{sid}}/tick")
-    def tick(sid: str, body: TickIn) -> TickOut:
-        s = session(sid)
-        t = s.tick(body.steps)
-        return TickOut(phase=s.world.phase, moves=t.moves, events=[_event(e) for e in t.events])
+    def tick(p: Caller, sid: str, body: TickIn) -> TickOut:
+        def run(s: Session) -> TickOut:
+            t = s.tick(body.steps)
+            return TickOut(phase=s.world.phase, moves=t.moves, events=[_event(e) for e in t.events])
+        return call(p, sid, run)
 
     @app.get(f"/{VERSION}/sessions/{{sid}}/lines/{{lid}}")
-    def line(sid: str, lid: str, wait: float = Query(0, ge=0, le=10)) -> LineOut:
-        return LineOut(**session(sid).line(lid, wait).to_json())
+    async def line(p: Caller, sid: str, lid: str, wait: float = Query(0, ge=0, le=10)) -> LineOut:
+        # A long poll waits on the line's model call without holding a thread, or the session's lock: many engines
+        # may be waiting at once, and the engine's next call mustn't wait behind its own poll.
+        session = (await asyncio.to_thread(host.live, p, sid)).session
+        pending = session.pending(lid)
+        if pending is not None and wait > 0:
+            try:
+                await asyncio.wait_for(asyncio.shield(asyncio.wrap_future(pending)), wait)
+            except Exception:
+                pass  # still provisional, or it settled with the template line: either way, say how it stands
+        return LineOut(**session.line(lid).to_json())
 
     @app.get(f"/{VERSION}/sessions/{{sid}}/npcs/{{npc}}")
-    def inspect(sid: str, npc: str) -> NpcOut:
-        return NpcOut(**session(sid).inspect(npc))
+    def inspect(p: Caller, sid: str, npc: str) -> NpcOut:
+        return NpcOut(**call(p, sid, lambda s: s.inspect(npc), saves=False))
 
     @app.get(f"/{VERSION}/sessions/{{sid}}/snapshot")
-    def snapshot(sid: str) -> dict[str, Any]:
-        return session(sid).snapshot()
+    def snapshot(p: Caller, sid: str) -> dict[str, Any]:
+        return call(p, sid, lambda s: s.snapshot(), saves=False)
+
+    @app.get(f"/{VERSION}/project")
+    def get_project(p: Caller) -> ProjectOut:
+        calls, tokens = host.storage.today(p.id)
+        return ProjectOut(id=p.id, name=p.name, caps=p.caps.to_json(), today={"calls": calls, "tokens": tokens},
+                          sessions=host.storage.open_sessions(p.id), model=host.model_settings(p))
+
+    @app.put(f"/{VERSION}/project/model", status_code=204)
+    def put_model(p: Caller, body: ModelIn) -> None:
+        """Set the models the project's sessions speak through, with its own keys (a server only). Sessions
+        opened or reloaded from now on use them."""
+        host.set_model(p, body.model_dump())
+
+    @app.delete(f"/{VERSION}/project/model", status_code=204)
+    def delete_model(p: Caller) -> None:
+        host.set_model(p, None)
+
+    @app.get(f"/{VERSION}/usage", response_model=list[UsageOut])
+    def usage(p: Caller, since: float = Query(0, description="Unix time"), until: float | None = None,
+              limit: int = Query(10_000, ge=1, le=100_000),
+              format: str = Query("json", pattern="^(json|csv)$")) -> Any:
+        """The project's usage events, oldest first: each model call, each line settled, each call a cap refused."""
+        events = host.storage.usage(p.id, since, until, limit)
+        if format == "json":
+            return [e.to_json() for e in events]
+        out = io.StringIO()
+        writer = csv.DictWriter(out, fieldnames=USAGE_FIELDS, lineterminator="\n")
+        writer.writeheader()
+        writer.writerows(e.to_json() for e in events)
+        return Response(out.getvalue(), media_type="text/csv")
 
     return app
