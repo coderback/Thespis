@@ -62,6 +62,22 @@ def _clamp(v: int, bounds: tuple[int, int]) -> int:
     return max(bounds[0], min(bounds[1], v))
 
 
+def _numbers(world: dict) -> dict:
+    """A saved world with its numbers as Thespis wrote them: whole numbers are ints, except evidence confidences."""
+    def whole(x):
+        if isinstance(x, float) and x.is_integer():
+            return int(x)
+        if isinstance(x, dict):
+            return {k: whole(v) for k, v in x.items()}
+        return [whole(v) for v in x] if isinstance(x, list) else x
+
+    world = whole(world)
+    for b in world.get("beliefs", []):
+        for e in b.get("evidence", []):
+            e["conf"] = float(e["conf"])
+    return world
+
+
 class Game:
     """A game definition, compiled and checked: load once, play many sessions."""
 
@@ -276,7 +292,7 @@ class Session:
                     w.beliefs.add_evidence(to, claim, credence(w.npcs[to].trust_in.get(npc, 0)), npc, statement.id,
                                            w.phase)
             situation = situation if situation is not None else self.game.situation(moment, b)
-            pack = self.voice.pack(w, npc, situation, choice, claim, view) if self.mind.active else None
+            pack = self._ask(self.voice.pack(w, npc, situation, choice, claim, view)) if self.mind.active else None
             d = w.decisions.record(DECIDE, npc, w.phase, moment, allowed=list(choices), chosen=choice, line=text,
                                    cites=cites, reason=f"{choice} scores {choices[choice]}", source="fallback",
                                    asserted=statement.id if statement else None)
@@ -293,7 +309,7 @@ class Session:
             if said is None:
                 return Line(None, npc, None)
             situation = situation if situation is not None else self.game.situation(trigger, fill or {})
-            pack = self.voice.pack(w, npc, situation, stakes=trigger in self.voice.stakes) \
+            pack = self._ask(self.voice.pack(w, npc, situation, stakes=trigger in self.voice.stakes)) \
                 if self.mind.active else None
             d = w.decisions.record(REACT, npc, w.phase, trigger, line=said[0], cites=said[1], reason=trigger,
                                    source="fallback")
@@ -383,13 +399,15 @@ class Session:
 
     @classmethod
     def restore(cls, game: Game, snapshot: Mapping, **kw) -> Session:
-        """A session from a snapshot of this game. A snapshot from a newer Thespis, or of another game, is refused."""
+        """A session from a snapshot of this game. A snapshot from a newer Thespis, or of another game, is refused.
+        One that went through an engine with a single number type (GDScript reads every JSON number as a float)
+        restores the same."""
         if snapshot.get("thespis") != SNAPSHOT_VERSION:
             raise DefinitionError(f"snapshot version {snapshot.get('thespis')!r}; this Thespis reads "
                                   f"{SNAPSHOT_VERSION}")
         if snapshot.get("game") != game.id:
             raise DefinitionError(f"snapshot of {snapshot.get('game')!r}, not {game.id!r}")
-        world = World.from_json(dict(snapshot["world"]))
+        world = World.from_json(_numbers(dict(snapshot["world"])))
         return cls(game, world, {k: list(v) for k, v in dict(snapshot.get("witnesses", {})).items()}, **kw)
 
     def inspect(self, npc: str) -> dict:
@@ -430,6 +448,11 @@ class Session:
             return None
         arg = action.partition(":")[2] if action else ""
         return text.format_map(_Fill({"who": self.game.who(arg), **fill})), list(dict.fromkeys(known))
+
+    @staticmethod
+    def _ask(pack: StatePack) -> StatePack | None:
+        """The pack to voice, or None when it holds nothing to cite: every line must cite, so the model can't help."""
+        return pack if pack.refs else None
 
     def _speak(self, kind: str, d: Decision, pack: StatePack | None, fallback: Utterance, wait: bool,
                statement: Event | None = None) -> Line:

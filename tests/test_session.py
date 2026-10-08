@@ -96,6 +96,30 @@ def test_a_snapshot_restores_the_same_minds_and_plays_on_the_same():
     assert b.snapshot() == a.snapshot()
 
 
+def test_a_snapshot_read_as_floats_restores_the_same():
+    """GDScript reads every JSON number as a float; a save that went through Godot must still restore exactly."""
+    def floats(x):
+        if isinstance(x, dict):
+            return {k: floats(v) for k, v in x.items()}
+        if isinstance(x, list):
+            return [floats(v) for v in x]
+        return float(x) if isinstance(x, int) and not isinstance(x, bool) else x
+
+    a = Session.new(TAVERN)
+    insulted(a)
+    a.tick()
+    b = Session.restore(TAVERN, floats(a.snapshot()))
+    assert b.snapshot() == a.snapshot()
+    assert b.decide("garrick", "turn").reason == "leave scores 5"
+
+
+def test_the_model_is_not_asked_when_there_is_nothing_to_cite():
+    model = FakeModel()
+    s = Session.new(TAVERN, gateway=model)
+    line = s.decide("garrick", "turn", wait=False)  # he knows nothing yet
+    assert (line.status, line.text, line.action) == (FINAL, None, "leave") and model.calls == []
+
+
 def test_a_snapshot_of_another_game_or_version_is_refused():
     snap = Session.new(TAVERN).snapshot()
     with pytest.raises(DefinitionError, match="not 'tavern'"):
