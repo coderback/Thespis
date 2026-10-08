@@ -45,10 +45,13 @@ that isn't to this machine ([thespis/offline.py](../thespis/offline.py)):
 Python. It also checks the build against its budgets and plays a turn through it. CI builds and checks it on Windows,
 macOS and Linux.
 
-| | Budget | Windows (Ryzen 7 5800H) |
-| --- | --- | --- |
-| Archive | 25 MB | 20.1 MB |
-| Cold start, launch to `/v1/health` answering | 4 s | 1.73 s (median of three, after a first start) |
+| | Budget | Windows, CI | macOS, CI | Linux, CI | Windows, a Ryzen 7 5800H laptop |
+| --- | --- | --- | --- | --- | --- |
+| Archive | 25 MB | 17.4 MB | 21.5 MB | 17.8 MB | 20.1 MB |
+| Cold start, launch to `/v1/health` answering | 4 s | 1.02 s | 1.48 s | 0.43 s | 1.73 s |
+
+Cold start is the median of three starts after a first. Linux builds are stripped of their debug symbols: unstripped,
+the archive was 38.3 MB.
 
 **Why a folder, not a single file.** PyInstaller's one-file build was measured and turned down for two reasons:
 - **It's slower to start.** It unpacks itself on every start, which took cold start from 2.1 s to 4.7 s.
@@ -180,8 +183,8 @@ Two changes found by this test raised it:
 The earliest runs also measured the load generator rather than the server: one Python client process tops out near
 60 requests a second. The engines now run in four client processes.
 
-These numbers are for a Ryzen 7 5800H laptop with the server, Postgres, the model and the engines all on it. CI
-runs the same test at 100 engines on every push.
+These numbers are for a Ryzen 7 5800H laptop, with the server, Postgres, the model and the engines all on it. CI
+runs the same test at 100 engines on every push. On a Linux runner: 2000 requests, 0 errors, engine calls p95 8 ms.
 
 ### Offline: the reference scene with the network refused
 
