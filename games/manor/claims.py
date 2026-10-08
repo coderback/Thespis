@@ -1,5 +1,5 @@
-"""The manor's vocabulary for claims (thespis.claims). Where someone was, and when, shares the claim's second slot as
-"room@time" until typed claims arrive (docs/cast-review.md, Phase 3)."""
+"""The manor's vocabulary for claims (thespis.claims). The extractor writes where someone was, and when, as
+ROOM@TIME; thespis.claims.as_claim types it into the claim's place and at."""
 
 from __future__ import annotations
 

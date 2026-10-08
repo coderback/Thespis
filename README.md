@@ -58,7 +58,8 @@ flowchart LR
     F --> R
 ```
 
-- **Ledger:** append-only ground truth (`thespis/ledger.py`). Nothing edits or deletes an event.
+- **Ledger:** append-only ground truth (`thespis/ledger.py`). Nothing edits or deletes an event. Claims are typed:
+  a predicate, who it's about and whom it names, and optionally where and when it held and whether it's denied.
 - **Beliefs:** each NPC's evidence for a claim, with its source and confidence (`thespis/beliefs.py`). Truth is never
   stored with a belief; it's derived from the ledger, so a belief can be false, and testimony can retract it.
 - **Drives decide, the model words it:** the utility brain scores every allowed action from the NPC's drives and

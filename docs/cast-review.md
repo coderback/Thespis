@@ -250,6 +250,8 @@ Each phase ends at a gate Rehearsal can measure. The durations assume one engine
    - Perception, affordances and the tick in the core.
    - Both games ported to it.
    - Gate: every route plays to the same outcome; the adapters at least halve.
+   - **Status, 8 October 2026:** typed claims are in. A claim can carry a place, a time and a denial; the manor's
+     "study@1" is now `place` and `at`, and sessions saved in the old form load through an upgrade.
 4. **Service and SDK (3–4 weeks).**
    - `/v1` API, tenants and keys, the async gateway, Postgres, OpenTelemetry, cost metering.
    - The Godot SDK and one example scene.

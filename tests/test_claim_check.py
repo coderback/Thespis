@@ -9,12 +9,12 @@ from games.crypt_road import rules
 from games.crypt_road.content import new_world
 from games.manor import rules as mn_rules
 from games.manor.content import new_world as manor_world
+from games.manor.content import was_in
 from tests.test_model_voice import FakeModel, play_demo
 from thespis import claims
 from thespis.claims import CHECK_PROMPT, EXTRACT_PROMPT, ClaimCheck, ClaimChecking, checking_from_env
 from thespis.expression import Mind, StatePack, Utterance, Validator
 from thespis.gateway import ModelReply
-from thespis.ledger import Claim
 
 CHECKING = ClaimChecking()
 
@@ -82,7 +82,7 @@ def test_no_answer_from_the_extractor_refuses_the_line(tavern):
 def test_a_lie_the_game_chose_passes_and_must_be_stated():
     w = manor_world()
     mn_rules.act(w, "move", "kitchen")
-    alibi = Claim("was_in", "sable", "kitchen@1")
+    alibi = was_in("sable", "kitchen", 1)
     c = ClaimCheck(Extractor(says(("was_in", "sable", "kitchen@1"))), mn_rules.claims.VOCABULARY,
                    lambda p: mn_rules.claims.facts(w, p.npc))
     assert c.problems([(pack("sable", asserted=alibi), "The kitchen, all morning.")]) == [None]

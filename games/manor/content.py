@@ -46,18 +46,21 @@ def took(who: str) -> Claim:
 
 
 def was_in(who: str, room: str, phase: int) -> Claim:
-    """The core's claims have two slots, so the room and the phase share the second: "study@1"."""
-    return Claim("was_in", who, f"{room}@{phase}")
-
-
-def place(claim: Claim) -> tuple[str, int]:
-    room, phase = claim.b.split("@")
-    return room, int(phase)
+    return Claim("was_in", who, place=room, at=phase)
 
 
 def contradicts(a: Claim, b: Claim) -> bool:
     """Two places for the same person at the same time can't both be true."""
-    return a.pred == b.pred == "was_in" and a.a == b.a and place(a)[1] == place(b)[1] and place(a)[0] != place(b)[0]
+    return a.pred == b.pred == "was_in" and a.a == b.a and a.at == b.at and a.place != b.place
+
+
+def upgrade_claim(d: dict) -> dict:
+    """A claim saved before typed claims, when the room and the phase shared its second slot ("study@1"), as it is
+    saved now. Applied when a session is loaded, so sessions saved before keep working."""
+    if d.get("pred") == "was_in" and "@" in str(d.get("b", "")):
+        room, _, phase = d["b"].partition("@")
+        return {k: v for k, v in d.items() if k != "b"} | {"place": room, "at": int(phase)}
+    return d
 
 
 def conf_from_trust(trust: int) -> float:
