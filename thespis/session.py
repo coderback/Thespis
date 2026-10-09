@@ -34,6 +34,7 @@ from __future__ import annotations
 import contextvars
 import hashlib
 import math
+import re
 import threading
 import time
 import tomllib
@@ -263,6 +264,16 @@ class Game:
         return template.format_map(_Fill(fill)) if template else ""
 
     # ------------------------------------------------------------ the player's words
+    @cached_property
+    def people(self) -> dict[str, str]:
+        """Who each NPC is, briefly, from its persona's first clause: "The stable boy", "A sellsword with a
+        reputation to protect". The understander reads it to know who "the barkeep" is."""
+        out = {}
+        for npc, t in self.cast.data["npc"].items():
+            first = re.split(r"[:.;]", str(t["persona"]), maxsplit=1)[0].strip()
+            out[npc] = first[:1].lower() + first[1:] if first else ""
+        return out
+
     @property
     def claim_words(self) -> dict[str, str]:
         return dict(self.cast.data.get("words", {}).get("claims", {}))
@@ -558,7 +569,7 @@ class Session:
                 raise Unknown("the game declares no [intents]")
             offers = self.game.offers(w, player, offered, to)
             names = {**self.game.names, **{str(p["name"]).lower(): pid for pid, p in w.players.items()}}
-            words = Words(names, self.game.claim_words, self.who, self.voice.claim_text)
+            words = Words(names, self.game.claim_words, self.who, self.voice.claim_text, self.game.people)
         # Outside the lock: a model call takes a second, and nothing here writes to the session.
         return Understander(self.game.intents, words, self.mind, self.embedder).read(text, offers, player, to)
 

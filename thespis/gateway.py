@@ -59,6 +59,7 @@ PLAYER_FACING = frozenset({"act", "react", "narrate", "extract", "check", "under
 MAX_TOKENS = 150
 LONGER = {"tell": 450}  # call types whose replies need more room: a told scene is several lines
 TEMPERATURE = 0.6
+READING = frozenset({"understand", "confirm"})  # call types that read rather than write: temperature 0
 MAX_CONCURRENT = 4  # threads one complete_many uses; each provider's own limit is its profile's `concurrency`
 COOLDOWN = {401: 600.0, 402: 600.0, 403: 600.0, 429: 30.0}  # seconds to skip a provider after these answers
 
@@ -104,9 +105,10 @@ class Provider:
         """The request. With a schema, the reply must match it: structured outputs, a grammar, or a tool call."""
         if schema is not None:
             schema = self.profile.adapt(schema, name)
+        temperature = 0.0 if name in READING else TEMPERATURE
         if self.anthropic:
             system = "\n".join(m["content"] for m in messages if m["role"] == "system")
-            body = {"model": self.model, "max_tokens": MAX_TOKENS, "temperature": TEMPERATURE, "system": system,
+            body = {"model": self.model, "max_tokens": MAX_TOKENS, "temperature": temperature, "system": system,
                     "messages": [m for m in messages if m["role"] != "system"]}
             if schema is not None:
                 body |= {"tools": [{"name": name, "description": "Give your reply.", "input_schema": schema}],
@@ -114,7 +116,7 @@ class Provider:
         else:
             fmt = {"type": "json_schema", "json_schema": {"name": name, "strict": True, "schema": schema}} \
                 if schema is not None else {"type": "json_object"}
-            body = {"model": self.model, "messages": messages, "max_tokens": MAX_TOKENS, "temperature": TEMPERATURE,
+            body = {"model": self.model, "messages": messages, "max_tokens": MAX_TOKENS, "temperature": temperature,
                     "response_format": fmt}
         body = {**body, **self.profile.extra, **self.extra}
         if name in LONGER:  # at least that much room, whatever the profile or extra cap a line at

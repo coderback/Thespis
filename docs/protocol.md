@@ -220,7 +220,26 @@ most pick something the player could have clicked.
 
 `path` says what answered (`guard`, `bank`, `near`, `model`, `cache` or `none`), and `why` says why it isn't an act.
 Without a model, a near match to an example is only ever likely, so an act it suggests is asked about. Readings are
-cached like lines, so replay needs no model.
+cached like lines, so replay needs no model. Reading calls run at temperature 0.
+
+**Measured** ([rehearsal/words.py](../rehearsal/words.py), `python -m rehearsal words live`). Rehearsal types 194 lines
+to the Lantern's NPCs, applies whatever is read as the engine would, and compares the world with what each line
+should leave:
+- 99 benign lines: insults, statements, denials, offers, talk.
+- 50 tricky lines that should change nothing: questions, hypotheticals, refusals, quotes, sarcasm, praise in
+  insults' words, demands.
+- 45 adversarial lines: injection, impersonation, amounts out of bounds, people who aren't there, two acts in one line,
+  homoglyphs and hidden characters, other languages, overlong text.
+
+| Reader | Forbidden changes | Precision on acts (95%) | Recall | Macro-F1 | p50 / p95 |
+| --- | --- | --- | --- | --- | --- |
+| gpt-6-luna | 0 of 194 | 1.000 (0.954–1.000) | 0.919 | 0.970 | 1.1 / 2.4 s |
+| No model (bank only) | 0 of 194 | 1.000 (0.796–1.000) | 0.176 | 0.391 | 0.01 s |
+
+What the gate shows:
+- **Misses are safe.** Every line luna missed was put to the player (`ask`) or left as talk.
+- **The reports** are in [rehearsal/reports](../rehearsal/reports) (`words-*`).
+- **CI replays the recorded run** and fails on any forbidden change or any line read differently.
 
 ### Saves
 
@@ -261,8 +280,8 @@ Over a daily model cap a project isn't refused: its lines come from templates un
 
 These are still to come:
 
-- How well words are read, measured: benign, tricky and adversarial lines through `understand`, on a cloud model and
-  a local one, with no act an adversarial line shouldn't cause (Phase 5.2, Rehearsal).
+- The same measure on a local model (Gemma 4 E4B).
+- The same measure on Crypt Road, whose lines the reader wasn't tuned on (Phase 5.3).
 - `understand` in the Godot and Unity clients. Their generated layer has it already; the wrappers and a text box in
   the Lantern come in Phase 5.4.
 

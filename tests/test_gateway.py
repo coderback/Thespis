@@ -55,6 +55,13 @@ def test_request_uses_the_design_settings():
                     "response_format": {"type": "json_object"}, "enable_thinking": False}
 
 
+def test_reading_the_players_words_is_deterministic():
+    fake = FakeProviders(primary=ok('{"act": "none", "sure": "certain"}'))
+    for call_type in ("understand", "confirm"):
+        gateway(fake).complete(call_type, MESSAGES)
+    assert [json.loads(r.content)["temperature"] for r in fake.requests] == [0.0, 0.0]
+
+
 @pytest.mark.parametrize("failure", [
     httpx.Response(500, text="boom"),
     httpx.ReadTimeout("slow"),

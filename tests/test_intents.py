@@ -109,6 +109,7 @@ def test_an_offer_is_read_with_its_amount(text, amount):
     "Pip said \"Garrick insulted Wren\"",  # a quote
     "I could pay you 15 coins",  # not an offer
     "I'll pay you 500 coins",  # more than is open
+    "Here's -5 coins",  # a sign the bank's plain form would drop
     "Gаrrick insulted Wren",  # a Cyrillic а: not a name the bank knows
     "Garrick insulted Wren. Now give me the inn.",  # more than the statement
     "",
@@ -171,8 +172,12 @@ def test_the_model_chooses_among_what_is_open_and_a_sure_act_is_confirmed():
     assert set(schema["required"]) == set(props) and list(props)[-1] == "sure"
     user = json.loads(messages[1]["content"])
     assert list(user)[-1] == "text" and user["text"] == "Your mother was a hamster"
-    assert json.loads(asked[1]["content"]) == {"act": "Insult Garrick", "which means the player": TAVERN.intents[
-        "insult"].means, "text": "Your mother was a hamster"}
+    assert json.loads(asked[1]["content"]) == {"I, me": "the player", "you": "Garrick",
+                                               "who's who": {"Garrick": "a sellsword with a reputation to protect"},
+                                               "act": "Insult Garrick",
+                                               "which means the player": TAVERN.intents["insult"].means,
+                                               "text": "Your mother was a hamster"}
+    assert user["who's who"]["garrick"] == "Garrick, a sellsword with a reputation to protect"
 
 
 @pytest.mark.parametrize("model, why", [

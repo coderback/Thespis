@@ -7,6 +7,8 @@
     python -m rehearsal compare rehearsal/reports/baseline.json rehearsal/reports/<new>.json
     python -m rehearsal live --local gemma4-e4b --judge local:qwen3.5-4b   # offline: a local speaker and judge
     python -m rehearsal calibrate rehearsal/reports/<run>.lines.json.gz --judge local:qwen3.5-4b
+    python -m rehearsal words live --record    # the player's words: how typed text is read (rehearsal/words.py)
+    python -m rehearsal words replay           # ... from recordings, as CI does; `words bank` with no model at all
 
 `live` reads LLM_* (the speaker, as on the host) and JUDGE_<NAME>_* (the judge) from .env. With `--local <model>` the
 speaker is that model on this machine instead, and no cloud model speaks; `--judge local:<model>` judges with a local
@@ -32,7 +34,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from rehearsal import calibrate, handread, measure, sessions  # noqa: E402
+from rehearsal import calibrate, handread, measure, sessions, words  # noqa: E402
 from rehearsal.record import DictCache, Recorder, RecordingGateway, ReplayGateway, transcript  # noqa: E402
 from rehearsal.scenarios import Scenario, Stage, scenarios  # noqa: E402
 from thespis import expression  # noqa: E402
@@ -289,6 +291,70 @@ def compare(args) -> int:
     return 0 if all(ok for _, ok, _ in results) else 1
 
 
+def words_cmd(args) -> int:
+    """The player's words (rehearsal/words.py): live, from recordings, or with no model at all."""
+    sets = tuple(args.set.split(",")) if args.set else words.SET_ORDER
+    meta = {"when": datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC"), "commit": _commit()}
+    if args.mode == "replay":
+        outcomes, problems = words.replay()
+        data, md = words.report(outcomes, {**meta, "label": "replay", "reader": "recordings"})
+        print(md)
+        for p in problems:
+            print(f"FAIL {p}")
+        return 1 if problems or not data["passed"] else 0
+    chosen = words.books(args.only)
+    if args.mode == "bank":
+        outcomes = words.run(chosen, None, sets, progress=True)
+        meta |= {"label": "bank", "reader": "no model: the bank and near matches"}
+        return _words_report(outcomes, meta, "bank")
+    from dotenv import load_dotenv
+
+    from thespis.gateway import OpenAICompatGateway, gateway_from_env
+
+    load_dotenv(ROOT / ".env")
+    env: dict[str, str] = dict(os.environ)
+    local = None
+    if args.local:
+        from thespis.runtime.local import LocalModel
+        local = LocalModel(args.local).start()
+        env = {k: v for k, v in env.items() if not k.startswith("LLM_")} | local.env()
+        print(f"reading through {local.plan.describe()}")
+    try:
+        reader = gateway_from_env(env)
+        if not isinstance(reader, OpenAICompatGateway):
+            print("No model configured: set LLM_* in .env, or pass --local <model>")
+            return 1
+        reader.calls = deque()
+        recording = RecordingGateway(reader)
+        outcomes = words.run(chosen, recording, sets, progress=True)
+    finally:
+        if local is not None:
+            local.stop()
+    label = args.local or reader.models[0]
+    meta |= {"label": label, "reader": ", ".join(reader.models), "calls": len(reader.calls),
+             "failed_calls": sum(not c.ok for c in reader.calls)}
+    code = _words_report(outcomes, meta, label)
+    if args.record:
+        if args.only or args.set or args.local:
+            print("not recording: only the full set on the configured model is recorded for replay")
+        else:
+            _write(words.RECORDINGS, words.recording(recording, outcomes))
+            print(f"recorded {sum(len(v) for v in recording.replies.values())} replies to "
+                  f"{words.RECORDINGS.relative_to(ROOT)}")
+    return code
+
+
+def _words_report(outcomes, meta: dict, label: str) -> int:
+    data, md = words.report(outcomes, meta)
+    REPORTS.mkdir(exist_ok=True)
+    stem = REPORTS / f"words-{datetime.now(UTC).strftime('%Y-%m-%d-%H%M')}-{label.replace('/', '-')}"
+    _write(stem.with_suffix(".json"), data)
+    stem.with_suffix(".md").write_text(md, encoding="utf-8", newline="\n")
+    print(md)
+    print(f"wrote {stem.with_suffix('.md').relative_to(ROOT)} and .json")
+    return 0 if data["passed"] else 1
+
+
 def _commit() -> str:
     return subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True,
                           cwd=ROOT).stdout.strip() or "unknown"
@@ -324,6 +390,13 @@ def main(argv: list[str] | None = None) -> int:
     p = sub.add_parser("replay", help="the recordings answer, no network")
     p.add_argument("--update", action="store_true", help="rewrite transcripts.json from the replay")
     p.set_defaults(fn=replay)
+    p = sub.add_parser("words", help="the player's words: how typed text is read (rehearsal/words.py)")
+    p.add_argument("mode", choices=("live", "replay", "bank"))
+    p.add_argument("--local", help="live: read through this registry model on this machine")
+    p.add_argument("--record", action="store_true", help="live: write rehearsal/words/recordings.json")
+    p.add_argument("--only", help="only the line files whose name contains this")
+    p.add_argument("--set", help="only these sets: benign, hard, adversarial (comma-separated)")
+    p.set_defaults(fn=words_cmd)
     p = sub.add_parser("compare", help="the gate: a new report against a base")
     p.add_argument("base")
     p.add_argument("new")
