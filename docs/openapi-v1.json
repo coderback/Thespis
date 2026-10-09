@@ -299,6 +299,32 @@
         "title": "HealthOut",
         "type": "object"
       },
+      "IntentOut": {
+        "properties": {
+          "args": {
+            "additionalProperties": true,
+            "description": "Each argument: an id, a whole number, or a claim {pred, a, b, ...}",
+            "title": "Args",
+            "type": "object"
+          },
+          "reads": {
+            "description": "As put to the player: 'Tell Wren that Garrick insulted her'",
+            "title": "Reads",
+            "type": "string"
+          },
+          "verb": {
+            "title": "Verb",
+            "type": "string"
+          }
+        },
+        "required": [
+          "verb",
+          "args",
+          "reads"
+        ],
+        "title": "IntentOut",
+        "type": "object"
+      },
       "JoinIn": {
         "properties": {
           "at": {
@@ -604,6 +630,26 @@
         "title": "ObserveIn",
         "type": "object"
       },
+      "OfferIn": {
+        "properties": {
+          "args": {
+            "additionalProperties": true,
+            "description": "Each argument's choices now, narrowing the game's: ids for an npc, player, place or choice; {min, max} for an amount; {preds, subjects} for a claim. Left out, the game's (an npc: whoever is where the player is)",
+            "title": "Args",
+            "type": "object"
+          },
+          "verb": {
+            "description": "An intent the game declares: [intents.<verb>]",
+            "title": "Verb",
+            "type": "string"
+          }
+        },
+        "required": [
+          "verb"
+        ],
+        "title": "OfferIn",
+        "type": "object"
+      },
       "ProjectOut": {
         "properties": {
           "caps": {
@@ -887,6 +933,106 @@
           "events"
         ],
         "title": "TickOut",
+        "type": "object"
+      },
+      "UnderstandIn": {
+        "properties": {
+          "offered": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/OfferIn"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The intents open now, as the engine's buttons have them; left out, every intent the game declares",
+            "title": "Offered"
+          },
+          "player": {
+            "default": "player",
+            "description": "Who typed it",
+            "title": "Player",
+            "type": "string"
+          },
+          "text": {
+            "description": "What the player typed",
+            "maxLength": 4000,
+            "title": "Text",
+            "type": "string"
+          },
+          "to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The NPC the player is speaking to",
+            "title": "To"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "UnderstandIn",
+        "type": "object"
+      },
+      "UnderstandOut": {
+        "properties": {
+          "intent": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IntentOut"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The act, or for talk, the game's talk intent if it declares one"
+          },
+          "path": {
+            "description": "What answered: guard, bank, near, model, cache or none",
+            "title": "Path",
+            "type": "string"
+          },
+          "readings": {
+            "description": "For ask: what the words might do, most likely first",
+            "items": {
+              "$ref": "#/components/schemas/IntentOut"
+            },
+            "title": "Readings",
+            "type": "array"
+          },
+          "status": {
+            "description": "act (apply the intent), ask (put the readings to the player first) or talk (words that do nothing else)",
+            "title": "Status",
+            "type": "string"
+          },
+          "sure": {
+            "description": "certain, likely or unsure",
+            "title": "Sure",
+            "type": "string"
+          },
+          "why": {
+            "default": "",
+            "title": "Why",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "intent",
+          "sure",
+          "readings",
+          "path"
+        ],
+        "title": "UnderstandOut",
         "type": "object"
       },
       "UpdateIn": {
@@ -2168,6 +2314,74 @@
           }
         },
         "summary": "Tick"
+      }
+    },
+    "/v1/sessions/{sid}/understand": {
+      "post": {
+        "description": "What the player's words do, among the intents open now: an act to apply as the engine would apply the\nbutton, readings to put to the player first, or talk. It changes nothing; report the act with observe.",
+        "operationId": "understand_v1_sessions__sid__understand_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sid",
+            "required": true,
+            "schema": {
+              "title": "Sid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Bearer <the project's key, or the sidecar's token>",
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer <the project's key, or the sidecar's token>",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnderstandIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnderstandOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Understand"
       }
     },
     "/v1/sessions/{sid}/update": {

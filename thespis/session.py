@@ -42,6 +42,7 @@ from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import asdict, dataclass, field, replace
 from functools import cached_property, partial
 from pathlib import Path
+from typing import Any
 
 from thespis.beliefs import credence
 from thespis.brain import Brain, UtilityBrain
@@ -52,6 +53,7 @@ from thespis.deception import SAID, log_statement
 from thespis.decisions import DECIDE, REACT, Decision
 from thespis.expression import Mind, StatePack, Utterance, Validator
 from thespis.gateway import ModelGateway
+from thespis.intents import Arg, Bounds, ClaimDomain, Domain, Offer, Understander, Understood, Words, declared_intents
 from thespis.ledger import Claim, Event
 from thespis.minds import NPC
 from thespis.perception import at_the_scene, reported
@@ -108,6 +110,7 @@ class Game:
         self.places: dict[str, str] = dict(d.get("places", {}))
         self.players: dict[str, dict] = {k: dict(v) for k, v in d.get("players", {}).items()}
         self.choices = declared(d)
+        self.intents = declared_intents(d)
         self._check()
         self.ties: dict[str, list[tuple[str, str]]] = {}  # npc -> [(the other, kind)], in the order declared
         for t in d.get("tie", []):
@@ -119,6 +122,7 @@ class Game:
             vocabulary |= {npc.lower(): npc, str(t["name"]).lower(): npc,
                            **{str(a).lower(): npc for a in t.get("aliases", [])}}
         vocabulary |= {str(p["name"]).lower(): pid for pid, p in self.players.items()}
+        self.names = vocabulary  # names, aliases and ids, in lower case, to ids
         stakes = {c.do.partition(":")[0] for cs in self.choices.values() for c in cs.choices if c.asserts}
         self.voice = Voice(cast=cast, validator=Validator(vocabulary), claim_text=self.claim_text,
                            sentence=self.sentence, who=self.who, setting=self.setting, describe=self.describe,
@@ -258,6 +262,77 @@ class Game:
         template = self.cast.data.get("situations", {}).get(key)
         return template.format_map(_Fill(fill)) if template else ""
 
+    # ------------------------------------------------------------ the player's words
+    @property
+    def claim_words(self) -> dict[str, str]:
+        return dict(self.cast.data.get("words", {}).get("claims", {}))
+
+    def offers(self, w: World, player: str, offered: Sequence[Mapping[str, Any]] | None = None,
+               to: str | None = None) -> list[Offer]:
+        """The intents open now, with each argument's choices: the engine's (`offered`, as its buttons have them),
+        held to what the game declares; or, with none given, every intent the game declares over what Thespis knows:
+        the NPCs where the player is, or the one they speak `to`. An intent with an argument left no choices isn't
+        open."""
+        here = w.where(player)
+        npcs = tuple(n.id for n in w.npcs_at(here)) if here else tuple(w.npcs)
+        players = ("player", *w.players)
+        out = []
+        every: list[Mapping[str, Any]] = [{"verb": v} for v in self.intents]
+        for o in offered if offered is not None else every:
+            verb = o.get("verb")
+            d = self.intents.get(str(verb))
+            if d is None:
+                raise Unknown(f"no intent {verb!r} in the game's [intents]")
+            given = dict(o.get("args") or {})
+            extra = set(given) - {a.name for a in d.args}
+            if extra:
+                raise DefinitionError(f"{verb}: no argument {', '.join(sorted(extra))}")
+            domains: dict[str, Domain] = {}
+            for a in d.args:
+                domain = self._domain(a, given.get(a.name), w, npcs, players, to if a.name == "to" else None, verb)
+                if not domain or (isinstance(domain, Bounds) and domain.low > domain.high):
+                    break
+                domains[a.name] = domain
+            else:
+                out.append(Offer(d.verb, domains))
+        return out
+
+    def _domain(self, a: Arg, given: Any, w: World, npcs: tuple[str, ...], players: tuple[str, ...], to: str | None,
+                verb: object) -> Domain:
+        where = f"{verb}.{a.name}"
+        if a.type == "amount":
+            low, high = a.low, a.high
+            if given is not None:
+                if not isinstance(given, Mapping) or not all(isinstance(given.get(k, 0), int) for k in ("min", "max")):
+                    raise DefinitionError(f"{where}: an amount's choices are {{min, max}}, whole numbers")
+                low, high = max(low, given.get("min", low)), min(high, given.get("max", high))
+            return Bounds(low, high)
+        if a.type == "claim":
+            words = self.claim_words
+            preds, subjects = a.preds or tuple(words), (*players, *w.npcs)
+            if given is not None:
+                if not isinstance(given, Mapping):
+                    raise DefinitionError(f"{where}: a claim's choices are {{preds, subjects}}")
+                preds = self._within(given.get("preds", preds), preds, f"{where}.preds")
+                subjects = self._within(given.get("subjects", subjects), subjects, f"{where}.subjects")
+            places = tuple(self.places) if any("{place}" in words.get(p, "") for p in preds) else ()
+            return ClaimDomain(tuple(preds), tuple(subjects), places)
+        universe = {"npc": tuple(w.npcs), "player": players, "place": tuple(self.places), "choice": a.options}[a.type]
+        if given is not None:
+            return self._within(given, universe, where)
+        if a.type == "npc":
+            return (to,) if to is not None else npcs
+        return universe
+
+    @staticmethod
+    def _within(given, universe: Sequence[str], where: str) -> tuple[str, ...]:
+        if not isinstance(given, list | tuple) or not all(isinstance(x, str) for x in given):
+            raise DefinitionError(f"{where}: a list of ids")
+        unknown = [x for x in given if x not in universe]
+        if unknown:
+            raise Unknown(f"{where}: {', '.join(unknown)} isn't one of {', '.join(universe)}")
+        return tuple(dict.fromkeys(given))
+
 
 @dataclass
 class Line:
@@ -297,6 +372,7 @@ class Session:
                                                  int(memory.get("events", 5)))
         self.mind = mind or Mind(gateway, self.voice.validator)
         self.brain = brain or UtilityBrain()
+        self.embedder = embedder
         self._lines: dict[str, Line] = {}
         self._pending: dict[str, Future] = {}
         self._lock = threading.RLock()
@@ -466,6 +542,25 @@ class Session:
                                             structured=structured, to=to)
             return self._voice(line, "tell" if structured else "narrate", pack,
                                Utterance(None, telling, line.cites, "fallback", segments=segments), wait)
+
+    def understand(self, text: str, to: str | None = None, player: str = "player",
+                   offered: Sequence[Mapping[str, Any]] | None = None) -> Understood:
+        """What `player`'s words to `to` do, among the intents open now (`[intents]`, thespis.intents): an act to
+        apply (`act`), readings to put to the player first (`ask`), or words that do nothing else (`talk`). It changes
+        nothing: the engine applies an act as it would the button, and reports what happened with `observe`."""
+        with self._lock:
+            w = self.world
+            if not w.is_player(player):
+                raise Unknown(f"no player {player!r}")
+            if to is not None:
+                self._npc(to)
+            if not self.game.intents:
+                raise Unknown("the game declares no [intents]")
+            offers = self.game.offers(w, player, offered, to)
+            names = {**self.game.names, **{str(p["name"]).lower(): pid for pid, p in w.players.items()}}
+            words = Words(names, self.game.claim_words, self.who, self.voice.claim_text)
+        # Outside the lock: a model call takes a second, and nothing here writes to the session.
+        return Understander(self.game.intents, words, self.mind, self.embedder).read(text, offers, player, to)
 
     def tick(self, steps: int = 1) -> Tick:
         """The minds' own time, `steps` phases of it: scheduled walks, then gossip, then drives settling, then the

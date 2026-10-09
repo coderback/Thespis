@@ -106,6 +106,21 @@ class NarrateIn(BaseModel):
     to: str | None = Field(None, description="Tell it to this player: only what they took part in or saw")
 
 
+class OfferIn(BaseModel):
+    verb: str = Field(description="An intent the game declares: [intents.<verb>]")
+    args: dict[str, Any] = Field(default_factory=dict, description=(
+        "Each argument's choices now, narrowing the game's: ids for an npc, player, place or choice; {min, max} for "
+        "an amount; {preds, subjects} for a claim. Left out, the game's (an npc: whoever is where the player is)"))
+
+
+class UnderstandIn(BaseModel):
+    text: str = Field(max_length=4000, description="What the player typed")
+    to: str | None = Field(None, description="The NPC the player is speaking to")
+    player: str = Field("player", description="Who typed it")
+    offered: list[OfferIn] | None = Field(None, description=(
+        "The intents open now, as the engine's buttons have them; left out, every intent the game declares"))
+
+
 class JoinIn(BaseModel):
     player: str = Field(description="A new player's id (not 'player', which every game has, nor an NPC's)")
     name: str | None = Field(None, description="What NPCs and the narrator call them")
@@ -168,6 +183,22 @@ class LineOut(BaseModel):
     segments: list[dict[str, Any]] | None = Field(
         None, description="A told scene, for a game whose narrator is structured: in order, each the narrator's "
                           "words or one speaker's ({speaker, line, cites})")
+
+
+class IntentOut(BaseModel):
+    verb: str
+    args: dict[str, Any] = Field(description="Each argument: an id, a whole number, or a claim {pred, a, b, ...}")
+    reads: str = Field(description="As put to the player: 'Tell Wren that Garrick insulted her'")
+
+
+class UnderstandOut(BaseModel):
+    status: str = Field(description="act (apply the intent), ask (put the readings to the player first) or talk "
+                                    "(words that do nothing else)")
+    intent: IntentOut | None = Field(description="The act, or for talk, the game's talk intent if it declares one")
+    sure: str = Field(description="certain, likely or unsure")
+    readings: list[IntentOut] = Field(description="For ask: what the words might do, most likely first")
+    path: str = Field(description="What answered: guard, bank, near, model, cache or none")
+    why: str = ""
 
 
 class TickOut(BaseModel):
@@ -344,6 +375,14 @@ def create_app(games: Mapping[str, Game] | None = None, gateway: ModelGateway | 
     @app.post(f"/{VERSION}/sessions/{{sid}}/narrate")
     def narrate(p: Caller, sid: str, body: NarrateIn) -> LineOut:
         return LineOut(**call(p, sid, lambda s: s.narrate(body.since, body.wait, body.to)).to_json())
+
+    @app.post(f"/{VERSION}/sessions/{{sid}}/understand")
+    def understand(p: Caller, sid: str, body: UnderstandIn) -> UnderstandOut:
+        """What the player's words do, among the intents open now: an act to apply as the engine would apply the
+        button, readings to put to the player first, or talk. It changes nothing; report the act with observe."""
+        offered = [o.model_dump() for o in body.offered] if body.offered is not None else None
+        return UnderstandOut(**call(p, sid, lambda s: s.understand(body.text, body.to, body.player, offered),
+                                    saves=False).to_json())
 
     @app.post(f"/{VERSION}/sessions/{{sid}}/players", status_code=201)
     def join(p: Caller, sid: str, body: JoinIn) -> dict[str, Any]:

@@ -111,6 +111,31 @@ tell = "{a} told {t} that {claim}."
 gossip = "{a} told {t} that {claim}."
 move = "{a} walked from {where} to {to}."
 
+# ---------------------------------------------------------------- the player's words (thespis.intents)
+# What the player may do by typing it. The engine offers the ones open now; Thespis reads which one the words do, if
+# any, and the engine applies it as it would the button. Words that do none of them are talk.
+[intents.insult]
+means = "insults the one they speak to, to their face"
+reads = "Insult {to}"
+args = { to = "npc" }
+examples = ["you're a coward", "you smell like a wet dog", "go back to whatever ditch you crawled out of"]
+
+[intents.tell]
+means = "tells the one they speak to, as fact, that the claim is true (or, with neg, that it isn't)"
+reads = "Tell {to} that {claim}"
+args = { to = "npc", claim = "claim" }
+examples = ["{claim}, I saw it with my own eyes"]
+
+[intents.pay]
+means = "gives or firmly offers the one they speak to money"
+reads = "Pay {to} {amount} coins"
+args = { to = "npc", amount = { type = "amount", min = 1, max = 100 } }
+examples = ["here, {amount} coins for your trouble"]
+
+[intents.talk]
+reads = "Talk to {to}"
+args = { to = "npc" }
+
 [actions]
 leave = "set off up the north road"
 wait = "stay where you are for now"
