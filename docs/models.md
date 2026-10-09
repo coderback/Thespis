@@ -95,7 +95,7 @@ Reports are in [rehearsal/reports](../rehearsal/reports): `cloud-luna`, `local-g
 
 **Still open:** Gemma lays out the claim check's JSON over many lines, and twice in a run that ran it past 300 tokens (about 780 characters on 43 lines). That claim check then counts as unavailable, and the line is refused. A grammar without free whitespace should fix it.
 
-**The player's words: Gemma asks before it acts.** Reading typed words as acts ([protocol.md](protocol.md#the-players-words)), Gemma made 21 forbidden changes in 194 lines, where the cloud made none (`words-2026-10-09-1032-gemma4-e4b`). So no model in the registry is marked as passing (`acts`), and `--local` sets `LLM_ACTS=ask`: every act with consequences that a local model reads is put to the player as a question rather than applied.
+**The player's words: Gemma asks before it acts.** Reading typed words as acts ([protocol.md](protocol.md#the-players-words)), Gemma made 21 forbidden changes in 194 lines, where the cloud made none (`words-2026-10-09-1032-gemma4-e4b`). So no model in the registry is marked as passing (`acts`), and `--local` sets `LLM_ACTS=ask`: every act with consequences that a local model reads is put to the player as a question rather than applied. Asking first, Gemma makes none (`words-2026-10-09-1137-gemma4-e4b`).
 
 **One laptop, one run each:** these are single runs on one machine, with intervals several points wide. Run the same on yours: `models serve`, then `python -m rehearsal live` with `LLM_PROFILE=llamacpp` (and no cloud `LLM_*` set, so nothing else speaks).
 
