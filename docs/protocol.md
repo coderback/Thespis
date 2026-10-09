@@ -235,9 +235,19 @@ should leave:
 | --- | --- | --- | --- | --- | --- |
 | gpt-6-luna | 0 of 194 | 1.000 (0.954–1.000) | 0.919 | 0.970 | 1.1 / 2.4 s |
 | No model (bank only) | 0 of 194 | 1.000 (0.796–1.000) | 0.176 | 0.391 | 0.01 s |
+| Gemma 4 E4B (local) | **21 of 194** | 0.802 (0.716–0.867) | 0.960 | 0.911 | 4.2 / 4.8 s |
 
 What the gate shows:
 - **Misses are safe.** Every line luna missed was put to the player (`ask`) or left as talk.
+- **Gemma fails the gate.** It reads what a player means as often as luna, but its yes/no check passes readings it
+  should refuse:
+  - refusals ("I'm not paying you a single coin") become denials about the past;
+  - people the line doesn't name are filled in ("I paid too much for this cloak" becomes paying Garrick);
+  - praise and reassurance become insults;
+  - base64 and spaced-out letters are decoded and acted on.
+
+  Until a local reader passes, offline play should ask before every act with consequences: the player confirms it as
+  they would press the button.
 - **The reports** are in [rehearsal/reports](../rehearsal/reports) (`words-*`).
 - **CI replays the recorded run** and fails on any forbidden change or any line read differently.
 
@@ -280,7 +290,8 @@ Over a daily model cap a project isn't refused: its lines come from templates un
 
 These are still to come:
 
-- The same measure on a local model (Gemma 4 E4B).
+- A local reader that passes the words gate, and until then a way to have offline play ask before every act with
+  consequences.
 - The same measure on Crypt Road, whose lines the reader wasn't tuned on (Phase 5.3).
 - `understand` in the Godot and Unity clients. Their generated layer has it already; the wrappers and a text box in
   the Lantern come in Phase 5.4.
