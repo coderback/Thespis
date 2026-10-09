@@ -149,5 +149,13 @@ What the checks cover:
 - a save restored as it was;
 - the sidecar refusing nothing off the machine, and stopping with the client.
 
-**CI** runs the `dotnet` runner on every push. The `unity` runner needs a licensed editor, so for now it runs on a
-developer's machine.
+**CI** runs both on every push:
+- **`unity`:** the `dotnet` runner.
+- **`unity-editor`:** the `unity` runner. It installs the editor the project names (cached between runs) and signs in
+  with a Unity Personal licence. Then it plays the scene and returns the seat when the job ends. Runs queue rather
+  than overlap, since a Personal licence has few seats.
+
+The licence comes from two repository secrets, `UNITY_USERNAME` (the Unity ID's email) and `UNITY_PASSWORD`. Without
+them, as on a fork's pull request, the job skips. Unity no longer issues `.ulf` licence files for Personal seats, so
+the licence is signed in with the account itself. Use an account without two-factor sign-in, ideally one kept for
+CI.

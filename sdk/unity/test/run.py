@@ -56,8 +56,9 @@ def run_unity(unity: str, env: dict[str, str]) -> int:
     out = Path(env.get("TEMP", "/tmp")) / f"thespis-unity-{env['THESPIS_EXPECT']}.xml"
     log = out.with_suffix(".log")
     out.unlink(missing_ok=True)
-    code = subprocess.run([unity, "-batchmode", "-projectPath", str(PROJECT), "-runTests", "-testPlatform", "PlayMode",
-                           "-testResults", str(out), "-logFile", str(log)], env=env, timeout=1800).returncode
+    headless = ["-nographics"] if sys.platform != "win32" else []  # a CI runner has no display
+    code = subprocess.run([unity, "-batchmode", *headless, "-projectPath", str(PROJECT), "-runTests", "-testPlatform",
+                           "PlayMode", "-testResults", str(out), "-logFile", str(log)], env=env, timeout=1800).returncode
     if not out.exists():
         print(f"Unity wrote no results (exit {code}); its log: {log}")
         print(log.read_text(encoding="utf-8", errors="replace")[-4000:] if log.exists() else "")
