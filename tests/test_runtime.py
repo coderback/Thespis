@@ -10,6 +10,7 @@ from pathlib import Path
 import httpx
 import pytest
 
+from thespis.gateway import gateway_from_env, reads_acts
 from thespis.runtime.download import ChecksumError, fetch
 from thespis.runtime.hardware import Device, Machine, choose, parse_devices
 from thespis.runtime.local import LocalModel, plan_for
@@ -145,6 +146,13 @@ def test_the_server_runs_on_the_chosen_device_with_thinking_off():
     cpu = bare(None).args(Path("m.gguf"))
     assert cpu[cpu.index("-dev") + 1] == "none" and cpu[cpu.index("-ngl") + 1] == "0"
     assert "-dev" not in bare(None, os="macos").args(Path("m.gguf"))  # Metal: llama.cpp chooses
+
+
+
+def test_a_local_model_asks_before_acting_on_the_players_words():
+    env = bare(None).env()
+    assert env["LLM_ACTS"] == "ask" and not reads_acts(gateway_from_env(env))  # none has passed the words gate
+    assert not any(m.acts for m in MODELS.values())
 
 
 PARENT = """

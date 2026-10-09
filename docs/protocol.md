@@ -246,8 +246,10 @@ What the gate shows:
   - praise and reassurance become insults;
   - base64 and spaced-out letters are decoded and acted on.
 
-  Until a local reader passes, offline play should ask before every act with consequences: the player confirms it as
-  they would press the button.
+  So until a local model passes, it asks before every act with consequences: the reading is put to the player
+  (`ask`, "this reader asks before every act with consequences"), who confirms it as they would press the button.
+  Each model in the runtime's registry says whether it passed (`acts`), and `--local` sets `LLM_ACTS=ask` for one
+  that hasn't. Set it yourself for any model you haven't measured. A gateway with a backup asks if either does.
 - **The reports** are in [rehearsal/reports](../rehearsal/reports) (`words-*`).
 - **CI replays the recorded run** and fails on any forbidden change or any line read differently.
 
@@ -290,8 +292,7 @@ Over a daily model cap a project isn't refused: its lines come from templates un
 
 These are still to come:
 
-- A local reader that passes the words gate, and until then a way to have offline play ask before every act with
-  consequences.
+- A local reader that passes the words gate, so that offline play can act on the player's words without asking.
 - The same measure on Crypt Road, whose lines the reader wasn't tuned on (Phase 5.3).
 - `understand` in the Godot and Unity clients. Their generated layer has it already; the wrappers and a text box in
   the Lantern come in Phase 5.4.

@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 
 from thespis.api import DefinitionError, Game, Session, Unknown
 from thespis.expression import Mind
-from thespis.gateway import ModelReply
+from thespis.gateway import ModelReply, Provider
 from thespis.intents import ACT, ASK, TALK, UNDERSTAND_HASH, amount_of, declared_intents, normalize
 from thespis.ledger import Claim
 from thespis.moderation import Blocklist
@@ -207,6 +207,21 @@ def test_a_denial_is_told_as_one():
     u = session(model).understand("Garrick never insulted you", to="wren")
     assert u.status == ACT and u.intent.args["claim"] == Claim("insulted", "garrick", "wren", neg=True)
     assert u.intent.reads == "Tell Wren that it is not true that Garrick insulted Wren"
+
+
+class Unmeasured(Reads):
+    """A reader that hasn't passed the words gate, as every local model hasn't yet (LLM_ACTS=ask)."""
+
+    providers = (Provider("local", "http://127.0.0.1:9999/v1", "", "m", acts=False),)
+
+
+def test_a_reader_that_hasnt_passed_the_gate_asks_before_every_act():
+    model = Unmeasured(reading("insult", to="garrick"))
+    u = session(model).understand("Your mother was a hamster", to="garrick")
+    assert (u.status, u.why, [r.reads for r in u.readings]) == (
+        ASK, "this reader asks before every act with consequences", ["Insult Garrick"])
+    assert [c[0] for c in model.calls] == ["understand"]  # no check: its answer couldn't make it act
+    assert act_of(session(model).understand("Garrick insulted Wren", to="wren"))[0] == ACT  # the bank still acts
 
 
 def test_the_bank_answers_first_and_the_model_isnt_asked():

@@ -74,6 +74,7 @@ class Provider:
     api_version: str = ""  # Azure's api-version query, for deployment-style URLs
     structured: bool = True  # send a call's JSON schema as structured outputs; False keeps to JSON mode
     profile: Profile = DEFAULT  # what kind of endpoint it is (thespis.profiles)
+    acts: bool = True  # its readings of the player's words may act; False asks first (thespis.intents)
 
     @property
     def azure(self) -> bool:
@@ -367,7 +368,8 @@ def _filtered(r: httpx.Response) -> bool:
 def provider_from_env(env: Mapping[str, str], prefix: str) -> Provider | None:
     """The provider configured under `prefix` (e.g. LLM_ or JUDGE_DEEPSEEK_): PROFILE (thespis.profiles; a name or a
     probe's file), BASE_URL (the profile's if left out), API_KEY (unless the profile needs none), MODEL, and optional
-    TIMEOUT (seconds), EXTRA (JSON), API_VERSION and STRUCTURED (0 keeps it to JSON mode). None unless it has a model,
+    TIMEOUT (seconds), EXTRA (JSON), API_VERSION, STRUCTURED (0 keeps it to JSON mode) and ACTS (`ask`: every act
+    with consequences it reads from the player's words is asked about first). None unless it has a model,
     a URL and, where needed, a key. CONCURRENCY overrides the profile's calls at once (a server shared by many
     players wants more than a laptop's model can take)."""
     named = env.get(f"{prefix}PROFILE", "").strip()
@@ -385,7 +387,14 @@ def provider_from_env(env: Mapping[str, str], prefix: str) -> Provider | None:
     return Provider(name=f"{urlparse(base).hostname or base}/{model}", base_url=base, api_key=key, model=model,
                     extra=json.loads(extra) if extra else {}, api_version=env.get(f"{prefix}API_VERSION", "").strip(),
                     structured=env.get(f"{prefix}STRUCTURED", "1").strip() != "0",
+                    acts=env.get(f"{prefix}ACTS", "").strip().lower() != "ask",
                     profile=with_timeout(prof, float(timeout) if timeout else None))
+
+
+def reads_acts(gateway: object) -> bool:
+    """Whether every provider behind a gateway may turn the player's words into acts without asking. A wrapper
+    (recording, metering) passes its inner gateway's providers on; one without providers, such as replay, may."""
+    return all(getattr(p, "acts", True) for p in getattr(gateway, "providers", ()))
 
 
 def gateway_from_env(env: Mapping[str, str] | None = None) -> OpenAICompatGateway | NoModel:

@@ -30,7 +30,9 @@ Reading, in order:
    reply is checked against what was offered whatever the provider enforced; one outside it is talk.
 4. Verify: a sure reading of a consequential act is put to the model again as a yes/no question about that act.
 5. Decide: a consequential act needs a sure, confirmed reading to be `act`; otherwise it is `ask`, which the engine
-   shows as "Did you mean...?". Anything else needs at least a likely one, or it is talk.
+   shows as "Did you mean...?". Anything else needs at least a likely one, or it is talk. A model that hasn't
+   passed the words gate (a provider with ACTS=ask: thespis.gateway; every local model for now) has every act
+   with consequences it reads asked about, unchecked.
 
 Without a model, a bank match or a near match to an example (lexical, or by meaning given an embedder) is all there is,
 and a near match is only ever likely. Replies are cached like lines (thespis.expression), so replay reads the cache.
@@ -49,6 +51,7 @@ from dataclasses import dataclass, field
 
 from thespis.considerations import DefinitionError
 from thespis.expression import Mind
+from thespis.gateway import reads_acts
 from thespis.ledger import Claim
 from thespis.recall import Embedder
 from thespis.tracing import span
@@ -525,6 +528,8 @@ class Understander:
             return self._talk(offers, to, path, "no act")
         sure = str(data.get("sure"))
         sure = sure if sure in (CERTAIN, LIKELY, UNSURE) else UNSURE
+        if self.intents[reading.verb].consequential and not reads_acts(getattr(self.mind, "gateway", None)):
+            return Understood(ASK, None, sure, [reading], path, "this reader asks before every act with consequences")
         confirmed = False
         if self.intents[reading.verb].consequential and sure == CERTAIN:
             confirmed = self._verify(clean, reading, speaker, to)

@@ -33,6 +33,9 @@ class Model:
     ram_gb: float  # to run it on the CPU instead
     ctx: int = 4096  # context per slot; a state pack and its reply fit in well under half of it
     kind: str = "chat"  # "chat" or "embed"
+    # Reads the player's words into acts without asking: only a model that passed the words gate (docs/protocol.md).
+    # Gemma 4 E4B made 21 forbidden changes in 194 lines, so for now every local model asks first.
+    acts: bool = False
 
 
 HF = "https://huggingface.co"

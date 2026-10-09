@@ -283,10 +283,12 @@ class LocalModel:
         self.proc = None
 
     def env(self, prefix: str = "LLM_") -> dict[str, str]:
-        """The settings that point the gateway at this server; for an embedding model, recall (EMBED_*)."""
+        """The settings that point the gateway at this server, asking before acts unless the model passed the words
+        gate; for an embedding model, recall (EMBED_*)."""
         if self.model.kind == "embed":
             return {"EMBED_BASE_URL": self.url, "EMBED_MODEL": self.model.id}
-        return {f"{prefix}PROFILE": "llamacpp", f"{prefix}BASE_URL": self.url, f"{prefix}MODEL": self.model.id}
+        return {f"{prefix}PROFILE": "llamacpp", f"{prefix}BASE_URL": self.url, f"{prefix}MODEL": self.model.id,
+                **({} if self.model.acts else {f"{prefix}ACTS": "ask"})}
 
     def __enter__(self) -> LocalModel:
         return self.start()
