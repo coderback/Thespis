@@ -28,6 +28,7 @@ const ROUTES := {
 	"react": ["POST", "/v1/sessions/{sid}/react", "ReactIn", "LineOut"],
 	"snapshot": ["GET", "/v1/sessions/{sid}/snapshot", "", ""],
 	"tick": ["POST", "/v1/sessions/{sid}/tick", "TickIn", "TickOut"],
+	"understand": ["POST", "/v1/sessions/{sid}/understand", "UnderstandIn", "UnderstandOut"],
 	"update": ["POST", "/v1/sessions/{sid}/update", "UpdateIn", ""],
 	"usage": ["GET", "/v1/usage", "", "UsageOut"],
 }
@@ -48,6 +49,8 @@ static func make(name: String):
 			return GameOut.new()
 		"HealthOut":
 			return HealthOut.new()
+		"IntentOut":
+			return IntentOut.new()
 		"JoinIn":
 			return JoinIn.new()
 		"LineOut":
@@ -60,6 +63,8 @@ static func make(name: String):
 			return NpcOut.new()
 		"ObserveIn":
 			return ObserveIn.new()
+		"OfferIn":
+			return OfferIn.new()
 		"ProjectOut":
 			return ProjectOut.new()
 		"ProviderIn":
@@ -74,6 +79,10 @@ static func make(name: String):
 			return TickIn.new()
 		"TickOut":
 			return TickOut.new()
+		"UnderstandIn":
+			return UnderstandIn.new()
+		"UnderstandOut":
+			return UnderstandOut.new()
 		"UpdateIn":
 			return UpdateIn.new()
 		"UsageOut":
@@ -234,6 +243,25 @@ class HealthOut extends RefCounted:
 		return d
 
 
+class IntentOut extends RefCounted:
+	var args: Dictionary = {}  ## Each argument: an id, a whole number, or a claim {pred, a, b, ...}
+	var reads: String = ""  ## As put to the player: 'Tell Wren that Garrick insulted her'
+	var verb: String = ""
+
+	func read(d: Dictionary):
+		if d.has("args"): args = d["args"]
+		if d.has("reads"): reads = str(d["reads"])
+		if d.has("verb"): verb = str(d["verb"])
+		return self
+
+	func to_dict() -> Dictionary:
+		var d := {}
+		d["args"] = args
+		d["reads"] = reads
+		d["verb"] = verb
+		return d
+
+
 class JoinIn extends RefCounted:
 	var at = null  ## string, or null. Where they are
 	var name = null  ## string, or null. What NPCs and the narrator call them
@@ -378,6 +406,22 @@ class ObserveIn extends RefCounted:
 		if true_ != null: d["true"] = true_
 		d["verb"] = verb
 		d["witnesses"] = witnesses
+		return d
+
+
+class OfferIn extends RefCounted:
+	var args: Dictionary = {}  ## Each argument's choices now, narrowing the game's: ids for an npc, player, place or choice; {min, max} for an amount; {preds, subjects} for a claim. Left out, the game's (an npc: whoever is where the player is)
+	var verb: String = ""  ## An intent the game declares: [intents.<verb>]
+
+	func read(d: Dictionary):
+		if d.has("args"): args = d["args"]
+		if d.has("verb"): verb = str(d["verb"])
+		return self
+
+	func to_dict() -> Dictionary:
+		var d := {}
+		d["args"] = args
+		d["verb"] = verb
 		return d
 
 
@@ -538,6 +582,56 @@ class TickOut extends RefCounted:
 		d["events"] = events.map(func(x): return x.to_dict())
 		d["moves"] = moves
 		d["phase"] = phase
+		return d
+
+
+class UnderstandIn extends RefCounted:
+	var offered = null  ## array, or null. The intents open now, as the engine's buttons have them; left out, every intent the game declares
+	var player: String = "player"  ## Who typed it
+	var text: String = ""  ## What the player typed
+	var to = null  ## string, or null. The NPC the player is speaking to
+
+	func read(d: Dictionary):
+		offered = d["offered"] if d.get("offered") != null else null
+		if d.has("player"): player = str(d["player"])
+		if d.has("text"): text = str(d["text"])
+		to = str(d["to"]) if d.get("to") != null else null
+		return self
+
+	func to_dict() -> Dictionary:
+		var d := {}
+		if offered != null: d["offered"] = offered
+		d["player"] = player
+		d["text"] = text
+		if to != null: d["to"] = to
+		return d
+
+
+class UnderstandOut extends RefCounted:
+	var intent: IntentOut = null  ## The act, or for talk, the game's talk intent if it declares one
+	var path: String = ""  ## What answered: guard, bank, near, model, cache or none
+	var readings: Array[IntentOut] = []  ## For ask: what the words might do, most likely first
+	var status: String = ""  ## act (apply the intent), ask (put the readings to the player first) or talk (words that do nothing else)
+	var sure: String = ""  ## certain, likely or unsure
+	var why: String = ""
+
+	func read(d: Dictionary):
+		intent = IntentOut.new().read(d["intent"]) if d.get("intent") != null else null
+		if d.has("path"): path = str(d["path"])
+		readings.assign(d.get("readings", []).map(func(x): return IntentOut.new().read(x)))
+		if d.has("status"): status = str(d["status"])
+		if d.has("sure"): sure = str(d["sure"])
+		if d.has("why"): why = str(d["why"])
+		return self
+
+	func to_dict() -> Dictionary:
+		var d := {}
+		if intent != null: d["intent"] = intent.to_dict()
+		d["path"] = path
+		d["readings"] = readings.map(func(x): return x.to_dict())
+		d["status"] = status
+		d["sure"] = sure
+		d["why"] = why
 		return d
 
 

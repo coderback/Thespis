@@ -8,6 +8,7 @@
               witnesses=["wren"])
     s.update("garrick", nudge={"grudge": 4})
     line = s.decide("garrick", "turn")  # what he does, and what he says as he does it
+    words = s.understand("Garrick insulted Wren", to="wren")  # what the player's typing does: act, ask or talk
 
 thespis.session explains the calls; thespis.http serves the same ones as /v1.
 """
@@ -15,9 +16,10 @@ thespis.session explains the calls; thespis.http serves the same ones as /v1.
 from thespis import __version__
 from thespis.considerations import DefinitionError
 from thespis.gateway import ModelGateway, gateway_from_env
+from thespis.intents import Understood
 from thespis.ledger import Claim, Event
 from thespis.play import NotAllowed
 from thespis.session import FINAL, PROVISIONAL, SNAPSHOT_VERSION, WITHDRAWN, Game, Line, Session, Unknown
 
 __all__ = ["Claim", "DefinitionError", "Event", "FINAL", "Game", "Line", "ModelGateway", "NotAllowed", "PROVISIONAL",
-           "SNAPSHOT_VERSION", "Session", "Unknown", "WITHDRAWN", "__version__", "gateway_from_env"]
+           "SNAPSHOT_VERSION", "Session", "Understood", "Unknown", "WITHDRAWN", "__version__", "gateway_from_env"]

@@ -48,6 +48,7 @@ namespace Thespis.Api
         public static readonly Route React = new Route("POST", "/v1/sessions/{sid}/react", "ReactIn", "LineOut");
         public static readonly Route Snapshot = new Route("GET", "/v1/sessions/{sid}/snapshot", "", "");
         public static readonly Route Tick = new Route("POST", "/v1/sessions/{sid}/tick", "TickIn", "TickOut");
+        public static readonly Route Understand = new Route("POST", "/v1/sessions/{sid}/understand", "UnderstandIn", "UnderstandOut");
         public static readonly Route Update = new Route("POST", "/v1/sessions/{sid}/update", "UpdateIn", "");
         public static readonly Route Usage = new Route("GET", "/v1/usage", "", "UsageOut");
     }
@@ -175,6 +176,20 @@ namespace Thespis.Api
         public int Refused { get; set; }
     }
 
+    public class IntentOut
+    {
+        /// <summary>Each argument: an id, a whole number, or a claim {pred, a, b, ...}</summary>
+        [JsonProperty("args")]
+        public JObject Args { get; set; } = new();
+
+        /// <summary>As put to the player: 'Tell Wren that Garrick insulted her'</summary>
+        [JsonProperty("reads")]
+        public string Reads { get; set; } = "";
+
+        [JsonProperty("verb")]
+        public string Verb { get; set; } = "";
+    }
+
     public class JoinIn
     {
         /// <summary>Where they are</summary>
@@ -295,6 +310,17 @@ namespace Thespis.Api
         /// <summary>NPCs who saw it, besides the actor and target</summary>
         [JsonProperty("witnesses")]
         public List<string> Witnesses { get; set; } = new();
+    }
+
+    public class OfferIn
+    {
+        /// <summary>Each argument's choices now, narrowing the game's: ids for an npc, player, place or choice; {min, max} for an amount; {preds, subjects} for a claim. Left out, the game's (an npc: whoever is where the player is)</summary>
+        [JsonProperty("args")]
+        public JObject Args { get; set; } = new();
+
+        /// <summary>An intent the game declares: [intents.<verb>]</summary>
+        [JsonProperty("verb")]
+        public string Verb { get; set; } = "";
     }
 
     public class ProjectOut
@@ -418,6 +444,51 @@ namespace Thespis.Api
 
         [JsonProperty("phase")]
         public int Phase { get; set; }
+    }
+
+    public class UnderstandIn
+    {
+        /// <summary>The intents open now, as the engine's buttons have them; left out, every intent the game declares</summary>
+        [JsonProperty("offered", NullValueHandling = NullValueHandling.Ignore)]
+        public List<OfferIn>? Offered { get; set; }
+
+        /// <summary>Who typed it</summary>
+        [JsonProperty("player")]
+        public string Player { get; set; } = "player";
+
+        /// <summary>What the player typed</summary>
+        [JsonProperty("text")]
+        public string Text { get; set; } = "";
+
+        /// <summary>The NPC the player is speaking to</summary>
+        [JsonProperty("to", NullValueHandling = NullValueHandling.Ignore)]
+        public string? To { get; set; }
+    }
+
+    public class UnderstandOut
+    {
+        /// <summary>The act, or for talk, the game's talk intent if it declares one</summary>
+        [JsonProperty("intent", NullValueHandling = NullValueHandling.Ignore)]
+        public IntentOut? Intent { get; set; }
+
+        /// <summary>What answered: guard, bank, near, model, cache or none</summary>
+        [JsonProperty("path")]
+        public string Path { get; set; } = "";
+
+        /// <summary>For ask: what the words might do, most likely first</summary>
+        [JsonProperty("readings")]
+        public List<IntentOut> Readings { get; set; } = new();
+
+        /// <summary>act (apply the intent), ask (put the readings to the player first) or talk (words that do nothing else)</summary>
+        [JsonProperty("status")]
+        public string Status { get; set; } = "";
+
+        /// <summary>certain, likely or unsure</summary>
+        [JsonProperty("sure")]
+        public string Sure { get; set; } = "";
+
+        [JsonProperty("why")]
+        public string Why { get; set; } = "";
     }
 
     public class UpdateIn
