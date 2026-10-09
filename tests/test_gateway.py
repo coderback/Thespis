@@ -8,7 +8,7 @@ import httpx
 import pytest
 
 from thespis import gateway as gw
-from thespis.gateway import NoModel, OpenAICompatGateway, Provider, gateway_from_env, parse_json
+from thespis.gateway import NoModel, OpenAICompatGateway, Provider, gateway_from_env, parse_json, reads_acts
 
 PRIMARY = Provider("primary", "https://primary.test/v1", "key-p", "fast-1", {"enable_thinking": False})
 BACKUP = Provider("backup", "https://backup.test/v1/", "key-b", "fast-2")
@@ -53,6 +53,13 @@ def test_request_uses_the_design_settings():
     body = json.loads(request.content)
     assert body == {"model": "fast-1", "messages": MESSAGES, "max_tokens": 150, "temperature": 0.6,
                     "response_format": {"type": "json_object"}, "enable_thinking": False}
+
+
+def test_reading_the_players_words_is_deterministic():
+    fake = FakeProviders(primary=ok('{"act": "none", "sure": "certain"}'))
+    for call_type in ("understand", "confirm"):
+        gateway(fake).complete(call_type, MESSAGES)
+    assert [json.loads(r.content)["temperature"] for r in fake.requests] == [0.0, 0.0]
 
 
 @pytest.mark.parametrize("failure", [
@@ -155,6 +162,11 @@ def test_configuration_from_the_environment():
     assert "k1" not in repr(g.providers[0])  # keys never reach logs
     half = gateway_from_env({"LLM_BASE_URL": "https://api.example.com/v1", "LLM_API_KEY": "k1"})
     assert isinstance(half, NoModel)  # incomplete settings mean no model, not a crash
+    assert g.providers[0].acts and reads_acts(g)
+    asks = gateway_from_env({"LLM_BASE_URL": "https://api.example.com/v1", "LLM_API_KEY": "k1", "LLM_MODEL": "m1",
+                             "LLM_BACKUP_BASE_URL": "https://o.example.org/v1", "LLM_BACKUP_API_KEY": "k2",
+                             "LLM_BACKUP_MODEL": "m2", "LLM_BACKUP_ACTS": "ask"})
+    assert not reads_acts(asks)  # a backup that may not act makes the gateway ask: either may be the one reading
 
 
 def test_azure_uses_the_api_key_header_and_api_version():

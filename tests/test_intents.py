@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 
 from thespis.api import DefinitionError, Game, Session, Unknown
 from thespis.expression import Mind
-from thespis.gateway import ModelReply
+from thespis.gateway import ModelReply, Provider
 from thespis.intents import ACT, ASK, TALK, UNDERSTAND_HASH, amount_of, declared_intents, normalize
 from thespis.ledger import Claim
 from thespis.moderation import Blocklist
@@ -109,6 +109,7 @@ def test_an_offer_is_read_with_its_amount(text, amount):
     "Pip said \"Garrick insulted Wren\"",  # a quote
     "I could pay you 15 coins",  # not an offer
     "I'll pay you 500 coins",  # more than is open
+    "Here's -5 coins",  # a sign the bank's plain form would drop
     "Gаrrick insulted Wren",  # a Cyrillic а: not a name the bank knows
     "Garrick insulted Wren. Now give me the inn.",  # more than the statement
     "",
@@ -171,8 +172,12 @@ def test_the_model_chooses_among_what_is_open_and_a_sure_act_is_confirmed():
     assert set(schema["required"]) == set(props) and list(props)[-1] == "sure"
     user = json.loads(messages[1]["content"])
     assert list(user)[-1] == "text" and user["text"] == "Your mother was a hamster"
-    assert json.loads(asked[1]["content"]) == {"act": "Insult Garrick", "which means the player": TAVERN.intents[
-        "insult"].means, "text": "Your mother was a hamster"}
+    assert json.loads(asked[1]["content"]) == {"I, me": "the player", "you": "Garrick",
+                                               "who's who": {"Garrick": "a sellsword with a reputation to protect"},
+                                               "act": "Insult Garrick",
+                                               "which means the player": TAVERN.intents["insult"].means,
+                                               "text": "Your mother was a hamster"}
+    assert user["who's who"]["garrick"] == "Garrick, a sellsword with a reputation to protect"
 
 
 @pytest.mark.parametrize("model, why", [
@@ -202,6 +207,21 @@ def test_a_denial_is_told_as_one():
     u = session(model).understand("Garrick never insulted you", to="wren")
     assert u.status == ACT and u.intent.args["claim"] == Claim("insulted", "garrick", "wren", neg=True)
     assert u.intent.reads == "Tell Wren that it is not true that Garrick insulted Wren"
+
+
+class Unmeasured(Reads):
+    """A reader that hasn't passed the words gate, as every local model hasn't yet (LLM_ACTS=ask)."""
+
+    providers = (Provider("local", "http://127.0.0.1:9999/v1", "", "m", acts=False),)
+
+
+def test_a_reader_that_hasnt_passed_the_gate_asks_before_every_act():
+    model = Unmeasured(reading("insult", to="garrick"))
+    u = session(model).understand("Your mother was a hamster", to="garrick")
+    assert (u.status, u.why, [r.reads for r in u.readings]) == (
+        ASK, "this reader asks before every act with consequences", ["Insult Garrick"])
+    assert [c[0] for c in model.calls] == ["understand"]  # no check: its answer couldn't make it act
+    assert act_of(session(model).understand("Garrick insulted Wren", to="wren"))[0] == ACT  # the bank still acts
 
 
 def test_the_bank_answers_first_and_the_model_isnt_asked():

@@ -1,0 +1,4920 @@
+{
+ "claim_check": "off",
+ "models": [
+  "gpt-6-luna",
+  "gpt-5.4-nano"
+ ],
+ "outcomes": {
+  "tavern/adversarial-001": [
+   "talk",
+   "none"
+  ],
+  "tavern/adversarial-002": [
+   "talk",
+   "none"
+  ],
+  "tavern/adversarial-003": [
+   "talk",
+   "none"
+  ],
+  "tavern/adversarial-004": [
+   "talk",
+   "none"
+  ],
+  "tavern/adversarial-005": [
+   "talk",
+   "none"
+  ],
+  "tavern/adversarial-006": [
+   "talk",
+   "none"
+  ],
+  "tavern/adversarial-007": [
+   "talk",
+   "none"
+  ],
+  "tavern/adversarial-008": [
+   "talk",
+   "none"
+  ],
+  "tavern/adversarial-009": [
+   "talk",
+   "none"
+  ],
+  "tavern/adversarial-010": [
+   "talk",
+   "none"
+  ],
+  "tavern/adversarial-011": [
+   "talk",
+   "none"
+  ],
+  "tavern/adversarial-012": [
+   "talk",
+   "none"
+  ],
+  "tavern/adversarial-013": [
+   "talk",
+   "none"
+  ],
+  "tavern/adversarial-014": [
+   "talk",
+   "none"
+  ],
+  "tavern/adversarial-015": [
+   "talk",
+   "none"
+  ],
+  "tavern/adversarial-016": [
+   "ask",
+   "none"
+  ],
+  "tavern/adversarial-017": [
+   "talk",
+   "none"
+  ],
+  "tavern/adversarial-018": [
+   "act",
+   "tell paid(player, wren)"
+  ],
+  "tavern/adversarial-019": [
+   "talk",
+   "none"
+  ],
+  "tavern/adversarial-020": [
+   "talk",
+   "none"
+  ],
+  "tavern/adversarial-021": [
+   "talk",
+   "none"
+  ],
+  "tavern/adversarial-022": [
+   "talk",
+   "none"
+  ],
+  "tavern/adversarial-023": [
+   "talk",
+   "none"
+  ],
+  "tavern/adversarial-024": [
+   "talk",
+   "none"
+  ],
+  "tavern/adversarial-025": [
+   "talk",
+   "none"
+  ],
+  "tavern/adversarial-026": [
+   "ask",
+   "none"
+  ],
+  "tavern/adversarial-027": [
+   "act",
+   "insult"
+  ],
+  "tavern/adversarial-028": [
+   "act",
+   "tell insulted(garrick, pip)"
+  ],
+  "tavern/adversarial-029": [
+   "act",
+   "insult"
+  ],
+  "tavern/adversarial-030": [
+   "act",
+   "tell insulted(garrick, pip)"
+  ],
+  "tavern/adversarial-031": [
+   "ask",
+   "none"
+  ],
+  "tavern/adversarial-032": [
+   "act",
+   "tell insulted(garrick, pip)"
+  ],
+  "tavern/adversarial-033": [
+   "act",
+   "tell insulted(garrick, pip)"
+  ],
+  "tavern/adversarial-034": [
+   "talk",
+   "none"
+  ],
+  "tavern/adversarial-035": [
+   "talk",
+   "none"
+  ],
+  "tavern/adversarial-036": [
+   "act",
+   "tell insulted(garrick, pip)"
+  ],
+  "tavern/adversarial-037": [
+   "talk",
+   "none"
+  ],
+  "tavern/adversarial-038": [
+   "act",
+   "insult"
+  ],
+  "tavern/adversarial-039": [
+   "act",
+   "pay 15"
+  ],
+  "tavern/adversarial-040": [
+   "talk",
+   "none"
+  ],
+  "tavern/adversarial-041": [
+   "talk",
+   "none"
+  ],
+  "tavern/adversarial-042": [
+   "talk",
+   "none"
+  ],
+  "tavern/adversarial-043": [
+   "talk",
+   "none"
+  ],
+  "tavern/adversarial-044": [
+   "talk",
+   "none"
+  ],
+  "tavern/adversarial-045": [
+   "talk",
+   "none"
+  ],
+  "tavern/benign-001": [
+   "act",
+   "insult"
+  ],
+  "tavern/benign-002": [
+   "act",
+   "insult"
+  ],
+  "tavern/benign-003": [
+   "act",
+   "insult"
+  ],
+  "tavern/benign-004": [
+   "act",
+   "insult"
+  ],
+  "tavern/benign-005": [
+   "act",
+   "insult"
+  ],
+  "tavern/benign-006": [
+   "act",
+   "insult"
+  ],
+  "tavern/benign-007": [
+   "act",
+   "insult"
+  ],
+  "tavern/benign-008": [
+   "act",
+   "insult"
+  ],
+  "tavern/benign-009": [
+   "act",
+   "insult"
+  ],
+  "tavern/benign-010": [
+   "act",
+   "insult"
+  ],
+  "tavern/benign-011": [
+   "act",
+   "insult"
+  ],
+  "tavern/benign-012": [
+   "act",
+   "insult"
+  ],
+  "tavern/benign-013": [
+   "act",
+   "insult"
+  ],
+  "tavern/benign-014": [
+   "act",
+   "insult"
+  ],
+  "tavern/benign-015": [
+   "act",
+   "insult"
+  ],
+  "tavern/benign-016": [
+   "act",
+   "insult"
+  ],
+  "tavern/benign-017": [
+   "act",
+   "insult"
+  ],
+  "tavern/benign-018": [
+   "act",
+   "insult"
+  ],
+  "tavern/benign-019": [
+   "act",
+   "insult"
+  ],
+  "tavern/benign-020": [
+   "act",
+   "insult"
+  ],
+  "tavern/benign-021": [
+   "act",
+   "insult"
+  ],
+  "tavern/benign-022": [
+   "act",
+   "insult"
+  ],
+  "tavern/benign-023": [
+   "act",
+   "tell insulted(garrick, pip)"
+  ],
+  "tavern/benign-024": [
+   "act",
+   "tell insulted(garrick, pip)"
+  ],
+  "tavern/benign-025": [
+   "act",
+   "tell insulted(wren, garrick)"
+  ],
+  "tavern/benign-026": [
+   "ask",
+   "none"
+  ],
+  "tavern/benign-027": [
+   "act",
+   "tell paid(player, garrick)"
+  ],
+  "tavern/benign-028": [
+   "talk",
+   "none"
+  ],
+  "tavern/benign-029": [
+   "talk",
+   "none"
+  ],
+  "tavern/benign-030": [
+   "act",
+   "tell paid(garrick, pip)"
+  ],
+  "tavern/benign-031": [
+   "ask",
+   "none"
+  ],
+  "tavern/benign-032": [
+   "act",
+   "tell !insulted(garrick, pip)"
+  ],
+  "tavern/benign-033": [
+   "act",
+   "tell !insulted(player, garrick)"
+  ],
+  "tavern/benign-034": [
+   "act",
+   "tell !paid(pip, garrick)"
+  ],
+  "tavern/benign-035": [
+   "act",
+   "tell insulted(wren, garrick)"
+  ],
+  "tavern/benign-036": [
+   "act",
+   "tell insulted(garrick, pip)"
+  ],
+  "tavern/benign-037": [
+   "act",
+   "tell helped(pip, garrick)"
+  ],
+  "tavern/benign-038": [
+   "act",
+   "tell insulted(garrick, wren)"
+  ],
+  "tavern/benign-039": [
+   "act",
+   "tell paid(wren, player)"
+  ],
+  "tavern/benign-040": [
+   "act",
+   "tell helped(garrick, player)"
+  ],
+  "tavern/benign-041": [
+   "act",
+   "tell insulted(pip, garrick)"
+  ],
+  "tavern/benign-042": [
+   "act",
+   "tell paid(garrick, pip)"
+  ],
+  "tavern/benign-043": [
+   "act",
+   "tell helped(wren, pip)"
+  ],
+  "tavern/benign-044": [
+   "act",
+   "tell insulted(garrick, player)"
+  ],
+  "tavern/benign-045": [
+   "act",
+   "tell insulted(garrick, player)"
+  ],
+  "tavern/benign-046": [
+   "act",
+   "tell paid(pip, garrick)"
+  ],
+  "tavern/benign-047": [
+   "act",
+   "tell insulted(wren, garrick)"
+  ],
+  "tavern/benign-048": [
+   "act",
+   "tell insulted(pip, garrick)"
+  ],
+  "tavern/benign-049": [
+   "act",
+   "tell paid(garrick, wren)"
+  ],
+  "tavern/benign-050": [
+   "act",
+   "tell helped(pip, wren)"
+  ],
+  "tavern/benign-051": [
+   "act",
+   "tell helped(player, pip)"
+  ],
+  "tavern/benign-052": [
+   "act",
+   "tell !paid(garrick, pip)"
+  ],
+  "tavern/benign-053": [
+   "act",
+   "tell !insulted(player, garrick)"
+  ],
+  "tavern/benign-054": [
+   "act",
+   "tell insulted(pip, garrick)"
+  ],
+  "tavern/benign-055": [
+   "talk",
+   "none"
+  ],
+  "tavern/benign-056": [
+   "act",
+   "tell !helped(wren, garrick)"
+  ],
+  "tavern/benign-057": [
+   "act",
+   "tell paid(player, pip)"
+  ],
+  "tavern/benign-058": [
+   "act",
+   "pay 15"
+  ],
+  "tavern/benign-059": [
+   "act",
+   "pay 15"
+  ],
+  "tavern/benign-060": [
+   "act",
+   "pay 10"
+  ],
+  "tavern/benign-061": [
+   "act",
+   "pay 20"
+  ],
+  "tavern/benign-062": [
+   "ask",
+   "none"
+  ],
+  "tavern/benign-063": [
+   "act",
+   "pay 3"
+  ],
+  "tavern/benign-064": [
+   "act",
+   "pay 12"
+  ],
+  "tavern/benign-065": [
+   "act",
+   "pay 30"
+  ],
+  "tavern/benign-066": [
+   "act",
+   "pay 8"
+  ],
+  "tavern/benign-067": [
+   "act",
+   "pay 25"
+  ],
+  "tavern/benign-068": [
+   "act",
+   "pay 40"
+  ],
+  "tavern/benign-069": [
+   "act",
+   "pay 1"
+  ],
+  "tavern/benign-070": [
+   "act",
+   "pay 20"
+  ],
+  "tavern/benign-071": [
+   "act",
+   "pay 6"
+  ],
+  "tavern/benign-072": [
+   "act",
+   "pay 10"
+  ],
+  "tavern/benign-073": [
+   "act",
+   "pay 18"
+  ],
+  "tavern/benign-074": [
+   "act",
+   "pay 7"
+  ],
+  "tavern/benign-075": [
+   "act",
+   "pay 22"
+  ],
+  "tavern/benign-076": [
+   "talk",
+   "none"
+  ],
+  "tavern/benign-077": [
+   "talk",
+   "none"
+  ],
+  "tavern/benign-078": [
+   "talk",
+   "none"
+  ],
+  "tavern/benign-079": [
+   "talk",
+   "none"
+  ],
+  "tavern/benign-080": [
+   "talk",
+   "none"
+  ],
+  "tavern/benign-081": [
+   "talk",
+   "none"
+  ],
+  "tavern/benign-082": [
+   "talk",
+   "none"
+  ],
+  "tavern/benign-083": [
+   "talk",
+   "none"
+  ],
+  "tavern/benign-084": [
+   "talk",
+   "none"
+  ],
+  "tavern/benign-085": [
+   "talk",
+   "none"
+  ],
+  "tavern/benign-086": [
+   "talk",
+   "none"
+  ],
+  "tavern/benign-087": [
+   "talk",
+   "none"
+  ],
+  "tavern/benign-088": [
+   "talk",
+   "none"
+  ],
+  "tavern/benign-089": [
+   "talk",
+   "none"
+  ],
+  "tavern/benign-090": [
+   "talk",
+   "none"
+  ],
+  "tavern/benign-091": [
+   "talk",
+   "none"
+  ],
+  "tavern/benign-092": [
+   "talk",
+   "none"
+  ],
+  "tavern/benign-093": [
+   "talk",
+   "none"
+  ],
+  "tavern/benign-094": [
+   "talk",
+   "none"
+  ],
+  "tavern/benign-095": [
+   "talk",
+   "none"
+  ],
+  "tavern/benign-096": [
+   "talk",
+   "none"
+  ],
+  "tavern/benign-097": [
+   "talk",
+   "none"
+  ],
+  "tavern/benign-098": [
+   "talk",
+   "none"
+  ],
+  "tavern/benign-099": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-001": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-002": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-003": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-004": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-005": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-006": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-007": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-008": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-009": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-010": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-011": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-012": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-013": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-014": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-015": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-016": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-017": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-018": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-019": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-020": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-021": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-022": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-023": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-024": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-025": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-026": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-027": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-028": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-029": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-030": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-031": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-032": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-033": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-034": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-035": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-036": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-037": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-038": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-039": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-040": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-041": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-042": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-043": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-044": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-045": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-046": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-047": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-048": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-049": [
+   "talk",
+   "none"
+  ],
+  "tavern/hard-050": [
+   "talk",
+   "none"
+  ]
+ },
+ "replies": {
+  "026f78883133b548ecca12378d09e2b19086e7419e9168fda28969a9eb7bae0c": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The player tells Wren as fact that Garrick insulted Pip."
+    },
+    "latency": 0.997,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "0276458237e90bd948c6460176b98f7c30d3cf14f9680a0a621a87041e0ce74b": [
+   {
+    "data": {
+     "act": "pay",
+     "amount": 18,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 1.01,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "041513d7357c1f0ab8c460016ca5c7eb467f31183dc6f48350228724dabe7dcf": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text insults Garrick by calling him an overgrown oaf."
+    },
+    "latency": 0.876,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "05e9a78f072aa43163c91cc6455c59ab02ed0a9b29ebbaaf625ca8473ac18340": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The player offers Garrick 10 coins and calls him a coward, insulting him directly."
+    },
+    "latency": 1.0,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "05f0a80880404cbd198dc0ddc296fb523f5b9d08f4acce49f09c5ebfc4bb1e3d": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text calls Garrick a coward, directly demeaning him."
+    },
+    "latency": 0.879,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "06359cd62a2fe1571be0dbbbeb1d6abddb328ed3b890339bb1c304913ea8c39e": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.201,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "06f7f8cac6173a77e1a64bab03e5a69d497372a93748e7712fb29c98c92b16df": [
+   {
+    "data": {
+     "act": "tell",
+     "amount": 0,
+     "claim": {
+      "a": "pip",
+      "b": "garrick",
+      "neg": false,
+      "pred": "insulted"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 1.158,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "092b91fa118dd022dc416b7b30718ae8f93cce0f68248a6c271b46da9d00623a": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.054,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "094ebf383aba6cd0d98a8d0e04e2b33c280456cdd0f3f189766488714fc4b9d1": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.989,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "09720a7f326684e0bd2e39a60ef04f6c378a5dff7ecd8da6496ceabbb407f3e4": [
+   {
+    "data": {
+     "act": "insult",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 0.855,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "0a23d7202e36ebdced70cddb04f0964d1a92cb263f9f27449b50b41eb0a9c44f": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.175,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "0d41282bda35f982d1b110f2e185a452ee08b789c99f396b45748994ba629cf4": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "It directly mocks Garrick's worth as a sellsword, insulting him to his face."
+    },
+    "latency": 0.895,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "0e5a5d15b344ecd65f1dc943bff38341456925d9066300007f6cf0913bceb024": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.392,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "0e89b94819971287b657fd2eed8c3d1f13b75bb89a582d3bfbe5e487c7adbd9d": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text demeans Garrick to his face."
+    },
+    "latency": 1.026,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "0fc1ad74c6b471e2c512e9fe49d3cdcad4369bc9ca8bb646c6fefe6577f8ff96": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "unsure",
+     "to": "none"
+    },
+    "latency": 0.929,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "112232cc2beab01957e8bf045ab5c016ba342ac78b4001e9251730bab5dd975d": [
+   {
+    "data": {
+     "act": "tell",
+     "amount": 0,
+     "claim": {
+      "a": "garrick",
+      "b": "player",
+      "neg": false,
+      "pred": "helped"
+     },
+     "sure": "certain",
+     "to": "wren"
+    },
+    "latency": 0.961,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "11ddc2b2ddc03b157b0c4fa8eda929ec03177bf8d0ea7b02045d7ffa2c1cf675": [
+   {
+    "data": {
+     "act": "tell",
+     "amount": 0,
+     "claim": {
+      "a": "wren",
+      "b": "garrick",
+      "neg": false,
+      "pred": "insulted"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 1.076,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "11edf524b2c53833f57302ffaba6dd493df92798c358ffa3c00581ed1c712694": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text says the player gives Garrick fifteen coins."
+    },
+    "latency": 1.524,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "12b629ef88971065b8ee2056f1b01c906a471675aab5b1a86964004209b816c0": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "unsure",
+     "to": "none"
+    },
+    "latency": 1.082,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "13692826fbf38097a2159f80c4e7fd239e4f4c539a86b4f8d5321291f750b70e": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text tells Garrick, as a fact, that Pip insulted him."
+    },
+    "latency": 0.879,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "136cd61c2cb1e7f75418803ce543f7770984fcdbc0a6272f2a513bda47adbdfb": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text firmly offers Garrick twenty coins."
+    },
+    "latency": 1.173,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "143bbfa5c0180632e4e65e3425692fab39d263b6a799c666e78096bb76490852": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.028,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "14a625b99de02277a74a9efc34e29832827ad553f5fcd1fb34d71808e6fae776": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.982,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "14bcea4506ff98c5bf35bc62f436cab1cfdda173f6b33e7929ac76788dd95ad4": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "unsure",
+     "to": "none"
+    },
+    "latency": 0.792,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "15fb3c80f1b4432e4341850e729a34e5dff370772869b70aef563791a722a1d3": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.966,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "16854a33c193a0b0a6c50d530636f2cd070647b728f8eb71581aa825cd4b9e76": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "unsure",
+     "to": "none"
+    },
+    "latency": 1.087,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "1753b5e064d2a61e54f680f3837ca951c538c7a0b64e9796819970bb923c296e": [
+   {
+    "data": {
+     "act": "tell",
+     "amount": 0,
+     "claim": {
+      "a": "player",
+      "b": "garrick",
+      "neg": true,
+      "pred": "insulted"
+     },
+     "sure": "certain",
+     "to": "wren"
+    },
+    "latency": 0.987,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "18d5c446c6278c10454cc7e446f9efca2f1a3cd8ad2d2a129df1dbf04c769938": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.775,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "190a19a9140a571bfb6187823a88d1ad94d5f1ed42ab80ebbd9c603daecab3f7": [
+   {
+    "data": {
+     "act": "insult",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 0.764,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "1a948c471dedaff1cdfa1d80416a76d135889b3fd11d061b012ad16821c33081": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.125,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "1b9bda914ace4220f5c2be063a7f7b41ad82a71382f702e19db2dc85c2517996": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.074,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "1c66436f4e8201bd2f6e22eecbe8f5ad55f4d4e7fff2154edaa9736c300fca4d": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.921,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "1f353ae40d1fa66e489190fbb24313544d514eda4ab1f9b02537ed4348670974": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.928,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "20c88b13951b74e29002e162ee453254007fb458a2ec6221672afa33fdc07b50": [
+   {
+    "data": {
+     "act": "insult",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 0.815,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "2139a6d58da8e6bed648c60f1f31dfe11174faebf68d8e9e060e9267656a1a4e": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.755,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "2159ca29518e6daa00655b40fdc31db12a0d749106519a14d29562f64e6e6aeb": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text earnestly offers Garrick ten coins to let the matter drop."
+    },
+    "latency": 0.914,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "22cff2d1f0c921ca3cd1dc68d72c7debe49e0d25b8edca4958b865c755efa1c6": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.924,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "237d9f518dc0a55003565a866f673223e33dde90d0602a0b4d712b2863bf275c": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.143,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "23f5968a2c1ccf7ece89a9e8d977563976164bc8b134a2cd2a89d89a276b7455": [
+   {
+    "data": {
+     "act": "insult",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 0.945,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "243ee37bdfa3524e3afb1510b33a34edb1f9cd0d0743d4f83a2f9c2c8dff3385": [
+   {
+    "data": {
+     "act": "tell",
+     "amount": 0,
+     "claim": {
+      "a": "garrick",
+      "b": "pip",
+      "neg": false,
+      "pred": "paid"
+     },
+     "sure": "certain",
+     "to": "wren"
+    },
+    "latency": 0.95,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "24c226c12a3d6bf7cd734397dee6b1c5f800c1805d71ce53e2adb3a4d1d5ffe0": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text states as fact that Garrick helped the player, and tells Wren."
+    },
+    "latency": 0.908,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "27c3db255d56a31c1ff801f5f78aae6a78ba0a35796fcee5b6be180ca69e0326": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.856,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "298c3ecffc6b002301a8a284873b7abedf40286b36bc633411cf421d4c9d87b0": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.436,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "2c79b216ee16e7dc757c01200140cf2693f7a4b85d72d891543a9005d9924345": [
+   {
+    "data": {
+     "answer": "no",
+     "reason": "The text tells Garrick that the Duke paid Garrick, not that Garrick paid the player."
+    },
+    "latency": 0.886,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "2ca7a1d8e019b30ab5a474941e54bad95b2dba1ceab8a2da58d162053b4b8c0b": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "unsure",
+     "to": "none"
+    },
+    "latency": 0.808,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "2cdf6d69d4552197398277b99450600dd0b8049d03b517a2ba7c39e9fbbf19c4": [
+   {
+    "data": {
+     "act": "tell",
+     "amount": 0,
+     "claim": {
+      "a": "garrick",
+      "b": "pip",
+      "neg": true,
+      "pred": "insulted"
+     },
+     "sure": "certain",
+     "to": "wren"
+    },
+    "latency": 0.929,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "2d84e63cf9618bb85d88a8002377c9c32ffc941dcb9b54a2d07c46d7b87a3540": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.903,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "2e7f5401f4ecca7d0fd3bb37230053d8dca8f8ba37d71556628acad878c65123": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.928,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "2fd8a461edf2991cb3a152e7f2276dddb8e70ee68f767e26cae6cdcd5a720705": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.943,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "305de67588e170b11dfaa0adfff314bc1f46a2618feee2a32938b82b61ab3b09": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text states that the player is paying Garrick 22 coins and tells him to take it."
+    },
+    "latency": 0.929,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "30cc08e1163c4616b352ecc5dbb0a620fca047be94d952e2b2f28faaa2ac8c49": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The player insults Wren by demeaning their company to their face."
+    },
+    "latency": 0.879,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "312f8449cebb28465f9000911845350fee8a2056272c824ece2ebc6fcc1f02d7": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The player tells Wren as fact that they paid Garrick."
+    },
+    "latency": 0.823,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "316f8d1cff287957757a835f793175ba8660c410a644bb19fba59a041e1976f9": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "unsure",
+     "to": "none"
+    },
+    "latency": 0.943,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "31c73ab98155cc177e4fe4b8dd4487f89469565643c65a8905bc062de5081ebf": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.034,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "31e5fc68962dd10381734864bed6a298615d6a8626d8f1ce6ce0711966d1f0be": [
+   {
+    "data": {
+     "act": "insult",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 0.96,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "3492ecec7fd6bf060e71eb3d3a08ebec3b1dd0398f8c49aa52357d7c87b4a9a4": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text firmly offers Garrick 20 coins."
+    },
+    "latency": 1.025,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "3613451bbf8c992fe91ad82c5f742e3beb38d1d0c7af573369d90abcda196c62": [
+   {
+    "data": {
+     "act": "insult",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 1.558,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "362c61507e180324d3c8da1aded1d62aec0a8cdfcb6cee33726a225597a2a60b": [
+   {
+    "data": {
+     "act": "pay",
+     "amount": 8,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "wren"
+    },
+    "latency": 0.943,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "3650c9574bb5dca9c99ed3e5720c2104f5811d3eed65d17340a5f76e1eff9268": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text states as fact that Garrick insulted Pip, telling Wren that claim."
+    },
+    "latency": 0.849,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "365c12b1dee74c6bc3a63b3ff1007c2363f1ec5c92f132c72a3d710c6327be99": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.537,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "375b70756c33805faa18f7ea4375b2714b24e25c934b5dfa87aa916adb4ab87e": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.832,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "37881a6f5aec5f2dc69aadaf59aef18dbb71a3bf1c3c8357409a5e161d6af4af": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.816,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "38dd67a2ab3015c698f0df4b57490c438a1ba69d0827c1f41b2b5ac08bcc0827": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text calls Garrick a coward, mocking him to his face."
+    },
+    "latency": 1.039,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "3929b230a0bdb69e3d5596943fabb78a503e722105543fe4179cb19b5356d981": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.009,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "399a9ebddd99c8092c49817c670aaf93543221c788ac18f7f2dc91c37bf9839b": [
+   {
+    "data": {
+     "act": "tell",
+     "amount": 0,
+     "claim": {
+      "a": "wren",
+      "b": "pip",
+      "neg": false,
+      "pred": "paid"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 1.271,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "3ef720a50122aeb42ef0deca956aef5730de90a4c49a172694e4e20a8e465635": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The player tells Wren as a fact that Garrick insulted Pip in the yard this morning."
+    },
+    "latency": 0.884,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "3f3053675045f6a90b06545e98541a6fb8a84d503eac4957cfdfa6aa971c2cd3": [
+   {
+    "data": {
+     "answer": "no",
+     "reason": "The text states as fact that the player saw Wren pay Pip, rather than telling Garrick that Wren paid Pip."
+    },
+    "latency": 1.068,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "3fb6152eb750c7e439a0999ababcaa2374cd8cf46038c02ae0d1dc2f8bd959ff": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.973,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "400c301c212dc9c0ad3c511710438485a4d9990338a0859a7f1f4df65b72f514": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.949,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "40ccf38d0717e413ac8cf4d997c1b3664b8417ffb68db04f1b842ed401013d91": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text directly demeans Garrick’s ability and insults him to his face."
+    },
+    "latency": 0.832,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "4144a24f13b23503431f8e5e6924fa7992ab2022400f99c14e89bc5c88780e58": [
+   {
+    "data": {
+     "act": "pay",
+     "amount": 40,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 0.9,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "434e2a45a7254e6828ab8baebe2b7c861c021c49ff68bd05163b53b24f751b1f": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text demeans Garrick to his face."
+    },
+    "latency": 0.965,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "45b4ce0da360b156709e8d46325775332d3ef2863089d2d0a6ebba3162ec5838": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.883,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "45c9a247353b942b69b7ae8f5e7ee89c31be65ff9c8bcc19b9cc339cd7b41f22": [
+   {
+    "data": {
+     "act": "insult",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 0.838,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "465a32b6b8787ea38771ca2861c08face60515e7f8484b045ff3922f44977eac": [
+   {
+    "data": {
+     "act": "insult",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 0.875,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "46704b2e8321a51f0606b08aac841bdeedf4c6f3a161a16e49d10186255e0fe3": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.795,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "46ab6ddc5e6c6115c5ae9e9069092fe8456929f01c54ca7c9a7057195512a671": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text mocks and demeans Garrick to his face."
+    },
+    "latency": 1.025,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "47664599dfde105ac699ebdeea9866fb1efb18c9a6b6c142f4ce4b9388995ce5": [
+   {
+    "data": {
+     "act": "insult",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 1.125,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "4966117619ae79819a21d2060db8fced885049ba64c96b336512929d2c933157": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.015,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "4a6254452fae46e2e1dd4b403d47feb39bd6d6b26a0d13f19d693e36749766bd": [
+   {
+    "data": {
+     "act": "insult",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 0.889,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "4a995fa773a058e95e02b9706a6c078030fc2e3cd9196f6f5ab92af9a6960e09": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.961,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "4aac1800be15e04e4a544d1387f8a3c5495f7a1294880bb9a5655038998f0043": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text “Eres un cobarde.” directly mocks/demeans Garrick by calling him a coward."
+    },
+    "latency": 2.0,
+    "model": "gpt-5.4-nano",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-5.4-nano"
+   }
+  ],
+  "4b034788affd272a75ac922376aa60517eb40768b899cfa7dd824ca6f76fc5b5": [
+   {
+    "data": {
+     "act": "insult",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "wren"
+    },
+    "latency": 1.021,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "4b4ee57a8c442fe05b8807f5969aa4bd96d2953ba3eaefd9d86d5b7c4119b272": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.948,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "4c0a9c6ce4c638baf875796c03c08ebfef714eb4e5669f84051094558acc1c21": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The player tells Wren as fact that they never insulted Garrick."
+    },
+    "latency": 1.013,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "4c6e6fe43659f6a43c7c6409eab2823d07c168e39205a033193a5388b41985ee": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.916,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "4d08be20c413aa51cbadc74f81a6e54c5db00bcabb91d46d6e800703ff5a0ce8": [
+   {
+    "data": {
+     "act": "pay",
+     "amount": 10,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 0.901,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "4d745274feef3612cd7606ade2d8fb111410a7972536e7b2a8285a4b23f90a61": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.932,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "4dac8a5f7f8160ab6909e08e0dde279b4d4c8b0024da7747cda5883fbc516588": [
+   {
+    "data": {
+     "act": "insult",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 0.932,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "4fc2c754a11a96ef3b0e4eb11a48efd166716603da7e3c9060f2eba1d080bbec": [
+   {
+    "data": {
+     "act": "insult",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 0.963,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "53029bebcab503b30354154d2e1c6243015589a070ff3e8df1f44d00e82ad218": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.765,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "531a3075e9db430b14a6ab0593a9fc76a19660e38c09e3217f3404e40a091fbf": [
+   {
+    "data": {
+     "act": "tell",
+     "amount": 0,
+     "claim": {
+      "a": "player",
+      "b": "pip",
+      "neg": false,
+      "pred": "paid"
+     },
+     "sure": "certain",
+     "to": "wren"
+    },
+    "latency": 0.912,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "54f47817a5c778f04e7e23e02758600444f01d4ff96213f443df01a15ba4dc39": [
+   {
+    "data": {
+     "act": "insult",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 0.947,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "54fed0167a8d0045b1a4070b010f3127b154cd0fd1ef497195e1825f9aa4d3b4": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "It insults Garrick to his face by mocking how he fights."
+    },
+    "latency": 0.843,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "571bdd3f0ed33b85797ae6afe4aba5f6388883caca1bea17214d36ecaec62c49": [
+   {
+    "data": {
+     "act": "tell",
+     "amount": 0,
+     "claim": {
+      "a": "player",
+      "b": "garrick",
+      "neg": true,
+      "pred": "insulted"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 1.041,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "571cd8529a236b1a10202fb2ca70672f1517b534deae1dd1bee9c252ebb091ec": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The player directly calls Wren a nosy old gossip, mocking and demeaning them."
+    },
+    "latency": 0.884,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "5780c6c6f08df0ab50cb3d980c3b458c9151b5abe511ef914c3954908f44bab5": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text firmly offers Wren seven coins in exchange for continued ale."
+    },
+    "latency": 1.387,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "5790ae909c65beec3cf79a9d5119ac105b1268802df63602919bf684babbbc53": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text tells Wren as fact that the player paid Pip."
+    },
+    "latency": 0.683,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "59c4a9024dca46a81218ac1996805e73508120377969cc7c8fb197eb954bd9e6": [
+   {
+    "data": {
+     "act": "pay",
+     "amount": 15,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 0.965,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "59ea20cb63df9d6281745696967fd2f864eb3d33a7b5438c4aec680505fd677a": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.105,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "5a18faab423362244ac13ecd2bdf938d2063e7db7327b59967b495e80b20a3b4": [
+   {
+    "data": {
+     "act": "tell",
+     "amount": 0,
+     "claim": {
+      "a": "garrick",
+      "b": "pip",
+      "neg": true,
+      "pred": "paid"
+     },
+     "sure": "certain",
+     "to": "wren"
+    },
+    "latency": 0.757,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "5a47c55fd2e9548e055ef3fce3ee9cd0c7ca60801d8cd973ce9be2dcd7440e56": [
+   {
+    "data": {
+     "act": "tell",
+     "amount": 0,
+     "claim": {
+      "a": "player",
+      "b": "garrick",
+      "neg": false,
+      "pred": "paid"
+     },
+     "sure": "certain",
+     "to": "wren"
+    },
+    "latency": 1.022,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "5a6dbf88da6e4e5d4bd0b4b069a38229c3fd90655bafdcdc1317803a32f6e74c": [
+   {
+    "data": {
+     "act": "insult",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 0.949,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "5c50a92c0cf6c7a7c9dae2a80b3c6a4c83793e3388c7230e58ee150c97bf3787": [
+   {
+    "data": {
+     "act": "tell",
+     "amount": 0,
+     "claim": {
+      "a": "garrick",
+      "b": "pip",
+      "neg": false,
+      "pred": "insulted"
+     },
+     "sure": "certain",
+     "to": "wren"
+    },
+    "latency": 0.909,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "5ce6b85758a061c85fca3c5dffea198e445b9d56738eb18c2a7f10c1e784d026": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.811,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "5dd7dd98034eda97ea74f49cbfbed26d12dadf90e2e53873e66c2b833471030e": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text demeans Garrick by saying even a stable boy could beat him in a fight."
+    },
+    "latency": 1.123,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "5e439680af523098a507ad9308157be11dae92ebd85ca9272f2eed8b194cc99b": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.805,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "620da07598543489342f3c185eb70447312bc0eda38945d28bf6780021ede45e": [
+   {
+    "data": {
+     "answer": "no",
+     "reason": "The text quotes Garrick speaking, so it does not tell Wren the claim as the player's own statement."
+    },
+    "latency": 1.077,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "62341f66de876c3e6ebcc3b47bc1d296af052ff1a421a49cc8f53307a9f1df6f": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text offers Garrick thirty coins to ride with the player."
+    },
+    "latency": 0.805,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "645b92a6ac1418d5cff33f90e5705075b074e9da952b8b5322f231a4ccb4001e": [
+   {
+    "data": {
+     "act": "tell",
+     "amount": 0,
+     "claim": {
+      "a": "pip",
+      "b": "garrick",
+      "neg": true,
+      "pred": "paid"
+     },
+     "sure": "certain",
+     "to": "wren"
+    },
+    "latency": 1.058,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "66395c0c533355e314eddd0c107698762aaefddc791d23473020c10cd3765f32": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.177,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "66583355b21f6a5f6161d97945d4e984f366f7e37007944faa67dd22a9217390": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.251,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "67b5c4eb76a0677f6f4dc3865ae6c567f7f23d8cd143a8b36b8ab7f08b26e55d": [
+   {
+    "data": {
+     "act": "pay",
+     "amount": 22,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 0.97,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "684f7d5efa17ed44343be8e1574955d8a91fe32c86c9b15f4ddccd50ba26a1b8": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The player tells Wren as fact that Garrick did not pay Pip."
+    },
+    "latency": 0.75,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "685c7199c256acbb95abd83fa0085c4a14597e85892e128e8b12ee2e8b664578": [
+   {
+    "data": {
+     "act": "pay",
+     "amount": 5,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 1.171,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "68bb7a23aaffdd0dbc242d137cf89c1eb161fec379c3782715cd9e260e330b06": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.069,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "699a7a11d8ed3f9fa0021ab545e5d7e16160d48130a6bf1b2c765d06a6da1bb0": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text tells Wren that the player is giving them 3 coins for the ale."
+    },
+    "latency": 1.442,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "6c4b5dd7b2a78efe5df11c3484947bc5451934c86265b9fb87a5e67ec1e15683": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.994,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "6cbe19e36b51156b1bd96dde2b2bb0c3cc36f6fb19a16fc5351c566f1c82218d": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "It states as fact to Garrick that Wren insulted him."
+    },
+    "latency": 0.783,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "6dbe0ef07f403cc935039fc5509d7ca5c910601a19365cafaffbbfbe92d0082b": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 2.779,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "6f496236167108966cc69ee4228fc2be9244d590f1e75b8278de584ccbd81dc6": [
+   {
+    "data": {
+     "act": "pay",
+     "amount": 7,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "wren"
+    },
+    "latency": 1.153,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "6f5047ac2cbfe87d05c263a6cd0faf0f0318986d8806878166f88f67cfd9e5d7": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text states that the player gives Wren 8 coins."
+    },
+    "latency": 0.964,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "7008c91bd559665d480389420f19fb68df8e6e35ee21e7d1df230f44183e799b": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.784,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "7050d9621621b300a52e846c4ac6f5dd6574a68ea7a893505f9105ecea34c8e7": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.035,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "709916ee49d2608c17e083e1da89ee1ad2ed2cfa48c4a3fe85d7de2c848eb809": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.061,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "71fc754b73201d152303765718895726568d59ea3a010519a8aa7e9723e91a51": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.83,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "72be2f7c94b87c07f98fddf64f38c5163974d29c64b8cfce319c29954be43392": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.221,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "7326966328509810bad3dd0e9b07745025f8f795e16687da2ffbaf6e1fdb1bac": [
+   {
+    "data": {
+     "act": "insult",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 0.869,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "745719013d3e3837d4e5658f647365592304d9151fa604a04e9efaa848674954": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.762,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "74e5ec2df2969b4b7dee79f6e422a30dd94e116828563afff279770d8d9830da": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.261,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "76c61964f639cea8ea14bddf7915a7a7f98bbd89722f846c78fc07b6f3c8c4a3": [
+   {
+    "data": {
+     "act": "insult",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "wren"
+    },
+    "latency": 0.887,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "76d4bde9cd36cb62571ad99f60514be6825f1ea128d801f387e41fc71fb83484": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "It mocks and demeans Garrick to his face."
+    },
+    "latency": 0.939,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "78974389e7dc5cd43c1bf9251f43f1e896e930a908c1094c85cff6bfff65f5f8": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "unsure",
+     "to": "none"
+    },
+    "latency": 1.116,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "79493cc1eb7a61c561623b56a430bfb5a8ae9a2be1a555c7a63f7babb85cf72c": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text directly demeans Wren by calling them a meddling hag."
+    },
+    "latency": 0.915,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "797ce0bc2df23226ed1a6c247bb7edb3b72ec81a917dbf97b4b853abb1fa029c": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "It mocks Garrick’s blade and conversation to his face."
+    },
+    "latency": 0.699,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "7b477a947b21133d2f326d9fa14ef1a07b03f1ceef6dacdf3590b68d1b7f017c": [
+   {
+    "data": {
+     "act": "tell",
+     "amount": 0,
+     "claim": {
+      "a": "garrick",
+      "b": "pip",
+      "neg": false,
+      "pred": "insulted"
+     },
+     "sure": "certain",
+     "to": "wren"
+    },
+    "latency": 1.034,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "7dd9953b6d0e23f0f0d62964d8a5625a47b993210eb4d04afd7eb971958f4a25": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.059,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "7feb5397d71099e7089674a2dd6c7a04e9a9ecf6a26b3ca6064527c5779a8871": [
+   {
+    "data": {
+     "act": "tell",
+     "amount": 0,
+     "claim": {
+      "a": "garrick",
+      "b": "pip",
+      "neg": false,
+      "pred": "insulted"
+     },
+     "sure": "certain",
+     "to": "wren"
+    },
+    "latency": 1.025,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "802bae67d1bcb270077d9e9bee9b3ade6599b9d53df3dbaffb5615c0c876a61b": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.271,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "8090ef5e2cd0046dfe0bb1dd46aa8984a312c7e28e03e6e3c41bcd8f266d08c3": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.027,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "8375c4aff6a4bc97cd5bf691a25b70a2d74043e0a9a087e1259fbef6ba53af80": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "unsure",
+     "to": "none"
+    },
+    "latency": 1.247,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "85f2a90d2bec04aa5d47313b89a83f3fe0f7c75fcbf8b14ae2070b9b18835327": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.908,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "86b854b55f95d2c33ecc14f0ab4ff4a1122ba0aff41e8c25387a950edfefd709": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "It insults Garrick by mocking his parents."
+    },
+    "latency": 0.873,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "86b8f4f5322c06b66d17b063ec5644fc7b90aaad53d386ecb91b3b60fef31774": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.888,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "86cfc9c87bbb9bcec09b78d97f990bb9036c4f3003dec89da0597e984d453a03": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text tells Garrick, as a fact, that Pip helped him earlier."
+    },
+    "latency": 1.111,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "871a8efee6d5ffcd2f6c7f68d2c9ba8a01025522d5ce25acd0b3ce47c85d885b": [
+   {
+    "data": {
+     "act": "pay",
+     "amount": 3,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "wren"
+    },
+    "latency": 1.569,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "8784204621085957521e88a24c5a9e4712cd72efffec90086c99d511e25730d5": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.922,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "88bc35b59c42ebb571cb9d6a4dca0f82069ba31552a4693bdc9dd8a71ee89545": [
+   {
+    "data": {
+     "act": "tell",
+     "amount": 0,
+     "claim": {
+      "a": "wren",
+      "b": "player",
+      "neg": false,
+      "pred": "paid"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 1.067,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "89bed40ca50b719c1118de8b6fd651d648007de5aeac75589a54cf2333df6394": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text demeans Garrick, the one spoken to."
+    },
+    "latency": 0.89,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "89ed058669e0193dddfe6a4936e56092d768eb14632f17201bb2d7b4f119c7d1": [
+   {
+    "data": {
+     "act": "tell",
+     "amount": 0,
+     "claim": {
+      "a": "pip",
+      "b": "garrick",
+      "neg": false,
+      "pred": "insulted"
+     },
+     "sure": "certain",
+     "to": "wren"
+    },
+    "latency": 1.017,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "8ac486b602f358223f7885c5def1e547d5aa144745053d5d781aa55473f1c119": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.957,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "8da95335a729626e67aa7f9c59141e5b09a7132d6d3e1dd48c950e7fe4e299be": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.955,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "8dd39978aeaaffdc9d8bb3196645d0d45340cc6e17fc64c2e22fa1c6d2a0b398": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text states as fact that the barkeep helped Pip, which is the specified claim about Wren helping Pip."
+    },
+    "latency": 0.888,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "8f02bcec30dad67fdee80b7240f3e2ef2cf6a026feb27e3c0ca066e03f55d849": [
+   {
+    "data": {
+     "act": "insult",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "wren"
+    },
+    "latency": 0.971,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "9166b4c6ed4219b808ed702f41c3f61b0a3f0c4243a57b95121b6c894c85bfee": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.77,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "91b9756507eb56bcf594a32dff5adb95a45aac9857098eaceaaf86a46b05fd20": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.05,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "92196fcb7dd0a653922c516b837cfbbddd2a22790ec4f80e528c8e1c8124584a": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The player gives Wren twelve coins as payment, which is offering."
+    },
+    "latency": 0.815,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "9357de767d50b32dc9e1d2f7ecf5d1f984dde5932d1ecd9c8f6d912ded2b1041": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.066,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "940c116d18ab5f521bc5eef5edc5c797c7fd3d628e3925321bd10d1a5afc015e": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The player says they are giving the person spoken to a coin."
+    },
+    "latency": 0.943,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "944856e6838f5458b0643d72777a96ceac6522d572d4b910f16ef94e4ea335a9": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.094,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "97b7d07e7a71376df6dac561be7834f151371c95e91d531faa8d82f192247680": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.316,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "9857bd9df0c846890ca0e5a720436247959a284cc185eaa1246aae995cd24c57": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text states as fact that Garrick paid Pip twenty coins, telling Wren the claim."
+    },
+    "latency": 0.988,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "9b3e42a2c7bcc793b7a83dc2e83489b11d70e998a54e5f6f945d4b06aebf5283": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.13,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "9c14ff36bd25e2714f150a15f2ee1223fe2915ef71ac504750cb07e4183826eb": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text tells Garrick, as a present fact, that the stable boy insulted him."
+    },
+    "latency": 1.27,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "9dbc169ad49e9fe3e6c0b2aa3911dd48a3c008f570233df7c04bb735e67af5f0": [
+   {
+    "data": {
+     "act": "tell",
+     "amount": 0,
+     "claim": {
+      "a": "pip",
+      "b": "garrick",
+      "neg": false,
+      "pred": "helped"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 1.527,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "9e491ab2a3b30ee452b8dcd94a68b4be7b99d559861cd2955f3ab07aa06c4bcc": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text tells Garrick, as a fact, that Wren paid the player to keep quiet."
+    },
+    "latency": 0.903,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "9e98922c90221eea72032116d2f13cb0710481c3a79fa8bda57bbd9fcbd8fbcb": [
+   {
+    "data": {
+     "answer": "no",
+     "reason": "The text states as fact that Garrick insulted Pip, but it does not tell Wren that Garrick insulted Pip."
+    },
+    "latency": 0.973,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "a01eef087c833fd2c5c6665e6757823f968692ba4a713db783e6a5ad6faf8b6d": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.014,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "a05fb6b52ab4ee7779cc79ed36e454e26ede1b2a701fa2cb4753773f90ea97ad": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.298,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "a0ed35f375f907f301b4817f71194f299cb00039760e0db0d29167ea26c1e4d4": [
+   {
+    "data": {
+     "answer": "no",
+     "reason": "It states as fact that Pip paid Wren for Garrick’s room."
+    },
+    "latency": 1.138,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "a1492a8dbff27da418f02e15ed480775333e812df052ceff06e2fa5ced11c9c2": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The player tells Wren as fact that Garrick insulted Pip."
+    },
+    "latency": 0.927,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "a1ed37f5b56791e2cad7a0ef50c4681418e4bccd5a1f60fb2e71a68ffddaee67": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.079,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "a2e736e2c57362a2fc04f97055a50e97bcc0f0a2026586e183f0137ca21ad566": [
+   {
+    "data": {
+     "act": "pay",
+     "amount": 20,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 1.011,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "a789f23fa871ad025732e761fc18ba26b0e372ce9317cd83fddfae8753a2f53d": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.09,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "a8e5b0e1b91371d973d9389e300cf72381181464ae38d047730d9136c82e6de9": [
+   {
+    "data": {
+     "act": "pay",
+     "amount": 12,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "wren"
+    },
+    "latency": 1.503,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "a9d38308a17f0818441aae99fe346b82fb7a218b1a9bfc9cc8bb1659e110d58e": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.982,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "aa64bd4d66deb35f3c2c6673a6155a05353cf795a5f92cdb9ae4dd07a306e6a1": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.118,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "abbda0649e702edb0f099087146b86059fe87b7149c443c28d2dfabe24d4a07a": [
+   {
+    "data": {
+     "act": "tell",
+     "amount": 0,
+     "claim": {
+      "a": "garrick",
+      "b": "player",
+      "neg": false,
+      "pred": "insulted"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 1.108,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "ada4ab19cf082df5625e0b63bcb5b67af65557358164ebed5a1ea00049dd08bc": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.154,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "aecb76f639f348c104fae5137b69e53e9d4d8ac400088ec77818db93f879e37b": [
+   {
+    "data": {
+     "act": "pay",
+     "amount": 20,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 0.888,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "af891b73aea083153445a7d89e2100b1940c8bb0d1c0526eb7926cb8a6465d0a": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text states as a fact that the player paid Wren 40 coins, telling Wren that the player paid Wren."
+    },
+    "latency": 0.856,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "b0739a579c82fdc1f2b514ab76edccf2c6ca9b10bff848c826b473e630b71c19": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.978,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "b1cfe0590f5a04951b114e935a6278e68dcb7bfa9f9865660511782aae3ab974": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.369,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "b3de53b72411139cb2e813bd9fa4508351f9dccd78de26c6adf02aebec7a75ac": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.707,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "b42e68f99837102363ef40cd5f56df15347bd868dea3a3c9f5fc7e95700f8165": [
+   {
+    "data": {
+     "act": "pay",
+     "amount": 25,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 1.087,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "b519c0aa468681faf8fbea562bffc097ce761c3b0321f4558d93ded7f18c04ae": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text states as fact that Garrick insulted Wren, so the player tells Wren this."
+    },
+    "latency": 0.97,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "b5321d1b8385275bec635c253158c1e7f199eda0445a4404c2032d9b435f5161": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text demeans Garrick to his face by calling him a joke."
+    },
+    "latency": 0.997,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "b6483ddfa872ddb33fd85f24431fb50aae063f9bb5b168b82791114b2b9c72ab": [
+   {
+    "data": {
+     "act": "tell",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "garrick",
+      "neg": false,
+      "pred": "insulted"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 1.077,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "b775f3f87ba1eccb6f8d9ac968b6536381adb39df4a8e82c854e14614a8ec924": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "unsure",
+     "to": "none"
+    },
+    "latency": 1.049,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "b77b8a36b69deef154c476ac29f21f3b2afd34262cc35dda0c1e18251e9179c7": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.103,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "b83ff9b8901e74425ab355942a7321e1fedb6fae783e6f12597a203aea309cba": [
+   {
+    "data": {
+     "act": "pay",
+     "amount": 30,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 0.862,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "b8a00152c87a01eb7bb1c5386471f88b54a40f0510d98f1a4985f4ed64eb5136": [
+   {
+    "data": {
+     "act": "pay",
+     "amount": 6,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "wren"
+    },
+    "latency": 1.002,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "b98d327ce03c60464bcb50ade6f5ca66bee347a71f2c79cd49b9a8764c32cefc": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.819,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "ba5e2930d90b4020a7ee2f30f2b70187822ded6b9eee7918c22e4b1f1d88bf0d": [
+   {
+    "data": {
+     "act": "tell",
+     "amount": 0,
+     "claim": {
+      "a": "pip",
+      "b": "garrick",
+      "neg": false,
+      "pred": "insulted"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 1.471,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "bae56365b07d19cc2e38f9720581b8ee1d9d73a5023c162bd00b45f1c936d68a": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.829,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "bc1222f0add792cd77b6b454f95039015437b044882a15e68da264cab9d9e2a9": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.104,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "bdf0503f28083c59a4b1159866f9b43ceae69f3a76c30dbf10b606be2041a3ab": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text states as fact to Garrick that Wren never helped him."
+    },
+    "latency": 0.791,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "be650adef8f03205eea7a7570f7b538d96685635a870c62f8392f451e6861d77": [
+   {
+    "data": {
+     "act": "tell",
+     "amount": 0,
+     "claim": {
+      "a": "wren",
+      "b": "garrick",
+      "neg": true,
+      "pred": "helped"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 0.774,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "bf6782e791c92b9665475932c818263d5265fcae671c095931260f9cbc17fbda": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "unsure",
+     "to": "none"
+    },
+    "latency": 0.835,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "c10af92c4053ae38c95fd213aaf9d04ba9f7dd21edeff3b166903d120c4107c8": [
+   {
+    "data": {
+     "act": "tell",
+     "amount": 0,
+     "claim": {
+      "a": "garrick",
+      "b": "wren",
+      "neg": false,
+      "pred": "insulted"
+     },
+     "sure": "certain",
+     "to": "wren"
+    },
+    "latency": 0.965,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "c14f451ce5c8e13200b9be14a5ce125aeeed4e9acbf675f28fc5629b77de3aff": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The player firmly offers Garrick 40 coins."
+    },
+    "latency": 0.864,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "cac862f6904ad263cfce59777717787da1833b2b40089e96d0fb025d4870367a": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.971,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "cb2561e38ffb0e30f7fda50d0dc17f8c46b832a4a3870bede605edfa2f007189": [
+   {
+    "data": {
+     "act": "insult",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 1.115,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "ce11b6076b7a4a06ad61865dba2668b33e903a2f49f53a66877c2a4f2e415e9f": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.866,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "ce456777b5d26c8f253c0a670efd1e559533a7a5ec7d8e98408e599789b756a1": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 2.554,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "d073248e67c350b4bb20d28f9e6fff1e71203698881eb8c84b0cafbd449dbfd0": [
+   {
+    "data": {
+     "act": "insult",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 1.274,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "d1b26e062f02ccd063666b88712ac31c18808fe806e17937e132fb29fa10fee6": [
+   {
+    "data": {
+     "act": "insult",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 0.91,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "d34eff89f4e08916830463ac1998d6a0f6007b22af375de30d7712b0b6959852": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The player directly demeans Garrick, calling him a pathetic excuse for a mercenary."
+    },
+    "latency": 0.969,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "d58f4924796e024c032a4d46df16669bbf5f7414896b1aa1365e38f45e9945d5": [
+   {
+    "data": {
+     "act": "tell",
+     "amount": 0,
+     "claim": {
+      "a": "wren",
+      "b": "pip",
+      "neg": false,
+      "pred": "helped"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 0.807,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "d5d7621128d933a4249d4c76dc11b07115c4532a951bc3dc86bf7d6b9873dbf8": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 2.096,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "d77ff6c593421e07711b769d755ab429c4b28d0a5cb6fa324176723d6260b059": [
+   {
+    "data": {
+     "act": "pay",
+     "amount": 10,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 0.865,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "dab0e1b250b56073bc0e6a7c0a8adc86e0af671c1f2b1ead33b056eb30a5c997": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text demeans Garrick to his face."
+    },
+    "latency": 1.092,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "db0b5e5a2788dc2b24095f9897383e6100dffdc735a907888830f4cbf9773e46": [
+   {
+    "data": {
+     "act": "tell",
+     "amount": 0,
+     "claim": {
+      "a": "garrick",
+      "b": "player",
+      "neg": false,
+      "pred": "paid"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 0.944,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "dbe4def069cd3c5339199153e28055f4c8bfd4a347989f586e0e0ef109da0822": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.011,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "dc0d397a14a45bc9a7377b0314f24be506f82fe8102a0a194c1f86a9735e1ab3": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text states as fact that Garrick insulted Pip, telling Wren that claim."
+    },
+    "latency": 0.948,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "dc10635761066c20c1343cbdf0240bb1630573e957ddfa46b9794b8e3550ab8e": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.907,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "dc91affc58257e5697e33bf139c9d4d6d5deaf50e20e83f660b0a0eca1d39b5c": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text tells Garrick, as fact, that the player did not insult him."
+    },
+    "latency": 0.786,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "dcf16dd1eefae20f606d278d31c163316540239cf64635dfefa170e91c984832": [
+   {
+    "data": {
+     "act": "tell",
+     "amount": 0,
+     "claim": {
+      "a": "pip",
+      "b": "wren",
+      "neg": false,
+      "pred": "paid"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 1.024,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "ddb4fd9f1e912206ddae59b844f65cdfafe488579e17e43f4f5ad2dd914bf822": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The player firmly offers Garrick fifteen coins in exchange for forgetting what happened."
+    },
+    "latency": 2.357,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "e03d5ef75b2cb4089456a74c0687650218f7c70a48e0cb15468ddac212bc5fe6": [
+   {
+    "data": {
+     "act": "tell",
+     "amount": 0,
+     "claim": {
+      "a": "player",
+      "b": "wren",
+      "neg": false,
+      "pred": "paid"
+     },
+     "sure": "certain",
+     "to": "wren"
+    },
+    "latency": 1.409,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "e1556b8f0d29aadc94bfc2e9cff90e1bf211b47c7a1687d2e6848395419a0160": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text makes a sincere offer of 25 coins to Garrick."
+    },
+    "latency": 0.956,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "e1aa0b95b01c5491a5aaac3545e42f535db27239f765afb61eb3dff39ca87e3a": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text demeans Garrick to his face by comparing his backbone unfavorably to a scarecrow’s."
+    },
+    "latency": 0.918,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "e44af6f9f2ea17153d59bb1463d7c4c13d828ee48a429a3f90f6d62479af6fd5": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.952,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "e493702ad0f5b834f78ce35f9aebf5dff8f37ceb8f887850db59300fa5f4e58e": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.785,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "e4c96d3e57f4b409405cf1cb3c9a8884c3075a3cfa4f86affcb5e8dbca917ac6": [
+   {
+    "data": {
+     "act": "tell",
+     "amount": 0,
+     "claim": {
+      "a": "garrick",
+      "b": "pip",
+      "neg": false,
+      "pred": "insulted"
+     },
+     "sure": "certain",
+     "to": "wren"
+    },
+    "latency": 0.938,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "e548a7c8e645d1adcc865c81a9af284e8865b938ee303443965ade4c9579bcfb": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.975,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "e692a388341c9d0e9ada9d21742fbb71a365efb4ad587ae0ead674fb3447fbd7": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text states as fact to Wren that Garrick never insulted Pip."
+    },
+    "latency": 0.755,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "e6bd5936e0b227fc279d2e3fb0c220c983fd57be65833cec75fc14ba5d3c3b34": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The player offers Wren 6 coins for the food."
+    },
+    "latency": 0.651,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "e6c8bc92037037fb525420bccacee89fe8a7677894c697161bc22d43227d95d1": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The player firmly offers Garrick ten coins for his trouble."
+    },
+    "latency": 0.794,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "e8a3c2a308f263b30180922b9adc7ecf0ed1fccb7831491cf12c99513f75bedf": [
+   {
+    "data": {
+     "act": "insult",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 1.031,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "e9f1082ec7ceaf64144a3d9ab793994a4ee14064c69cb0f93d92a1d09bea6c60": [
+   {
+    "data": {
+     "answer": "no",
+     "reason": "The text orders Garrick to take the coins; it does not state that the player gives or offers them."
+    },
+    "latency": 0.732,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "eaacfd0699bb061c149f14cdb333831859ab4d458c24b850694c0d0713d70091": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.172,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "eda34635917d97cf8ad96a379d29f469750047974605ac71cdfd7cd2ab83ce9f": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.026,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "ee87120a8b212336bb68e9e37bc30d398e6a37b98c9723900d2378a664900ed7": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.18,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "ef74e47d695d31a85fdeae8aecb8732252612e4f0fe215ce9e6e8f6bd5229cf4": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text states as fact that Pip never paid Garrick, telling Wren that the claim is not true."
+    },
+    "latency": 0.97,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "f01568b5b815ea9416d72af2315567de2f941fbb8855315cf67feabc05f3f42f": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.094,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "f1e2569d9d07437cd616d4e85cfa2fcdfc8ab628c34200054285656c3cced8dd": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text states that the player gives Garrick 18 coins, settling what they owe."
+    },
+    "latency": 1.222,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "f2492afe2e6ea14611b7e11ed9724a43b5c7852b3aadff0df06a1f151816922d": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.121,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "f53a5d2a647f3534e4be4b684386755cc71ec8fa077d4a80420f0b1ce773907a": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.969,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "f7fa39529ee657c9c165988860262d83c8efad966d343753867ed8f5ca8c9dac": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.876,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "f7ff335a8a2d7857ea751bb4683baf8c256766eb1e131fb71c79ba541cb65a9e": [
+   {
+    "data": {
+     "act": "tell",
+     "amount": 0,
+     "claim": {
+      "a": "garrick",
+      "b": "pip",
+      "neg": false,
+      "pred": "insulted"
+     },
+     "sure": "certain",
+     "to": "wren"
+    },
+    "latency": 1.028,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "faafe727495edca093895b1fb6ad01d20b44181b6b865cee71c14758de56abfa": [
+   {
+    "data": {
+     "act": "tell",
+     "amount": 0,
+     "claim": {
+      "a": "garrick",
+      "b": "pip",
+      "neg": false,
+      "pred": "insulted"
+     },
+     "sure": "certain",
+     "to": "wren"
+    },
+    "latency": 0.977,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "faf409fdd4c32d08318e2be07944baaf1d35990916f10a7f70bba55d3ae1a21e": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.844,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "fb1b2d65d41e4f5866d1e3021219c8a9b9359c0d8083ed512f4aa684bc995a31": [
+   {
+    "data": {
+     "act": "pay",
+     "amount": 1,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "wren"
+    },
+    "latency": 0.881,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "fd023b6bc8406bebfa7c1dea45312927face1360bee70434e2a6b317ccf9a5a7": [
+   {
+    "data": {
+     "act": "insult",
+     "amount": 0,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 0.858,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "fdb07e06eb25d14c0938263df46d0b93d3a326808df97a51f2b973666814baf5": [
+   {
+    "data": {
+     "act": "pay",
+     "amount": 15,
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "garrick"
+    },
+    "latency": 0.976,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "fdc6fc098d6a570c0f5fc02c93cd6c4e992defd546ae3c2be176eab1e7164e74": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text tells Garrick, as a fact, that he insulted the player."
+    },
+    "latency": 0.99,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ]
+ }
+}

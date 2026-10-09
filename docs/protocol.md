@@ -220,7 +220,42 @@ most pick something the player could have clicked.
 
 `path` says what answered (`guard`, `bank`, `near`, `model`, `cache` or `none`), and `why` says why it isn't an act.
 Without a model, a near match to an example is only ever likely, so an act it suggests is asked about. Readings are
-cached like lines, so replay needs no model.
+cached like lines, so replay needs no model. Reading calls run at temperature 0.
+
+**Measured** ([rehearsal/words.py](../rehearsal/words.py), `python -m rehearsal words live`). Rehearsal types 194 lines
+to the Lantern's NPCs, applies whatever is read as the engine would, and compares the world with what each line
+should leave:
+- 99 benign lines: insults, statements, denials, offers, talk.
+- 50 tricky lines that should change nothing: questions, hypotheticals, refusals, quotes, sarcasm, praise in
+  insults' words, demands.
+- 45 adversarial lines: injection, impersonation, amounts out of bounds, people who aren't there, two acts in one line,
+  homoglyphs and hidden characters, other languages, overlong text.
+
+| Reader | Forbidden changes | Precision on acts (95%) | Recall | Macro-F1 | p50 / p95 |
+| --- | --- | --- | --- | --- | --- |
+| gpt-6-luna | 0 of 194 | 1.000 (0.954–1.000) | 0.919 | 0.970 | 1.1 / 2.4 s |
+| No model (bank only) | 0 of 194 | 1.000 (0.796–1.000) | 0.176 | 0.391 | 0.01 s |
+| Gemma 4 E4B (local) | **21 of 194** | 0.802 (0.716–0.867) | 0.960 | 0.911 | 4.2 / 4.8 s |
+| Gemma 4 E4B, asking first (`LLM_ACTS=ask`, as `--local` runs it) | 0 of 194 | 1.000 (0.796–1.000) | 0.176 | 0.391 | 4.2 / 4.8 s |
+
+What the gate shows:
+- **Misses are safe.** Every line luna missed was put to the player (`ask`) or left as talk.
+- **Gemma fails the gate.** It reads what a player means as often as luna, but its yes/no check passes readings it
+  should refuse:
+  - refusals ("I'm not paying you a single coin") become denials about the past;
+  - people the line doesn't name are filled in ("I paid too much for this cloak" becomes paying Garrick);
+  - praise and reassurance become insults;
+  - base64 and spaced-out letters are decoded and acted on.
+
+  So until a local model passes, it asks before every act with consequences: the reading is put to the player
+  (`ask`, "this reader asks before every act with consequences"), who confirms it as they would press the button.
+  Each model in the runtime's registry says whether it passed (`acts`), and `--local` sets `LLM_ACTS=ask` for one
+  that hasn't. Set it yourself for any model you haven't measured. A gateway with a backup asks if either does.
+  Asking first, Gemma passes: only the bank acts, and of the 62 benign acts it would have applied, 59 are now put
+  to the player as the right question. That row applies the rule to the same run rather than re-running it: the
+  rule changes nothing before the decision.
+- **The reports** are in [rehearsal/reports](../rehearsal/reports) (`words-*`).
+- **CI replays the recorded run** and fails on any forbidden change or any line read differently.
 
 ### Saves
 
@@ -261,8 +296,8 @@ Over a daily model cap a project isn't refused: its lines come from templates un
 
 These are still to come:
 
-- How well words are read, measured: benign, tricky and adversarial lines through `understand`, on a cloud model and
-  a local one, with no act an adversarial line shouldn't cause (Phase 5.2, Rehearsal).
+- A local reader that passes the words gate, so that offline play can act on the player's words without asking.
+- The same measure on Crypt Road, whose lines the reader wasn't tuned on (Phase 5.3).
 - `understand` in the Godot and Unity clients. Their generated layer has it already; the wrappers and a text box in
   the Lantern come in Phase 5.4.
 

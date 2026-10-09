@@ -59,6 +59,7 @@ PLAYER_FACING = frozenset({"act", "react", "narrate", "extract", "check", "under
 MAX_TOKENS = 150
 LONGER = {"tell": 450}  # call types whose replies need more room: a told scene is several lines
 TEMPERATURE = 0.6
+READING = frozenset({"understand", "confirm"})  # call types that read rather than write: temperature 0
 MAX_CONCURRENT = 4  # threads one complete_many uses; each provider's own limit is its profile's `concurrency`
 COOLDOWN = {401: 600.0, 402: 600.0, 403: 600.0, 429: 30.0}  # seconds to skip a provider after these answers
 
@@ -73,6 +74,7 @@ class Provider:
     api_version: str = ""  # Azure's api-version query, for deployment-style URLs
     structured: bool = True  # send a call's JSON schema as structured outputs; False keeps to JSON mode
     profile: Profile = DEFAULT  # what kind of endpoint it is (thespis.profiles)
+    acts: bool = True  # its readings of the player's words may act; False asks first (thespis.intents)
 
     @property
     def azure(self) -> bool:
@@ -104,9 +106,10 @@ class Provider:
         """The request. With a schema, the reply must match it: structured outputs, a grammar, or a tool call."""
         if schema is not None:
             schema = self.profile.adapt(schema, name)
+        temperature = 0.0 if name in READING else TEMPERATURE
         if self.anthropic:
             system = "\n".join(m["content"] for m in messages if m["role"] == "system")
-            body = {"model": self.model, "max_tokens": MAX_TOKENS, "temperature": TEMPERATURE, "system": system,
+            body = {"model": self.model, "max_tokens": MAX_TOKENS, "temperature": temperature, "system": system,
                     "messages": [m for m in messages if m["role"] != "system"]}
             if schema is not None:
                 body |= {"tools": [{"name": name, "description": "Give your reply.", "input_schema": schema}],
@@ -114,7 +117,7 @@ class Provider:
         else:
             fmt = {"type": "json_schema", "json_schema": {"name": name, "strict": True, "schema": schema}} \
                 if schema is not None else {"type": "json_object"}
-            body = {"model": self.model, "messages": messages, "max_tokens": MAX_TOKENS, "temperature": TEMPERATURE,
+            body = {"model": self.model, "messages": messages, "max_tokens": MAX_TOKENS, "temperature": temperature,
                     "response_format": fmt}
         body = {**body, **self.profile.extra, **self.extra}
         if name in LONGER:  # at least that much room, whatever the profile or extra cap a line at
@@ -365,7 +368,8 @@ def _filtered(r: httpx.Response) -> bool:
 def provider_from_env(env: Mapping[str, str], prefix: str) -> Provider | None:
     """The provider configured under `prefix` (e.g. LLM_ or JUDGE_DEEPSEEK_): PROFILE (thespis.profiles; a name or a
     probe's file), BASE_URL (the profile's if left out), API_KEY (unless the profile needs none), MODEL, and optional
-    TIMEOUT (seconds), EXTRA (JSON), API_VERSION and STRUCTURED (0 keeps it to JSON mode). None unless it has a model,
+    TIMEOUT (seconds), EXTRA (JSON), API_VERSION, STRUCTURED (0 keeps it to JSON mode) and ACTS (`ask`: every act
+    with consequences it reads from the player's words is asked about first). None unless it has a model,
     a URL and, where needed, a key. CONCURRENCY overrides the profile's calls at once (a server shared by many
     players wants more than a laptop's model can take)."""
     named = env.get(f"{prefix}PROFILE", "").strip()
@@ -383,7 +387,14 @@ def provider_from_env(env: Mapping[str, str], prefix: str) -> Provider | None:
     return Provider(name=f"{urlparse(base).hostname or base}/{model}", base_url=base, api_key=key, model=model,
                     extra=json.loads(extra) if extra else {}, api_version=env.get(f"{prefix}API_VERSION", "").strip(),
                     structured=env.get(f"{prefix}STRUCTURED", "1").strip() != "0",
+                    acts=env.get(f"{prefix}ACTS", "").strip().lower() != "ask",
                     profile=with_timeout(prof, float(timeout) if timeout else None))
+
+
+def reads_acts(gateway: object) -> bool:
+    """Whether every provider behind a gateway may turn the player's words into acts without asking. A wrapper
+    (recording, metering) passes its inner gateway's providers on; one without providers, such as replay, may."""
+    return all(getattr(p, "acts", True) for p in getattr(gateway, "providers", ()))
 
 
 def gateway_from_env(env: Mapping[str, str] | None = None) -> OpenAICompatGateway | NoModel:
