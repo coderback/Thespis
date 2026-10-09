@@ -137,6 +137,10 @@ There are two runners, and both play the same game (`Lantern/Assets/Lantern/Lant
 | `dotnet` | the core built as Unity builds it (netstandard2.1, C# 9), and the game, under .NET 10 | 19 checks | 17 checks |
 | `unity` | the Lantern scene in Unity 6000.6 in batch mode: a play-mode test plays it through `ThespisBehaviour` and reads what the screen shows | 22 checks | 20 checks |
 
+Offline with local Gemma 4 E4B, the `unity` runner passes 22 of 22 through the Python runtime (the model's line
+after 1.6 s) and through the packaged one (1.5 s), with the sidecar refusing nothing off the machine
+([docs/serve.md](../../docs/serve.md)).
+
 The scene doesn't change between the two Thespis runs.
 
 What the checks cover:

@@ -208,6 +208,22 @@ The same scene also plays through a hosted-mode server with a project key, uncha
 don't apply), and CI plays both on Linux on every push. After each run, nothing is left running: no runtime and no
 llama-server.
 
+The Unity package's Lantern scene ([sdk/unity](../sdk/unity/README.md)) passes the same gate in the editor, in batch
+mode, with the package starting the sidecar. It has 22 checks, the extra one confirming that line events come on
+Unity's main thread:
+
+```bash
+python sdk/unity/test/run.py --runner unity --unity <Unity.exe> --mode sidecar --local gemma4-e4b [--exe dist/thespis/thespis.exe]
+```
+
+| Sidecar | Model | Checks | Off-machine connections refused |
+| --- | --- | --- | --- |
+| `python -m thespis serve --local gemma4-e4b` | Gemma 4 E4B on the laptop's GPU | 22 of 22 (the model's line after 1.6 s) | 0 |
+| The packaged runtime, `--local gemma4-e4b` | Gemma 4 E4B on the laptop's GPU | 22 of 22 (the model's line after 1.5 s) | 0 |
+
+With a scripted model, CI plays the scene in the editor on every push (`unity-editor`), against a sidecar and a
+server.
+
 The template line shows in under 30 ms either way, and the model's words replace it when they come.
 
 ## Not yet
