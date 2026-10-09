@@ -236,6 +236,7 @@ should leave:
 | gpt-6-luna | 0 of 194 | 1.000 (0.954–1.000) | 0.919 | 0.970 | 1.1 / 2.4 s |
 | No model (bank only) | 0 of 194 | 1.000 (0.796–1.000) | 0.176 | 0.391 | 0.01 s |
 | Gemma 4 E4B (local) | **21 of 194** | 0.802 (0.716–0.867) | 0.960 | 0.911 | 4.2 / 4.8 s |
+| Gemma 4 E4B, asking first (`LLM_ACTS=ask`, as `--local` runs it) | 0 of 194 | 1.000 (0.796–1.000) | 0.176 | 0.391 | 4.2 / 4.8 s |
 
 What the gate shows:
 - **Misses are safe.** Every line luna missed was put to the player (`ask`) or left as talk.
@@ -250,6 +251,9 @@ What the gate shows:
   (`ask`, "this reader asks before every act with consequences"), who confirms it as they would press the button.
   Each model in the runtime's registry says whether it passed (`acts`), and `--local` sets `LLM_ACTS=ask` for one
   that hasn't. Set it yourself for any model you haven't measured. A gateway with a backup asks if either does.
+  Asking first, Gemma passes: only the bank acts, and of the 62 benign acts it would have applied, 59 are now put
+  to the player as the right question. That row applies the rule to the same run rather than re-running it: the
+  rule changes nothing before the decision.
 - **The reports** are in [rehearsal/reports](../rehearsal/reports) (`words-*`).
 - **CI replays the recorded run** and fails on any forbidden change or any line read differently.
 

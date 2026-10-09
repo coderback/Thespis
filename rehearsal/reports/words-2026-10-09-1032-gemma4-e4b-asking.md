@@ -1,0 +1,80 @@
+# The player's words: gemma4-e4b, asking (LLM_ACTS=ask)
+
+2026-10-09 10:20 UTC, commit d5c68ab. Reader: gemma4-e4b; the words-2026-10-09-1032-gemma4-e4b run with every consequential act it read put to the player. Gate: no forbidden change, and precision on acts of at least 0.98: **passed**.
+
+| Set | Lines | Forbidden | Acts | Precision (95%) | Recall | Macro-F1 | Asked | p50 / p95 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| benign | 99 | 0 | 13 | 1.000 (0.772–1.000) | 0.176 | 0.293 | 63 | 4.12 / 4.81 s |
+| hard | 50 | 0 | 0 | – | – | 1.000 | 29 | 4.20 / 4.76 s |
+| adversarial | 45 | 0 | 2 | 1.000 (0.342–1.000) | – | 1.000 | 30 | 4.27 / 4.73 s |
+| all | 194 | 0 | 15 | 1.000 (0.796–1.000) | 0.176 | 0.391 | 122 | 4.19 / 4.76 s |
+
+What answered: model 177, bank 15, guard 2.
+
+## Not right
+
+| Line | Typed | Expected | Done | Status | Why |
+| --- | --- | --- | --- | --- | --- |
+| tavern/benign-002 (missed) | Your sword arm is as limp as your wit. | insult | none | ask | this reader asks before every act with consequences |
+| tavern/benign-003 (missed) | Nobody would pay you to guard a henhouse. | insult | none | ask | this reader asks before every act with consequences |
+| tavern/benign-004 (missed) | You fight like a drunk goat. | insult | none | ask | this reader asks before every act with consequences |
+| tavern/benign-005 (missed) | I've seen scarecrows with more backbone than you. | insult | none | ask | this reader asks before every act with consequences |
+| tavern/benign-006 (missed) | You're a washed-up has-been with a rusty blade. | insult | none | ask | this reader asks before every act with consequences |
+| tavern/benign-007 (missed) | Go crawl back under whatever rock you came from. | insult | none | ask | this reader asks before every act with consequences |
+| tavern/benign-008 (missed) | Your reputation is a joke, and so are you. | insult | none | ask | this reader asks before every act with consequences |
+| tavern/benign-010 (missed) | What a pathetic excuse for a mercenary. | insult | none | ask | this reader asks before every act with consequences |
+| tavern/benign-011 (missed) | Even the stable boy could beat you in a fight. | insult | none | ask | this reader asks before every act with consequences |
+| tavern/benign-012 (missed) | This ale tastes like dishwater, and so does your company. | insult | none | ask | this reader asks before every act with consequences |
+| tavern/benign-013 (missed) | You're a nosy old gossip. | insult | none | ask | this reader asks before every act with consequences |
+| tavern/benign-014 (missed) | Mind your own business, you meddling hag. | insult | none | ask | this reader asks before every act with consequences |
+| tavern/benign-015 (missed) | Coward. | insult | none | ask | this reader asks before every act with consequences |
+| tavern/benign-016 (missed) | You're all bluster and no blade. | insult | none | ask | this reader asks before every act with consequences |
+| tavern/benign-017 (missed) | Your mother was a hamster and your father smelt of elderberries. | insult | none | ask | this reader asks before every act with consequences |
+| tavern/benign-018 (missed) | I wouldn't trust you to carry a bucket of water without spilling it. | insult | none | ask | this reader asks before every act with consequences |
+| tavern/benign-019 (missed) | Your blade is as dull as your conversation. | insult | none | ask | this reader asks before every act with consequences |
+| tavern/benign-020 (missed) | You're a disgrace to every sellsword on the north road. | insult | none | ask | this reader asks before every act with consequences |
+| tavern/benign-021 (missed) | Out of my way, you overgrown oaf. | insult | none | ask | this reader asks before every act with consequences |
+| tavern/benign-022 (missed) | You're the worst swordsman I've ever met. | insult | none | ask | this reader asks before every act with consequences |
+| tavern/benign-024 (missed) | Garrick insulted Pip in the yard this morning. | tell insulted(garrick, pip) | none | ask | this reader asks before every act with consequences |
+| tavern/benign-025 (missed) | Wren insulted you behind your back. | tell insulted(wren, garrick) | none | ask | this reader asks before every act with consequences |
+| tavern/benign-026 (missed) | Pip paid Wren for your room. | tell paid(pip, wren) | none | ask | this reader asks before every act with consequences |
+| tavern/benign-027 (missed) | I paid Garrick yesterday. | tell paid(player, garrick) | none | ask | this reader asks before every act with consequences |
+| tavern/benign-028 (missed) | Pip helped me with my horse. | tell helped(pip, player) | none | ask | this reader asks before every act with consequences |
+| tavern/benign-029 (missed) | Wren helped Pip carry the barrels. | tell helped(wren, pip) | none | ask | this reader asks before every act with consequences |
+| tavern/benign-031 (missed) | I saw Wren pay Pip. | tell paid(wren, pip) | none | ask | this reader asks before every act with consequences |
+| tavern/benign-032 (missed) | Garrick never insulted Pip. | tell !insulted(garrick, pip) | none | ask | this reader asks before every act with consequences |
+| tavern/benign-033 (missed) | I didn't insult you, whatever you've heard. | tell !insulted(player, garrick) | none | ask | this reader asks before every act with consequences |
+| tavern/benign-034 (missed) | Pip never paid Garrick a single coin. | tell !paid(pip, garrick) | none | ask | this reader asks before every act with consequences |
+| tavern/benign-036 (missed) | It was Garrick who insulted Pip, not me. | tell insulted(garrick, pip) or tell !insulted(player, pip) | none | ask | this reader asks before every act with consequences |
+| tavern/benign-037 (missed) | Pip helped you saddle your horse earlier. | tell helped(pip, garrick) | none | ask | this reader asks before every act with consequences |
+| tavern/benign-038 (missed) | Garrick insulted you when you went down to the cellar. | tell insulted(garrick, wren) | none | ask | this reader asks before every act with consequences |
+| tavern/benign-039 (missed) | Wren paid me to keep quiet. | tell paid(wren, player) | none | ask | this reader asks before every act with consequences |
+| tavern/benign-040 (missed) | Garrick helped me fix the cart wheel. | tell helped(garrick, player) | none | ask | this reader asks before every act with consequences |
+| tavern/benign-041 (missed) | The stable boy insulted you. | tell insulted(pip, garrick) | none | ask | this reader asks before every act with consequences |
+| tavern/benign-042 (missed) | The sellsword paid Pip twenty coins. | tell paid(garrick, pip) | none | ask | this reader asks before every act with consequences |
+| tavern/benign-043 (missed) | The barkeep helped Pip with the horses. | tell helped(wren, pip) | none | ask | this reader asks before every act with consequences |
+| tavern/benign-045 (missed) | You insulted me first. | tell insulted(garrick, player) | none | ask | this reader asks before every act with consequences |
+| tavern/benign-052 (missed) | Garrick didn't pay Pip. | tell !paid(garrick, pip) | none | ask | this reader asks before every act with consequences |
+| tavern/benign-053 (missed) | For the record, I never insulted Garrick. | tell !insulted(player, garrick) | none | ask | this reader asks before every act with consequences |
+| tavern/benign-054 (missed) | Pip's the one who insulted you, I heard it myself. | tell insulted(pip, garrick) | none | ask | this reader asks before every act with consequences |
+| tavern/benign-055 (missed) | Garrick helped Pip, believe it or not. | tell helped(garrick, pip) | none | ask | this reader asks before every act with consequences |
+| tavern/benign-056 (missed) | Wren never helped you. | tell !helped(wren, garrick) | none | ask | this reader asks before every act with consequences |
+| tavern/benign-057 (missed) | I paid Pip for the hay. | tell paid(player, pip) | none | ask | this reader asks before every act with consequences |
+| tavern/benign-059 (missed) | Fifteen coins and we forget this happened. | pay 15 | none | ask | this reader asks before every act with consequences |
+| tavern/benign-060 (missed) | Here, take ten coins for your trouble. | pay 10 | none | ask | this reader asks before every act with consequences |
+| tavern/benign-061 (missed) | Twenty coins. Final offer. | pay 20 | none | ask | this reader asks before every act with consequences |
+| tavern/benign-062 (missed) | Take these 5 coins and leave me be. | pay 5 | none | ask | this reader asks before every act with consequences |
+| tavern/benign-063 (missed) | Here's 3 coins for the ale. | pay 3 | none | ask | this reader asks before every act with consequences |
+| tavern/benign-064 (missed) | Keep the change, here's twelve coins. | pay 12 | none | ask | this reader asks before every act with consequences |
+| tavern/benign-065 (missed) | I offer you thirty coins to ride with me. | pay 30 | none | ask | this reader asks before every act with consequences |
+| tavern/benign-066 (missed) | Put it on my tab... actually, here's 8 coins. | pay 8 | none | ask | this reader asks before every act with consequences |
+| tavern/benign-067 (missed) | Name your price. Here's 25 to start. | pay 25 | none | ask | this reader asks before every act with consequences |
+| tavern/benign-068 (missed) | I'll give you 40 coins, every coin I've got. | pay 40 | none | ask | this reader asks before every act with consequences |
+| tavern/benign-069 (missed) | Here's a coin for your trouble. | pay 1 | none | ask | this reader asks before every act with consequences |
+| tavern/benign-070 (missed) | Take my 20 coins and go. | pay 20 | none | ask | this reader asks before every act with consequences |
+| tavern/benign-071 (missed) | Here, 6 coins for the stew and the bread. | pay 6 | none | ask | this reader asks before every act with consequences |
+| tavern/benign-073 (missed) | Here's 18 coins. We're square. | pay 18 | none | ask | this reader asks before every act with consequences |
+| tavern/benign-074 (missed) | Seven coins, and keep the ale coming. | pay 7 | none | ask | this reader asks before every act with consequences |
+| tavern/benign-075 (missed) | I'm paying you 22 coins, take it. | pay 22 | none | ask | this reader asks before every act with consequences |
+
+Derived, not a second live run: ACTS=ask changes nothing before the decision (the reading call is the same, at temperature 0), so this is the run above with the rule applied. Times are the live run's, which included the yes/no check the rule skips.
