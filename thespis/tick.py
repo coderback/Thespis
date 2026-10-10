@@ -84,14 +84,17 @@ def gossip(w: World, gossips: Sequence[str], about: Collection[str] | None, prio
 def spread(w: World, tellers: Sequence[str], listeners: Callable[[str], Sequence[tuple[str, float]]],
            about: Collection[str] | None, priority: Mapping[str, int], threshold: float,
            happened: Callable[[World, Claim], bool], hear: Callable[[World, str, Claim, float, str, Event], None],
-           trust: Callable[[str, str], float]) -> None:
+           trust: Callable[[str, str], float], most: int | None = None, start: int = 0) -> int:
     """Gossip along ties. Each teller tells each of its `listeners` (with how much of a report carries to each) one
     thing that listener hasn't heard: the worst news it holds about any of `about` (None: about anyone), then the
     surest. The listener believes it as subjective logic discounts a report (Jøsang 2016, trust discounting): the
     teller's confidence, times how far the listener trusts the teller (`trust(listener, teller)`), times what carries
     along the tie. So a story weakens with every mouth it passes through, and stops once nobody holds it surely
     enough to pass it on. Each teller tells what it knew as the tick began, so a story travels one tie per tick.
-    Nobody is told what they did themselves: they know."""
+    Nobody is told what they did themselves: they know.
+
+    With `most`, at most that many things are told in a tick, the town over: the tellers take turns from `start`, and
+    the turn to begin the next tick from is returned, so in a town of hundreds nobody is left unheard."""
     known: dict[str, list[tuple[Claim, float]]] = {}
     for g in tellers:
         mine = [b for b in w.beliefs.for_npc(g)
@@ -99,14 +102,20 @@ def spread(w: World, tellers: Sequence[str], listeners: Callable[[str], Sequence
         mine.sort(key=lambda b: (priority.get(b.claim.pred, 0), b.conf, (b.claim.pred, b.claim.a, b.claim.b)),
                   reverse=True)
         known[g] = [(b.claim, b.conf) for b in mine]
-    for g in tellers:
+    told = 0
+    for turn in range(len(tellers)):
+        g = tellers[(start + turn) % len(tellers)]
         teller = w.npcs[g]
         for listener, carry in listeners(g):
             for claim, conf in known[g]:
                 if claim.a != listener and w.beliefs.get(listener, claim) is None:
+                    if most is not None and told >= most:
+                        return (start + turn) % len(tellers)  # this teller has more to tell: the next turn is theirs
+                    told += 1
                     # Told face to face, it happened where they stand; along a tie between people apart, nowhere
                     # anyone else could overhear it.
                     where = teller.loc if w.npcs[listener].loc == teller.loc else ""
                     e = w.ledger.append(w.phase, "gossip", g, listener, where, claim, happened(w, claim))
                     hear(w, listener, claim, round(conf * trust(listener, g) * carry, 2), g, e)
                     break
+    return start

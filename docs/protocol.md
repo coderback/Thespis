@@ -13,6 +13,9 @@ There's one set of calls, made in one of two ways:
 | `/v1` HTTP | Any engine | `thespis serve --game game.toml`, a sidecar beside the game, or `thespis serve --server`, many projects each with its key ([serve.md](serve.md)). Needs `pip install thespis[serve]`, or `thespis[server]` for a server |
 
 The two make the same calls with the same results; a test plays one scene both ways and compares them.
+
+The library is the core alone, with one dependency (`httpx`). It isn't on PyPI; a game pins a release tag:
+`pip install "thespis @ git+https://github.com/coderback/Thespis@v0.3.0"`.
 [openapi-v1.json](openapi-v1.json) is the HTTP contract, generated from the server and committed. A test fails when
 the two drift, so a change to `/v1` shows up as a diff to review.
 
@@ -34,7 +37,7 @@ NPCs, one choice set, gossip and words. Everything in it is checked when it load
 | `[npc.<id>.lines]` | Template lines by key: an action's kind for `decide`, a trigger for `react`. `{who}` and bindings fill them |
 | `[kind.<id>]` | A kind of person, for a cast that grows in play: what an `[npc.<id>]` holds, apart from `name` and `start` ([below](#a-cast-that-grows)) |
 | `[[npc.<id>.choices.<moment>]]` | What the NPC may do at that moment (below) |
-| `[gossip]` | `gossips`, `about` (ids, or `"everyone"`), `priority` by predicate, `threshold`, `decay`; with ties, `along` and `in_person` (below) |
+| `[gossip]` | `gossips`, `about` (ids, or `"everyone"`), `priority` by predicate, `threshold`, `decay`; with ties, `along`, `in_person` and `most` (below) |
 | `[claims]` | `one_actor`: deeds only one person can have done to another, and `caught` ([below](#a-cast-that-grows)) |
 | `[[tie]]` | `between = [a, b]`, `kind`: a relationship gossip travels along |
 | `[words.claims]`, `[words.events]` | A claim and an event in words, as the model reads them |
@@ -142,6 +145,15 @@ and says nothing more. What he believed is kept, and the town still holds its be
 
 **News of anyone.** `[gossip] about = "everyone"` lets any news travel, where a list names whose news does. Nobody
 is told what they did themselves.
+
+**So many things a tick.** With ties, `[gossip] most = 12` has a tick tell at most twelve things, the town over.
+- The tellers take turns, and whose turn comes next is kept in the save, so nobody is left unheard.
+- News ends up where it would have without the limit, a few ticks later.
+- Without it, a town of hundreds tells thousands of things in a tick, and each telling is an event in the ledger.
+
+**At town size.** [tools/town_bench.py](../tools/town_bench.py) plays 300 people through 2,000 events and 200 ticks
+with no model. On a Ryzen 7 5800H laptop: a tick takes 10 ms (p95 17 ms), an `observe` 0.1 ms, a `decide` 0.3 ms,
+a save to text 120 ms and a load from it 290 ms, for a 3 MB save. CI holds each to a budget.
 
 **One culprit.** `[claims] one_actor = ["robbed", "killed"]` says a robbery has one robber. An NPC who comes to
 believe two people did the same thing to the same one keeps one story:

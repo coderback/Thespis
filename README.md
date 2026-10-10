@@ -316,6 +316,7 @@ To work on the client with hot reload, run `npm run dev` in `client/` next to th
 | `python -m thespis serve --game examples/tavern/game.toml` | The `/v1` protocol as a sidecar: localhost, sessions in SQLite, offline unless `--online` ([docs/serve.md](docs/serve.md)) |
 | `python -m thespis serve --server --db postgresql://...` | The `/v1` protocol as a server: projects with their own keys, caps and usage; `thespis projects create NAME` makes one |
 | `python tools/package.py` | Builds the runtime a game ships beside it (one folder, no Python needed), and checks its size and cold start |
+| `python tools/town_bench.py` | The minds at town size, with no model: 300 people added in play, 2,000 events, 200 ticks; what each call costs and how big the save is (`--check` in CI) |
 | `python tools/loadtest.py --players 200 --db <db>` | Many engines playing at once against one server: latency per route, errors, the gate |
 | `python sdk/godot/test/run.py --godot <path>` | The Godot addon's example, headless, against a sidecar the addon starts and a hosted-mode server; `--mode sidecar --local gemma4-e4b` plays it offline |
 | `python sdk/unity/test/run.py [--unity <Unity.exe>]` | The Unity package's example under .NET, and with `--unity` the scene in the editor, against a sidecar and a server |
