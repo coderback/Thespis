@@ -18,7 +18,7 @@ maintenance system, Doyle 1979), so the beliefs resting on it fall with it.
 from __future__ import annotations
 
 from collections.abc import Callable
-from dataclasses import asdict, dataclass, field, replace
+from dataclasses import dataclass, field, replace
 
 from thespis.ledger import Claim
 
@@ -66,9 +66,9 @@ class Evidence:
     against: bool = False  # it says the claim is false
 
     def to_json(self) -> dict:
-        d = asdict(self)
-        if not self.against:
-            del d["against"]  # so evidence for a claim serialises exactly as it always has
+        d: dict = {"source": self.source, "event": self.event, "phase": self.phase, "conf": self.conf}
+        if self.against:
+            d["against"] = True  # left out otherwise, so evidence for a claim serialises exactly as it always has
         return d
 
 
@@ -90,10 +90,16 @@ class Belief:
     npc: str
     claim: Claim
     evidence: list[Evidence] = field(default_factory=list)
+    _fused: tuple[tuple[Evidence, ...], Opinion] | None = field(default=None, init=False, repr=False, compare=False)
 
     @property
     def opinion(self) -> Opinion:
-        return fuse(self.evidence)
+        """The fusion of its evidence, worked out again only when the evidence has changed: a belief is asked its
+        opinion far more often than it hears anything new."""
+        was, now = self._fused, tuple(self.evidence)
+        if was is None or was[0] != now:
+            was = self._fused = (now, fuse(self.evidence))
+        return was[1]
 
     @property
     def conf(self) -> float:
@@ -140,6 +146,9 @@ class BeliefStore:
     def __init__(self, beliefs: list[Belief] | None = None):
         self._beliefs: list[Belief] = list(beliefs or [])
         self._index = {(b.npc, b.claim): b for b in self._beliefs}
+        self._of: dict[str, list[Belief]] = {}  # each NPC's own, in the same order
+        for b in self._beliefs:
+            self._of.setdefault(b.npc, []).append(b)
 
     def add_evidence(self, npc: str, claim: Claim, conf: float, source: str, event: str,
                      phase: int, against: bool = False) -> tuple[Belief, bool]:
@@ -153,6 +162,7 @@ class BeliefStore:
             belief = Belief(f"b{len(self._beliefs) + 1:04d}", npc, claim)
             self._beliefs.append(belief)
             self._index[(npc, claim)] = belief
+            self._of.setdefault(npc, []).append(belief)
         belief.evidence.append(Evidence(source, event, phase, conf, against))
         return belief, is_new
 
@@ -177,7 +187,7 @@ class BeliefStore:
         return belief.conf if belief and belief.active else 0.0
 
     def for_npc(self, npc: str) -> list[Belief]:
-        return [b for b in self._beliefs if b.npc == npc]
+        return list(self._of.get(npc, ()))
 
     def all(self) -> list[Belief]:
         return list(self._beliefs)

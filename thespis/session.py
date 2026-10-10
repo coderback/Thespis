@@ -108,14 +108,18 @@ def _other_actor(x: Claim, y: Claim) -> bool:
     return (x.pred, x.b, x.place, x.at) == (y.pred, y.b, y.place, y.at) and x.a != y.a and not (x.neg or y.neg)
 
 
+PLAIN = (str, int, bool, type(None))  # what a saved world holds that is never a number to put right
+
+
 def _numbers(world: dict) -> dict:
     """A saved world with its numbers as Thespis wrote them: whole numbers are ints, except evidence confidences."""
     def whole(x):
-        if isinstance(x, float) and x.is_integer():
-            return int(x)
-        if isinstance(x, dict):
-            return {k: whole(v) for k, v in x.items()}
-        return [whole(v) for v in x] if isinstance(x, list) else x
+        kind = type(x)
+        if kind is dict:
+            return {k: v if type(v) in PLAIN else whole(v) for k, v in x.items()}
+        if kind is list:
+            return [v if type(v) in PLAIN else whole(v) for v in x]
+        return int(x) if kind is float and x.is_integer() else x
 
     world = whole(world)
     for b in world.get("beliefs", []):
@@ -216,6 +220,9 @@ class Game:
                 raise DefinitionError(f"players.{pid}: needs name = \"...\", and an id no NPC has")
             if self.places and p.get("start") is not None and p["start"] not in self.places:
                 raise DefinitionError(f"players.{pid}.start: {p['start']!r} is not in [places]")
+        most = d.get("gossip", {}).get("most")
+        if most is not None and (not isinstance(most, int) or isinstance(most, bool) or most < 1):
+            raise DefinitionError("gossip.most: how many things are told in a tick, a whole number from 1")
         about = d.get("gossip", {}).get("about", [])
         if about != EVERYONE and not (isinstance(about, list) and all(isinstance(x, str) for x in about)):
             raise DefinitionError(f"gossip.about: a list of ids, or \"{EVERYONE}\"")
@@ -711,9 +718,13 @@ class Session:
             def grapevine(t: Tick) -> None:
                 if g and g.get("along"):
                     tellers = [t for t in g.get("gossips") or list(self._ties()) if t not in w.gone]
-                    spread(w, tellers, self._listeners, about, g.get("priority", {}),
-                           g.get("threshold", 0.5), lambda w, c: w.ledger.happened(c), hear,
-                           lambda listener, teller: credence(w.npcs[listener].trust_in.get(teller, 0)))
+                    most = g.get("most")
+                    turn = spread(w, tellers, self._listeners, about, g.get("priority", {}),
+                                  g.get("threshold", 0.5), lambda w, c: w.ledger.happened(c), hear,
+                                  lambda listener, teller: credence(w.npcs[listener].trust_in.get(teller, 0)),
+                                  most, w.counters.get("grapevine", 0) if most and tellers else 0)
+                    if most:
+                        w.counters["grapevine"] = turn  # whose turn it is to tell, next tick
                 elif g:
                     gossip(w, [t for t in g.get("gossips", []) if t not in w.gone], about, g.get("priority", {}),
                            g.get("threshold", 0.5), g.get("decay", 0.8), lambda w, c: w.ledger.happened(c), hear)
@@ -734,8 +745,15 @@ class Session:
             start = len(w.ledger)
             tick = run_tick(w, [step for _ in range(max(0, steps)) for step in (walking, grapevine, settling,
                                                                                 advance)])
-            for e in list(w.ledger)[start:]:
-                self._overheard(e)
+            written = list(w.ledger)[start:]
+            if written:
+                order = {n: i for i, n in enumerate(w.npcs)}
+                standing: dict[str, list[str]] = {}  # who is where, once for the tick
+                for n in w.npcs.values():
+                    if n.id not in w.gone:
+                        standing.setdefault(n.loc, []).append(n.id)
+                for e in written:
+                    self._overheard(e, standing, order)
             return tick
 
     # ------------------------------------------------------------ lines on their way
@@ -849,12 +867,18 @@ class Session:
             self._tied = tied
         return self._tied
 
-    def _overheard(self, e: Event) -> None:
-        """Everyone at the scene of an event Thespis itself wrote saw it: NPCs, and the players standing there."""
+    def _overheard(self, e: Event, standing: Mapping[str, Sequence[str]] | None = None,
+                   order: Mapping[str, int] | None = None) -> None:
+        """Everyone at the scene of an event Thespis itself wrote saw it: NPCs, and the players standing there.
+        `standing` says who is where and `order` gives each one's place in the cast, for a caller with many events."""
         w = self.world
         if not e.loc:  # it happened nowhere anyone else stood: word passed between two people apart
             return
-        seen = [n for n in w.npcs if n not in (e.actor, e.target) and n not in w.gone and at_the_scene(w, n, e)]
+        if standing is not None and order is not None:  # at_the_scene, looked up instead of asked of everyone
+            there = {n for place in {e.loc, e.target} if place for n in standing.get(place, ())}
+            seen = sorted(there - {e.actor, e.target}, key=order.__getitem__)
+        else:
+            seen = [n for n in w.npcs if n not in (e.actor, e.target) and n not in w.gone and at_the_scene(w, n, e)]
         seen += [p for p, v in w.players.items() if p not in (e.actor, e.target) and v.get("loc") in (e.loc, e.target)]
         if seen:
             self.witnesses[e.id] = seen
@@ -888,7 +912,7 @@ class Session:
         (thespis.beliefs.reconcile). Sources it trusts alike settle nothing."""
         w, n = self.world, self.world.npcs[npc]
         mine = w.beliefs.get(npc, c)
-        rivals = [b for b in w.beliefs.for_npc(npc) if b.active and _other_actor(b.claim, c)]
+        rivals = [b for b in w.beliefs.for_npc(npc) if _other_actor(b.claim, c) and b.active]
         if mine is None or not rivals:
             return
         for b in (mine, *rivals):  # trust in a teller it had no view of starts at 0, so being caught can lower it

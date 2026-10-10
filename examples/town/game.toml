@@ -75,6 +75,7 @@ priority = { killed = 4, robbed = 3, threatened = 2 }
 threshold = 0.5
 along = { kin = 1.0, friend = 0.9 }
 in_person = 0.8
+most = 12  # things told in a tick, the town over: the tellers take turns, so a big town's news takes its time
 
 # ---------------------------------------------------------------- what can't both be true
 [claims]

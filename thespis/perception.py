@@ -7,7 +7,7 @@ event that delivered evidence it holds), or when it saw it.
 
 from __future__ import annotations
 
-from collections.abc import Callable, Collection, Mapping
+from collections.abc import Callable, Collection, Iterator, Mapping
 
 from thespis.ledger import Claim, Event
 from thespis.world import World
@@ -36,14 +36,21 @@ def knows(w: World, npc: str, event_id: str, sees: Sees = at_the_scene) -> bool:
     return sees(w, npc, e)
 
 
+def _newest(w: World, npc: str, sees: Sees, hidden: Collection[str] = ()) -> Iterator[Event]:
+    """The events the NPC knows, newest first, as `knows` has it: what it learned of is looked up once."""
+    learned = {ev.event for b in w.beliefs.for_npc(npc) for ev in b.evidence}
+    return (e for e in reversed(list(w.ledger))
+            if e.id not in hidden and (npc in (e.actor, e.target) or e.id in learned or sees(w, npc, e)))
+
+
 def known(w: World, npc: str, n: int, sees: Sees = at_the_scene, hidden: Collection[str] = ()) -> list[Event]:
     """The last `n` events the NPC knows, oldest first, leaving out any still `hidden` from it."""
-    return [e for e in reversed(list(w.ledger)) if e.id not in hidden and knows(w, npc, e.id, sees)][:n][::-1]
+    return [e for _, e in zip(range(n), _newest(w, npc, sees, hidden))][::-1]
 
 
 def latest(w: World, npc: str, sees: Sees = at_the_scene) -> str | None:
     """The most recent event the NPC knows, for a line with nothing better to cite."""
-    return next((e.id for e in reversed(list(w.ledger)) if knows(w, npc, e.id, sees)), None)
+    return next((e.id for e in _newest(w, npc, sees)), None)
 
 
 def witness(w: World, claim: Claim, actor: str, target: str, event: Event, at: str, give: Give) -> None:
