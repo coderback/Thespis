@@ -8,8 +8,10 @@ Checks, in order:
      tools/warm_cache.py (with REPLAY=0 on the host).
   3. Every line in that run cites ids that exist, and every decision chose from its allowed list.
   4. Every scripted route, with the brain off, ends as the rules model predicts.
-  5. A session reloaded from disk is identical.
-  6. The model answers a question it has never been asked: one live call. Under REPLAY=1 this is skipped.
+  5. A lie typed to Brenna ("Kael robbed Odo.") lands as the button's would: read without a model, logged false,
+     and believed as far as she trusts the player.
+  6. A session reloaded from disk is identical.
+  7. The model answers a question it has never been asked: one live call. Under REPLAY=1 this is skipped.
 
 Exits 1 if any check fails. A failed model check alone is a warning: the game still plays on the cache and templates.
 """
@@ -55,6 +57,21 @@ def check_cites(state: dict) -> tuple[bool, str]:
             bad.append(f"{d['id']} chose {d['chosen']}")
     lines = sum(1 for d in state["decisions_tail"] if d["line"])
     return not bad, f"{lines} lines, all cite real ids" if not bad else "; ".join(bad)
+
+
+def check_words(client) -> tuple[bool, str]:
+    """The player's words (POST /say): a lie typed at the gate is the lie its button tells."""
+    s = Session(client)
+    s.start(DEMO_SEED, "fallback")
+    s.act("move")
+    s.act("move")  # straight to the guard post, where Brenna is
+    out = s.post("/say", {"target": "brenna", "text": "Kael robbed Odo."})
+    read, told = out["understood"], [(e["verb"], e["truth"]) for e in out["events"]]
+    lie = {"pred": "robbed", "a": "kael", "b": "odo"}
+    held = [b["conf"] for b in out["state"]["beliefs"] if b["npc"] == "brenna" and b["claim"] == lie]
+    if (read["status"], read["path"]) != ("act", "bank") or told != [("tell_claim", False)] or not held:
+        return False, f"read as {read['status']} by {read['path']}; events {told}; Brenna's belief {held or 'missing'}"
+    return True, f"typed, the lie is logged false and Brenna holds it at {held[0]}"
 
 
 def check_reload(client, session: str) -> tuple[bool, str]:
@@ -122,6 +139,7 @@ def run(client, when: str) -> list[tuple[str, bool, str]]:
                 wrong.append(f"{name}: {got}, expected {EXPECTED[name]}")
         return not wrong, f"all {len(ROUTES)} as predicted" if not wrong else "; ".join(wrong)
     check("route outcomes", routes)
+    check("the player's words", check_words, client)
     check("reload from disk", lambda: check_reload(client, demo["session"]))
     check("model answers", check_model, client, when)
     return results

@@ -4,7 +4,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { whyChain, mapFigures, splitReplies, beliefBursts, moodIcons, worldMemory, clock, claimText, eventText } from "../src/model.js";
+import { whyChain, mapFigures, splitReplies, beliefBursts, moodIcons, worldMemory, clock, claimText, eventText, actionText, readingLabel, heardText } from "../src/model.js";
 import { FixtureApi, DEMO_ROUTE } from "../src/api.js";
 
 const dir = fileURLToPath(new URL("../../fixtures/", import.meta.url));
@@ -74,6 +74,37 @@ test("text helpers", () => {
   assert.equal(eventText({ verb: "refuse", actor: "brenna", target: "player" }), "Brenna turned down your offer");
   assert.equal(eventText({ verb: "bribe", actor: "player", target: "brenna", amount: 20 }), "You paid Brenna 20 coins");
   assert.ok(worldMemory(fx("state_p7_end")).some((l) => l.startsWith("Brenna no longer believes")));
+});
+
+test("what you typed, as the button it was read as (POST /say)", () => {
+  const lie = { verb: "tell_claim", target: "brenna", claim: { pred: "robbed", a: "kael", b: "odo" } };
+  const threat = { verb: "bribe", target: "brenna", amount: 20, appeal: "threat" };
+  assert.equal(readingLabel(lie), 'Tell Brenna: "Kael robbed Odo"');
+  assert.equal(readingLabel(threat), "Offer Brenna 20 coins, with a threat");
+  assert.equal(readingLabel({ verb: "bribe", target: "brenna", amount: 15 }), "Offer Brenna 15 coins");
+  assert.equal(readingLabel({ verb: "insult", target: "kael" }), "Insult Kael");
+  assert.equal(actionText({ ...threat, appeal: "duty" }), "You offer Brenna 20 coins, appealing to her duty.");
+  assert.equal(actionText({ verb: "bribe", target: "brenna", amount: 20 }), "You offer Brenna 20 coins.");
+  const reading = (act) => ({ verb: act.verb, act });
+  assert.deepEqual(heardText({ status: "act", intent: reading(lie), sure: "certain", readings: [], path: "bank", why: "" }),
+    { verdict: "acted", what: 'Tell Brenna: "Kael robbed Odo"', how: "Read by the game's own phrases · certain" });
+  const asked = heardText({ status: "ask", intent: null, sure: "certain", readings: [reading(threat)], path: "model", why: "this reader asks before every act with consequences" });
+  assert.equal(asked.verdict, "asked");
+  assert.equal(asked.what, "Offer Brenna 20 coins, with a threat");
+  assert.ok(asked.how.startsWith("Read by the model · certain · this reader asks"));
+  const talk = heardText({ status: "talk", intent: reading({ verb: "talk", target: "mags" }), sure: "unsure", readings: [], path: "model", why: "no act" });
+  assert.deepEqual([talk.verdict, talk.what], ["talk", "Talk: it changes nothing"]);
+});
+
+test("the fixture backend takes what is typed as talk", async () => {
+  const names = ["session_new", ...DEMO_ROUTE.map(([n]) => n)];
+  const api = new FixtureApi(Object.fromEntries(names.map((n) => [n, fx(n)])));
+  await api.newSession();
+  for (const [, req] of DEMO_ROUTE.slice(0, 3)) await api.act(req);
+  const out = await api.say({ target: "mags", text: "Where did Kael go?" });
+  assert.equal(out.understood.status, "talk");
+  assert.equal(out.replies[0].npc, "mags");
+  await assert.rejects(api.say({ target: "mags", text: "Again?" }), (e) => e.status === 409); // off the demo route
 });
 
 test("the fixture backend plays the whole demo route", async () => {

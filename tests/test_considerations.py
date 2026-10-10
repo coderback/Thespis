@@ -44,6 +44,22 @@ def test_bindings_name_the_action_and_gate_its_terms():
     assert list(CRYPT["brenna", "crime_belief"].options(w, View("x"), culprit="kael")) == ["detain:kael", "wait"]
 
 
+def test_a_bound_value_can_be_compared():
+    w = world()
+    heard = CRYPT["brenna", "appeal"]  # what an appeal made with an offer is worth to her
+    at = View("guard_post")
+    assert heard.options(w, at, appeal="duty", trust=0) == {"relent": 5, "unmoved": 1}
+    assert heard.options(w, at, appeal="duty", trust=-1) == {"unmoved": 1}  # gte = 0
+    assert heard.options(w, at, appeal="threat", trust=3) == {"bristle": 5, "unmoved": 1}  # is = "threat"
+    assert heard.options(w, at, appeal="pity", trust=3) == heard.options(w, at, trust=3) == {"unmoved": 1}
+    w.npcs["brenna"].flags["duty_heard"] = True
+    assert heard.options(w, at, appeal="duty", trust=0) == {"unmoved": 1}
+    numbers = compile_choices("kael", "x", [{"do": "go", "utility": 1, "when": [{"bound": "n", "gt": 2, "lte": 5}]},
+                                           {"do": "one", "utility": 1, "when": [{"bound": "n", "is": 1}]}])
+    assert [list(numbers.options(w, at, n=n)) for n in (1, 2, 3, 5, 6, True, "3", None)] == [
+        ["one"], [], ["go"], ["go"], [], [], [], []]  # only a number compares, and True isn't 1
+
+
 def test_an_action_names_the_claim_it_states():
     assert MANOR["sable", "asked_morning"].asserts() == {
         "deceive:alibi": Claim("was_in", "sable", place="kitchen", at=1)}
@@ -51,7 +67,7 @@ def test_an_action_names_the_claim_it_states():
 
 def test_every_declared_choice_compiles():
     assert set(CRYPT) == {("kael", "tick"), ("brenna", "crime_belief"), ("brenna", "witness_present"),
-                          ("brenna", "bribe_offer")}
+                          ("brenna", "bribe_offer"), ("brenna", "appeal")}
     assert declared({"npc": {"x": {"name": "X"}}}) == {}
 
 
@@ -65,6 +81,9 @@ def test_every_declared_choice_compiles():
     ([{"do": "go", "utility": 1, "when": [{"drive": "fear", "most": 3}]}], "unknown key most"),
     ([{"do": "go", "utility": 1, "when": [{"fly": True}]}], "unknown condition 'fly'"),
     ([{"do": "go", "utility": 1, "when": [{"at": "x", "flag": "y"}]}], "one condition per table"),
+    ([{"do": "go", "utility": 1, "when": [{"bound": "x", "at": "y"}]}], "unknown key at"),
+    ([{"do": "go", "utility": 1, "when": [{"bound": "x", "gte": "two"}]}], "expected a number"),
+    ([{"do": "go", "utility": 1, "when": [{"bound": "x", "is": ["duty"]}]}], "expected a string or a number"),
     ([{"do": "go", "utility": 1, "when": [{"believes": {"a": "x"}}]}], "a claim needs pred and a"),
     ([{"do": "go", "utility": 1, "when": [{"any": "at"}]}], "expected a list of conditions"),
     ([{"do": "go", "utility": [{"drive": "x", "times": 2}]}], "unknown key times"),

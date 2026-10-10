@@ -7,6 +7,8 @@ from games.crypt_road import hooks, narrator, voice  # importing hooks registers
 from games.crypt_road.rules import ActResult, Tick, happened
 from thespis.director import sift
 from thespis.expression import Mind
+from thespis.intents import Reading, Understood
+from thespis.ledger import Claim
 from thespis.world import World
 
 TAIL = 50  # covers a whole demo run
@@ -42,6 +44,18 @@ def act_view(result: ActResult, w: World) -> dict:
         "epilogue": [tick_view(t) for t in result.epilogue] if result.epilogue else None,
         "state": state_view(w),
     }
+
+
+def understood_view(u: Understood, to: str) -> dict:
+    """How the player's words to `to` were read (POST /say): `status` is act (done), ask (the `readings` are put to
+    the player, nothing done) or talk. Each reading carries the POST /act body that performs it. `path` says what
+    answered (the bank, the model, the cache) and `why` why not, when it wasn't sure."""
+    def reading(r: Reading) -> dict:
+        args = {k: v.to_json() if isinstance(v, Claim) else v for k, v in r.args.items() if k != "to"}
+        return {"verb": r.verb, "act": {"verb": r.verb, "target": to, **args}}
+
+    return {"status": u.status, "intent": reading(u.intent) if u.intent else None, "sure": u.sure,
+            "readings": [reading(r) for r in u.readings], "path": u.path, "why": u.why}
 
 
 # ---------------------------------------------------------------- the digest: told by the model, or built by code (#19)

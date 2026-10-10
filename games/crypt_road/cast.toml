@@ -142,7 +142,32 @@ utility = 5
 
 [[npc.brenna.choices.bribe_offer]]
 do = "refuse"
-utility = [3, { plus = 4, if = { bound = "lowball" } }]
+utility = [3, { plus = 4, if = { bound = "lowball" } }, { plus = 10, if = { bound = "threatened" } }]
+
+# What an appeal made with an offer is worth to her. The player's words only pick the appeal ([intents.bribe]); these
+# rules weigh it. Duty moves her once, while she doesn't distrust whoever makes it: her price comes down for that
+# deal. A threat turns her against them: she refuses the offer, whatever it is, and trusts them less. Pity and
+# flattery are heard and change nothing: she is practical.
+[[npc.brenna.choices.appeal]]
+do = "relent"
+utility = 5
+when = [{ bound = "appeal", is = "duty" }, { bound = "trust", gte = 0 }, { not_flag = "duty_heard" }]
+
+[[npc.brenna.choices.appeal]]
+do = "bristle"
+utility = 5
+when = [{ bound = "appeal", is = "threat" }]
+
+[[npc.brenna.choices.appeal]]
+do = "unmoved"
+utility = 1
+
+# How each appeal reads in the situation Brenna answers an offer in.
+[appeals]
+duty = "They appeal to your duty to keep the road orderly."
+pity = "They plead their own hardship."
+threat = "They threaten you if you turn it down."
+flattery = "They flatter you."
 
 # What each event was, in words: the digest says them to the player, and state packs say them about the player.
 # {a} is the actor and {t} the target, {where} the stop it happened at, {to} where someone walked; words.py fills them.
@@ -164,6 +189,40 @@ release = "{a} released {t}."
 testify = "{a} told {t} that {denied}."
 take_relic = "{a} took the relic."
 told = "{a} told {t} that {claim}."  # tell_claim, accuse and gossip: anything that carries a claim
+
+# A claim in words, as the player might type it: read in reverse to find the claim in what they wrote.
+[words.claims]
+robbed = "{a} robbed {b}"
+beat = "{a} beat {b}"
+insulted = "{a} insulted {b}"
+spared = "{a} spared {b}"
+lied = "{a} lied about {b}"
+
+# ---------------------------------------------------------------- the player's words (thespis.intents)
+# What the player may do by typing it to someone, instead of pressing the button: the rules offer the ones open with
+# that person now, Thespis reads which one the words do, if any, and the rules apply it exactly as they would the
+# button. Words that do none of them are talk, which changes nothing.
+[intents.insult]
+means = "mocks or demeans the one they speak to, to their face. Harsh words about someone else, or praise, respect, a warning or a refusal in blunt words, aren't an insult"
+reads = "Insult {to}"
+args = { to = "npc" }
+examples = ["you're a coward", "you couldn't guard a henhouse", "you're all bluster and no blade"]
+
+[intents.tell_claim]
+means = "tells the one they speak to, as fact, that the claim happened"
+reads = "Tell {to} that {claim}"
+args = { to = "npc", claim = { type = "claim", denials = false } }
+examples = ["{claim}, I saw it with my own eyes", "you should know that {claim}"]
+
+[intents.bribe]
+means = "offers the one they speak to a sum of coins, in earnest, to look the other way, forget the trouble or let them pass. appeal is how the offer is pressed, if it is: duty (her duty, the law, order on the road), pity (the speaker's own hardship), threat (harm to her if she refuses), flattery (praise of her); none when coins are all that is offered"
+reads = "Offer {to} {amount} coins"
+args = { to = "npc", amount = { type = "amount", min = 1 }, appeal = { type = "choice", options = ["duty", "pity", "threat", "flattery"], optional = true } }
+examples = ["{amount} coins and you never saw me", "{amount} coins to look the other way", "{amount} coins to let me pass"]
+
+[intents.talk]
+reads = "Talk to {to}"
+args = { to = "npc" }
 
 # What each action does, for the model's DOING, by the action's kind. {next} is the next stop, {who} whom it names.
 [actions]

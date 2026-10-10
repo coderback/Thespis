@@ -82,6 +82,16 @@ export function memory(state) {
 export const fmtTrust = (t) => (t > 0 ? `+${t}` : String(t));
 
 /** The player's own line in the log. */
+/** A reading of what you typed (POST /manor/say), as the button it would press. */
+export function readingLabel(act) {
+  switch (act.verb) {
+    case "ask": return `Ask ${name(act.target)} about ${topicName(act.topic)}`;
+    case "request_questioning": return `Have Lady Vane question ${name(act.target)}`;
+    case "accuse": return `Accuse ${name(act.target)}`;
+    default: return act.verb.replace("_", " ");
+  }
+}
+
 export function actionText(body) {
   switch (body.verb) {
     case "ask": return `You ask ${name(body.target)} about ${topicName(body.topic)}.`;

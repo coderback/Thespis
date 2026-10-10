@@ -1,12 +1,13 @@
-// The bottom bar: the dialogue log and the buttons built from GET /allowed, with the Talk box and the
-// three-dropdown claim builder for Tell...
+// The bottom bar: the dialogue log and the buttons built from GET /allowed, with the "Say or do..." box and the
+// three-dropdown claim builder for Tell... What you type is read as one of the buttons, or as talk (POST /say).
 
 import { $, esc, badge } from "./dom.js";
-import { name, claimText } from "./model.js";
+import { name, claimText, readingLabel } from "./model.js";
 
 export class Bar {
-  constructor({ onAct, onLine }) {
-    this.onAct = onAct; // (body) => Promise
+  constructor({ onAct, onSay, onLine }) {
+    this.onAct = onAct; // (body, opts) => Promise
+    this.onSay = onSay; // (target, text) => Promise
     this.onLine = onLine; // (decisionId) => void, opens the why-chain
     this.busy = false;
     this.verbs = [];
@@ -43,6 +44,25 @@ export class Bar {
   }
 
   clearLog() { $("log").innerHTML = ""; }
+
+  /** A reading that wasn't sure enough to act on, put to you: each chip is the button it names. */
+  ask(target, text, readings) {
+    this.clearAsk();
+    const el = document.createElement("div");
+    el.className = "logline ask";
+    el.id = "ask";
+    el.innerHTML = `<span>Did you mean:</span>${readings.map((r, i) => `<button class="chipbtn" data-i="${i}">${esc(readingLabel(r.act))}</button>`).join("")}<button class="chipbtn plain" data-plain>Just say it</button>`;
+    el.onclick = (e) => {
+      const b = e.target.closest("button");
+      if (!b || this.busy) return;
+      this.clearAsk();
+      if (b.dataset.plain !== undefined) this.onAct({ verb: "talk", target, text }, { quiet: true });
+      else this.onAct(readings[+b.dataset.i].act);
+    };
+    this.push(el);
+  }
+
+  clearAsk() { $("ask")?.remove(); }
 
   // --- buttons ---------------------------------------------------------------------------------------
 
@@ -83,7 +103,7 @@ export class Bar {
   }
 
   click(v, el) {
-    if (v.verb === "talk") return this.talkPop(v, el);
+    if (v.verb === "talk") return this.sayPop(v, el);
     if (v.verb === "tell_claim") return this.tellPop(v, el);
     if (v.verb === "bribe") return this.bribePop(v, el);
     const body = { verb: v.verb };
@@ -107,11 +127,12 @@ export class Bar {
 
   closePop() { $("pop").hidden = true; }
 
-  talkPop(v, el) {
+  sayPop(v, el) {
     const max = v.args?.max_len ?? 200;
-    const pop = this.openPop(`<h4>Talk to ${esc(name(v.target))}</h4>
-      <form class="row"><input id="talk-text" maxlength="${max}" placeholder="Say something..." autocomplete="off" /><button class="act ends" style="flex:none">Say</button></form>
-      <div class="count"><span id="talk-n">0</span> / ${max}. Talking is free: it never ends the phase.</div>`, el);
+    const who = esc(name(v.target));
+    const pop = this.openPop(`<h4>Say or do... <span class="muted">to ${who}</span></h4>
+      <form class="row"><input id="talk-text" maxlength="${max}" placeholder="Say it, or do it in words..." autocomplete="off" /><button class="act" style="flex:none">Say</button></form>
+      <div class="count"><span id="talk-n">0</span> / ${max}. Words can do what the buttons do: an insult, a claim, an offer of coins. Anything else is talk, which is free.</div>`, el);
     const input = pop.querySelector("input");
     input.focus();
     input.oninput = () => { $("talk-n").textContent = input.value.length; };
@@ -119,7 +140,7 @@ export class Bar {
       e.preventDefault();
       const text = input.value.trim() || "Hello.";
       this.closePop();
-      this.onAct({ verb: "talk", target: v.target, text });
+      this.onSay(v.target, text);
     };
   }
 
@@ -164,5 +185,5 @@ export class Bar {
 }
 
 function shortLabel(v) {
-  return { talk: "Talk", insult: "Insult", challenge: "Challenge", humiliate: "Humiliate", spare: "Spare", tell_claim: "Tell...", bribe: "Bribe..." }[v.verb] || v.label;
+  return { talk: "Say...", insult: "Insult", challenge: "Challenge", humiliate: "Humiliate", spare: "Spare", tell_claim: "Tell...", bribe: "Bribe..." }[v.verb] || v.label;
 }

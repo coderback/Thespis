@@ -69,6 +69,7 @@ All under `/manor`, with the session id in the `X-Session` header. Errors are `{
 | `GET /manor/state` | The state: phase, clock, status, outcome, room, people, beliefs (each with `truth`), ledger (each with `truth` and `text`), decisions (a lie has `asserted`) |
 | `GET /manor/allowed` | `{verbs: [{verb, target, label, args, ends_phase, enabled, reason}]}` |
 | `POST /manor/act` `{verb, target?, topic?}` | `{events, replies, state}`; `replies` are `{decision, npc, line, cites, source}` |
+| `POST /manor/say` `{target, text}` | What the player types to someone in the room, read as one of the buttons open now: a question as `ask`, and, to Lady Vane, a request to question someone or an accusation. The answer is `/manor/act`'s plus `understood`, shaped as [The Crypt Road's](api.md#saying). An accusation is always asked first (`ask`), as its button asks once more; words that are none of these do nothing (`talk`) |
 | `POST /manor/reset` | `{state}` |
 | `POST /manor/reload` | `{state}`, rebuilt from disk (the dev panel) |
 | `POST /manor/dev/brain` `{mode: "model" or "fallback"}` | `{mode}`: with `fallback`, no model calls |

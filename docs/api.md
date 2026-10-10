@@ -13,7 +13,8 @@ Changing anything here? Update `fixtures/` in the same PR and get the other pers
 | `POST /session` `{seed?}` | `{session, state}` | Default seed is the demo seed |
 | `GET /state` | Full snapshot (shape below) | NPCs carry `last_seen`; beliefs carry an `evidence` list |
 | `GET /allowed` | `{verbs: [{verb, target, label, args, ends_phase, enabled, reason}]}` | Disabled verbs come with a reason for the tooltip. After a duel win, only `humiliate` and `spare` are enabled |
-| `POST /act` `{verb, target?, claim?, amount?, text?}` | `{events, replies, tick, epilogue, state}` | See [Acting](#acting) |
+| `POST /act` `{verb, target?, claim?, amount?, text?, appeal?}` | `{events, replies, tick, epilogue, state}` | See [Acting](#acting) |
+| `POST /say` `{target, text}` | `{events, replies, tick, epilogue, state, understood}` | What the player types to an NPC at their stop, read as one of the buttons open with them or as talk. See [Saying](#saying) |
 | `GET /digest?since=<phase>` | `{text, hook, cites, epilogue, source, epilogue_source}` | Fetch while moves animate. `epilogue` is `null` until the race ends. `hook` is the story's live thread in this window (revenge brewing, a lie told, a lie exposed), or `null`. With the brain on, the Dungeon Master (the model) tells `text` and `epilogue`, citing the events; `source` and `epilogue_source` are `llm`, `cache` or `fallback` (the code-built telling) |
 | `POST /reset` | `{state}` | Wipes this session, keeps the seed |
 | `POST /reload` | `{state}` | Rebuilds this session from disk (dev panel) |
@@ -30,7 +31,7 @@ The `/reload` and `/dev/*` endpoints other than `/dev/calls` stay open: the dev 
 each touches only the caller's own session. The server sends no CORS headers unless `CORS_ORIGINS` names an origin:
 the client is served from the same URL, and in dev Vite proxies the API.
 
-Moderation runs on what a player writes (the text of `talk`, an edited persona) before a model reads it, and on every
+Moderation runs on what a player writes (the text of `talk` and `say`, an edited persona) before a model reads it, and on every
 model line before the player sees it. A flagged line is replaced by the NPC's code line, with `source: "fallback"`,
 so the response shape never changes.
 
@@ -46,7 +47,7 @@ Only verbs whose target shares the player's stop are listed. A verb with no targ
 | `humiliate` | `kael` | Yes | | `{}` |
 | `spare` | `kael` | Yes | | `{}` |
 | `tell_claim` | NPC at your stop | No | `claim` | `{preds: [...], subjects: [...]}`: the claim builder's options |
-| `bribe` | `brenna` | No | `amount`, whole coins from 1 to what you hold | `{amount, min: 1, max: <your coins>}`: `amount` is the offer to suggest, her last counter or 20 |
+| `bribe` | `brenna` | No | `amount`, whole coins from 1 to what you hold; `appeal`, if the offer was pressed in words | `{amount, min: 1, max: <your coins>}`: `amount` is the offer to suggest, her last counter or 20 |
 | `move` | none | Yes | | `{to: "<next stop>"}` |
 | `wait` | none | Yes | | `{}` |
 | `take_relic` | none | Ends the race | | `{}` |
@@ -74,6 +75,18 @@ disabled with the reason `"Choose: humiliate or spare"`. The pick ends the phase
   next phase"`.
 - An offer outside 1 to the player's coins is refused with 409 and a reason, and nothing is written.
 
+**Appeals.** An offer made in words ([Saying](#saying)) may be pressed with an `appeal`: `duty`, `pity`, `threat` or
+`flattery`. The words only pick it. What it's worth is the game's rule, declared in `cast.toml`
+(`[[npc.brenna.choices.appeal]]`), and her choice is a decision like any other, shown in the inspector:
+
+| Appeal | What Brenna does |
+| --- | --- |
+| `duty` | While her trust in the player is 0 or more, her price comes down by 5 until that deal is done. Once |
+| `threat` | She refuses the offer, whatever it is, and her trust in the player falls by 1 |
+| `pity`, `flattery` | Nothing: she hears it, and her price stands |
+
+The buttons send no appeal. Any other value is refused with 409.
+
 ## Acting
 
 `POST /act` returns:
@@ -87,6 +100,39 @@ disabled with the reason `"Choose: humiliate or spare"`. The pick ends the phase
   `[{who, from, to}]` and includes the player. It has no digest: fetch `GET /digest` while the moves animate.
 - `epilogue`: `null`, except on the request that ends the race. See [The race end](#the-race-end).
 - `state`: the full snapshot after everything above.
+
+## Saying
+
+`POST /say` takes what the player typed to `target` (1 to 200 characters). The engine reads it as one of the buttons
+open with that person now (`insult`, `tell_claim`, `bribe`) or as talk, and applies what it read exactly as `POST /act`
+would the button. So the answer has `/act`'s fields, plus `understood`:
+
+```json
+{
+  "status": "act",
+  "intent": {"verb": "tell_claim", "act": {"verb": "tell_claim", "target": "brenna",
+                                           "claim": {"pred": "robbed", "a": "kael", "b": "odo"}}},
+  "sure": "certain", "readings": [], "path": "bank", "why": ""
+}
+```
+
+| `status` | What happened | The client |
+| --- | --- | --- |
+| `act` | The words did what `intent` names, and it was applied: the rest of the answer is that act's | Shows it as the act |
+| `ask` | Nothing. The words may be one of `readings`, and the player is asked first | Shows each reading as a chip; a chip sends its `act` body to `POST /act` |
+| `talk` | The words do none of the buttons: they were said, as `talk`, which changes nothing | Shows the reply |
+
+- Every reading carries `act`: the `POST /act` body that performs it. Words can do nothing a button can't: the reading
+  is a choice among the buttons open now, each argument from the button's own choices, and the rules apply it.
+- `path` says what read the words: `bank` (the game's own phrases, with no model), `model`, `cache`, `guard` (too
+  long, or flagged by moderation) or `none`. `why` says why a reading went no further.
+- **What a model reads is asked first.** A reading from the game's own phrases ("Kael robbed Odo.", "I'll pay you 20
+  coins.") is applied at once. A reading only a model made comes back as `ask`: on this game's lines, which the
+  reader's prompts weren't tuned on, the model made 3 forbidden changes in 194
+  ([protocol.md](protocol.md#the-players-words)).
+- A denial ("Kael never robbed Odo") isn't an act this game has, so it is talk.
+- `say` isn't in `/allowed`: it needs `talk` to be enabled for `target`. Reading costs up to two model calls, counted
+  against the caps with the action's. With the brain off, only the game's own phrases are read.
 
 ## Shapes
 

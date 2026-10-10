@@ -129,6 +129,12 @@ class ActBody(BaseModel):
     claim: ClaimBody | None = None
     amount: int | None = None
     text: str | None = None
+    appeal: str | None = None  # how a bribe is pressed, when the player's words said (POST /say)
+
+
+class SayBody(BaseModel):
+    target: str
+    text: str
 
 
 class BrainBody(BaseModel):
@@ -195,13 +201,35 @@ def post_act(body: ActBody, request: Request, x_session: str | None = Header(def
             result = rules.act(world, body.verb, body.target, body.claim.model_dump() if body.claim else None,
                                body.amount, body.text, gateway=request.app.state.gateway, cache=store,
                                replay=request.app.state.replay, budget=_budget(request.app.state, store, world),
-                               moderator=request.app.state.moderator, checking=request.app.state.checking)
+                               moderator=request.app.state.moderator, checking=request.app.state.checking,
+                               appeal=body.appeal)
         except rules.NotAllowed as e:
             raise ApiError(409, "not_allowed", e.reason) from None
         store.save(session, world)
         if result.model_calls:
             store.count_calls(result.model_calls)
         return views.act_view(result, world)
+
+
+@app.post("/say")
+def post_say(body: SayBody, request: Request, x_session: str | None = Header(default=None)):
+    """What the player types to someone, read as one of the buttons open with them now and applied as that button
+    would be (thespis.intents). The answer is /act's, with `understood`: how the words were read. A reading that
+    isn't sure enough comes back with nothing done, to be put to the player."""
+    store, session = _store(request), _session(x_session)
+    with LOCKS.hold(session):
+        world = _load(store, session)
+        try:
+            understood, result = rules.say(
+                world, body.target, body.text, gateway=request.app.state.gateway, cache=store,
+                replay=request.app.state.replay, budget=_budget(request.app.state, store, world),
+                moderator=request.app.state.moderator, checking=request.app.state.checking)
+        except rules.NotAllowed as e:
+            raise ApiError(409, "not_allowed", e.reason) from None
+        store.save(session, world)
+        if result.model_calls:
+            store.count_calls(result.model_calls)
+        return {**views.act_view(result, world), "understood": views.understood_view(understood, body.target)}
 
 
 @app.get("/digest")

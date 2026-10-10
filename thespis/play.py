@@ -2,16 +2,19 @@
 
 The verbs come in the docs/api.md shape: {verb, target, label, args, ends_phase, enabled, reason}, where a disabled
 verb carries a reason a player can read. Every action opens one Mind, with the brain on or off as the session says,
-and adds the model calls it made to the session's running total.
+and adds the model calls it made to the session's running total. What the player types instead of pressing a button is
+read against those same verbs (`offers`, thespis.intents).
 """
 
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from types import EllipsisType
 
 from thespis.claims import ClaimCheck
 from thespis.expression import Mind, Observer, ReplyCache, Validator
 from thespis.gateway import ModelGateway
+from thespis.intents import Bounds, ClaimDomain, Domain, IntentDef, Offer
 from thespis.moderation import Moderator
 from thespis.world import World
 
@@ -48,6 +51,34 @@ def check(options: list[dict], verb: str, target: str | None) -> dict:
                 raise NotAllowed(option["reason"])
             return option
     raise NotAllowed(" ".join(x for x in ("You can't", verb.replace("_", " "), target, "here") if x))
+
+
+def offers(intents: Mapping[str, IntentDef], options: Sequence[Mapping], to: str) -> list[Offer]:
+    """The intents open to words said to `to`: each enabled verb aimed at them that the game declares as an intent of
+    the same name, its arguments' choices as the button has them (the verb's `args`): a claim's `{preds, subjects}`,
+    an amount's `{min, max}`, a choice's own options. A verb that is disabled, or aimed elsewhere, isn't open."""
+    out = []
+    for o in options:
+        d = intents.get(o["verb"])
+        if d is None or o["target"] != to or not o["enabled"]:
+            continue
+        given, domains = o.get("args") or {}, {}
+        for a in d.args:
+            domain: Domain
+            if a.name == "to":
+                domain = (to,)
+            elif a.type == "claim":
+                domain = ClaimDomain(tuple(given.get("preds", a.preds)), tuple(given.get("subjects", ())),
+                                     neg=a.denials)
+            elif a.type == "amount":
+                domain = Bounds(max(a.low, given.get("min", a.low)), min(a.high, given.get("max", a.high)))
+            else:
+                domain = a.options if a.type == "choice" else tuple(given.get(a.name, ()))
+            domains[a.name] = domain
+        if all(x.low <= x.high if isinstance(x, Bounds) else x.subjects if isinstance(x, ClaimDomain) else x
+               for x in domains.values()):
+            out.append(Offer(d.verb, domains))
+    return out
 
 
 def open_mind(w: World, validator: Validator, gateway: ModelGateway | None = None, cache: ReplyCache | None = None,

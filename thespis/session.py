@@ -34,7 +34,6 @@ from __future__ import annotations
 import contextvars
 import hashlib
 import math
-import re
 import threading
 import time
 import tomllib
@@ -54,7 +53,18 @@ from thespis.deception import SAID, log_statement
 from thespis.decisions import DECIDE, REACT, Decision
 from thespis.expression import Mind, StatePack, Utterance, Validator
 from thespis.gateway import ModelGateway
-from thespis.intents import Arg, Bounds, ClaimDomain, Domain, Offer, Understander, Understood, Words, declared_intents
+from thespis.intents import (
+    Arg,
+    Bounds,
+    ClaimDomain,
+    Domain,
+    Offer,
+    Understander,
+    Understood,
+    Words,
+    declared_intents,
+    people,
+)
 from thespis.ledger import Claim, Event
 from thespis.minds import NPC
 from thespis.perception import at_the_scene, reported
@@ -268,11 +278,7 @@ class Game:
     def people(self) -> dict[str, str]:
         """Who each NPC is, briefly, from its persona's first clause: "The stable boy", "A sellsword with a
         reputation to protect". The understander reads it to know who "the barkeep" is."""
-        out = {}
-        for npc, t in self.cast.data["npc"].items():
-            first = re.split(r"[:.;]", str(t["persona"]), maxsplit=1)[0].strip()
-            out[npc] = first[:1].lower() + first[1:] if first else ""
-        return out
+        return people(self.cast.data)
 
     @property
     def claim_words(self) -> dict[str, str]:
@@ -327,7 +333,7 @@ class Game:
                 preds = self._within(given.get("preds", preds), preds, f"{where}.preds")
                 subjects = self._within(given.get("subjects", subjects), subjects, f"{where}.subjects")
             places = tuple(self.places) if any("{place}" in words.get(p, "") for p in preds) else ()
-            return ClaimDomain(tuple(preds), tuple(subjects), places)
+            return ClaimDomain(tuple(preds), tuple(subjects), places, a.denials)
         universe = {"npc": tuple(w.npcs), "player": players, "place": tuple(self.places), "choice": a.options}[a.type]
         if given is not None:
             return self._within(given, universe, where)

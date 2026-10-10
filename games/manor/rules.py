@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from games.manor import claims, voice
+from games.manor import claims, voice, words
 from games.manor import content as C
 from games.manor.voice import Speech
 from thespis.affordances import decide
@@ -22,14 +22,16 @@ from thespis.claims import ClaimChecking
 from thespis.deception import SAID, log_statement
 from thespis.expression import Mind, Observer, ReplyCache
 from thespis.gateway import ModelGateway
+from thespis.intents import ACT, ASK, Offer, Understander, Understood, Words, declared_intents, people
 from thespis.ledger import Claim, Event
 from thespis.moderation import Moderator
-from thespis.play import NotAllowed, Verbs, check, count_calls, open_mind
+from thespis.play import NotAllowed, Verbs, check, count_calls, offers, open_mind
 from thespis.world import LOST, PLAYING, WON, World
 
 __all__ = ["NotAllowed"]
 
 OUTCOMES = C.CAST.data["outcomes"]
+SAY_MAX = 200
 
 
 @dataclass
@@ -60,6 +62,72 @@ def allowed(w: World) -> list[dict]:
         if room != loc:
             add("move", room, f"Go to {C.ROOM_NAMES[room]}", {"to": room}, True)
     return verbs.options
+
+
+# ---------------------------------------------------------------- the player's words
+# What the player types to someone is read as one of the buttons open now, or as nothing (thespis.intents).
+INTENTS = declared_intents(C.CAST.data)
+WORDS = Words(names={k: v for k, v in voice.VOCABULARY.items() if v in C.CAST.ids()}, claims={},
+              who=lambda x: words.who(x, about=True), claim_text=lambda c: words.claim_text(c, about=True),
+              people=people(C.CAST.data))
+NAMES_A_SUSPECT = ("request_questioning", "accuse")  # said to Lady Vane, about someone else
+# Whether a model's reading may be applied unasked. Not yet: the reader hasn't been measured on the manor's lines,
+# and missed the gate on the Crypt Road's (games/crypt_road/rules.py). The game's own phrases are applied at once.
+READS_ACT = False
+
+
+def open_to(w: World, to: str) -> list[Offer]:
+    """The intents the player's words to `to` may perform now: asking them, and, with Lady Vane, having a suspect
+    questioned or accusing one, whichever of those buttons are open."""
+    verbs = allowed(w)
+    out = offers(INTENTS, verbs, to)
+    for verb in NAMES_A_SUSPECT if to == C.OWNER else ():
+        suspects = tuple(v["target"] for v in verbs if v["verb"] == verb and v["enabled"])
+        if suspects:
+            out.append(Offer(verb, {"to": (to,), "suspect": suspects}))
+    return out
+
+
+def read(w: World, to: str, text: str, mind: Mind | None = None) -> Understood:
+    """What the player's words to `to` do, among the acts open now. It changes nothing. An accusation closes the
+    case, so however sure the reading, it is put to the player first, as its button asks once more."""
+    u = Understander(INTENTS, WORDS, mind, acts=READS_ACT).read(text, open_to(w, to), "player", to)
+    if u.status == ACT and u.intent is not None and u.intent.verb == "accuse":
+        return Understood(ASK, None, u.sure, [u.intent], u.path, "an accusation closes the case, so it is asked first")
+    return u
+
+
+def apply(w: World, u: Understood, to: str, **how) -> ActResult | None:
+    """Apply a reading as its button would be. Words that do nothing the game has, or a reading put back to the
+    player (`ask`), change nothing."""
+    if u.status != ACT or u.intent is None:
+        return None
+    args = u.intent.args
+    if u.intent.verb in NAMES_A_SUSPECT:
+        return act(w, u.intent.verb, args["suspect"], **how)
+    return act(w, u.intent.verb, to, args.get("topic"), **how)
+
+
+def say(w: World, to: str, text: str, gateway: ModelGateway | None = None, cache: ReplyCache | None = None,
+        replay: bool = False, budget: int | None = None, moderator: Moderator | None = None,
+        observer: Observer | None = None, checking: ClaimChecking | None = None) -> tuple[Understood, ActResult]:
+    """The player says `text` to `to`: it is read as one of the acts open now, and that act is applied exactly as its
+    button would be. Words that do none of them do nothing; a reading that isn't sure enough comes back as a question
+    for the player. Reading costs up to two model calls, counted with the action's."""
+    if w.status != PLAYING:
+        raise NotAllowed("The case is closed")
+    if to not in [n.id for n in w.npcs_at(w.player["loc"])]:
+        raise NotAllowed(f"{C.name(to)} isn't here to speak to")
+    if not text or len(text) > SAY_MAX:
+        raise NotAllowed(f"Say something, in {SAY_MAX} characters or fewer")
+    reader = open_mind(w, voice.VALIDATOR, gateway, cache, replay, budget, moderator)
+    u = read(w, to, text, reader)
+    reading = count_calls(w, reader)
+    result = apply(w, u, to, gateway=gateway, cache=cache, replay=replay,
+                   budget=None if budget is None else max(0, budget - reading), moderator=moderator,
+                   observer=observer, checking=checking) or ActResult([])
+    result.model_calls += reading
+    return u, result
 
 
 # ---------------------------------------------------------------- acting

@@ -1,12 +1,13 @@
 // The manor's bottom bar: the dialogue log, and the buttons built from GET /manor/allowed. Asking opens a choice of
-// topics; accusing asks once more, because it ends the case.
+// topics, or a box for your own words (POST /manor/say); accusing asks once more, because it ends the case.
 
 import { $, esc, badge } from "../dom.js";
-import { name, roomName, topicName } from "./model.js";
+import { name, roomName, topicName, readingLabel } from "./model.js";
 
 export class Bar {
-  constructor({ onAct, onLine }) {
+  constructor({ onAct, onSay, onLine }) {
     this.onAct = onAct; // (body) => Promise
+    this.onSay = onSay; // (target, text) => Promise
     this.onLine = onLine; // (decisionId) => void, opens the why-chain
     this.busy = false;
     this.verbs = [];
@@ -46,6 +47,24 @@ export class Bar {
   }
 
   clearLog() { $("log").innerHTML = ""; }
+
+  /** A reading of your words put to you before anything is done: each chip is the button it names. */
+  ask(readings) {
+    this.clearAsk();
+    const el = document.createElement("div");
+    el.className = "logline ask";
+    el.id = "ask";
+    el.innerHTML = `<span>Did you mean:</span>${readings.map((r, i) => `<button class="chipbtn" data-i="${i}">${esc(readingLabel(r.act))}</button>`).join("")}<button class="chipbtn plain" data-plain>Never mind</button>`;
+    el.onclick = (e) => {
+      const b = e.target.closest("button");
+      if (!b || this.busy) return;
+      this.clearAsk();
+      if (b.dataset.plain === undefined) this.onAct(readings[+b.dataset.i].act);
+    };
+    this.push(el);
+  }
+
+  clearAsk() { $("ask")?.remove(); }
 
   // --- buttons ---------------------------------------------------------------------------------------
 
@@ -106,11 +125,20 @@ export class Bar {
     const who = esc(name(v.target));
     const pop = this.openPop(`<h4>Ask ${who} about...</h4>
       <div class="row">${v.args.topics.map((t) => `<button class="act" data-topic="${esc(t.id)}">${esc(topicName(t.id))}</button>`).join("")}</div>
-      <div class="count">Asking is free: it never moves the clock on.</div>`, el);
+      <form class="row"><input maxlength="200" placeholder="...or in your own words" autocomplete="off" /><button class="act" style="flex:none">Say</button></form>
+      <div class="count">Asking is free: it never moves the clock on. Your own words are read as one of the buttons, or not at all.</div>`, el);
     pop.querySelectorAll("[data-topic]").forEach((b) => (b.onclick = () => {
       this.closePop();
       this.onAct({ verb: "ask", target: v.target, topic: b.dataset.topic });
     }));
+    const input = pop.querySelector("input");
+    pop.querySelector("form").onsubmit = (e) => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) return input.focus();
+      this.closePop();
+      this.onSay(v.target, text);
+    };
   }
 
   accusePop(v, el) {
