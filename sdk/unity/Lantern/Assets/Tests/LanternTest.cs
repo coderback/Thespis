@@ -125,8 +125,9 @@ namespace Lantern.Tests
             var final = settling.Result;
             Debug.Log($"     (template line after {shown} ms; the model's after {clock.ElapsedMilliseconds} ms)");
             Check(ReferenceEquals(final, spoken) && final.IsFinal && final.Source == "llm" &&
-                  final.Cites.SequenceEqual(new[] { "e0001" }),
-                "the client follows it until the model's line settles it, citing the insult", $"{final.Status} {final.Source}");
+                  final.Cites.Contains("e0001"),
+                "the client follows it until the model's line settles it, citing the insult",
+                $"{final.Status} {final.Source} {string.Join(",", final.Cites)}");
             yield return null;
             Check(!view.Faded("garrick") && view.Shown("garrick").EndsWith(final.Words()), "the scene shows the final line",
                 view.Shown("garrick"));

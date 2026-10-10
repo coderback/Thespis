@@ -190,9 +190,10 @@ There are two runners, and both play the same game (`Lantern/Assets/Lantern/Lant
 | `dotnet` | the core built as Unity builds it (netstandard2.1, C# 9), and the game, under .NET 10 | 30 checks | 28 checks |
 | `unity` | the Lantern scene in Unity 6000.6 in batch mode: a play-mode test plays it through `ThespisBehaviour` and reads what the screen shows | 31 checks | 29 checks |
 
-Offline with local Gemma 4 E4B, the `unity` runner passed the 22 checks it had before the word checks, through the
-Python runtime (the model's line after 1.6 s) and through the packaged one (1.5 s), with the sidecar refusing nothing
-off the machine ([docs/serve.md](../../docs/serve.md)). The nine word checks haven't been run with a local model yet.
+Offline with local Gemma 4 E4B, the `unity` runner passes 31 of 31, through the Python runtime (the model's line
+after 1.3 s) and through the packaged one (1.7 s), with the sidecar refusing nothing off the machine
+([docs/serve.md](../../docs/serve.md)). Read by Gemma, the unsure line comes back as a question, and the player's yes
+carries it out.
 
 The scene doesn't change between the two Thespis runs.
 

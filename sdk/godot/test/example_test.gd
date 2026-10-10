@@ -75,7 +75,7 @@ func _run() -> void:
 	check(scene.get_node("%Garrick").modulate.a < 1.0, "the scene shows it as provisional")
 	var final := await thespis.settle(spoken)
 	print("  (template line after %d ms; the model's after %d ms)" % [shown, Time.get_ticks_msec() - t0])
-	check(final == spoken and final.is_final() and final.source == "llm" and final.cites == ["e0001"],
+	check(final == spoken and final.is_final() and final.source == "llm" and "e0001" in final.cites,
 			"the client follows it until the model's line settles it, citing the insult", final.to_dict())
 	await process_frame
 	var label: Label = scene.get_node("%Garrick")

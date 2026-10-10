@@ -68,8 +68,9 @@ Check(spoken.Action == "confront:player" && spoken.IsProvisional && spoken.Text 
     "angry and insulted, he confronts the player, and his template line arrives provisional", spoken.Text);
 var final = await thespis.SettleAsync(spoken);
 Console.WriteLine($"  (template line after {shown} ms; the model's after {clock.ElapsedMilliseconds} ms)");
-Check(ReferenceEquals(final, spoken) && final.IsFinal && final.Source == "llm" && final.Cites.SequenceEqual(new[] { "e0001" }),
-    "the client follows it until the model's line settles it, citing the insult", $"{final.Status} {final.Source}");
+Check(ReferenceEquals(final, spoken) && final.IsFinal && final.Source == "llm" && final.Cites.Contains("e0001"),
+    "the client follows it until the model's line settles it, citing the insult",
+    $"{final.Status} {final.Source} {string.Join(",", final.Cites)}");
 Check(arrived.GetValueOrDefault(spoken.Id!) == 1 && settled.GetValueOrDefault(spoken.Id!) == 1,
     "LineArrived, then LineSettled, once each");
 

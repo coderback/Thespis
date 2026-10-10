@@ -203,12 +203,13 @@ python sdk/godot/test/run.py --godot <Godot console build> --mode sidecar [--loc
 | --- | --- | --- | --- |
 | `python -m thespis serve` | scripted, on localhost | 30 of 30 | 0 |
 | The packaged runtime (`dist/thespis/thespis.exe`) | scripted, on localhost | 30 of 30 | 0 |
-| `python -m thespis serve --local gemma4-e4b` | Gemma 4 E4B on the laptop's GPU | 21 of 21 (the model's line after 1.5 s) † | 0 |
-| The packaged runtime, `--local gemma4-e4b` | Gemma 4 E4B on the laptop's GPU | 21 of 21 (the model's line after 1.25 s) † | 0 |
+| `python -m thespis serve --local gemma4-e4b` | Gemma 4 E4B on the laptop's GPU | 30 of 30 (the model's line after 1.3 s) | 0 |
+| The packaged runtime, `--local gemma4-e4b` | Gemma 4 E4B on the laptop's GPU | 30 of 30 (the model's line after 1.4 s) | 0 |
 
-† Measured before the nine word checks were added. **They haven't been run with a local model yet.** Read by Gemma,
-which asks before it acts, the unsure line they type is one Rehearsal has it read as the right question ("You fight
-like a drunk goat."), but the scenes haven't played it.
+Read by Gemma, which asks before it acts, the unsure line is "You fight like a drunk goat.": it comes back as the
+question "Did you mean: Insult Garrick?", and the button carries it out. The injection is no act and moves no mind.
+Gemma's line may cite Garrick's belief about the insult beside the insult itself, so the check asks that it cites the
+insult, not that it cites nothing else.
 
 The same scene also plays through a hosted-mode server with a project key, unchanged (28 checks: the sidecar's two
 don't apply), and CI plays both on Linux on every push. After each run, nothing is left running: no runtime and no
@@ -224,13 +225,13 @@ python sdk/unity/test/run.py --runner unity --unity <Unity.exe> --mode sidecar -
 
 | Sidecar | Model | Checks | Off-machine connections refused |
 | --- | --- | --- | --- |
-| `python -m thespis serve --local gemma4-e4b` | Gemma 4 E4B on the laptop's GPU | 22 of 22 (the model's line after 1.6 s) † | 0 |
-| The packaged runtime, `--local gemma4-e4b` | Gemma 4 E4B on the laptop's GPU | 22 of 22 (the model's line after 1.5 s) † | 0 |
+| `python -m thespis serve --local gemma4-e4b` | Gemma 4 E4B on the laptop's GPU | 31 of 31 (the model's line after 1.3 s) | 0 |
+| The packaged runtime, `--local gemma4-e4b` | Gemma 4 E4B on the laptop's GPU | 31 of 31 (the model's line after 1.7 s) | 0 |
 
 With a scripted model, the scene passes 31 of 31, and CI plays it in the editor on every push (`unity-editor`),
 against a sidecar and a server.
 
-The template line shows in under 30 ms either way, and the model's words replace it when they come.
+The template line shows within about 30 ms either way, and the model's words replace it when they come.
 
 ## Not yet
 
