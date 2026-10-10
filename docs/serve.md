@@ -191,7 +191,9 @@ runs the same test at 100 engines on every push. On a Linux runner: 2000 request
 ### Offline: the reference scene with the network refused
 
 The Godot addon's example scene ([sdk/godot](../sdk/godot/README.md)) runs headless, with the addon starting the
-sidecar itself, as a shipped game would. It must pass all 21 checks with the sidecar refusing nothing:
+sidecar itself, as a shipped game would. It must pass all 30 checks with the sidecar refusing nothing. Nine of them
+are the player's words, typed to Garrick (Phase 5.4): an insult and a lie read with no model, an injection that
+changes nothing, and an unsure reading put to the player as a button.
 
 ```bash
 python sdk/godot/test/run.py --godot <Godot console build> --mode sidecar [--local gemma4-e4b] [--exe dist/thespis/thespis.exe]
@@ -199,17 +201,21 @@ python sdk/godot/test/run.py --godot <Godot console build> --mode sidecar [--loc
 
 | Sidecar | Model | Checks | Off-machine connections refused |
 | --- | --- | --- | --- |
-| `python -m thespis serve` | scripted, on localhost | 21 of 21 | 0 |
-| The packaged runtime (`dist/thespis/thespis.exe`) | scripted, on localhost | 21 of 21 | 0 |
-| `python -m thespis serve --local gemma4-e4b` | Gemma 4 E4B on the laptop's GPU | 21 of 21 (the model's line after 1.5 s) | 0 |
-| The packaged runtime, `--local gemma4-e4b` | Gemma 4 E4B on the laptop's GPU | 21 of 21 (the model's line after 1.25 s) | 0 |
+| `python -m thespis serve` | scripted, on localhost | 30 of 30 | 0 |
+| The packaged runtime (`dist/thespis/thespis.exe`) | scripted, on localhost | 30 of 30 | 0 |
+| `python -m thespis serve --local gemma4-e4b` | Gemma 4 E4B on the laptop's GPU | 21 of 21 (the model's line after 1.5 s) † | 0 |
+| The packaged runtime, `--local gemma4-e4b` | Gemma 4 E4B on the laptop's GPU | 21 of 21 (the model's line after 1.25 s) † | 0 |
 
-The same scene also plays through a hosted-mode server with a project key, unchanged (19 checks: the sidecar's two
+† Measured before the nine word checks were added. **They haven't been run with a local model yet.** Read by Gemma,
+which asks before it acts, the unsure line they type is one Rehearsal has it read as the right question ("You fight
+like a drunk goat."), but the scenes haven't played it.
+
+The same scene also plays through a hosted-mode server with a project key, unchanged (28 checks: the sidecar's two
 don't apply), and CI plays both on Linux on every push. After each run, nothing is left running: no runtime and no
 llama-server.
 
 The Unity package's Lantern scene ([sdk/unity](../sdk/unity/README.md)) passes the same gate in the editor, in batch
-mode, with the package starting the sidecar. It has 22 checks, the extra one confirming that line events come on
+mode, with the package starting the sidecar. It has 31 checks, the extra one confirming that line events come on
 Unity's main thread:
 
 ```bash
@@ -218,11 +224,11 @@ python sdk/unity/test/run.py --runner unity --unity <Unity.exe> --mode sidecar -
 
 | Sidecar | Model | Checks | Off-machine connections refused |
 | --- | --- | --- | --- |
-| `python -m thespis serve --local gemma4-e4b` | Gemma 4 E4B on the laptop's GPU | 22 of 22 (the model's line after 1.6 s) | 0 |
-| The packaged runtime, `--local gemma4-e4b` | Gemma 4 E4B on the laptop's GPU | 22 of 22 (the model's line after 1.5 s) | 0 |
+| `python -m thespis serve --local gemma4-e4b` | Gemma 4 E4B on the laptop's GPU | 22 of 22 (the model's line after 1.6 s) † | 0 |
+| The packaged runtime, `--local gemma4-e4b` | Gemma 4 E4B on the laptop's GPU | 22 of 22 (the model's line after 1.5 s) † | 0 |
 
-With a scripted model, CI plays the scene in the editor on every push (`unity-editor`), against a sidecar and a
-server.
+With a scripted model, the scene passes 31 of 31, and CI plays it in the editor on every push (`unity-editor`),
+against a sidecar and a server.
 
 The template line shows in under 30 ms either way, and the model's words replace it when they come.
 

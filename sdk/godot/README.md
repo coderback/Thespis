@@ -65,6 +65,50 @@ func show_line(line: ThespisLine) -> void:
 - **Many calls at once are fine.** Each request uses its own `HTTPRequest` from a small pool (`max_requests`, 6), so
   a poll held open never blocks the player's next action.
 
+## The player's words
+
+A player can type instead of pressing a button. The game file declares the acts they may do by typing (`[intents]`,
+[docs/protocol.md](../../docs/protocol.md#the-players-words)), and `understand` says which one their words do:
+
+```gdscript
+func say(text: String) -> void:
+    var r := await Thespis.understand(text, "garrick")    # what the player typed, and whom they said it to
+    if not r.ok:
+        return
+    match r.value.status:
+        "act":                                            # a sure reading: carry it out, as its button would
+            carry_out(r.value.intent)
+        "ask":                                            # perhaps an act with consequences: ask the player first
+            for reading in r.value.readings:
+                add_button("Did you mean: %s?" % reading.reads, carry_out.bind(reading))
+        "talk":                                           # the words do none of the game's acts
+            await Thespis.react("garrick", "talk")
+
+func carry_out(intent: ThespisApi.IntentOut) -> void:
+    match intent.verb:
+        "insult":
+            insult_garrick()
+        "tell":                                           # the claim goes back to observe as it came
+            await Thespis.observe(ThespisClient.event("tell", "player", "garrick", intent.args["claim"],
+                    ["wren"], {"said": true}))
+```
+
+- **`understand` only reads.** The engine carries the act out as it would the button, and reports it with `observe`.
+  So a lie the player types ("Wren insulted Pip.") is logged false by the ledger, as one told with a button is.
+- **The words can only pick.** A reading is one of the acts the game declares, and each argument comes from the game's
+  own lists: the NPCs there, its claims, an amount within its bounds. A line that tells the model what to answer can
+  pick, at most, an act the player could have clicked. The gate types one to a model that obeys it: 5000 coins, where
+  the game offers up to 100, is refused, and nothing changes.
+- **Say what's open now** with `offered`, as your buttons have it:
+  `Thespis.understand(text, "garrick", {"offered": [{"verb": "pay", "args": {"amount": {"min": 1, "max": coins}}}]})`.
+  Left out, every act the game declares is open.
+- **A local model asks first.** None has passed the words gate, so an act with consequences that one reads comes back
+  as `ask`. What the game's own phrases read (an intent's `examples`, and its claims stated plainly) is `act`, with no
+  model at all.
+- **Numbers in `intent.args` are floats,** as every JSON number is in GDScript: `int(intent.args["amount"])`.
+
+The Lantern has a box to say something to Garrick (`example/tavern.gd`: `say`, `carry_out`).
+
 ## Saves
 
 ```gdscript
@@ -122,12 +166,14 @@ python sdk/godot/test/run.py --godot <...> --mode sidecar --exe dist/thespis/the
 
 The runner plays `example/tavern.tscn` under `test/example_test.gd` twice, and the scene doesn't change between the
 two runs:
-- **Sidecar:** the addon starts the runtime itself, offline. It gets 21 checks.
+- **Sidecar:** the addon starts the runtime itself, offline. It gets 30 checks.
 - **Server:** a hosted-mode server with a project and its key, found through `THESPIS_URL` and `THESPIS_KEY`. It
-  gets 19 checks; the two sidecar-only ones don't apply.
+  gets 28 checks; the two sidecar-only ones don't apply.
 
-By default the model is scripted, answering after 1 s. A typical run shows the template line 33 ms after `decide`,
-then the model's line 1.04 s after it.
+By default the model is scripted ([sdk/harness.py](../harness.py)), answering a line after 1 s. A typical run shows
+the template line 33 ms after `decide`, then the model's line 1.04 s after it. Reading the player's words, the
+scripted model does as it's told: it gives back as its reading any JSON the text carries, and says yes when asked to
+confirm one. So the injection check is read by a model that obeys the injection.
 
 The checks:
 - typed replies;
@@ -135,6 +181,11 @@ The checks:
 - a failed call coming back as a result;
 - a tick, and a narration;
 - eight calls at once through six requests;
+- the player's words, typed to Garrick (nine checks):
+  - an insult read from the game's own phrases with no model, and carried out as the button would;
+  - a lie typed in the scene's box, logged false by the ledger and believed by Garrick;
+  - an injection that the model obeys, which is no act and leaves every mind and the ledger as they were;
+  - an unsure reading shown as a "Did you mean...?" button, which carries the act out when pressed;
 - a save through the game's own save file, restored as it was;
 - the sidecar refusing nothing off the machine, and stopping with the client.
 

@@ -98,6 +98,31 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Load"
 
+[node name="Speak" type="HBoxContainer" parent="Box"]
+layout_mode = 2
+
+[node name="Words" type="LineEdit" parent="Box/Speak"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Say something to Garrick..."
+max_length = 200
+
+[node name="Say" type="Button" parent="Box/Speak"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Say"
+
+[node name="Heard" type="Label" parent="Box"]
+unique_name_in_owner = true
+layout_mode = 2
+modulate = Color(1, 1, 1, 0.6)
+autowrap_mode = 3
+
+[node name="Asking" type="HFlowContainer" parent="Box"]
+unique_name_in_owner = true
+layout_mode = 2
+
 [node name="Status" type="Label" parent="Box"]
 unique_name_in_owner = true
 layout_mode = 2

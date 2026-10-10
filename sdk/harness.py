@@ -1,14 +1,16 @@
 """What the SDKs' test runners share (sdk/godot/test/run.py, sdk/unity/test/run.py): a scripted model, a hosted-mode
 server with a project and its key, and the environment an engine's test gets.
 
-The model is a stand-in for any OpenAI-compatible endpoint (llama.cpp, vLLM, a cloud provider). It answers after a
-delay, so a scene sees each line arrive provisional and settle when the model's words come.
+The model is a stand-in for any OpenAI-compatible endpoint (llama.cpp, vLLM, a cloud provider). It answers a line
+after a delay, so a scene sees each line arrive provisional and settle when the model's words come. Reading the
+player's words, it is a model that does as it's told: see ScriptedModel.
 """
 
 from __future__ import annotations
 
 import json
 import os
+import re
 import socket
 import subprocess
 import sys
@@ -29,14 +31,29 @@ LINE = "Watch your tongue, stranger."
 
 
 class ScriptedModel(BaseHTTPRequestHandler):
-    """An OpenAI-compatible /chat/completions that cites the first event in the state pack, else the first belief."""
+    """An OpenAI-compatible /chat/completions.
+
+    - **A line:** it cites the first event in the state pack, else the first belief.
+    - **The player's words** (thespis.intents): it reads no act, unless the text carries a JSON object, which it
+      gives back as its reading. So a line with an instruction in it is read by a model that obeys the instruction,
+      and what the engine then does shows what holds whatever the model says.
+    - **Asked to confirm a reading:** yes, always.
+    """
 
     def do_POST(self) -> None:
         body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
-        pack = json.loads(body["messages"][1]["content"])
-        refs = [x["id"] for x in pack.get("events", []) + pack.get("beliefs", [])]
-        time.sleep(DELAY)
-        content = json.dumps({"cites": refs[:1], "line": LINE})
+        asked = json.loads(body["messages"][1]["content"])
+        if "acts" in asked:  # which act the player's text does
+            told = re.search(r"\{.*\}", asked["text"], re.S)
+            content = json.dumps({"act": "none", "sure": "certain"})
+            if told and _is_json(told.group(0)):
+                content = told.group(0)
+        elif "act" in asked:  # whether the text does this act
+            content = json.dumps({"reason": "scripted", "answer": "yes"})
+        else:
+            refs = [x["id"] for x in asked.get("events", []) + asked.get("beliefs", [])]
+            time.sleep(DELAY)
+            content = json.dumps({"cites": refs[:1], "line": LINE})
         reply = json.dumps({"choices": [{"message": {"content": content}, "finish_reason": "stop"}],
                             "usage": {"prompt_tokens": 0, "completion_tokens": 0}}).encode()
         self.send_response(200)
@@ -47,6 +64,13 @@ class ScriptedModel(BaseHTTPRequestHandler):
 
     def log_message(self, *args) -> None:
         pass
+
+
+def _is_json(text: str) -> bool:
+    try:
+        return isinstance(json.loads(text), dict)
+    except ValueError:
+        return False
 
 
 def free_port() -> int:

@@ -48,7 +48,9 @@ namespace Thespis
     ///
     /// The engine owns the world. It reports what happened and who saw it (<see cref="ObserveAsync"/>), changes what
     /// it decides (<see cref="UpdateAsync"/>), and asks what an NPC does and says (<see cref="DecideAsync"/>,
-    /// <see cref="ReactAsync"/>, <see cref="NarrateAsync"/>). Thespis owns the minds.
+    /// <see cref="ReactAsync"/>, <see cref="NarrateAsync"/>). Thespis owns the minds. What the player types is read
+    /// as one of the acts the game file declares (<see cref="UnderstandAsync"/>), for the engine to carry out as it
+    /// would a button.
     /// <code>
     /// await thespis.StartAsync();                // a sidecar on this machine, or the server the options name
     /// await thespis.OpenAsync("tavern");
@@ -350,6 +352,26 @@ namespace Thespis
                 line.RaiseSettled();
             }
             done.TrySetResult(true);
+        }
+
+        // ------------------------------------------------------------------------------------------ the player's words
+
+        /// <summary>
+        /// What the player's own words do, among the acts the game file declares ([intents]). The reply's Status says
+        /// what to do with it: <c>act</c>, carry out Intent as its button would and report what happened with
+        /// <see cref="ObserveAsync"/>; <c>ask</c>, put Readings to the player first ("Did you mean: Insult
+        /// Garrick?") and carry out the one they pick; <c>talk</c>, the words do none of the game's acts.
+        /// Reading changes nothing, and an intent's arguments come only from the game's own lists: Args holds ids,
+        /// whole numbers and claims to hand back to observe as they came.
+        /// <paramref name="to"/> is the NPC spoken to. <paramref name="options"/> carries the rest: Offered (the acts
+        /// open now, narrowing the game's; left out, every act the game declares) and Player (who typed it).
+        /// </summary>
+        public Task<Result<UnderstandOut>> UnderstandAsync(string text, string? to = null, UnderstandIn? options = null)
+        {
+            var body = options ?? new UnderstandIn();
+            body.Text = text;
+            body.To = to ?? body.To;
+            return CallAsync<UnderstandOut>(Routes.Understand, Session(), body);
         }
 
         // ------------------------------------------------------------------------------------------ plumbing
