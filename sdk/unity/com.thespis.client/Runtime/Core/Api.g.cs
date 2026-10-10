@@ -327,6 +327,10 @@ namespace Thespis.Api
         [JsonProperty("claim", NullValueHandling = NullValueHandling.Ignore)]
         public ClaimIn? Claim { get; set; }
 
+        /// <summary>With said: how far its hearers believe it, when the engine's own rules decide that (a roll of the dice); left out, each hearer's trust in the speaker decides</summary>
+        [JsonProperty("conf", NullValueHandling = NullValueHandling.Ignore)]
+        public double? Conf { get; set; }
+
         /// <summary>The actor stated the claim: hearers believe it by their trust in them</summary>
         [JsonProperty("said")]
         public bool Said { get; set; } = false;

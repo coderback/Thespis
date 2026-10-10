@@ -644,6 +644,20 @@
             ],
             "description": "What it shows, or, with said, what was said"
           },
+          "conf": {
+            "anyOf": [
+              {
+                "maximum": 1.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "With said: how far its hearers believe it, when the engine's own rules decide that (a roll of the dice); left out, each hearer's trust in the speaker decides",
+            "title": "Conf"
+          },
           "said": {
             "default": false,
             "description": "The actor stated the claim: hearers believe it by their trust in them",
