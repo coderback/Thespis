@@ -186,7 +186,7 @@ the local runtime's BGE small (`thespis serve --embed local`).
 | Library (`Session`) | HTTP | What it does |
 | --- | --- | --- |
 | `Session.new(game, seed)` | `POST /v1/sessions {game, seed}` | A new playthrough |
-| `observe(verb, actor, target, at, claim, witnesses, said, true, amount)` | `POST .../observe` | Something happened. `witnesses` saw it. A deed's claim is believed for certain by whoever saw it or took part in it. A statement (`said`) is believed by whoever heard it, as far as each trusts the speaker. Its truth is the ledger's unless `true` says |
+| `observe(verb, actor, target, at, claim, witnesses, said, true, amount, conf)` | `POST .../observe` | Something happened. `witnesses` saw it. A deed's claim is believed for certain by whoever saw it or took part in it. A statement (`said`) is believed by whoever heard it, as far as each trusts the speaker, or as far as `conf` says when the engine's own rules decide how well it was told (a roll of the dice). Its truth is the ledger's unless `true` says |
 | `update(npc, loc, drives, nudge, flags, trust_in)` | `POST .../update` | The engine's rules changed an NPC (or, with a player's id, moved that player) |
 | `join(player, name, at)` | `POST .../players` | A player joins, or one already here is renamed or moves |
 | `add(npc, kind, name, at, persona, goal)` | `POST .../npcs` | Someone joins the cast, as one of a kind the game declares |

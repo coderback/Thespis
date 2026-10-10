@@ -418,6 +418,7 @@ class ObserveIn extends RefCounted:
 	var amount = null  ## integer, or null
 	var at = null  ## string, or null. Where it happened; the actor's place if left out
 	var claim: ClaimIn = null  ## What it shows, or, with said, what was said
+	var conf = null  ## number, or null. With said: how far its hearers believe it, when the engine's own rules decide that (a roll of the dice); left out, each hearer's trust in the speaker decides
 	var said: bool = false  ## The actor stated the claim: hearers believe it by their trust in them
 	var target = null  ## string, or null
 	var true_ = null  ## boolean, or null. Whether the claim is true; left out, the ledger decides
@@ -429,6 +430,7 @@ class ObserveIn extends RefCounted:
 		amount = int(d["amount"]) if d.get("amount") != null else null
 		at = str(d["at"]) if d.get("at") != null else null
 		claim = ClaimIn.new().read(d["claim"]) if d.get("claim") != null else null
+		conf = float(d["conf"]) if d.get("conf") != null else null
 		if d.has("said"): said = bool(d["said"])
 		target = str(d["target"]) if d.get("target") != null else null
 		true_ = bool(d["true"]) if d.get("true") != null else null
@@ -442,6 +444,7 @@ class ObserveIn extends RefCounted:
 		if amount != null: d["amount"] = amount
 		if at != null: d["at"] = at
 		if claim != null: d["claim"] = claim.to_dict()
+		if conf != null: d["conf"] = conf
 		d["said"] = said
 		if target != null: d["target"] = target
 		if true_ != null: d["true"] = true_
