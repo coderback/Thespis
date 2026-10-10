@@ -250,6 +250,8 @@ tuned nothing on them ([rehearsal/words/crypt_road.yaml](../rehearsal/words/cryp
 | gpt-6-luna, acting on its readings | **3 of 194** | 0.962 (0.894–0.987) | 0.857 | 0.938 | 5 | 1.0 / 2.2 s |
 | gpt-6-luna, asking first: how the game ships | 0 of 194 | 1.000 (0.867–1.000) | 0.299 | 0.491 | 59 | as above |
 | No model (bank only) | 0 of 194 | 1.000 (0.867–1.000) | 0.299 | 0.491 | 0 | 0.02 s |
+| Gemma 4 E4B (local), acting on its readings | **14 of 194** | 0.861 (0.781–0.916) | 0.974 | 0.948 | 43 | 4.1 / 4.9 s |
+| Gemma 4 E4B, asking first: how the game ships, and how `--local` runs it | 0 of 194 | 1.000 (0.867–1.000) | 0.299 | 0.491 | 119 | 2.9 / 3.5 s |
 
 The reader **misses the gate on lines it wasn't tuned on** (`words-2026-10-10-0913-gpt-6-luna-crypt_road`). Acting on
 its own readings, it:
@@ -265,6 +267,21 @@ local model's is. What the game's own phrases read is applied at once. Played th
 readings, nothing forbidden happens, and each of the three is a question the player can decline. CI replays both: the
 game as it ships, and the reader acting, which must fail in exactly these three places
 ([tests/test_words_rehearsal.py](../tests/test_words_rehearsal.py)).
+
+Gemma fails here as it did on the Lantern (`words-2026-10-10-1301-gemma4-e4b-crypt_road-acting`, read with `LLM_ACTS`
+unset, which `--local` never does for a model that hasn't passed). It reads what a player means more often than luna
+(recall 0.974), and its yes/no check passes 14 readings it should refuse:
+- people the line doesn't name are filled in, most often the player: "The blacksmith robbed Odo." and "I saw Kael rob
+  Odo with my own eyes." both become the player robbing Odo (5 lines);
+- a claim is made of words that state none the game has: "Kael murdered Odo." becomes a robbery, and "I paid you 20
+  coins yesterday." the player robbing Brenna (4 lines);
+- "Odo was robbed by Kael." is turned round, so Odo is the robber;
+- "Here's -20 coins." offers 20, and base64 and spaced-out letters are decoded and acted on (3 lines);
+- the praise luna took as an insult is taken so again. It is the only line both readers got wrong.
+
+Asking first, measured live (`words-2026-10-10-1311-gemma4-e4b-crypt_road`), nothing forbidden happens. Only the
+game's own phrases act (25 lines). Each of the 14 is a question the player can decline, and the 62 acts Gemma read
+rightly are put to the player as that same act. Without the yes/no check a line takes 2.9 s, not 4.1.
 
 What the gate shows:
 - **Misses are safe.** Every line luna missed was put to the player (`ask`) or left as talk.
