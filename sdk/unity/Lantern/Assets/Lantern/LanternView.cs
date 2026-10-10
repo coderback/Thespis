@@ -8,8 +8,9 @@ using UnityEngine;
 namespace Lantern
 {
     /// <summary>
-    /// The Lantern on screen: a line for each of Garrick, Wren, Pip and the narrator, and the player's choices as
-    /// buttons. The world is LanternGame's; this only shows it. A provisional line (the game's template) is drawn
+    /// The Lantern on screen: a line for each of Garrick, Wren, Pip and the narrator, the player's choices as
+    /// buttons, and a box to say something to Garrick in their own words. A reading the game isn't sure of is put
+    /// back to the player as a button. The world is LanternGame's; this only shows it. A provisional line (the game's template) is drawn
     /// faded until the model's words replace it. Nothing here says where Thespis runs: that's the ThespisSettings asset.
     /// </summary>
     public sealed class LanternView : MonoBehaviour
@@ -27,6 +28,7 @@ namespace Lantern
 
         private readonly Dictionary<string, ThespisLine> _showing = new Dictionary<string, ThespisLine>();
         private bool _busy;
+        private string _words = "";  // what the player is typing
 
         private void Awake()
         {
@@ -62,8 +64,12 @@ namespace Lantern
 
         public void Clear() => _showing.Clear();
 
+        /// <summary>A reading the game isn't sure of, as its button puts it to the player.</summary>
+        public static string Question(IntentOut reading) => $"Did you mean: {reading.Reads}?";
+
         private void OnGUI()
         {
+            var asking = Game.Asking;  // as it stood when this pass began: a click on a button below changes it
             GUILayout.BeginArea(new Rect(24, 24, Screen.width - 48, Screen.height - 48));
             GUILayout.Label("The Lantern's taproom, an hour before dusk. Garrick nurses a drink; Wren polishes the bar.");
             GUILayout.Label($"Hour {Game.Phase}. Pip is in {(Game.PipAt == "taproom" ? "the taproom" : "the " + Game.PipAt)}.");
@@ -85,15 +91,26 @@ namespace Lantern
             Button("Save", SaveAsync);
             Button("Load", LoadAsync);
             GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            _words = GUILayout.TextField(_words, 200);
+            Button("Say to Garrick", SayAsync, GUILayout.ExpandWidth(false));
+            GUILayout.EndHorizontal();
+            GUILayout.Label(Game.Heard);
+            GUILayout.BeginHorizontal();
+            foreach (var reading in asking)
+                Button(Question(reading), () => Game.CarryOutAsync(reading));
+            if (asking.Count > 0)
+                Button("No", () => { Game.Dismiss(); return Task.CompletedTask; });
+            GUILayout.EndHorizontal();
             GUI.enabled = true;
             GUILayout.FlexibleSpace();
             GUILayout.Label(Status);
             GUILayout.EndArea();
         }
 
-        private async void Button(string label, System.Func<Task> act)
+        private async void Button(string label, System.Func<Task> act, params GUILayoutOption[] layout)
         {
-            if (!GUILayout.Button(label))
+            if (!GUILayout.Button(label, layout))
                 return;
             _busy = true;
             try
@@ -104,6 +121,14 @@ namespace Lantern
             {
                 _busy = false;
             }
+        }
+
+        /// <summary>What the player typed goes to Garrick, to be read as one of the game's acts or as talk.</summary>
+        private Task SayAsync()
+        {
+            var text = _words.Trim();
+            _words = "";
+            return text.Length > 0 ? Game.SayAsync(text) : Task.CompletedTask;
         }
 
         private async Task SaveAsync()

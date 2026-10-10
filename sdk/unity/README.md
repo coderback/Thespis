@@ -82,6 +82,59 @@ public class Taproom : MonoBehaviour
   so handlers can touch the scene. The test checks it.
 - **Many calls at once:** up to `MaxRequests` (6) in flight, and the rest wait their turn.
 
+## The player's words
+
+A player can type instead of pressing a button. The game file declares the acts they may do by typing (`[intents]`,
+[docs/protocol.md](../../docs/protocol.md#the-players-words)), and `UnderstandAsync` says which one their words do:
+
+```csharp
+public async Task Say(string text)
+{
+    var r = await thespis.UnderstandAsync(text, "garrick");   // what the player typed, and whom they said it to
+    if (!r.Ok) return;
+    switch (r.Value.Status)
+    {
+        case "act":                                           // a sure reading: carry it out, as its button would
+            await CarryOut(r.Value.Intent);
+            break;
+        case "ask":                                           // perhaps an act with consequences: ask the player first
+            foreach (var reading in r.Value.Readings)
+                AddButton($"Did you mean: {reading.Reads}?", () => CarryOut(reading));
+            break;
+        default:                                              // talk: the words do none of the game's acts
+            await thespis.ReactAsync("garrick", "talk");
+            break;
+    }
+}
+
+async Task CarryOut(IntentOut intent)
+{
+    if (intent.Verb == "insult") InsultGarrick();
+    else if (intent.Verb == "tell")                           // the claim goes back to observe as it came
+    {
+        var telling = ThespisClient.Event("tell", "player", "garrick", intent.Args["claim"].ToObject<ClaimIn>(), "wren");
+        telling.Said = true;
+        await thespis.ObserveAsync(telling);
+    }
+}
+```
+
+- **`UnderstandAsync` only reads.** The engine carries the act out as it would the button, and reports it with
+  `ObserveAsync`. So a lie the player types ("Wren insulted Pip.") is logged false by the ledger, as one told with a
+  button is.
+- **The words can only pick.** A reading is one of the acts the game declares, and each argument comes from the game's
+  own lists: the NPCs there, its claims, an amount within its bounds. A line that tells the model what to answer can
+  pick, at most, an act the player could have clicked. The gate types one to a model that obeys it: 5000 coins, where
+  the game offers up to 100, is refused, and nothing changes.
+- **Say what's open now** with `Offered`, as your buttons have it:
+  `new UnderstandIn { Offered = new List<OfferIn> { new OfferIn { Verb = "pay", Args = JObject.Parse("{\"amount\": {\"min\": 1, \"max\": 40}}") } } }`.
+  Left out, every act the game declares is open.
+- **A local model asks first.** None has passed the words gate, so an act with consequences that one reads comes back
+  as `ask`. What the game's own phrases read (an intent's `examples`, and its claims stated plainly) is `act`, with no
+  model at all.
+
+The Lantern has a box to say something to Garrick (`LanternGame.cs`: `SayAsync`, `CarryOutAsync`).
+
 ## Saves
 
 ```csharp
@@ -134,12 +187,13 @@ There are two runners, and both play the same game (`Lantern/Assets/Lantern/Lant
 
 | Runner | What it runs | Sidecar | Server |
 | --- | --- | --- | --- |
-| `dotnet` | the core built as Unity builds it (netstandard2.1, C# 9), and the game, under .NET 10 | 19 checks | 17 checks |
-| `unity` | the Lantern scene in Unity 6000.6 in batch mode: a play-mode test plays it through `ThespisBehaviour` and reads what the screen shows | 22 checks | 20 checks |
+| `dotnet` | the core built as Unity builds it (netstandard2.1, C# 9), and the game, under .NET 10 | 30 checks | 28 checks |
+| `unity` | the Lantern scene in Unity 6000.6 in batch mode: a play-mode test plays it through `ThespisBehaviour` and reads what the screen shows | 31 checks | 29 checks |
 
-Offline with local Gemma 4 E4B, the `unity` runner passes 22 of 22 through the Python runtime (the model's line
-after 1.6 s) and through the packaged one (1.5 s), with the sidecar refusing nothing off the machine
-([docs/serve.md](../../docs/serve.md)).
+Offline with local Gemma 4 E4B, the `unity` runner passes 31 of 31, through the Python runtime (the model's line
+after 1.3 s) and through the packaged one (1.7 s), with the sidecar refusing nothing off the machine
+([docs/serve.md](../../docs/serve.md)). Read by Gemma, the unsure line comes back as a question, and the player's yes
+carries it out.
 
 The scene doesn't change between the two Thespis runs.
 
@@ -150,6 +204,11 @@ What the checks cover:
 - a failed call coming back as a result;
 - a tick, and a narration;
 - eight calls at once;
+- the player's words, typed to Garrick (nine checks):
+  - an insult read from the game's own phrases with no model, and carried out as the button would;
+  - a lie, logged false by the ledger and believed by Garrick;
+  - an injection that the model obeys, which is no act and leaves every mind and the ledger as they were;
+  - an unsure reading put to the player, whose yes carries the act out;
 - a save restored as it was;
 - the sidecar refusing nothing off the machine, and stopping with the client.
 

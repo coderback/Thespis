@@ -2,7 +2,8 @@
 ##
 ## The engine owns the world. It reports what happened and who saw it (`observe`), changes what it decides
 ## (`update`), and asks what an NPC does and says (`decide`, `react`, `narrate`). Thespis owns the minds: what each
-## NPC believes, what it chooses among the actions the game file declares, and its words.
+## NPC believes, what it chooses among the actions the game file declares, and its words. What the player types is
+## read as one of the acts the game file declares (`understand`), for the engine to carry out as it would a button.
 ##
 ##   await Thespis.start()        # a sidecar on this machine, or the server the settings name
 ##   await Thespis.open("tavern")
@@ -294,6 +295,25 @@ func _follow(spoken: ThespisLine) -> void:
 		line_settled.emit(spoken)
 		spoken.settled.emit(spoken)
 	spoken._followed.emit()
+
+
+# ------------------------------------------------------------------------------------------------ the player's words
+
+## What the player's own words do, among the acts the game file declares ([intents]). ok with a
+## ThespisApi.UnderstandOut, whose `status` says what to do with it:
+##   "act"   carry out `intent` as its button would, and report what happened with observe;
+##   "ask"   put `readings` to the player first ("Did you mean: Insult Garrick?"), and carry out the one they pick;
+##   "talk"  the words do none of the game's acts.
+## Reading changes nothing, and an intent's arguments come only from the game's own lists: `intent.args` holds ids,
+## whole numbers (as floats here, as every JSON number is) and claims to hand back to observe as they came.
+## `to` is the NPC spoken to. options: offered (the acts open now, each {"verb": ..., "args": ...} narrowing the
+## game's, such as {"verb": "pay", "args": {"amount": {"min": 1, "max": coins}}}; left out, every act the game
+## declares), and player (who typed it).
+func understand(text: String, to := "", options := {}) -> ThespisResult:
+	var body := _with({"text": text}, options)
+	if not to.is_empty():
+		body["to"] = to
+	return await _call("understand", {"sid": session_id}, body)
 
 
 # ------------------------------------------------------------------------------------------------ plumbing

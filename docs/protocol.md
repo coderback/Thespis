@@ -172,6 +172,10 @@ declares, among those open now, or as talk ([thespis/intents.py](../thespis/inte
 session. The engine applies the act it returns as it would the button, under its own rules, and reports it with
 `observe` as usual. A lie told by typing is logged with its real truth, like one told by a button.
 
+The Godot and Unity clients have it as `understand` and `UnderstandAsync`, and their Lantern examples take what the
+player types to Garrick ([sdk/godot](../sdk/godot/README.md#the-players-words),
+[sdk/unity](../sdk/unity/README.md#the-players-words)).
+
 ```toml
 [intents.pay]
 means = "gives or firmly offers the one they speak to money"  # what doing it is, for the model
@@ -345,9 +349,6 @@ These are still to come:
 - A reader that passes the words gate on lines it wasn't tuned on, so that the Crypt Road and the manor can act on a
   model's reading without asking. It would need a fresh set to be judged on: the Crypt Road's lines have now been
   looked at.
-- `understand` in the Godot and Unity clients. Their generated layer has it already; the wrappers and a text box in
-  the Lantern come in Phase 5.4.
-
 - Lines are polled. The Godot spike (4.1b) found long-polling (`?wait=2`) natural in GDScript, where server-sent events
   would mean driving `HTTPClient` by hand, so SSE waits until an engine needs it. The Godot addon follows provisional
   lines by long-polling ([sdk/godot](../sdk/godot/README.md)).
