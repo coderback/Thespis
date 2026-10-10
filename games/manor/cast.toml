@@ -96,6 +96,29 @@ question = "{a} questioned {t} in {room}."
 accuse = "{a} accused {t} before Lady Vane."
 constable = "{a} sent for the constable."
 
+# ---------------------------------------------------------------- the player's words (thespis.intents)
+# What the player may do by typing it to someone, instead of pressing the button. Asking is a question, so a question
+# performs it; so is asking Lady Vane to question someone. An accusation closes the case, so it is always asked first.
+[intents.ask]
+means = "asks the one they speak to about the topic: morning (where they were, or what they saw, did or know of this morning) or ring (the missing signet ring: where it is kept, who has it, what became of it)"
+reads = "Ask {to} about {topic}"
+args = { to = "npc", topic = { type = "choice", options = ["morning", "ring"] } }
+asks = true
+examples = ["where were you this {topic}", "what did you see this {topic}", "what happened this {topic}", "tell me about this {topic}", "tell me about the {topic}", "what do you know about the {topic}", "where is the {topic}", "who took the {topic}"]
+
+[intents.request_questioning]
+means = "asks the one they speak to, the lady of the house, to question the suspect herself, here and now"
+reads = "Have {to} question {suspect}"
+args = { to = "npc", suspect = "npc" }
+asks = true
+examples = ["question {suspect}", "please question {suspect}", "will you question {suspect}", "ask {suspect} what he saw", "ask {suspect} where she was", "have {suspect} questioned"]
+
+[intents.accuse]
+means = "accuses the suspect, before the one they speak to, of taking the ring: stated as the answer to the case, not wondered at or asked about"
+reads = "Accuse {suspect} before {to}"
+args = { to = "npc", suspect = "npc" }
+examples = ["I accuse {suspect}", "{suspect} took the ring", "{suspect} stole the ring", "{suspect} is the thief", "it was {suspect}"]
+
 # The claim extractor's vocabulary (thespis.claims): the predicates, characters and places it may use.
 [claims]
 description = "Predicates (a and b are ids):\n- took(a, ring): a took the signet ring; was_in(a, ROOM@TIME): a was in a room at a time, with TIME a number: 0 early morning, 1 mid-morning (also \"this morning\" or \"all morning\"), 2 noon, 3 early afternoon, 4 mid-afternoon, 5 late afternoon, 6 teatime, 7 evening; e.g. kitchen@1\n- left(a, room); at(a, room): a is in that room now; told(a, b); questioned(a, b); accused(a, b)\n- other: any other assertion about what happened, with b set to a short paraphrase\nCharacters: player (the one being spoken to, \"you\"), vane (Lady Vane, her ladyship), pell, sable. Rooms: hall, study, kitchen."

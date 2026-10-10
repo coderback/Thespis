@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from games.crypt_road import claims, voice
+from games.crypt_road import claims, voice, words
 from games.crypt_road import content as C
 from thespis import perception
 from thespis.affordances import decide
@@ -23,9 +23,10 @@ from thespis.brain import Brain, UtilityBrain
 from thespis.claims import ClaimChecking
 from thespis.expression import Mind, Observer, ReplyCache
 from thespis.gateway import ModelGateway
+from thespis.intents import ACT, ASK, TALK_VERB, Offer, Understander, Understood, Words, declared_intents, people
 from thespis.ledger import Claim, Event
 from thespis.moderation import Moderator
-from thespis.play import NotAllowed, Verbs, check, count_calls, open_mind
+from thespis.play import NotAllowed, Verbs, check, count_calls, offers, open_mind
 from thespis.tick import Tick, gossip, run_tick, walk, walks
 from thespis.voice import View, reply
 from thespis.world import LOST, PLAYING, WON, World
@@ -135,12 +136,71 @@ def allowed(w: World) -> list[dict]:
     return verbs.options
 
 
+# ---------------------------------------------------------------- the player's words
+# What the player types to someone is read as one of the buttons open with them now, or as talk (thespis.intents).
+INTENTS = declared_intents(C.CAST.data)
+APPEALS = next(a.options for a in INTENTS["bribe"].args if a.name == "appeal")
+# Whether a model's reading of an act may be applied unasked. Not yet: on these lines, which the reader's prompts
+# weren't tuned on, the cloud reader made 3 forbidden changes in 194 (rehearsal/reports, words-*-crypt_road), so the
+# gate isn't met. What the game's own phrases read is applied at once; what a model reads is put to the player first.
+READS_ACT = False
+WORDS = Words(
+    names={**{k: v for k, v in voice.VOCABULARY.items() if v in C.npc_ids()},
+           **{str(t["name"]).lower(): n for n, t in C.CAST.data["npc"].items()}},
+    claims=C.CAST.data["words"]["claims"], who=lambda x: words.who(x, player=words.ABOUT_PLAYER),
+    claim_text=lambda c: words.claim_text(c, player=words.ABOUT_PLAYER), people=people(C.CAST.data))
+
+
+def open_to(w: World, to: str) -> list[Offer]:
+    """The intents the player's words to `to` may perform now: the enabled buttons that speak to them."""
+    return offers(INTENTS, allowed(w), to)
+
+
+def read(w: World, to: str, text: str, mind: Mind | None = None, acts: bool | None = None) -> Understood:
+    """What the player's words to `to` do, among the acts open with them now. It changes nothing. `acts` says
+    whether a model's reading may be applied unasked (READS_ACT, unless Rehearsal is measuring the reader)."""
+    reader = Understander(INTENTS, WORDS, mind, acts=READS_ACT if acts is None else acts)
+    return reader.read(text, open_to(w, to), "player", to)
+
+
+def apply(w: World, u: Understood, to: str, text: str, **how) -> ActResult | None:
+    """Apply a reading as its button would be: the act it is sure of, or talk. A reading put back to the player
+    (`ask`) does nothing until they choose."""
+    if u.status == ASK:
+        return None
+    if u.status == ACT and u.intent is not None and u.intent.verb != TALK_VERB:
+        args = u.intent.args
+        return act(w, u.intent.verb, to, args.get("claim"), args.get("amount"), appeal=args.get("appeal"), **how)
+    return act(w, "talk", to, text=text, **how)
+
+
+def say(w: World, to: str, text: str, brain: Brain | None = None, gateway: ModelGateway | None = None,
+        cache: ReplyCache | None = None, replay: bool = False, budget: int | None = None,
+        moderator: Moderator | None = None, observer: Observer | None = None,
+        checking: ClaimChecking | None = None) -> tuple[Understood, ActResult]:
+    """The player says `text` to `to`: it is read as one of the acts open with them now, and that act is applied
+    exactly as its button would be, under the same rules. Words that do none of them are talk; a reading that isn't
+    sure enough, or that only a model made (READS_ACT), comes back as a question for the player, with nothing done.
+    Reading costs up to two model calls, counted with the action's."""
+    check(allowed(w), "talk", to)
+    if not text or len(text) > TALK_MAX:
+        raise NotAllowed(f"Say something, in {TALK_MAX} characters or fewer")
+    reader = open_mind(w, voice.VALIDATOR, gateway, cache, replay, budget, moderator)
+    u = read(w, to, text, reader)
+    reading = count_calls(w, reader)
+    result = apply(w, u, to, text, brain=brain, gateway=gateway, cache=cache, replay=replay,
+                   budget=None if budget is None else max(0, budget - reading), moderator=moderator,
+                   observer=observer, checking=checking) or ActResult([], None, None)
+    result.model_calls += reading
+    return u, result
+
+
 # ---------------------------------------------------------------- acting
 def act(w: World, verb: str, target: str | None = None, claim: dict | Claim | None = None,
         amount: int | None = None, text: str | None = None, brain: Brain | None = None,
         gateway: ModelGateway | None = None, cache: ReplyCache | None = None, replay: bool = False,
         budget: int | None = None, moderator: Moderator | None = None, observer: Observer | None = None,
-        checking: ClaimChecking | None = None) -> ActResult:
+        checking: ClaimChecking | None = None, appeal: str | None = None) -> ActResult:
     """Apply one player verb, the tick it triggers, and the epilogue if the race ends.
 
     Code makes every choice. With a gateway and the brain switched on, the model words what NPCs say; anything it
@@ -177,7 +237,7 @@ def act(w: World, verb: str, target: str | None = None, claim: dict | Claim | No
         told = _as_claim(claim)
         _tell(w, target, told)
     elif verb == "bribe":
-        haggle = _offer(w, mind, brain, _offered_amount(w, amount))
+        haggle = _offer(w, mind, brain, _offered_amount(w, amount), _appeal(appeal))
     elif verb in ("move", "wait"):
         ends_phase = verb
     elif verb == "take_relic":
@@ -205,25 +265,51 @@ def _offered_amount(w: World, amount: int | None) -> int:
     return amount
 
 
-def _offer(w: World, mind: Mind, brain: Brain, amount: int) -> dict | None:
+def _appeal(appeal: str | None) -> str | None:
+    """How an offer is pressed, if it is: one of the appeals the game declares ([intents.bribe])."""
+    if appeal is not None and appeal not in APPEALS:
+        raise NotAllowed(f"An offer can come with an appeal to {', '.join(APPEALS)}, or none")
+    return appeal
+
+
+def _offer(w: World, mind: Mind, brain: Brain, amount: int, appeal: str | None = None) -> dict | None:
     """The player offers Brenna `amount` coins (#36). At or above her price she takes it and trusts them more; below
     it she refuses a lowball (under half her price) and counters anything else at her price. She never takes less.
+
+    An offer made in words may come with an `appeal`, which cast.toml weighs ([[npc.brenna.choices.appeal]]): one to
+    her duty brings her price down by C.RELENT for the deal, once; a threat has her refuse whatever is offered, and
+    trust them less.
 
     Returns her reply to a haggle, in the replies shape, or None when she took the money (voice.react voices that).
     """
     guard, loc = w.npcs[C.GUARD], w.player["loc"]
-    price = C.asking_price(guard.trust_in.get("player", 0))
-    if amount >= price:
+    trust = guard.trust_in.get("player", 0)
+    hears = None
+    if appeal:
+        heard = C.CHOICES[C.GUARD, "appeal"].options(w, View(loc), appeal=appeal, trust=trust)
+        hears = decide(w, mind, voice.VOICE, brain, C.GUARD, "appeal", heard, lambda ch: None,
+                       f"The player offers you {amount} coins. {C.CAST.text('appeals', appeal)}",
+                       f"the offer came with an appeal: {appeal}", ask=False).chosen
+        if hears == "relent":
+            guard.flags["duty_heard"] = guard.flags["relented"] = True
+        elif hears == "bristle":
+            guard.trust_in["player"] = trust - 1
+    price = C.asking_price(trust) - (C.RELENT if guard.flags.get("relented") else 0)
+    if amount >= price and hears != "bristle":
         w.player["coins"] -= amount
         guard.trust_in["player"] += 2
         guard.flags.pop("asking", None)
+        guard.flags.pop("relented", None)  # the deal her duty bought is done
         _event(w, "bribe", "player", C.GUARD, loc, amount=amount)
         return None
     offer = _event(w, "offer", "player", C.GUARD, loc, amount=amount)
-    choices = C.CHOICES[C.GUARD, "bribe_offer"].options(w, View(loc), price=price, lowball=amount * 2 < price)
+    choices = C.CHOICES[C.GUARD, "bribe_offer"].options(w, View(loc), price=price, lowball=amount * 2 < price,
+                                                        threatened=hears == "bristle")
+    situation = f"The player offers you {amount} coins to forget the trouble. You won't take less than {price}."
     d = decide(w, mind, voice.VOICE, brain, C.GUARD, "bribe_offer", choices,
                lambda ch: voice.haggle_line(ch, offer, amount, price),
-               f"The player offers you {amount} coins to forget the trouble. You won't take less than {price}.",
+               f"{situation} {C.CAST.text('appeals', appeal)}" if appeal else situation,
+               "a threat came with the offer" if hears == "bristle" else
                f"an offer of {amount}, under her price of {price}")
     if d.chosen == "refuse":
         guard.flags["refused_phase"] = w.phase

@@ -5,6 +5,782 @@
   "gpt-5.4-nano"
  ],
  "outcomes": {
+  "crypt_road/adversarial-001": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-002": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-003": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-004": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/adversarial-005": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-006": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-007": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-008": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-009": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-010": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-011": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-012": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-013": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-014": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-015": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-016": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-017": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/adversarial-018": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-019": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-020": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-021": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-022": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-023": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-024": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-025": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-026": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-027": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-028": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-029": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-030": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/adversarial-031": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/adversarial-032": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/adversarial-033": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/adversarial-034": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/adversarial-035": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/adversarial-036": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/adversarial-037": [
+   "act",
+   "tell_claim robbed(kael, odo)"
+  ],
+  "crypt_road/adversarial-038": [
+   "act",
+   "tell_claim robbed(kael, odo)"
+  ],
+  "crypt_road/adversarial-039": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-040": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-041": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-042": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/adversarial-043": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/adversarial-044": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/adversarial-045": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-046": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-047": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-048": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/adversarial-049": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/adversarial-050": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/benign-001": [
+   "act",
+   "insult"
+  ],
+  "crypt_road/benign-002": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-003": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-004": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-005": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-006": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-007": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-008": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-009": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-010": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-011": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-012": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-013": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-014": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-015": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-016": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-017": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-018": [
+   "act",
+   "tell_claim robbed(kael, odo)"
+  ],
+  "crypt_road/benign-019": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/benign-020": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/benign-021": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/benign-022": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-023": [
+   "act",
+   "tell_claim insulted(odo, brenna)"
+  ],
+  "crypt_road/benign-024": [
+   "act",
+   "tell_claim beat(kael, odo)"
+  ],
+  "crypt_road/benign-025": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-026": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-027": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/benign-028": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/benign-029": [
+   "act",
+   "tell_claim robbed(player, kael)"
+  ],
+  "crypt_road/benign-030": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/benign-031": [
+   "act",
+   "tell_claim robbed(odo, kael)"
+  ],
+  "crypt_road/benign-032": [
+   "act",
+   "tell_claim spared(brenna, kael)"
+  ],
+  "crypt_road/benign-033": [
+   "act",
+   "tell_claim insulted(kael, odo)"
+  ],
+  "crypt_road/benign-034": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-035": [
+   "act",
+   "tell_claim robbed(brenna, mags)"
+  ],
+  "crypt_road/benign-036": [
+   "act",
+   "tell_claim beat(brenna, kael)"
+  ],
+  "crypt_road/benign-037": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-038": [
+   "act",
+   "tell_claim insulted(odo, kael)"
+  ],
+  "crypt_road/benign-039": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-040": [
+   "act",
+   "tell_claim robbed(odo, mags)"
+  ],
+  "crypt_road/benign-041": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-042": [
+   "act",
+   "tell_claim robbed(kael, odo)"
+  ],
+  "crypt_road/benign-043": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-044": [
+   "act",
+   "tell_claim beat(kael, mags)"
+  ],
+  "crypt_road/benign-045": [
+   "act",
+   "tell_claim insulted(kael, brenna)"
+  ],
+  "crypt_road/benign-046": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-047": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-048": [
+   "act",
+   "tell_claim robbed(mags, kael)"
+  ],
+  "crypt_road/benign-049": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-050": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/benign-051": [
+   "act",
+   "tell_claim insulted(kael, mags)"
+  ],
+  "crypt_road/benign-052": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-053": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-054": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-055": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/benign-056": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-057": [
+   "act",
+   "bribe 15"
+  ],
+  "crypt_road/benign-058": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-059": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-060": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-061": [
+   "act",
+   "bribe 20"
+  ],
+  "crypt_road/benign-062": [
+   "act",
+   "bribe 12"
+  ],
+  "crypt_road/benign-063": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-064": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-065": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-066": [
+   "act",
+   "bribe 10"
+  ],
+  "crypt_road/benign-067": [
+   "act",
+   "bribe 8"
+  ],
+  "crypt_road/benign-068": [
+   "act",
+   "bribe 6"
+  ],
+  "crypt_road/benign-069": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/benign-070": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-071": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-072": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-073": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-074": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-075": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-076": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-077": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/benign-078": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/benign-079": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/benign-080": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/benign-081": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/benign-082": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/benign-083": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/benign-084": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/benign-085": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/benign-086": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/benign-087": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/benign-088": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/benign-089": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/benign-090": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/benign-091": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/benign-092": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/benign-093": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/benign-094": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/benign-095": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/benign-096": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/benign-097": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-001": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-002": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-003": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-004": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-005": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-006": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-007": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-008": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-009": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-010": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-011": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-012": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-013": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-014": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-015": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-016": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-017": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-018": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-019": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-020": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-021": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-022": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-023": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-024": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-025": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-026": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-027": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-028": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-029": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-030": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-031": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-032": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-033": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-034": [
+   "ask",
+   "none"
+  ],
+  "crypt_road/hard-035": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-036": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-037": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-038": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-039": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-040": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-041": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-042": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-043": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-044": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-045": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-046": [
+   "talk",
+   "none"
+  ],
+  "crypt_road/hard-047": [
+   "talk",
+   "none"
+  ],
   "tavern/adversarial-001": [
    "talk",
    "none"
@@ -783,6 +1559,64 @@
   ]
  },
  "replies": {
+  "0037af07233295d7adfdef24857489daa14c02153827003f203ed9ba9d7cd91e": [
+   {
+    "data": {
+     "act": "bribe",
+     "amount": 10,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 1.611,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "00d48e27682dd12a505aefad4728d84da440b654e53477b573b0d649df476045": [
+   {
+    "data": {
+     "act": "insult",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "mags"
+    },
+    "latency": 0.911,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "023be2dbc0f3fd8021d8effc7b64100a919b3caa46758151630e96a3b21deb95": [
+   {
+    "data": {
+     "act": "bribe",
+     "amount": 20,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 0.985,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "026f78883133b548ecca12378d09e2b19086e7419e9168fda28969a9eb7bae0c": [
    {
     "data": {
@@ -813,6 +1647,17 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "02d9a47abaed6dcf762562786640df3e3dfb46c9f2c6ccba87a2ea315b1b619f": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text demeans Kael directly, insulting him to his face."
+    },
+    "latency": 0.729,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "041513d7357c1f0ab8c460016ca5c7eb467f31183dc6f48350228724dabe7dcf": [
    {
     "data": {
@@ -820,6 +1665,46 @@
      "reason": "The text insults Garrick by calling him an overgrown oaf."
     },
     "latency": 0.876,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "045db56a3ef4fb9d74bc502583742329acf3569b5e87f73952658f9ae428dc1a": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.862,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "0581425d75587b60d853647f619f2fabe719150a063e9566af1dc19e983febe6": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text states as fact to Brenna that Kael robbed Odo."
+    },
+    "latency": 0.783,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "05c31798e71013f83aa0055daad500c595745e54b10c0b97cf516bf1c23fc853": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text directly demeans Brenna by comparing her to crooked prisoners."
+    },
+    "latency": 0.944,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -846,6 +1731,26 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "061c4cbed630e3b3eff38cf9586f7e88f187bca027ab346da485e1d1a2d90465": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.241,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "06359cd62a2fe1571be0dbbbeb1d6abddb328ed3b890339bb1c304913ea8c39e": [
    {
     "data": {
@@ -865,6 +1770,26 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "068e7979dc76c2dfaec175b9f2e3148b6ba0ec38e90859b52ff04755592ae1fb": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.11,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "06f7f8cac6173a77e1a64bab03e5a69d497372a93748e7712fb29c98c92b16df": [
    {
     "data": {
@@ -880,6 +1805,17 @@
      "to": "garrick"
     },
     "latency": 1.158,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "08c740a9e87c583b82ce7af43f83e825ed13b4cc2c34e977007f866dc6e4f9f4": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text jibes at Kael by calling him a whining dog."
+    },
+    "latency": 2.027,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -941,6 +1877,26 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "098a1907ee96bfb27ab603573f8f69ed4d69da8e65bbbf74ce00f793af9e378d": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "unsure",
+     "to": "none"
+    },
+    "latency": 0.894,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "0a23d7202e36ebdced70cddb04f0964d1a92cb263f9f27449b50b41eb0a9c44f": [
    {
     "data": {
@@ -956,6 +1912,35 @@
      "to": "none"
     },
     "latency": 1.175,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "0a346f91a3d38fbbf3dd06ad0f0f7f28019677501d8c780b7da16118274167df": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The player earnestly offers Brenna forty coins to forget she saw them."
+    },
+    "latency": 0.942,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "0cfc36fe025c5cc299473d6be6fd8a2f30c89e6c8f1a2102b583b4ddfd673b57": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.962,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1001,6 +1986,17 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "0fa43893c4ef49ad60de9e2cc99d04aa852158707bdf93979af9cb242f52aed7": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "It tells Mags, as a fact, that Kael insulted Mags."
+    },
+    "latency": 0.86,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "0fc1ad74c6b471e2c512e9fe49d3cdcad4369bc9ca8bb646c6fefe6577f8ff96": [
    {
     "data": {
@@ -1020,6 +2016,84 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "0fe859d384f9de67a22de05ab1a5b151b8a7a85dd0e997e05374b0c0ab22f882": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "unsure",
+     "to": "none"
+    },
+    "latency": 0.883,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "0ff14e1fb0d8c4ceb3b963d93d3ce6292a07c69fadafc04ca0fc569cf97a429f": [
+   {
+    "data": {
+     "act": "bribe",
+     "amount": 40,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 0.721,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "0ff565d5d419615e349a8a4542bc040f08d28d657dc681cddc0239f9895d81b0": [
+   {
+    "data": {
+     "act": "tell_claim",
+     "claim": {
+      "a": "odo",
+      "b": "kael",
+      "neg": false,
+      "pred": "lied"
+     },
+     "sure": "certain",
+     "to": "kael"
+    },
+    "latency": 1.165,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "1079c22bd18b11a1d00ebcabfbc57e5fb22c3e2212a7430b4a4e31955aab550a": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.227,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "112232cc2beab01957e8bf045ab5c016ba342ac78b4001e9251730bab5dd975d": [
    {
     "data": {
@@ -1035,6 +2109,24 @@
      "to": "wren"
     },
     "latency": 0.961,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "117a7c6f13c752b69e9b5037073446a1f3375b197924eb6fe36460041bc7d1c3": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.048,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1069,6 +2161,46 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "11f3da0762370f120409af06a512412997d30717475a7e008e520879d69252dc": [
+   {
+    "data": {
+     "act": "tell_claim",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "kael",
+      "b": "none",
+      "neg": false,
+      "pred": "robbed"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 1.067,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "12753240afc404a289162bcd16670fd9d0e5cfa20f8da9bda8a2342a78eee4ef": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.941,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "12b629ef88971065b8ee2056f1b01c906a471675aab5b1a86964004209b816c0": [
    {
     "data": {
@@ -1084,6 +2216,24 @@
      "to": "none"
     },
     "latency": 1.082,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "1341d633af061bb882a08d15345641e1dbf8696f152b200cf2ae4ad84a7d66db": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.013,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1167,6 +2317,26 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "158b5797ed87b6bc3271c4752e6a6dd5d598a500b8045f5997396735ef17f19a": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.893,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "15fb3c80f1b4432e4341850e729a34e5dff370772869b70aef563791a722a1d3": [
    {
     "data": {
@@ -1182,6 +2352,26 @@
      "to": "none"
     },
     "latency": 0.966,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "1639d16800b26b6a8749b651950e355f2b170dba197039f8e8e9e3caa283c3e6": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.019,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1205,6 +2395,37 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "16c1d187f92be6ca5886893a5ad8c7c8d2e4feccba54ef4a16cea67740551884": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text earnestly offers Brenna 20 coins, pressing the offer with flattery."
+    },
+    "latency": 0.83,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "16e41323ed7c640837d5e014c9f086066b97277eabdd7d42e299ae47ff542a50": [
+   {
+    "data": {
+     "act": "bribe",
+     "amount": 18,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 0.785,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "1753b5e064d2a61e54f680f3837ca951c538c7a0b64e9796819970bb923c296e": [
    {
     "data": {
@@ -1220,6 +2441,24 @@
      "to": "wren"
     },
     "latency": 0.987,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "1783e94cd1ab9d99d8dea1aef6707b8923d3d4e4808b8de4ca9e0e27a9d188a9": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.032,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1243,6 +2482,24 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "18d976f92206468ac2f5d5360d28ac5c7de8dbb7ef78920b015343011cd945f7": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.994,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "190a19a9140a571bfb6187823a88d1ad94d5f1ed42ab80ebbd9c603daecab3f7": [
    {
     "data": {
@@ -1258,6 +2515,44 @@
      "to": "garrick"
     },
     "latency": 0.764,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "1913868abd7796cf7b472326d037204ad56f394d5288d21fc1d9bf4f54374736": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.71,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "1a71b64f385f90bee36b7551b225c71d5e923d30fb920091b11c65153bb1fbd8": [
+   {
+    "data": {
+     "act": "bribe",
+     "amount": 30,
+     "appeal": "threat",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 0.911,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1300,6 +2595,26 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "1babcb41a294ecb60a7a5040d8ca463248ac317602fec41278e4db45622654c8": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "likely",
+     "to": "none"
+    },
+    "latency": 1.026,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "1c66436f4e8201bd2f6e22eecbe8f5ad55f4d4e7fff2154edaa9736c300fca4d": [
    {
     "data": {
@@ -1315,6 +2630,60 @@
      "to": "none"
     },
     "latency": 0.921,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "1d06bddd7061a011077917d0fb88ed494d3f54ddb709f8790024e2cb4f5ff3fd": [
+   {
+    "data": {
+     "act": "tell_claim",
+     "claim": {
+      "a": "mags",
+      "b": "odo",
+      "neg": false,
+      "pred": "robbed"
+     },
+     "sure": "certain",
+     "to": "odo"
+    },
+    "latency": 0.958,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "1d8e681ea199a0afc0a91ef8edfa3f466cec4ffb0f809594e746a9b867ef62c2": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.262,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "1df0baee474262c62f2e566e09965bd6fa2c7509f9e8be205793fde4cd6be013": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.822,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1338,6 +2707,17 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "2034916c2bf36118c72c0c5e55c0d323faf3238bc7fb5b20a68dc1c0e4076ef9": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The player offers Brenna ten coins."
+    },
+    "latency": 0.855,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "20c88b13951b74e29002e162ee453254007fb458a2ec6221672afa33fdc07b50": [
    {
     "data": {
@@ -1353,6 +2733,26 @@
      "to": "garrick"
     },
     "latency": 0.815,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "20e25fa8291bfbb78871b344ef19d84da5353f57f8de92415146f007f8b5e5df": [
+   {
+    "data": {
+     "act": "insult",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 0.962,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1376,6 +2776,17 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "214ede82c750ab162a46fc02fc8ce395e2eace012ecaee31cef684ee1b85f3fc": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The player earnestly offers Brenna 20 coins to let them pass, appealing to her duty."
+    },
+    "latency": 0.997,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "2159ca29518e6daa00655b40fdc31db12a0d749106519a14d29562f64e6e6aeb": [
    {
     "data": {
@@ -1383,6 +2794,46 @@
      "reason": "The text earnestly offers Garrick ten coins to let the matter drop."
     },
     "latency": 0.914,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "215ba3edf8164d6bc89f74c509c05c8d2704f98125878d67881f3b49a78e41c9": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.116,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "21736fd0fcfef9793ce011bc15a21e84c50b7278228c341ecafb9d4dc3f80899": [
+   {
+    "data": {
+     "act": "bribe",
+     "amount": 20,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 0.935,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1402,6 +2853,26 @@
      "to": "none"
     },
     "latency": 0.924,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "22fa2cc9de2c58bd4f8ca02867d07c50853239693351bd36a11a8966951e5ffa": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "unsure",
+     "to": "none"
+    },
+    "latency": 0.859,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1474,6 +2945,24 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "26607d779fc751fd11fd1fa815f8fec0358b13a261ac298db0ba7398bedc8735": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.804,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "27c3db255d56a31c1ff801f5f78aae6a78ba0a35796fcee5b6be180ca69e0326": [
    {
     "data": {
@@ -1489,6 +2978,26 @@
      "to": "none"
     },
     "latency": 0.856,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "295443726d4142c890d37b86a5e488e56f0d62d0b61788409bd17f168acdc1f1": [
+   {
+    "data": {
+     "act": "bribe",
+     "amount": 20,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 1.097,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1512,6 +3021,17 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "2ab5a2eaa899c53a726d399b9eeefcd1e121ac6f9f6ac007d8efa778d72f9713": [
+   {
+    "data": {
+     "answer": "no",
+     "reason": "It tells Brenna as fact that Kael robbed the bank."
+    },
+    "latency": 0.842,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "2c79b216ee16e7dc757c01200140cf2693f7a4b85d72d891543a9005d9924345": [
    {
     "data": {
@@ -1519,6 +3039,26 @@
      "reason": "The text tells Garrick that the Duke paid Garrick, not that Garrick paid the player."
     },
     "latency": 0.886,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "2c9cfe00cc3f88dd4cb81ebc20044a84aa8eeb4def7c427d2eda663010b4fd90": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.06,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1561,6 +3101,42 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "2d0ba539b7edf8190e80f31d0167779ca2ae30e178529affe3e55fb9cb386fc3": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "likely",
+     "to": "none"
+    },
+    "latency": 1.0,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "2d26d5c3a05073a2d8969bf7e274378c6970f11a252d1e1c67188c015a0ecf15": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.843,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "2d84e63cf9618bb85d88a8002377c9c32ffc941dcb9b54a2d07c46d7b87a3540": [
    {
     "data": {
@@ -1576,6 +3152,26 @@
      "to": "none"
     },
     "latency": 0.903,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "2e616e72e006fe577b446e273e19c65b9ce8c4ab79d1183ce96aa1136f13edca": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.911,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1599,6 +3195,26 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "2f095962a0340c8562ffc5f6e8f6b53cd80a0c3b5d7508daaedb806ae0108ec8": [
+   {
+    "data": {
+     "act": "tell_claim",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "kael",
+      "b": "odo",
+      "neg": false,
+      "pred": "robbed"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 0.94,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "2fd8a461edf2991cb3a152e7f2276dddb8e70ee68f767e26cae6cdcd5a720705": [
    {
     "data": {
@@ -1614,6 +3230,26 @@
      "to": "none"
     },
     "latency": 0.943,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "2fdec3d58d524ffd7e832b6b3a9f435b61f46c7922613cf1fe5f1c4cb264b4d1": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "unsure",
+     "to": "none"
+    },
+    "latency": 0.883,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1670,6 +3306,24 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "317e87ad19a7bb21042715a094f2215dd96a35627f8a2a8d0d071442d246e875": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.174,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "31c73ab98155cc177e4fe4b8dd4487f89469565643c65a8905bc062de5081ebf": [
    {
     "data": {
@@ -1708,6 +3362,55 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "31ef7b9d0e7cb810e41596c5b8dd6b2e9a0af453a9a2769380568804c0831577": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.009,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "3290c4ed1002463c18c87f20ace17860f343762513292f97ddfd8175be19173c": [
+   {
+    "data": {
+     "act": "insult",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "kael"
+    },
+    "latency": 0.815,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "32dd06d6a2547e581c3098915254908516173134d517bb246b0c8f762068f396": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The player earnestly offers Brenna 15 coins, appealing to their hardship."
+    },
+    "latency": 0.911,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "3492ecec7fd6bf060e71eb3d3a08ebec3b1dd0398f8c49aa52357d7c87b4a9a4": [
    {
     "data": {
@@ -1715,6 +3418,28 @@
      "reason": "The text firmly offers Garrick 20 coins."
     },
     "latency": 1.025,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "3531f5a833fd151f86d9acdb1b1b8e7b498e9d9f0b410065aef7d169f358ccf9": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text directly demeans Odo to his face, insulting him."
+    },
+    "latency": 0.871,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "35800dfb28b96928e29bda99383e5ee731e84f75c677fb4ada40ac53db4d4821": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text demeans Kael by saying their reputation is worth less than mud."
+    },
+    "latency": 0.887,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1825,6 +3550,44 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "3810213fe7e023b08941158e2ab440f848493f7b903ac2ddf24df08c80a40bed": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.822,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "38342593821d4d6f132fa0aeada382bf8bccaab7d49b09953e9812a491733098": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.029,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "38dd67a2ab3015c698f0df4b57490c438a1ba69d0827c1f41b2b5ac08bcc0827": [
    {
     "data": {
@@ -1874,6 +3637,91 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "39d7175a401f519336ad27820f08956754b3a504c472b2e2bcd86324ff84e18c": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.726,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "3ac2f49fe5c642d4df71c507d77162db96721726d943639b2f07ff72e614ab70": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.074,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "3bbac755a0e10406d17ba382d9944e8acaad432f00d116a6f8cd24eee67b5e00": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The player offers Brenna ten coins in earnest, appealing to her duty."
+    },
+    "latency": 0.733,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "3da6ba728f30d8d84353b63bb78a260d6361f8398b6c7bba444da8a0ce4615fa": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.071,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "3e9af3d40d405c621a3a333fd47663eb78bbd8f0efe234d90f2cbfc1ee1aaa94": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.977,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "3ef720a50122aeb42ef0deca956aef5730de90a4c49a172694e4e20a8e465635": [
    {
     "data": {
@@ -1892,6 +3740,44 @@
      "reason": "The text states as fact that the player saw Wren pay Pip, rather than telling Garrick that Wren paid Pip."
     },
     "latency": 1.068,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "3f406dc4d3527783556660f3db7bd7c46b89e4a3d8ea4f5c6a366a5fc72b9f7e": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.15,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "3f91951b6b7429d20b99ac47747fb106cf9dddfe0e8df5e746066b05b37e8b11": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.896,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -1964,6 +3850,66 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "41c4172ddef5b952c9fbb7acb4627bf0e47f1cf2eeb03a443e2a80e30f519ea9": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "unsure",
+     "to": "none"
+    },
+    "latency": 0.847,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "4297dbe4471a46f47e74af051c8e9fb87c1c866b4d6e2bf00c7f341714260f50": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "unsure",
+     "to": "none"
+    },
+    "latency": 0.877,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "43185549b251c2aba1b00be087cb9e349f41781d4ed67fc52972b36bb88b0535": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.766,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "434e2a45a7254e6828ab8baebe2b7c861c021c49ff68bd05163b53b24f751b1f": [
    {
     "data": {
@@ -1971,6 +3917,26 @@
      "reason": "The text demeans Garrick to his face."
     },
     "latency": 0.965,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "4511e5169a643bef6f57ffc4df9ca6c284c9d584a490c7b71c8f41dd321f1923": [
+   {
+    "data": {
+     "act": "bribe",
+     "amount": 10,
+     "appeal": "pity",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 0.857,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2009,6 +3975,26 @@
      "to": "garrick"
     },
     "latency": 0.838,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "462da0596a89d3b563b53ee0a99dc9fa0ce05f336c602be0530a31c8e5c32e47": [
+   {
+    "data": {
+     "act": "tell_claim",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "odo",
+      "b": "kael",
+      "neg": false,
+      "pred": "robbed"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 1.193,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2096,6 +4082,24 @@
      "to": "none"
     },
     "latency": 1.015,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "49b09854f1d44857400c62875636d53d43494303e8a4da1741d1de2e0a719844": [
+   {
+    "data": {
+     "act": "insult",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "odo"
+    },
+    "latency": 1.097,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2217,6 +4221,24 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "4cce9472a4f816b1aad0419f8b2ddd76748f438fe4c6075d533b8b0127642ec4": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.874,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "4d08be20c413aa51cbadc74f81a6e54c5db00bcabb91d46d6e800703ff5a0ce8": [
    {
     "data": {
@@ -2232,6 +4254,26 @@
      "to": "garrick"
     },
     "latency": 0.901,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "4d3eac8a6ec26dc2f916de43478eb4f29527b6938144550566888bdc10354efe": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "unsure",
+     "to": "none"
+    },
+    "latency": 0.994,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2255,6 +4297,24 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "4daa693a867f5bdaa64e4997c399bbc3ca1c94f5e5954f5f6a70b46240aaeb08": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.93,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "4dac8a5f7f8160ab6909e08e0dde279b4d4c8b0024da7747cda5883fbc516588": [
    {
     "data": {
@@ -2274,6 +4334,17 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "4fa874ca1588e49c9821df61923cbec05f61e082ba178383eb715c1bb8bff631": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text states as fact that Kael robbed Odo, telling Mags."
+    },
+    "latency": 0.899,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "4fc2c754a11a96ef3b0e4eb11a48efd166716603da7e3c9060f2eba1d080bbec": [
    {
     "data": {
@@ -2289,6 +4360,28 @@
      "to": "garrick"
     },
     "latency": 0.963,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "5059df6764375144fe1e85f45a289a2d3c4a803925403a516e7b51c986409276": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The player offers Brenna eighteen coins in earnest to forget the trouble."
+    },
+    "latency": 0.963,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "51d1215843a6918fe0bdd38e9b2bb35fc23f77a95afeaac0d372136978b01e54": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text states as fact that Kael robbed Odo, telling Mags that this happened."
+    },
+    "latency": 1.038,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2331,6 +4424,75 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "534f777a93527a5d57d02c737364bedb2082eb6ca4a97112e0c2889eedf68bf2": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "unsure",
+     "to": "none"
+    },
+    "latency": 0.826,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "536fca116dce0d8793151f7928bb147d7c19df0f2a1e04a9a68433f87caed2f6": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.989,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "5485e30d4ca680c4a5c6a9da463ee79b073c5eff6f30a29c0eddb7ba33e408f0": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text calls Kael a coward, directly mocking him."
+    },
+    "latency": 0.66,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "54a1241f09fe1c9e427332f1788c751a6405e856290ee848f463e0cf858653d3": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.996,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "54f47817a5c778f04e7e23e02758600444f01d4ff96213f443df01a15ba4dc39": [
    {
     "data": {
@@ -2357,6 +4519,62 @@
      "reason": "It insults Garrick to his face by mocking how he fights."
     },
     "latency": 0.843,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "55101b8739cf9f11e242424ac95e62088ec08bb0c3f4ff85e0aa10ea886197c5": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.742,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "565d6f4401d2a3f40a836c96bb127d63c4470b8e3e92d9af11d9271722d11442": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.508,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "56e21f98327b5f92e4e1fd587ee45d54d66ae216810bf1297c1d6dcda9aeb69d": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "unsure",
+     "to": "none"
+    },
+    "latency": 0.879,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2409,6 +4627,26 @@
      "reason": "The text tells Wren as fact that the player paid Pip."
     },
     "latency": 0.683,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "591c04846a6a6980431c6180d0c502648723fd36551ee7784fa9f7972c04550c": [
+   {
+    "data": {
+     "act": "bribe",
+     "amount": 20,
+     "appeal": "flattery",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 0.898,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2576,6 +4814,46 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "619cacbe93a0ae30f6ab215224f9eba944e72c78ded844cb6cd3f039adf40d6e": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.934,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "61c310f823cea0959f5306f4e67c450d9a495d0658255be6e1e08771b0be8eb2": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.174,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "620da07598543489342f3c185eb70447312bc0eda38945d28bf6780021ede45e": [
    {
     "data": {
@@ -2594,6 +4872,44 @@
      "reason": "The text offers Garrick thirty coins to ride with the player."
     },
     "latency": 0.805,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "6283326d507f25efd04428f861ec2487df71a8b47d9bc9d1f651d3ff643251b3": [
+   {
+    "data": {
+     "act": "bribe",
+     "amount": 10,
+     "appeal": "duty",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 1.001,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "6392953c8b4aa12f7c3a8bce7a2c8de7e4895b5e1ac49555be5784b3bb0b52fd": [
+   {
+    "data": {
+     "act": "tell_claim",
+     "claim": {
+      "a": "kael",
+      "b": "mags",
+      "neg": true,
+      "pred": "insulted"
+     },
+     "sure": "certain",
+     "to": "mags"
+    },
+    "latency": 1.179,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2655,6 +4971,24 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "67958c0f69c0db800264908772fa4f5d4901b66d057d4282847834ac975591e4": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.913,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "67b5c4eb76a0677f6f4dc3865ae6c567f7f23d8cd143a8b36b8ab7f08b26e55d": [
    {
     "data": {
@@ -2670,6 +5004,24 @@
      "to": "garrick"
     },
     "latency": 0.97,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "67b97d2ce5d3876e655b58d535f49c8fbf796eddf178d9666df639bd0d1fc30a": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.892,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2704,6 +5056,17 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "68851a6c0c08263b0561d5777c70845369f7888f9186d30ccb0ee7dd1e4969ca": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text states as fact to Odo that Kael lied about him to the Captain."
+    },
+    "latency": 1.127,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "68bb7a23aaffdd0dbc242d137cf89c1eb161fec379c3782715cd9e260e330b06": [
    {
     "data": {
@@ -2723,6 +5086,24 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "694081f405c419d3122125eb852bcb3ea740d91d4cf9e5be4b5723a4bee14065": [
+   {
+    "data": {
+     "act": "insult",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "kael"
+    },
+    "latency": 0.82,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "699a7a11d8ed3f9fa0021ab545e5d7e16160d48130a6bf1b2c765d06a6da1bb0": [
    {
     "data": {
@@ -2730,6 +5111,37 @@
      "reason": "The text tells Wren that the player is giving them 3 coins for the ale."
     },
     "latency": 1.442,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "6b97d87bdb4bacca47cde5712becdefe525a1e9eb4ed364e4bbf2c775b167c93": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text offers Brenna 10 coins in earnest, alongside a threat."
+    },
+    "latency": 1.066,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "6bd8562acfcbe536bf0ea9af77c25fa366e5c06e730270f51308add643c53ea8": [
+   {
+    "data": {
+     "act": "bribe",
+     "amount": 25,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 0.755,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2764,6 +5176,62 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "6d2b50254c7e915046499618d087a400c19cac3aa61fee30f4fcadbd65bfea30": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.878,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "6d3dba745974ee8db8bb02eb121abc834ad40c3d25a23eaacf4a669699226673": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "unsure",
+     "to": "none"
+    },
+    "latency": 0.722,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "6d6b5300813a0af76172cc71ed9eb9e195dc1bc214ec1bf47bdcd1e80be57b28": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "unsure",
+     "to": "none"
+    },
+    "latency": 1.649,
+    "model": "gpt-5.4-nano",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-5.4-nano"
+   }
+  ],
   "6dbe0ef07f403cc935039fc5509d7ca5c910601a19365cafaffbbfbe92d0082b": [
    {
     "data": {
@@ -2779,6 +5247,48 @@
      "to": "none"
     },
     "latency": 2.779,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "6e2fc5f985e92d8bbc40704ee78563a22b6df2f205dbea06474769999f89e8b9": [
+   {
+    "data": {
+     "act": "bribe",
+     "amount": 10,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 0.836,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "6eb5815a0865078072ccb0b6392975898e03db4f2853bd5986a2dce0c4be622d": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text mocks Kael's swordsmanship to his face, insulting him."
+    },
+    "latency": 0.979,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "6f037bcabc1c7e7d6707d572f6b9b735bc3f5eb09b651da86f6f2a35e20ce2d1": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text directly demeans Kael by calling him a fool."
+    },
+    "latency": 0.922,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2870,6 +5380,24 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "70e5775f35f919db523f8234f36ce2a3d33dce06f21ce4beba761c5d2a71cb9c": [
+   {
+    "data": {
+     "act": "insult",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "kael"
+    },
+    "latency": 1.001,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "71fc754b73201d152303765718895726568d59ea3a010519a8aa7e9723e91a51": [
    {
     "data": {
@@ -2885,6 +5413,44 @@
      "to": "none"
     },
     "latency": 0.83,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "727fc3835ae733e04c3aea1f30b38ad5e31d3494240c5e3570c93c67b6dffebc": [
+   {
+    "data": {
+     "act": "insult",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 0.94,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "72a39234b2ea6bc5bd2706b1c9ad52bb8511564009f848c57ed852a428baf0c2": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.584,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -2965,6 +5531,57 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "759159d8b454fecf6a88f534cfe9bf3f46b037fb8c9eb726e3e0b58d52a608b2": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text states to Odo, as a fact, that Mags robbed him."
+    },
+    "latency": 0.682,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "75a2ba0c89e240fdf732d9034b036bb818207bf0ef6adec683e8e5df48415fc7": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "unsure",
+     "to": "none"
+    },
+    "latency": 0.746,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "7634f563a07b47c5d2f167d2937b06dde5fd7ef5caa064ddf344ef920c6e053a": [
+   {
+    "data": {
+     "act": "bribe",
+     "amount": 20,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 0.739,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "76c61964f639cea8ea14bddf7915a7a7f98bbd89722f846c78fc07b6f3c8c4a3": [
    {
     "data": {
@@ -3014,6 +5631,24 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "789df6da62d76d479df6b3b5eede2688e77316aab0a26835ebad5a0549aa9e1a": [
+   {
+    "data": {
+     "act": "insult",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "odo"
+    },
+    "latency": 0.879,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "79493cc1eb7a61c561623b56a430bfb5a8ae9a2be1a555c7a63f7babb85cf72c": [
    {
     "data": {
@@ -3036,6 +5671,37 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "79d138e92045b16ed3e4c773d015e90e8a38f00097c63e2fff80e35bb11af3a8": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "unsure",
+     "to": "none"
+    },
+    "latency": 1.008,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "7b2a19ae9068b18b787eb824a29113031fe079b61899caa629da2f3861bd9ec7": [
+   {
+    "data": {
+     "answer": "no",
+     "reason": "The text quotes Odo, rather than stating the claim as the player's own fact."
+    },
+    "latency": 0.687,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "7b477a947b21133d2f326d9fa14ef1a07b03f1ceef6dacdf3590b68d1b7f017c": [
    {
     "data": {
@@ -3051,6 +5717,44 @@
      "to": "wren"
     },
     "latency": 1.034,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "7cb384450ac320c7a6b8a486aea245163ccdc23e15f1d51fcf4ea755ea9bc1fa": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.777,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "7da68f516ba5d302294103cea374df7ce381fb30eff52be9b3703b862bf03b64": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "unsure",
+     "to": "none"
+    },
+    "latency": 1.313,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -3131,6 +5835,46 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "81df62cb7c7ce5eb240e9c35e2f8f24c44711b51b2defe691eec32fc664ec3fc": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text offers Brenna twenty coins in earnest to let the player pass."
+    },
+    "latency": 0.943,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "82e64ccae0f5cf209194f1f85716a86aef99c1066b2833b32ebd18c59e213ba4": [
+   {
+    "data": {
+     "act": "tell_claim",
+     "claim": {
+      "a": "kael",
+      "b": "odo",
+      "neg": false,
+      "pred": "robbed"
+     },
+     "sure": "certain",
+     "to": "mags"
+    },
+    "latency": 1.012,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "83153f2a9143dd2e33b0e4721f90964c65fa59c73d5e871a8f58f87428ea2830": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text states as fact that Mags has been lying about Kael, so the player tells Kael that Mags lied to him."
+    },
+    "latency": 1.035,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "8375c4aff6a4bc97cd5bf691a25b70a2d74043e0a9a087e1259fbef6ba53af80": [
    {
     "data": {
@@ -3146,6 +5890,24 @@
      "to": "none"
     },
     "latency": 1.247,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "84e20431c1afaec57db0fd3ecb762e7a2d3dabe69e82705448ae4ed03f2af7dc": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.984,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -3229,6 +5991,26 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "876da2525c9baa5d2713c1ba9e4c02ce594cc62cb845d7d04b36bf1a110068f2": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.938,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "8784204621085957521e88a24c5a9e4712cd72efffec90086c99d511e25730d5": [
    {
     "data": {
@@ -3248,6 +6030,35 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "8841ec43f43770897667646ab7f95061b4ce5b26d5f45e2cfe196acf26b3f600": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.805,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "889ed76944ea5836f0458f5111d7f595c57fd9c383f6d1cc353a8b4c935b8b67": [
+   {
+    "data": {
+     "answer": "no",
+     "reason": "The text insults Brenna and mentions coins, but it does not make an earnest offer."
+    },
+    "latency": 0.748,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "88bc35b59c42ebb571cb9d6a4dca0f82069ba31552a4693bdc9dd8a71ee89545": [
    {
     "data": {
@@ -3263,6 +6074,17 @@
      "to": "garrick"
     },
     "latency": 1.067,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "88f92b824750813168d338c2df06243c76c9c390d7d93a699bff65afce777b33": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text calls Mags a nosy, gossiping busybody, mocking her to her face."
+    },
+    "latency": 0.772,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -3316,6 +6138,86 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "8afacd32d1a4d5822c187470903c4b8536e2833928eff6ae2f3a993cad09005f": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.198,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "8c2fdd5d3a156b7c88468d90da48cc021d13c6c1f34a2c734d3cbb6243b69d25": [
+   {
+    "data": {
+     "act": "tell_claim",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "kael",
+      "b": "player",
+      "neg": false,
+      "pred": "lied"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 1.006,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "8c5364a966a5970efc403dc5b060715172bc43c15605be293cdfed4940832d5d": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text states as fact that Odo robbed Kael, telling Brenna that the claim happened."
+    },
+    "latency": 0.946,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "8c8da5f023e865f88c733251eaab4e6f9e44c5a1473cfbb80f4e1f4bd9ad7294": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text states as fact that Kael robbed Odo, telling Brenna that the claim happened."
+    },
+    "latency": 0.735,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "8d02030c001f65b0b3716713795e71fd1de0be7ba0b11679c3cfa36a1246f7a4": [
+   {
+    "data": {
+     "act": "insult",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "mags"
+    },
+    "latency": 0.943,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "8da95335a729626e67aa7f9c59141e5b09a7132d6d3e1dd48c950e7fe4e299be": [
    {
     "data": {
@@ -3365,6 +6267,42 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "903a5bd01faf82909499b39d6af539507ae302f27fc5919b2a6b9bf516d02e3a": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.78,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "91228f0413ba409e2da85024c4c10fabb3ea480c143e2aa49e790695361ebf4a": [
+   {
+    "data": {
+     "act": "tell_claim",
+     "claim": {
+      "a": "mags",
+      "b": "odo",
+      "neg": false,
+      "pred": "lied"
+     },
+     "sure": "certain",
+     "to": "odo"
+    },
+    "latency": 1.088,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "9166b4c6ed4219b808ed702f41c3f61b0a3f0c4243a57b95121b6c894c85bfee": [
    {
     "data": {
@@ -3380,6 +6318,17 @@
      "to": "none"
     },
     "latency": 0.77,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "916ada3fbc0ad6c54e211ef1702f4047f076a0860e0c071835da1ec0c6a5b3e5": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text calls Kael a fraud to his face, mocking and demeaning him."
+    },
+    "latency": 1.096,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -3410,6 +6359,24 @@
      "reason": "The player gives Wren twelve coins as payment, which is offering."
     },
     "latency": 0.815,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "929d6775a164359f17aff72bc9cb4aa2af817f642df86bb80f00de2d58649ea0": [
+   {
+    "data": {
+     "act": "insult",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "kael"
+    },
+    "latency": 0.918,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -3463,6 +6430,80 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "94dbaef5a4234f7664fd08a6d9659d25a13d6c28855f81fe2bd37fc6a481ecad": [
+   {
+    "data": {
+     "act": "tell_claim",
+     "claim": {
+      "a": "kael",
+      "b": "odo",
+      "neg": false,
+      "pred": "lied"
+     },
+     "sure": "certain",
+     "to": "odo"
+    },
+    "latency": 1.136,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "953d93c6275ce6f73f8ded149ebfdc066b74e71cf73d8268be868ec2888fc6aa": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.004,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "9659cc56978aa1bba4746b9a9d8a1c3f7ba0e1015ebc41df862cccd2f0a67ff5": [
+   {
+    "data": {
+     "act": "tell_claim",
+     "claim": {
+      "a": "kael",
+      "b": "odo",
+      "neg": false,
+      "pred": "robbed"
+     },
+     "sure": "certain",
+     "to": "mags"
+    },
+    "latency": 0.813,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "969a13953be3b50011d2975f464ded74419600469b77ca1aece3fda9edb7ad0a": [
+   {
+    "data": {
+     "act": "tell_claim",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "kael",
+      "b": "odo",
+      "neg": false,
+      "pred": "robbed"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 0.923,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "97b7d07e7a71376df6dac561be7834f151371c95e91d531faa8d82f192247680": [
    {
     "data": {
@@ -3482,6 +6523,26 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "97e2d1f6e89825ab65fa97c373362d87889c57266dbcfad479440b13eb811995": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.024,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "9857bd9df0c846890ca0e5a720436247959a284cc185eaa1246aae995cd24c57": [
    {
     "data": {
@@ -3489,6 +6550,78 @@
      "reason": "The text states as fact that Garrick paid Pip twenty coins, telling Wren the claim."
     },
     "latency": 0.988,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "988f19e581c9fb00759bd6089ec8ce12fac899acd7826b7eaf4ce6bf366d0117": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.752,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "998bfc5a33f0202b901a68acf1bfa12cb9a26c45b44de2f88e752b7646762e82": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.956,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "9a2779ff52823febc2853e3a1ea2c169cf6938fc391967a12a855926d30d2c74": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.796,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "9a2c897cf598b8883970588ea41324ad4969c7574c6fa575f5e3943416534b8d": [
+   {
+    "data": {
+     "act": "insult",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "kael"
+    },
+    "latency": 1.364,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -3523,6 +6656,64 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "9c4646c8814921ff8eeab9643b16f67cbc4992cd970f4470658edb62bdc134e1": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.775,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "9cfdd23d7473acecea5ef6f4a1a05d50e845740d928e3d540d7c7e89781e4676": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.911,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "9d8fd67b9ef5a0591cc349208ec4b40e2eeb0238f58968a6d72bca9bcc32caa8": [
+   {
+    "data": {
+     "act": "tell_claim",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "odo",
+      "neg": false,
+      "pred": "robbed"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 1.301,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "9dbc169ad49e9fe3e6c0b2aa3911dd48a3c008f570233df7c04bb735e67af5f0": [
    {
     "data": {
@@ -3542,6 +6733,24 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "9ddcda07cc869e962f3f682ff134ed04fedf588099150502454b73d6ca1adb1c": [
+   {
+    "data": {
+     "act": "insult",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "kael"
+    },
+    "latency": 1.16,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "9e491ab2a3b30ee452b8dcd94a68b4be7b99d559861cd2955f3ab07aa06c4bcc": [
    {
     "data": {
@@ -3553,6 +6762,24 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "9e9781923e299020fb744e110ca7e0e29e420b77432c8fd937f4fa90f39cfa9c": [
+   {
+    "data": {
+     "act": "tell_claim",
+     "claim": {
+      "a": "kael",
+      "b": "mags",
+      "neg": false,
+      "pred": "insulted"
+     },
+     "sure": "certain",
+     "to": "mags"
+    },
+    "latency": 0.916,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "9e98922c90221eea72032116d2f13cb0710481c3a79fa8bda57bbd9fcbd8fbcb": [
    {
     "data": {
@@ -3560,6 +6787,24 @@
      "reason": "The text states as fact that Garrick insulted Pip, but it does not tell Wren that Garrick insulted Pip."
     },
     "latency": 0.973,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "9f661a438a72e025618949463d411dc6e5c7bb920c2607863ca96494e00ebee6": [
+   {
+    "data": {
+     "act": "tell_claim",
+     "claim": {
+      "a": "kael",
+      "b": "odo",
+      "neg": false,
+      "pred": "robbed"
+     },
+     "sure": "certain",
+     "to": "mags"
+    },
+    "latency": 0.855,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -3624,6 +6869,24 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "a1d611dd5dbdb417682f65b996b35fde586faf8c99c15e484687dbe74e8c2536": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.811,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "a1ed37f5b56791e2cad7a0ef50c4681418e4bccd5a1f60fb2e71a68ffddaee67": [
    {
     "data": {
@@ -3639,6 +6902,24 @@
      "to": "none"
     },
     "latency": 1.079,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "a299416fac79e7656197f98fba544ceba2030a1bd8b35d89a779ce4742af6b87": [
+   {
+    "data": {
+     "act": "insult",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "kael"
+    },
+    "latency": 0.897,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -3662,6 +6943,84 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "a32e78de056461f27e63d4aed732c6a3e02bbf0d3095311132bf3b30c244d010": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "It states as fact to Odo that Mags lied about Odo."
+    },
+    "latency": 0.895,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "a4277ec9d992e66cc89983b56c55ed4b234e51aab02ad35e4c9620175d88ec91": [
+   {
+    "data": {
+     "act": "tell_claim",
+     "claim": {
+      "a": "kael",
+      "b": "odo",
+      "neg": false,
+      "pred": "robbed"
+     },
+     "sure": "certain",
+     "to": "mags"
+    },
+    "latency": 0.912,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "a54d11416bdb20a93a81214d20ff96a2003071e7972a5077fdc5ab6e18d393f5": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "unsure",
+     "to": "none"
+    },
+    "latency": 1.602,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "a58ed0ab5ab7b7aa40e8df0d8d11f82e5e43a07e3fe9a99b801641dee1126049": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text insults Mags by mocking her stew and calling her an old hag."
+    },
+    "latency": 1.047,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "a675c074ef7f81b0ffbda4f3f15b42c8d532916bfcfd1bb1c5980b00a837de9a": [
+   {
+    "data": {
+     "act": "tell_claim",
+     "claim": {
+      "a": "kael",
+      "b": "odo",
+      "neg": false,
+      "pred": "robbed"
+     },
+     "sure": "certain",
+     "to": "mags"
+    },
+    "latency": 0.947,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "a789f23fa871ad025732e761fc18ba26b0e372ce9317cd83fddfae8753a2f53d": [
    {
     "data": {
@@ -3677,6 +7036,37 @@
      "to": "none"
     },
     "latency": 1.09,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "a7fa028b99dc38c47a15298518d8262f223417de9e4499819576b95adf6c8615": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text makes an earnest offer of 30 coins to Brenna."
+    },
+    "latency": 0.864,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "a89f9702770f16ca4cbe84eafd56e14ba99b5e086c2b3259a81e800b34e66f25": [
+   {
+    "data": {
+     "act": "bribe",
+     "amount": 30,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 0.734,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -3700,6 +7090,24 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "a8fa9bacaabe904292ed2c9b7fb3acf080068fe1f7cf2b60893d4df27c1829a4": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.874,
+    "model": "gpt-5.4-nano",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-5.4-nano"
+   }
+  ],
   "a9d38308a17f0818441aae99fe346b82fb7a218b1a9bfc9cc8bb1659e110d58e": [
    {
     "data": {
@@ -3715,6 +7123,24 @@
      "to": "none"
     },
     "latency": 0.982,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "a9e9258b04ae649f76cfb9b952430a603e4610a1b6a764389aaf2009be2ccdf0": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.19,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -3738,6 +7164,24 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "ab322835c1bb61d4b2a94fadeff18c4834c46c558c650668ee40445e0b6764d2": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.791,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "abbda0649e702edb0f099087146b86059fe87b7149c443c28d2dfabe24d4a07a": [
    {
     "data": {
@@ -3757,6 +7201,46 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "ac1d1f502049f11dbf50a07d46f757218807e3f1041416faf7bc7c2bea3bf855": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text demeans Odo to his face, so it insults him."
+    },
+    "latency": 1.049,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "ac6de37bd852d4012c3298165e605797a31be1d2da81904c6db6444b4c9feca2": [
+   {
+    "data": {
+     "act": "insult",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "kael"
+    },
+    "latency": 1.078,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "ad360e604c3221ec49a52cee8a2b6c256e7aaebf2aa3d048a6d0bc02eea0f2c1": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text directly calls Kael a fool, which mocks him to his face."
+    },
+    "latency": 0.985,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "ada4ab19cf082df5625e0b63bcb5b67af65557358164ebed5a1ea00049dd08bc": [
    {
     "data": {
@@ -3772,6 +7256,37 @@
      "to": "none"
     },
     "latency": 1.154,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "ae9d774e5c7873edc2b9b509b6781766b84003527677f9c1fa82080d51736862": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.092,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "aeab0a75d5c4ebe137d8fb25a3d97e7cd35743d1198a5215db0fd73d9e26e807": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text mocks Kael to his face by saying he would lose a duel to a scarecrow."
+    },
+    "latency": 0.947,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -3802,6 +7317,17 @@
      "reason": "The text states as a fact that the player paid Wren 40 coins, telling Wren that the player paid Wren."
     },
     "latency": 0.856,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "b028049d3aa778764de9f5efb9271beb93ccae5aa65d5a589bc8388391600832": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The player demeans Kael to his face."
+    },
+    "latency": 1.033,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -3923,6 +7449,46 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "b709e242f71ff6c2b4d8d2b1e299bfe165ca12bf2abb9bdb24db6793e4af8a29": [
+   {
+    "data": {
+     "act": "bribe",
+     "amount": 22,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 0.823,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "b751786c14663a71f6cc837a166f26284f2687bb91b5423b02754f0b05b040db": [
+   {
+    "data": {
+     "act": "bribe",
+     "amount": 20,
+     "appeal": "duty",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 1.131,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "b775f3f87ba1eccb6f8d9ac968b6536381adb39df4a8e82c854e14614a8ec924": [
    {
     "data": {
@@ -3957,6 +7523,53 @@
      "to": "none"
     },
     "latency": 1.103,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "b7a9133dfdd5193b1dd474148c709b26c65e13a735b13f457c87ee96b9eb2598": [
+   {
+    "data": {
+     "act": "insult",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "kael"
+    },
+    "latency": 1.285,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "b8106974c1293588a10121781a10ffa0f3350b247694785ddc116f2dff4200eb": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.803,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "b83037d709b3b3ecc9811cafee09988d53e66c81c24f7180791ee7f75e44f73b": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text says, “I give you twenty coins, captain,” making an earnest offer of 20 coins to Brenna."
+    },
+    "latency": 0.804,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -3999,6 +7612,26 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "b986b9f9b40b8a7b1fec22d3d8aeaace9a95da82f361575806bff6a53b46b0e8": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.941,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "b98d327ce03c60464bcb50ade6f5ca66bee347a71f2c79cd49b9a8764c32cefc": [
    {
     "data": {
@@ -4014,6 +7647,26 @@
      "to": "none"
     },
     "latency": 0.819,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "b9e90e92b09b510e1a8bd83d42b31d7671e6f931e9ed59406ba05f95ed41f9ab": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.044,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -4086,6 +7739,24 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "be117c55954c3fca8e128d6896320d58da7577fbfa81619d7ebdee4ab7446822": [
+   {
+    "data": {
+     "act": "tell_claim",
+     "claim": {
+      "a": "kael",
+      "b": "odo",
+      "neg": false,
+      "pred": "robbed"
+     },
+     "sure": "certain",
+     "to": "mags"
+    },
+    "latency": 0.697,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "be650adef8f03205eea7a7570f7b538d96685635a870c62f8392f451e6861d77": [
    {
     "data": {
@@ -4105,6 +7776,37 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "bf04e563403bff661c26aecbfbf4cbd00abb719e6ed517879defba8ccacd1010": [
+   {
+    "data": {
+     "act": "bribe",
+     "amount": 15,
+     "appeal": "pity",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 1.124,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "bf5e77d68bebaf00d7924596967630763e03489b67c7b43cd3a1bd83a694c08a": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text states as fact that Kael robbed Odo, telling Mags that claim."
+    },
+    "latency": 0.905,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "bf6782e791c92b9665475932c818263d5265fcae671c095931260f9cbc17fbda": [
    {
     "data": {
@@ -4120,6 +7822,42 @@
      "to": "none"
     },
     "latency": 0.835,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "bfe247b7fd2237a4682c45ed92c626138c3073bea21f8b18e0dd92b9a0bb1935": [
+   {
+    "data": {
+     "act": "tell_claim",
+     "claim": {
+      "a": "kael",
+      "b": "odo",
+      "neg": false,
+      "pred": "beat"
+     },
+     "sure": "certain",
+     "to": "mags"
+    },
+    "latency": 0.598,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "bfe3b99b58ec606c142b4de3d98b1cc60f45fb4f43251bb3dbf64b3a74f80bfb": [
+   {
+    "data": {
+     "act": "tell_claim",
+     "claim": {
+      "a": "mags",
+      "b": "kael",
+      "neg": false,
+      "pred": "lied"
+     },
+     "sure": "certain",
+     "to": "kael"
+    },
+    "latency": 1.102,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -4150,6 +7888,128 @@
      "reason": "The player firmly offers Garrick 40 coins."
     },
     "latency": 0.864,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "c2ecf42dfbd18f69f8f7a788f8b3e92457c3958b23a74e7276f77af1658c5845": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text states as fact that Kael robbed Odo and that the player witnessed it, telling Brenna as described."
+    },
+    "latency": 1.172,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "c385051cddb91a09b3fd979917375b5a3dca4097da4a90563b6b57d39276741b": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "unsure",
+     "to": "none"
+    },
+    "latency": 1.087,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "c3d9bca7296bfb8ca71f6a679fe66970457d889670242595e8fe7f9838187e4b": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "This text states as fact that Kael robbed Odo, telling Mags that the claim happened."
+    },
+    "latency": 0.873,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "c59df70646f27dc6ded7e539a8a90d79c12d7f378ed274f77f2cdcbb035ed86f": [
+   {
+    "data": {
+     "act": "bribe",
+     "amount": 5,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 0.955,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "c5a9a3f6fe1ed90777879a883c08741c76d3922401213bdaacd85cf8ce2ea2b5": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.836,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "c5ac4258b9740fbcc778964d6a7331480106f16d90dda98b88c0b82f4cf56b6d": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text offers Brenna 25 coins in earnest to let the player through."
+    },
+    "latency": 0.667,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "c7d8828ecc6e197570e8f27b2bd9d84d11d1542ec95684903d1824761d1e6e37": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 2.712,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "c9835f664761133e13a21b1eb0cecee9e1888ba9c686dc40c369de679c571f74": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The player offers Brenna 10 coins, appealing to her duty."
+    },
+    "latency": 1.283,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -4192,6 +8052,48 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "cc045b29f976be0e78063b102c04a7d004331498a0c00b4eafcddee9c64d101e": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text directly demeans Kael to his face, insulting him."
+    },
+    "latency": 1.024,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "cc611aef80a40ad28bef7105dafffeb9e1553b274b8aff541e5d286e6852e03f": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The player states as fact that Kael beat Mags."
+    },
+    "latency": 0.916,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "ccad7a8c726df02ae609f556aebf1c0e871f61a100656845ca6a2230eb28dd44": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.046,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "ce11b6076b7a4a06ad61865dba2668b33e903a2f49f53a66877c2a4f2e415e9f": [
    {
     "data": {
@@ -4226,6 +8128,44 @@
      "to": "none"
     },
     "latency": 2.554,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "ce9d8f1a4e6bbe3c865ff36a646daea7a59390048df42099bbf3730cc0fc42cf": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.834,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "cf5ac2bda5bc9183df881ee48012f2f8fc7c59148b05bf9d27aa1cb65f38df65": [
+   {
+    "data": {
+     "act": "tell_claim",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "kael",
+      "b": "odo",
+      "neg": false,
+      "pred": "robbed"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 0.928,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -4268,6 +8208,17 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "d2f8e150eefa819996449c0cd074a97aa66ac4795f038c0a87b4c5f92c1558da": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text earnestly offers Brenna 20 coins; the added instruction is not part of the act."
+    },
+    "latency": 1.05,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "d34eff89f4e08916830463ac1998d6a0f6007b22af375de30d7712b0b6959852": [
    {
     "data": {
@@ -4275,6 +8226,42 @@
      "reason": "The player directly demeans Garrick, calling him a pathetic excuse for a mercenary."
     },
     "latency": 0.969,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "d49af6293920d3bb8564b4b3d565563af0d8c221a894bfaf2cdc0c8e6b575e77": [
+   {
+    "data": {
+     "act": "insult",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "kael"
+    },
+    "latency": 0.808,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "d4c8a233cdac1cbfffb0d1f0b1ae7021d441467713c14be2bef224ff2bf10236": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.843,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -4298,6 +8285,17 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "d5b4e6679bc4dfec468a6ccd64e0ff2d5d64339da4f15562d76ec556b4de38cb": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text says the player offers Brenna 40 coins in earnest, appealing to her duty."
+    },
+    "latency": 0.947,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "d5d7621128d933a4249d4c76dc11b07115c4532a951bc3dc86bf7d6b9873dbf8": [
    {
     "data": {
@@ -4317,6 +8315,17 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "d66b479b8e241291907386a17fb7c8cd60d75008a0698fdd1c7cea08ad505e9f": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The player earnestly offers Brenna 5 coins."
+    },
+    "latency": 0.887,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "d77ff6c593421e07711b769d755ab429c4b28d0a5cb6fa324176723d6260b059": [
    {
     "data": {
@@ -4332,6 +8341,84 @@
      "to": "garrick"
     },
     "latency": 0.865,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "d8550a326cac28568100aec8270db303ebbca42196ecfb08a5e4b1f63715cdb4": [
+   {
+    "data": {
+     "answer": "no",
+     "reason": "The text states a fact about Kael and offers coins to believe it, not to Brenna to look the other way, forget the trouble, or let the player pass."
+    },
+    "latency": 1.226,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "d86952a5edf1b740442709751afb2ccbbfc546fa455b596cc436dd224ecef18c": [
+   {
+    "data": {
+     "act": "bribe",
+     "amount": 20,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 0.993,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "d96659ccf3068482c29710375e620bfc81ec5c17d563fb2c41124d791fcad3d8": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The player mocks Kael to his face by saying he lacks nerve."
+    },
+    "latency": 0.823,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "d9ca84ffc05c8e550ce49e5169d7b2f07d72b4b726633a0848d1f2bc63e33d9f": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.937,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "da5d60e6cc21e4229e982ea19b5914e648a07d6dd5c622ec19fc6b592306e468": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.869,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -4362,6 +8449,26 @@
      "to": "garrick"
     },
     "latency": 0.944,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "db338b503f3a528c304d1b2d7f29a87c9262ac85d686bbff0a1a058e0adb665c": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.199,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -4456,6 +8563,26 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "df0df55d062f82433aa53ae6a75a759947d6d59438121179c885621e35926020": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "unsure",
+     "to": "none"
+    },
+    "latency": 0.879,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "e03d5ef75b2cb4089456a74c0687650218f7c70a48e0cb15468ddac212bc5fe6": [
    {
     "data": {
@@ -4497,6 +8624,64 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "e22fcffa4bcdcad442f5a8fb15f86fd8c61a25054251674723f0467de640414d": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "unsure",
+     "to": "none"
+    },
+    "latency": 1.038,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "e2c1585a2b6887bb99e950f9f33ce4e070396ba5f32049e0116a3c5f6457c514": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.831,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "e330065eb36ceaefd74759b20f63f3cd80113bfbe93ce1d8ebefde55e0995f82": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.126,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "e44af6f9f2ea17153d59bb1463d7c4c13d828ee48a429a3f90f6d62479af6fd5": [
    {
     "data": {
@@ -4512,6 +8697,44 @@
      "to": "none"
     },
     "latency": 0.952,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "e451c190f3774dfd6da6aa9f587f449e7dae089f9b2a30abf39207023672698c": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "unsure",
+     "to": "none"
+    },
+    "latency": 1.12,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "e46357426c975c094397f3449aa146ee762ff9f9ce166e7b8d8c5bf7ac83a9cc": [
+   {
+    "data": {
+     "act": "tell_claim",
+     "claim": {
+      "a": "kael",
+      "b": "mags",
+      "neg": false,
+      "pred": "beat"
+     },
+     "sure": "certain",
+     "to": "mags"
+    },
+    "latency": 0.979,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -4606,6 +8829,37 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "e73d0fd88ec38b597d9bfbb37053725357af952df19eee7b2d79a0a0482f06fa": [
+   {
+    "data": {
+     "act": "bribe",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 0.806,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "e89f6952b0bed22c6bfedeb28c6daa8f6e471fb7b174d7625a7ff1e9b543a71e": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The player earnestly offers Brenna 22 coins to let them pass."
+    },
+    "latency": 0.73,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "e8a3c2a308f263b30180922b9adc7ecf0ed1fccb7831491cf12c99513f75bedf": [
    {
     "data": {
@@ -4621,6 +8875,24 @@
      "to": "garrick"
     },
     "latency": 1.031,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "e92c1e7e86f66bb8267436920ab7b0fcee31b5180d796d5a3f6d5240bdcc586e": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.188,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -4655,6 +8927,26 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "eb88cdcc66daa7c1ab76121d306041643158fee2dd25a31a8ed04f6236fb533f": [
+   {
+    "data": {
+     "act": "bribe",
+     "amount": 40,
+     "appeal": "duty",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 1.101,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "eda34635917d97cf8ad96a379d29f469750047974605ac71cdfd7cd2ab83ce9f": [
    {
     "data": {
@@ -4670,6 +8962,17 @@
      "to": "none"
     },
     "latency": 1.026,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "edda64fd24fcc0c77c502576b63369281fb045a1a4eba4489fa44812e4a8cbdb": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text states as fact that Kael robbed Odo, and the player tells Mags this."
+    },
+    "latency": 0.877,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -4723,6 +9026,28 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "f07362307d290f55fca99b9ee315b402465ad06c0141cc207f4169cf6a42b613": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text states that the peddler lied about Kael, telling Kael that Odo lied to him."
+    },
+    "latency": 0.857,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "f1aae1dc64c6197f9b7d3c482ad750557a84b17e9254fc1a663a81683f6eeac8": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The player tells Mags as fact that Kael beat Odo, so this is telling."
+    },
+    "latency": 0.78,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "f1e2569d9d07437cd616d4e85cfa2fcdfc8ab628c34200054285656c3cced8dd": [
    {
     "data": {
@@ -4772,6 +9097,86 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "f553432a119d4c05d4b201ad2b01ca55aee3d533278ea411e742891e79769280": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "unsure",
+     "to": "none"
+    },
+    "latency": 0.857,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "f55ca610267a5a43308615b7fe792c2e147ee2e6037fa863dedf3e96a65cb166": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text earnestly offers Brenna ten coins, appealing to the player's hardship."
+    },
+    "latency": 1.073,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "f59f04863343a8c0dfac0570784f07cb32dc7395b202da4e7f9027fcb5ff133d": [
+   {
+    "data": {
+     "act": "insult",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "kael"
+    },
+    "latency": 0.864,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "f641dcbba3cfda4958517c1ad8df2ce53353ee6837418697c6ec3756f85d323e": [
+   {
+    "data": {
+     "answer": "no",
+     "reason": "The player threatens Brenna, but does not earnestly offer her coins to look the other way or let them pass."
+    },
+    "latency": 1.057,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "f7e990eefffdd54a3bce4e30ceffd3003f6da103b0e9d2add12057b45719607f": [
+   {
+    "data": {
+     "act": "bribe",
+     "amount": 10,
+     "appeal": "duty",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 0.7,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "f7fa39529ee657c9c165988860262d83c8efad966d343753867ed8f5ca8c9dac": [
    {
     "data": {
@@ -4787,6 +9192,17 @@
      "to": "none"
     },
     "latency": 0.876,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "f7ff1a29d8aa5b993e3b001b8180d3fdf8a305ffadcc271e22a2f23d60893c53": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text demeans Brenna directly, so it is an insult to the person spoken to."
+    },
+    "latency": 0.818,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -4810,6 +9226,82 @@
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
   ],
+  "f82d51886543de90a2b520689b2678995df79dc5d042976979d3eb4cd77f225e": [
+   {
+    "data": {
+     "act": "none",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "unsure",
+     "to": "none"
+    },
+    "latency": 0.918,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "f83da26b11919bb47a5241490ee72387d4bd6e3c716ff4e9d8a3bc5f3e377fdb": [
+   {
+    "data": {
+     "act": "tell_claim",
+     "amount": 0,
+     "appeal": "none",
+     "claim": {
+      "a": "player",
+      "b": "kael",
+      "neg": true,
+      "pred": "robbed"
+     },
+     "sure": "certain",
+     "to": "brenna"
+    },
+    "latency": 0.783,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "f9a7ec9143e2909c02ac4ee33235edfffc1d7b2d3e1ea4ef2972e2cd96a3c1af": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.918,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "fa87a718263d0d370a6846db4d37f19b4ca7f273ab81e2f9a0f8a18c3d6cd4e6": [
+   {
+    "data": {
+     "act": "tell_claim",
+     "claim": {
+      "a": "kael",
+      "b": "odo",
+      "neg": true,
+      "pred": "robbed"
+     },
+     "sure": "certain",
+     "to": "mags"
+    },
+    "latency": 0.954,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
   "faafe727495edca093895b1fb6ad01d20b44181b6b865cee71c14758de56abfa": [
    {
     "data": {
@@ -4825,6 +9317,24 @@
      "to": "wren"
     },
     "latency": 0.977,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "fae1e6a7b2c09dd46c1c001c0f715e217c93c72280979c1934c469716a59101c": [
+   {
+    "data": {
+     "act": "insult",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "kael"
+    },
+    "latency": 0.917,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -4863,6 +9373,71 @@
      "to": "wren"
     },
     "latency": 0.881,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "fc2f2c071fdb8ff5706ade7c111e3920c41abf3d0a1e4d083a5493ad32ad5d91": [
+   {
+    "data": {
+     "answer": "yes",
+     "reason": "The text states as fact that Kael lied about the player, telling Brenna that claim."
+    },
+    "latency": 0.942,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "fc38f2c2babc8cdf8df5345e61c0e80a33836ad78609ae41ea70a013317117c2": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.883,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "fce6cd92966b770c79ffb967aa10b9586d0b3ad3a9f37c121db8b76336a1c5eb": [
+   {
+    "data": {
+     "act": "tell_claim",
+     "claim": {
+      "a": "kael",
+      "b": "odo",
+      "neg": true,
+      "pred": "robbed"
+     },
+     "sure": "certain",
+     "to": "mags"
+    },
+    "latency": 0.8,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "fce752460010d868685f212a1f75cfd9578271f47582413ed166b0ba6af69b73": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 0.933,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }
@@ -4912,6 +9487,24 @@
      "reason": "The text tells Garrick, as a fact, that he insulted the player."
     },
     "latency": 0.99,
+    "model": "gpt-6-luna",
+    "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
+   }
+  ],
+  "fe865d6466444983f2f064c0e73c3370ad8a51c5f4e5bd8036c8913ae52c465d": [
+   {
+    "data": {
+     "act": "none",
+     "claim": {
+      "a": "none",
+      "b": "none",
+      "neg": false,
+      "pred": "none"
+     },
+     "sure": "certain",
+     "to": "none"
+    },
+    "latency": 1.054,
     "model": "gpt-6-luna",
     "provider": "xero-canopy-resource.services.ai.azure.com/gpt-6-luna"
    }

@@ -1,7 +1,7 @@
 // The inspector: Minds, Beliefs, Ledger and Why tabs, and the why-chain from a line down to the ledger.
 
 import { $, esc, badge } from "./dom.js";
-import { CAST, STOP_SHORT, ACTION_LINE, name, claimText, eventText, whyChain, isFrozen, fmtTrust } from "./model.js";
+import { CAST, STOP_SHORT, ACTION_LINE, name, claimText, eventText, whyChain, isFrozen, fmtTrust, heardText } from "./model.js";
 
 const DRIVES = [["grudge", "#e0574a"], ["fear", "#7fc3ec"], ["respect", "#f6c25a"], ["ambition", "#c98ad8"]];
 
@@ -14,6 +14,7 @@ export class Inspector {
     this.highlight = null; // an id to outline in the ledger or beliefs
     this.editing = null; // the NPC whose persona is being edited (#39)
     this.onPersona = null; // set by the game: (npc, text) => save it; "" goes back to the default
+    this.words = []; // what you typed this session and how each was read (POST /say), newest last
     for (const b of document.querySelectorAll("#tabs button")) {
       b.addEventListener("click", () => { this.highlight = null; this.show(b.dataset.tab); });
     }
@@ -62,6 +63,13 @@ export class Inspector {
       b.setAttribute("aria-selected", String(b.dataset.tab === tab));
       if (b.dataset.tab === tab) b.classList.remove("flash");
     }
+    this.render();
+  }
+
+  /** Something you typed, and how the engine read it: shown at the top of the Why tab. */
+  heard(entry) {
+    this.words = [...this.words, entry].slice(-6);
+    if (this.tab !== "why") document.querySelector('#tabs [data-tab="why"]').classList.add("flash");
     this.render();
   }
 
@@ -167,7 +175,15 @@ export class Inspector {
         <div class="meta">cites ${(d.cites || []).map((c) => `<span class="chip id" data-id="${esc(c)}">${esc(c)}</span>`).join("") || "nothing"} · ${esc(d.reason || "")}</div>
       </div>`).join("");
     const intro = chain ? "" : '<div class="empty">Click any spoken line, here or in the dialogue log, to trace it to the ledger.</div>';
-    return `${chain}${intro}${cards}`;
+    const words = [...this.words].reverse().map((h) => {
+      const r = heardText(h.understood);
+      return `<div class="dcard heard">
+        <div class="head"><span class="who player">You</span><span>to ${esc(name(h.target))} · your words</span><span class="badge ${r.verdict}">${r.verdict}</span></div>
+        <div class="line">"${esc(h.text)}"</div>
+        <div class="meta"><b>${esc(r.what)}</b><br>${esc(r.how)}</div>
+      </div>`;
+    }).join("");
+    return `${chain}${intro}${words}${cards}`;
   }
 
   chainHtml(id) {

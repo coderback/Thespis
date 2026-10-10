@@ -37,6 +37,11 @@ class ActBody(BaseModel):
     topic: str | None = None
 
 
+class SayBody(BaseModel):
+    target: str
+    text: str
+
+
 class BrainBody(BaseModel):
     mode: Literal["model", "fallback"]
 
@@ -111,6 +116,26 @@ def post_act(body: ActBody, request: Request, x_session: str | None = Header(def
         if result.model_calls:
             state.store.count_calls(result.model_calls)  # counted with The Crypt Road's, against the global cap
         return views.act_view(result, world)
+
+
+@router.post("/say")
+def post_say(body: SayBody, request: Request, x_session: str | None = Header(default=None)):
+    """What the player types to someone, read as one of the buttons open now and applied as that button would be
+    (thespis.intents). The answer is /manor/act's, with `understood`: how the words were read."""
+    store, session, state = _sessions(request), _session(x_session), request.app.state
+    with LOCKS.hold(session):
+        world = _load(store, session)
+        try:
+            understood, result = rules.say(
+                world, body.target, body.text, gateway=state.gateway, cache=state.store, replay=state.replay,
+                budget=budget(state, state.store, world), moderator=state.manor_moderator,
+                checking=getattr(state, "checking", None))
+        except rules.NotAllowed as e:
+            raise ApiError(409, "not_allowed", e.reason) from None
+        store.save(session, world)
+        if result.model_calls:
+            state.store.count_calls(result.model_calls)
+        return {**views.act_view(result, world), "understood": views.understood_view(understood, body.target)}
 
 
 @router.post("/reset")

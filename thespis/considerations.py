@@ -16,7 +16,8 @@ Conditions:
   the player was seen).
 - `{flag = f}` / `{not_flag = f}`: the NPC's flag is set, or isn't.
 - `{believes = claim, min = c}`: the NPC holds the claim with at least `min` confidence, or actively at all.
-- `{bound = name}`: a value the game passed when it asked is truthy.
+- `{bound = name}`: a value the game passed when it asked is truthy. `{bound = name, is = v}`: it is exactly `v`, a
+  string or a number. `{bound = name, gte | gt | lte | lt | eq = n}`: it is a number, and compares so.
 - `{any = [...]}`, `{all = [...]}`, `{not = {...}}`.
 
 Utility terms: a number, or `{drive = d, weight = 1, plus = 0, if = {...}}` (a drive times its weight plus a constant,
@@ -75,6 +76,23 @@ def condition(c: object, where: str) -> Cond:
             raise DefinitionError(f"{where}: a drive condition needs one of {', '.join(COMPARE)}")
         d = str(c["drive"])
         return lambda w, n, v, env: all(op(n.drives.get(d, 0), x) for op, x in ops)
+    if "bound" in c:
+        _only(c, {"bound", "is", *COMPARE}, where)
+        name, same = str(c["bound"]), c.get("is")
+        if "is" in c and (isinstance(same, bool) or not isinstance(same, str | int | float)):
+            raise DefinitionError(f"{where}.is: expected a string or a number, got {same!r}")
+        ops = [(COMPARE[k], _number(v, f"{where}.{k}")) for k, v in c.items() if k in COMPARE]
+        if len(c) == 1:
+            return lambda w, n, v, env: bool(env.get(name))
+
+        def bound(w: World, n: NPC, v: View, env: Env) -> bool:
+            x = env.get(name)
+            if "is" in c and (isinstance(x, bool) or x != same):
+                return False
+            if not ops:
+                return True
+            return isinstance(x, int | float) and not isinstance(x, bool) and all(op(x, k) for op, k in ops)
+        return bound
     key = next(iter(c))
     if len(c) != 1 and key != "believes":
         raise DefinitionError(f"{where}: one condition per table, got {', '.join(c)}")
@@ -89,9 +107,6 @@ def condition(c: object, where: str) -> Cond:
         case "flag" | "not_flag":
             flag, want = str(val), key == "flag"
             return lambda w, n, v, env: bool(n.flags.get(flag)) == want
-        case "bound":
-            name = str(val)
-            return lambda w, n, v, env: bool(env.get(name))
         case "believes":
             _only(c, {"believes", "min"}, where)
             if not isinstance(val, Mapping) or "pred" not in val or "a" not in val:

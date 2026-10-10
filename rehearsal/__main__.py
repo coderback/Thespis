@@ -296,7 +296,7 @@ def words_cmd(args) -> int:
     sets = tuple(args.set.split(",")) if args.set else words.SET_ORDER
     meta = {"when": datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC"), "commit": _commit()}
     if args.mode == "replay":
-        outcomes, problems = words.replay()
+        outcomes, problems = words.replay(acting=args.acting, only=args.only)
         data, md = words.report(outcomes, {**meta, "label": "replay", "reader": "recordings"})
         print(md)
         for p in problems:
@@ -305,8 +305,9 @@ def words_cmd(args) -> int:
     chosen = words.books(args.only)
     if args.mode == "bank":
         outcomes = words.run(chosen, None, sets, progress=True)
-        meta |= {"label": "bank", "reader": "no model: the bank and near matches"}
-        return _words_report(outcomes, meta, "bank")
+        label = "bank" + (f"-{args.only}" if args.only else "")
+        meta |= {"label": label, "reader": "no model: the bank and near matches"}
+        return _words_report(outcomes, meta, label)
     from dotenv import load_dotenv
 
     from thespis.gateway import OpenAICompatGateway, gateway_from_env
@@ -326,19 +327,24 @@ def words_cmd(args) -> int:
             return 1
         reader.calls = deque()
         recording = RecordingGateway(reader)
-        outcomes = words.run(chosen, recording, sets, progress=True)
+        # A recorded run has the reader act on its readings, so both ways of playing them can be replayed.
+        outcomes = words.run(chosen, recording, sets, progress=True, acting=args.acting or args.record)
     finally:
         if local is not None:
             local.stop()
-    label = args.local or reader.models[0]
+    label = (args.local or reader.models[0]) + (f"-{args.only}" if args.only else "")
     meta |= {"label": label, "reader": ", ".join(reader.models), "calls": len(reader.calls),
              "failed_calls": sum(not c.ok for c in reader.calls)}
     code = _words_report(outcomes, meta, label)
     if args.record:
-        if args.only or args.set or args.local:
-            print("not recording: only the full set on the configured model is recorded for replay")
+        was = json.loads(words.RECORDINGS.read_text(encoding="utf-8")) if args.only and words.RECORDINGS.exists() \
+            else None
+        if args.set or args.local:
+            print("not recording: only whole games on the configured model are recorded for replay")
+        elif was is not None and was["models"] != list(recording.models):
+            print(f"not recording: the other games were recorded on {was['models']}; record every game again")
         else:
-            _write(words.RECORDINGS, words.recording(recording, outcomes))
+            _write(words.RECORDINGS, words.recording(recording, chosen, was))
             print(f"recorded {sum(len(v) for v in recording.replies.values())} replies to "
                   f"{words.RECORDINGS.relative_to(ROOT)}")
     return code
@@ -394,6 +400,8 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("mode", choices=("live", "replay", "bank"))
     p.add_argument("--local", help="live: read through this registry model on this machine")
     p.add_argument("--record", action="store_true", help="live: write rehearsal/words/recordings.json")
+    p.add_argument("--acting", action="store_true",
+                   help="the reader acts on its own readings, where a game would put them to the player")
     p.add_argument("--only", help="only the line files whose name contains this")
     p.add_argument("--set", help="only these sets: benign, hard, adversarial (comma-separated)")
     p.set_defaults(fn=words_cmd)

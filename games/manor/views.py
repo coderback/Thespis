@@ -7,6 +7,7 @@ from dataclasses import asdict
 from games.manor import content as C
 from games.manor import words
 from games.manor.rules import ActResult
+from thespis.intents import Reading, Understood
 from thespis.ledger import Event
 from thespis.world import World
 
@@ -45,6 +46,18 @@ def decision_view(w: World, d) -> dict:
         said = w.ledger.get(d.asserted).claimed
         out["knew"] = [b.id for b in w.beliefs.for_npc(d.npc) if b.active and C.contradicts(b.claim, said)]
     return out
+
+
+def understood_view(u: Understood, to: str) -> dict:
+    """How the player's words to `to` were read (POST /manor/say): `status` is act (done), ask (the `readings` are
+    put to the player, nothing done) or talk (words that do nothing here). Each reading carries the POST /manor/act
+    body that performs it."""
+    def reading(r: Reading) -> dict:
+        body = {"verb": r.verb, "target": r.args.get("suspect", to)}
+        return {"verb": r.verb, "act": body | ({"topic": r.args["topic"]} if "topic" in r.args else {})}
+
+    return {"status": u.status, "intent": reading(u.intent) if u.intent else None, "sure": u.sure,
+            "readings": [reading(r) for r in u.readings], "path": u.path, "why": u.why}
 
 
 def act_view(result: ActResult, w: World) -> dict:

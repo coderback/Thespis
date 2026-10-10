@@ -2,7 +2,7 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { actionText, bursts, caseNote, isLie, memory, moodIcons, spokenLines, visitedRooms } from "../src/manor/model.js";
+import { actionText, bursts, caseNote, isLie, memory, moodIcons, readingLabel, spokenLines, visitedRooms } from "../src/manor/model.js";
 import { SPRITES } from "../src/manor/sprites.js";
 import { STEPS } from "../src/manor/autoplay.js";
 
@@ -19,6 +19,12 @@ function noon() {
     decisions: [],
   };
 }
+
+test("what you typed, as the button it was read as (POST /manor/say)", () => {
+  assert.equal(readingLabel({ verb: "ask", target: "sable", topic: "morning" }), "Ask Sable about this morning");
+  assert.equal(readingLabel({ verb: "request_questioning", target: "pell" }), "Have Lady Vane question Pell");
+  assert.equal(readingLabel({ verb: "accuse", target: "sable" }), "Accuse Sable");
+});
 
 test("rooms you have stood in", () => {
   const s = noon();

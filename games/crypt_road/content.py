@@ -30,6 +30,7 @@ GOSSIPS = ("odo", "mags")  # pass on what they know, in this order
 WITNESSES = ("odo", "mags")  # the guard can question them
 FINE = 20  # the standard fine, in coins: the offer the client suggests first
 PRICE_MIN, PRICE_MAX = 15, 30  # the bounds on what Brenna will take (#36)
+RELENT = 5  # what an appeal to her duty takes off her price, once
 DUEL_WIN_CHANCE = 0.6
 CRIME_CONF = 0.5  # beliefs below this are stored and shown but never acted on
 

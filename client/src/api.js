@@ -42,6 +42,7 @@ export class HttpApi {
   state() { return this.req("GET", "/state"); }
   allowed() { return this.req("GET", "/allowed"); }
   act(body) { return this.req("POST", "/act", body); }
+  say(body) { return this.req("POST", "/say", body); } // {target, text}: read as one of the buttons, or as talk
   digest(since) { return this.req("GET", `/digest?since=${since}`); }
   reset() { return this.req("POST", "/reset", {}); }
   reload() { return this.req("POST", "/reload", {}); }
@@ -123,6 +124,12 @@ export class FixtureApi {
     this.current = this.clone(out.state); // kept as the fixture has it, so an edit can be undone
     this.withPersonas(out.state);
     return out;
+  }
+
+  /** The fixtures hold no readings, so whatever is typed is talk, where the demo route talks. */
+  async say({ target, text }) {
+    const out = await this.act({ verb: "talk", target, text });
+    return { ...out, understood: { status: "talk", intent: { verb: "talk", act: { verb: "talk", target } }, sure: "unsure", readings: [], path: "none", why: "fixture mode reads nothing" } };
   }
 
   async digest(since) {

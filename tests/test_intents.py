@@ -67,11 +67,105 @@ def act_of(u) -> tuple:
      "predicates come from"),
     ({"intents": {"pick": {"means": "x", "args": {"c": {"type": "choice"}}}}}, "a choice needs options"),
     ({"intents": {"pay": {"means": "x", "args": {"n": {"type": "amount", "min": 5, "max": 1}}}}}, "min first"),
+    ({"intents": {"pay": {"means": "x", "args": {"n": {"type": "amount", "optional": True}}}}}, "only a choice"),
+    ({"intents": {"tell": {"means": "x", "args": {"c": {"type": "claim", "denials": "no"}}}}}, "denials: true or"),
+    ({"intents": {"ask": {"means": "x", "asks": "yes"}}}, "asks are true or false"),
 ])
 def test_a_badly_declared_intent_is_refused_by_where_it_is(change, error):
     data = {**tomllib.loads((ROOT / "examples" / "tavern" / "game.toml").read_text(encoding="utf-8")), **change}
     with pytest.raises(DefinitionError, match=error):
         declared_intents(data)
+
+
+# ---------------------------------------------------------------- optional choices, denials, acts that are questions
+SHOP = {
+    "words": {"claims": {"robbed": "{a} robbed {b}"}},
+    "intents": {
+        "pay": {"means": "offers money", "reads": "Pay {to} {amount}", "examples": ["{amount} for you"],
+                "args": {"to": "npc", "amount": {"type": "amount", "min": 1, "max": 50},
+                         "manner": {"type": "choice", "options": ["kindly", "curtly"], "optional": True}}},
+        "tell": {"means": "tells it as fact", "args": {"to": "npc", "claim": {"type": "claim", "denials": False}}},
+        "ask": {"means": "asks about the topic", "asks": True, "consequential": False,
+                "args": {"to": "npc", "topic": {"type": "choice", "options": ["prices", "rumours"]}},
+                "examples": ["what are your {topic}"]},
+    },
+}
+
+
+def shop(model=None, offered=("pay", "tell", "ask")):
+    """An understander over a game given as data, and what is open with Ana."""
+    from thespis.expression import Validator
+    from thespis.intents import Bounds, ClaimDomain, Offer, Understander, Words
+
+    intents = declared_intents(SHOP)
+    words = Words({"ana": "ana", "bo": "bo"}, SHOP["words"]["claims"], str.capitalize, lambda c: c.label())
+    domains = {"pay": {"to": ("ana",), "amount": Bounds(1, 50), "manner": intents["pay"].arg("manner").options},
+               "tell": {"to": ("ana",), "claim": ClaimDomain(("robbed",), ("player", "ana", "bo"), neg=False)},
+               "ask": {"to": ("ana",), "topic": intents["ask"].arg("topic").options}}
+    mind = Mind(model, Validator({})) if model else None
+    return Understander(intents, words, mind), [Offer(v, domains[v]) for v in offered]
+
+
+def shop_reads(act: str, **args) -> dict:
+    return {"act": act, "to": "none", "amount": 0, "manner": "none", "topic": "none", "sure": "certain",
+            "claim": {"pred": "none", "a": "none", "b": "none", "neg": False}, **args}
+
+
+def test_an_optional_choice_may_be_left_out_by_the_words_and_by_the_model():
+    u, open_now = shop()
+    plain = u.read("12 for you", open_now, to="ana")
+    assert act_of(plain) == (ACT, "pay", {"to": "ana", "amount": 12}) and plain.intent.reads == "Pay Ana 12"
+    assert act_of(u.read("7 coins", open_now, to="ana"))[1] == "pay"  # the generic phrasings still apply
+
+    model = Reads(shop_reads("pay", to="ana", amount=9, manner="none"))
+    u, open_now = shop(model)
+    assert act_of(u.read("nine, there you go", open_now, to="ana")) == (ACT, "pay", {"to": "ana", "amount": 9})
+    shown = json.loads(model.calls[0][1][1]["content"])["acts"][0]["args"]
+    assert shown["manner"] == ["kindly", "curtly", "none"]  # the model is told it may be left out
+    model.reading = shop_reads("pay", to="ana", amount=9, manner="curtly")
+    pressed = u.read("nine. take it and go", open_now, to="ana")
+    assert pressed.intent.args["manner"] == "curtly" and pressed.intent.reads == "Pay Ana 9 (manner: curtly)"
+    model.reading = shop_reads("pay", to="ana", amount=9, manner="rudely")
+    assert u.read("nine, and good riddance", open_now, to="ana").status == TALK  # not one of its options
+    model.reading = shop_reads("ask", to="ana", topic="none")
+    assert u.read("so", open_now, to="ana").status == TALK  # a choice that isn't optional must be made
+
+
+def test_a_claim_without_denials_cant_be_told_as_never_having_happened():
+    claim = {"pred": "robbed", "a": "bo", "b": "ana", "neg": False}
+    model = Reads(shop_reads("tell", to="ana", claim=claim))
+    u, open_now = shop(model)
+    assert act_of(u.read("Bo robbed you, you know", open_now, to="ana"))[:2] == (ACT, "tell")
+    model.reading = shop_reads("tell", to="ana", claim={**claim, "neg": True})
+    denied = u.read("Bo never robbed you", open_now, to="ana")
+    assert denied.status == TALK and "isn't an act offered" in denied.why
+
+
+def test_a_question_performs_only_an_act_that_is_itself_a_question():
+    u, open_now = shop()
+    asked = u.read("What are your prices?", open_now, to="ana")
+    assert act_of(asked) == (ACT, "ask", {"to": "ana", "topic": "prices"}) and asked.path == "bank"
+    assert u.read("Bo robbed Ana?", open_now, to="ana").status == TALK  # telling isn't asking
+    assert u.read("what would your prices be", open_now, to="ana").status == TALK  # a hedge still stops the bank
+
+
+def test_the_prompts_say_an_act_may_be_a_question_only_where_one_is_open():
+    from thespis.intents import UNDERSTAND_ASKS, UNDERSTAND_PROMPT, VERIFY_ASKS, VERIFY_PROMPT
+
+    model = Reads(shop_reads("pay", to="ana", amount=9))
+    u, open_now = shop(model)
+    u.read("go on then, nine", open_now, to="ana")
+    assert [c[1][0]["content"] for c in model.calls] == [UNDERSTAND_PROMPT + " " + UNDERSTAND_ASKS, VERIFY_PROMPT]
+    model.calls.clear()
+    u, open_now = shop(model, offered=("pay", "tell"))
+    u.read("go on then, nine", open_now, to="ana")
+    assert model.calls[0][1][0]["content"] == UNDERSTAND_PROMPT  # as every game without one has it
+    model = Reads(shop_reads("ask", to="ana", topic="rumours"))
+    u, open_now = shop(model)
+    for intent in u.intents.values():  # had asking consequences, its check would be told it is a question
+        object.__setattr__(intent, "consequential", True)
+    u.read("heard anything lately?", open_now, to="ana")
+    assert model.calls[1][1][0]["content"] == VERIFY_PROMPT + " " + VERIFY_ASKS
 
 
 def test_the_lantern_declares_its_intents():

@@ -6,7 +6,7 @@ import { ManorApi } from "./api.js";
 import { runAutoplay } from "./autoplay.js";
 import { Bar } from "./bar.js";
 import { Inspector } from "./inspector.js";
-import { actionText, ARRIVAL, bursts, caseNote, isLie, memory, spokenLines } from "./model.js";
+import { actionText, ARRIVAL, bursts, caseNote, isLie, memory, name, spokenLines } from "./model.js";
 import { ManorView } from "./scene.js";
 
 const params = new URLSearchParams(location.search);
@@ -26,7 +26,7 @@ class ManorGame {
     this.cacheHits = 0;
     this.map = new ManorView($("map"));
     this.inspector = new Inspector();
-    this.bar = new Bar({ onAct: (b) => this.act(b), onLine: (id) => this.inspector.openChain(id) });
+    this.bar = new Bar({ onAct: (b) => this.act(b), onSay: (t, x) => this.say(t, x), onLine: (id) => this.inspector.openChain(id) });
     this.map.setState(ARRIVING, { instant: true });
     this.wire();
   }
@@ -122,21 +122,39 @@ class ManorGame {
 
   // --- acting ----------------------------------------------------------------------------------------
 
-  async act(body) {
+  act(body) { return this.perform(body, () => this.api.act(body)); }
+
+  /** What you type to someone: the engine reads it as one of the buttons open now, or as nothing (POST /manor/say). */
+  say(target, text) { return this.perform({ target, text }, () => this.api.say({ target, text })); }
+
+  async perform(body, send) {
     if (this.busy) return null;
     this.busy = true;
     this.bar.setBusy(true);
     this.bar.closePop();
+    this.bar.clearAsk();
     $("hint").hidden = true;
     const prev = this.state;
     let res;
     try {
-      res = await this.api.act(body);
+      res = await send();
     } catch (e) {
       this.toast(e.reason || String(e));
       this.busy = false;
       this.bar.setBusy(false);
       return null;
+    }
+    const heard = res.understood;
+    if (heard) {
+      this.bar.sys(`You to ${name(body.target)}: "${body.text}"`);
+      if (heard.status !== "act") { // nothing was done: the readings are put to you, or there was nothing in it
+        if (heard.status === "ask") this.bar.ask(heard.readings);
+        else this.bar.sys(`${name(body.target)} finds nothing in that to answer. Ask about this morning or the ring.`);
+        this.busy = false;
+        this.bar.setBusy(false);
+        return res;
+      }
+      body = heard.intent.act;
     }
     this.bar.sys(actionText(body));
     if (body.verb === "move") await this.map.walkPlayer(res.state);

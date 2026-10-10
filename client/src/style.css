@@ -54,6 +54,12 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .logline .q { font-family: var(--speech); font-size: 18px; line-height: 1; }
 .logline.sys { color: var(--muted); font-style: italic; cursor: default; }
 .logline.sys:hover { background: none; }
+.logline.ask { cursor: default; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; color: var(--muted); }
+.logline.ask:hover { background: none; }
+.chipbtn { background: var(--accent); color: #1b1420; border: 1.5px solid var(--accent); border-radius: 999px; padding: 3px 10px; font: 600 12px var(--sans); cursor: pointer; }
+.chipbtn:hover { background: var(--accent-2); }
+.chipbtn.plain { background: none; color: var(--text); border-color: var(--line); }
+.chipbtn.plain:hover { border-color: var(--accent); background: var(--panel-2); }
 .who.kael { color: #e06a5a; } .who.brenna { color: #7fa7e8; } .who.mags { color: #c98ad8; } .who.odo { color: #e0a84a; } .who.player { color: #9fe08a; }
 
 #actions { padding: 8px 10px; display: flex; flex-direction: column; gap: 5px; overflow-y: auto; }
@@ -85,6 +91,9 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .badge.cache { background: #263f55; color: #9fcdf0; }
 .badge.fallback { background: #4d3a25; color: #f0c48a; }
 .badge.offline { background: #5a2a26; color: #f2a59b; }
+.badge.acted { background: #2f4d2a; color: #a8e08f; }
+.badge.asked { background: #4d3a25; color: #f0c48a; }
+.badge.talk { background: #263f55; color: #9fcdf0; }
 
 #narrator { padding: 8px 12px 10px; border-bottom: 1px solid var(--line); height: 170px; display: flex; flex-direction: column; min-height: 0; }
 #narrator h2 { margin: 0 0 6px; font: 600 11px var(--sans); text-transform: uppercase; letter-spacing: .08em; color: var(--accent); }
@@ -139,6 +148,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
 
 .dcard { background: var(--panel-2); border-radius: 10px; padding: 8px 10px; margin-bottom: 8px; cursor: pointer; border: 1.5px solid transparent; }
 .dcard:hover { border-color: var(--accent); }
+.dcard.heard { cursor: default; border-style: dashed; border-color: var(--line); }
+.dcard.heard:hover { border-color: var(--line); }
 .dcard .head { display: flex; gap: 6px; align-items: center; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
 .dcard .head .badge { margin-left: auto; }
 .dcard .line { font-family: var(--speech); font-size: 19px; line-height: 1.05; margin: 4px 0; }

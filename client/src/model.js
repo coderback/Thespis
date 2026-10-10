@@ -35,6 +35,48 @@ export function claimText(claim, { lower = false } = {}) {
   return `${a} ${CLAIM_VERBS[claim.pred] || claim.pred} ${b}`;
 }
 
+const APPEALS = { duty: "appealing to her duty", pity: "pleading hardship", threat: "with a threat", flattery: "with flattery" };
+
+/** What an act is, as the log says it: a button pressed, or words read as one. */
+export function actionText(body, state) {
+  const t = body.target ? name(body.target) : "";
+  switch (body.verb) {
+    case "talk": return `You to ${t}: "${body.text}"`;
+    case "insult": return `You insult ${t}.`;
+    case "challenge": return `You challenge ${t} to a duel.`;
+    case "humiliate": return `You humiliate ${t} and take his purse.`;
+    case "spare": return `You spare ${t}.`;
+    case "tell_claim": return `You tell ${t}: "${claimText(body.claim)}."`;
+    case "bribe": return `You offer ${t} ${body.amount} coins${body.appeal ? `, ${APPEALS[body.appeal] || body.appeal}` : ""}.`;
+    case "move": return `You walk on from ${STOP_SHORT[state.player.loc]}.`;
+    case "wait": return "You wait.";
+    case "take_relic": return "You take the relic.";
+    default: return `You ${body.verb} ${t}`;
+  }
+}
+
+/** A reading of what you typed (POST /say), as the button it would press. */
+export function readingLabel(act) {
+  const t = name(act.target);
+  switch (act.verb) {
+    case "tell_claim": return `Tell ${t}: "${claimText(act.claim)}"`;
+    case "bribe": return `Offer ${t} ${act.amount} coins${act.appeal ? `, ${APPEALS[act.appeal] || act.appeal}` : ""}`;
+    case "insult": return `Insult ${t}`;
+    case "talk": return `Talk to ${t}`;
+    default: return `${act.verb.replace("_", " ")} ${t}`.trim();
+  }
+}
+
+const READERS = { bank: "the game's own phrases", near: "a near match to them", model: "the model", cache: "the model's cached reading", guard: "the guard, before anything read it" };
+
+/** How what you typed was read, for the inspector: what it was taken as, what read it, and why it went no further. */
+export function heardText(u) {
+  const by = READERS[u.path] ? `Read by ${READERS[u.path]}` : "Nothing read it as an act";
+  if (u.status === "act" && u.intent.verb !== "talk") return { verdict: "acted", what: readingLabel(u.intent.act), how: `${by} · ${u.sure}` };
+  if (u.status === "ask") return { verdict: "asked", what: u.readings.map((r) => readingLabel(r.act)).join(" or "), how: `${by} · ${u.sure}${u.why ? ` · ${u.why}` : ""}` };
+  return { verdict: "talk", what: "Talk: it changes nothing", how: u.why ? `${by} · ${u.why}` : by };
+}
+
 export function claimKey(c) {
   return c ? `${c.pred}(${c.a},${c.b})` : "";
 }

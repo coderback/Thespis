@@ -6,7 +6,7 @@ import { Inspector } from "./inspector.js";
 import { Bar } from "./bar.js";
 import { $, esc, sleep } from "./dom.js";
 import { runAutoplay } from "./autoplay.js";
-import { clock, name, splitReplies, beliefBursts, worldMemory, claimText, STOP_SHORT } from "./model.js";
+import { clock, name, splitReplies, beliefBursts, worldMemory, actionText, readingLabel } from "./model.js";
 
 const params = new URLSearchParams(location.search);
 
@@ -37,7 +37,7 @@ export class Game {
     this.map = new MapView($("map"));
     this.inspector = new Inspector();
     this.inspector.onPersona = (npc, text) => this.editPersona(npc, text);
-    this.bar = new Bar({ onAct: (b) => this.act(b), onLine: (id) => this.inspector.openChain(id) });
+    this.bar = new Bar({ onAct: (b, o) => this.act(b, o), onSay: (t, x) => this.say(t, x), onLine: (id) => this.inspector.openChain(id) });
     this.state = null;
     this.busy = false;
     this.autoplaying = false;
@@ -94,6 +94,7 @@ export class Game {
     $("endcard").hidden = true;
     this.inspector.chainId = null;
     this.inspector.prev = null;
+    this.inspector.words = [];
     this.map.clearBubbles();
   }
 
@@ -157,22 +158,42 @@ export class Game {
 
   // --- acting ----------------------------------------------------------------------------------------
 
-  async act(body) {
+  act(body, opts) { return this.perform(body, () => this.api.act(body), opts); }
+
+  /** What you type to someone: the engine reads it as one of the buttons open with them, or as talk (POST /say). */
+  say(target, text) { return this.perform({ verb: "talk", target, text }, () => this.api.say({ target, text })); }
+
+  async perform(body, send, { quiet = false } = {}) {
     if (this.busy) return null;
     this.busy = true;
     this.bar.setBusy(true);
+    this.bar.clearAsk();
     $("hint").hidden = true;
     const prev = this.state;
     let res;
     try {
-      res = await this.api.act(body);
+      res = await send();
     } catch (e) {
       this.toast(e.reason || String(e));
       this.busy = false;
       this.bar.setBusy(false);
       return null;
     }
-    this.bar.sys(actionText(body, prev));
+    if (!quiet) this.bar.sys(actionText(body, prev));
+    const heard = res.understood;
+    if (heard) {
+      this.inspector.heard({ target: body.target, text: body.text, understood: heard });
+      if (heard.status === "ask") { // not sure enough to act: nothing happened, and the readings are put to you
+        this.bar.ask(body.target, body.text, heard.readings);
+        this.busy = false;
+        this.bar.setBusy(false);
+        return res;
+      }
+      if (heard.status === "act" && heard.intent.verb !== "talk") {
+        body = heard.intent.act;
+        this.bar.sys(`Taken as: ${readingLabel(body)}.`);
+      }
+    }
     if (body.verb === "challenge") await this.map.rollDice(res.events.some((e) => e.verb === "beat" && e.actor === "player"));
 
     const { before, after } = splitReplies(res.replies, res.state, prev.phase);
@@ -324,23 +345,6 @@ export class Game {
     $("dev-model").onclick = () => brain("model");
     $("dev-fallback").onclick = () => brain("fallback");
     $("dev-new").onclick = () => { $("landing").hidden = true; this.newSession(+$("dev-seed").value || undefined); };
-  }
-}
-
-function actionText(body, state) {
-  const t = body.target ? name(body.target) : "";
-  switch (body.verb) {
-    case "talk": return `You to ${t}: "${body.text}"`;
-    case "insult": return `You insult ${t}.`;
-    case "challenge": return `You challenge ${t} to a duel.`;
-    case "humiliate": return `You humiliate ${t} and take his purse.`;
-    case "spare": return `You spare ${t}.`;
-    case "tell_claim": return `You tell ${t}: "${claimText(body.claim)}."`;
-    case "bribe": return `You offer ${t} ${body.amount} coins.`;
-    case "move": return `You walk on from ${STOP_SHORT[state.player.loc]}.`;
-    case "wait": return "You wait.";
-    case "take_relic": return "You take the relic.";
-    default: return `You ${body.verb} ${t}`;
   }
 }
 

@@ -40,6 +40,7 @@ export class ManorApi {
   state() { return this.req("GET", "/state"); }
   allowed() { return this.req("GET", "/allowed"); }
   act(body) { return this.req("POST", "/act", body); }
+  say(body) { return this.req("POST", "/say", body); } // {target, text}: read as one of the buttons, or as nothing
   reset() { return this.req("POST", "/reset", {}); }
   reload() { return this.req("POST", "/reload", {}); }
   brain(mode) { return this.req("POST", "/dev/brain", { mode }); }
