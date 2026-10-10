@@ -41,7 +41,7 @@ import hashlib
 import json
 import logging
 import re
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from typing import Protocol
 
@@ -219,15 +219,28 @@ class Validator:
     def __init__(self, vocabulary: dict[str, str]):
         """`vocabulary` maps every way of naming a character or place (lower case) to its game id."""
         self.vocabulary = vocabulary
-        terms = sorted(vocabulary, key=len, reverse=True)
-        self._pattern = re.compile(r"\b(" + "|".join(re.escape(t) for t in terms) + r")\b", re.IGNORECASE) \
-            if terms else None
+        self._compiled: tuple[int, re.Pattern | None] = (-1, None)
+
+    @property
+    def _pattern(self) -> re.Pattern | None:
+        if self._compiled[0] != len(self.vocabulary):  # compiled when first asked, and again once it has learned more
+            terms = sorted(self.vocabulary, key=len, reverse=True)
+            self._compiled = (len(terms), re.compile(r"\b(" + "|".join(re.escape(t) for t in terms) + r")\b",
+                                                     re.IGNORECASE) if terms else None)
+        return self._compiled[1]
+
+    def learn(self, names: Mapping[str, str]) -> None:
+        """More ways of naming someone, to their id: a cast that grows in play (Session.add). Names already known
+        keep whom they name."""
+        for name, who in names.items():
+            self.vocabulary.setdefault(name.lower(), who)
 
     def named(self, line: str) -> set[str]:
         """The game ids of every character or place a line names."""
-        if not self._pattern:
+        pattern = self._pattern
+        if not pattern:
             return set()
-        return {self.vocabulary[m.group(1).lower()] for m in self._pattern.finditer(line)}
+        return {self.vocabulary[m.group(1).lower()] for m in pattern.finditer(line)}
 
     def problem(self, data: dict, pack: StatePack, kind: str) -> str | None:
         """Why a model reply (citing the pack's references) can't be used, or None if it passes."""

@@ -127,6 +127,21 @@ class JoinIn(BaseModel):
     at: str | None = Field(None, description="Where they are")
 
 
+class NpcIn(BaseModel):
+    id: str = Field(description="A new NPC's id: letters, digits, _ . and -, and not one already taken")
+    kind: str = Field(description="A kind of person the game declares: [kind.<id>]")
+    name: str = Field(description="What others and the narrator call them")
+    at: str = Field("", description="Where they are")
+    persona: str | None = Field(None, description="Their own persona; their kind's if left out")
+    goal: str | None = Field(None, description="Their own goal; their kind's if left out")
+
+
+class TieIn(BaseModel):
+    a: str
+    b: str
+    kind: str = Field(description="A kind of tie the game's [gossip] along declares")
+
+
 class TickIn(BaseModel):
     steps: int = Field(1, ge=1, le=100)
 
@@ -207,11 +222,17 @@ class TickOut(BaseModel):
     events: list[EventOut]
 
 
+class TieOut(BaseModel):
+    between: list[str]
+    kind: str
+
+
 class GameOut(BaseModel):
     id: str
     name: str
     digest: str
     npcs: list[str]
+    kinds: list[str] = Field(default_factory=list, description="Kinds of people the engine may add in play")
     places: list[str]
     choices: dict[str, list[str]] = Field(description="Each NPC's choice sets, by moment")
 
@@ -287,8 +308,8 @@ def _game(g: Game) -> GameOut:
     moments: dict[str, list[str]] = {}
     for npc, moment in g.choices:
         moments.setdefault(npc, []).append(moment)
-    return GameOut(id=g.id, name=g.name, digest=g.digest, npcs=list(g.cast.ids()), places=list(g.places),
-                   choices=moments)
+    return GameOut(id=g.id, name=g.name, digest=g.digest, npcs=list(g.cast.ids()), kinds=list(g.kinds),
+                   places=list(g.places), choices=moments)
 
 
 def create_app(games: Mapping[str, Game] | None = None, gateway: ModelGateway | None = None,
@@ -389,6 +410,28 @@ def create_app(games: Mapping[str, Game] | None = None, gateway: ModelGateway | 
         """A player joins, or one already here is renamed or moves: an agent NPCs see, hear and hold beliefs
         about by id. Move them later with update (npc = their id, loc)."""
         return call(p, sid, lambda s: s.join(body.player, body.name, body.at))
+
+    @app.post(f"/{VERSION}/sessions/{{sid}}/npcs", status_code=201)
+    def add(p: Caller, sid: str, body: NpcIn) -> dict[str, Any]:
+        """Someone joins the cast in play: an NPC of a kind the game declares, with its own id, name and place.
+        From here on it is an NPC like any the game file names."""
+        return call(p, sid, lambda s: s.add(body.id, body.kind, body.name, body.at, body.persona, body.goal))
+
+    @app.delete(f"/{VERSION}/sessions/{{sid}}/npcs/{{npc}}")
+    def retire(p: Caller, sid: str, npc: str) -> dict[str, Any]:
+        """An NPC leaves the story, dead or gone for good: it sees, says and decides nothing more. What it believed
+        is kept, and others still believe things about it."""
+        return call(p, sid, lambda s: s.retire(npc))
+
+    @app.post(f"/{VERSION}/sessions/{{sid}}/ties", status_code=201)
+    def tie(p: Caller, sid: str, body: TieIn) -> TieOut:
+        """A tie between two NPCs, made in play: gossip travels along it as [gossip] along says for its kind."""
+        return TieOut(**call(p, sid, lambda s: s.tie(body.a, body.b, body.kind)))
+
+    @app.delete(f"/{VERSION}/sessions/{{sid}}/ties/{{a}}/{{b}}", status_code=204)
+    def untie(p: Caller, sid: str, a: str, b: str) -> None:
+        """Break a tie made in play."""
+        call(p, sid, lambda s: s.untie(a, b))
 
     @app.post(f"/{VERSION}/sessions/{{sid}}/tick")
     def tick(p: Caller, sid: str, body: TickIn) -> TickOut:
