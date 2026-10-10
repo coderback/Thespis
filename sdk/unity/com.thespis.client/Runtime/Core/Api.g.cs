@@ -42,12 +42,16 @@ namespace Thespis.Api
         public static readonly Route Decide = new Route("POST", "/v1/sessions/{sid}/decide", "DecideIn", "LineOut");
         public static readonly Route Line = new Route("GET", "/v1/sessions/{sid}/lines/{lid}", "", "LineOut");
         public static readonly Route Narrate = new Route("POST", "/v1/sessions/{sid}/narrate", "NarrateIn", "LineOut");
+        public static readonly Route Add = new Route("POST", "/v1/sessions/{sid}/npcs", "NpcIn", "");
+        public static readonly Route Retire = new Route("DELETE", "/v1/sessions/{sid}/npcs/{npc}", "", "");
         public static readonly Route Inspect = new Route("GET", "/v1/sessions/{sid}/npcs/{npc}", "", "NpcOut");
         public static readonly Route Observe = new Route("POST", "/v1/sessions/{sid}/observe", "ObserveIn", "EventOut");
         public static readonly Route Join = new Route("POST", "/v1/sessions/{sid}/players", "JoinIn", "");
         public static readonly Route React = new Route("POST", "/v1/sessions/{sid}/react", "ReactIn", "LineOut");
         public static readonly Route Snapshot = new Route("GET", "/v1/sessions/{sid}/snapshot", "", "");
         public static readonly Route Tick = new Route("POST", "/v1/sessions/{sid}/tick", "TickIn", "TickOut");
+        public static readonly Route Tie = new Route("POST", "/v1/sessions/{sid}/ties", "TieIn", "TieOut");
+        public static readonly Route Untie = new Route("DELETE", "/v1/sessions/{sid}/ties/{a}/{b}", "", "");
         public static readonly Route Understand = new Route("POST", "/v1/sessions/{sid}/understand", "UnderstandIn", "UnderstandOut");
         public static readonly Route Update = new Route("POST", "/v1/sessions/{sid}/update", "UpdateIn", "");
         public static readonly Route Usage = new Route("GET", "/v1/usage", "", "UsageOut");
@@ -151,6 +155,10 @@ namespace Thespis.Api
 
         [JsonProperty("id")]
         public string Id { get; set; } = "";
+
+        /// <summary>Kinds of people the engine may add in play</summary>
+        [JsonProperty("kinds")]
+        public List<string> Kinds { get; set; } = new();
 
         [JsonProperty("name")]
         public string Name { get; set; } = "";
@@ -265,6 +273,33 @@ namespace Thespis.Api
 
         [JsonProperty("wait")]
         public bool Wait { get; set; } = false;
+    }
+
+    public class NpcIn
+    {
+        /// <summary>Where they are</summary>
+        [JsonProperty("at")]
+        public string At { get; set; } = "";
+
+        /// <summary>Their own goal; their kind's if left out</summary>
+        [JsonProperty("goal", NullValueHandling = NullValueHandling.Ignore)]
+        public string? Goal { get; set; }
+
+        /// <summary>A new NPC's id: letters, digits, _ . and -, and not one already taken</summary>
+        [JsonProperty("id")]
+        public string Id { get; set; } = "";
+
+        /// <summary>A kind of person the game declares: [kind.<id>]</summary>
+        [JsonProperty("kind")]
+        public string Kind { get; set; } = "";
+
+        /// <summary>What others and the narrator call them</summary>
+        [JsonProperty("name")]
+        public string Name { get; set; } = "";
+
+        /// <summary>Their own persona; their kind's if left out</summary>
+        [JsonProperty("persona", NullValueHandling = NullValueHandling.Ignore)]
+        public string? Persona { get; set; }
     }
 
     public class NpcOut
@@ -444,6 +479,28 @@ namespace Thespis.Api
 
         [JsonProperty("phase")]
         public int Phase { get; set; }
+    }
+
+    public class TieIn
+    {
+        [JsonProperty("a")]
+        public string A { get; set; } = "";
+
+        [JsonProperty("b")]
+        public string B { get; set; } = "";
+
+        /// <summary>A kind of tie the game's [gossip] along declares</summary>
+        [JsonProperty("kind")]
+        public string Kind { get; set; } = "";
+    }
+
+    public class TieOut
+    {
+        [JsonProperty("between")]
+        public List<string> Between { get; set; } = new();
+
+        [JsonProperty("kind")]
+        public string Kind { get; set; } = "";
     }
 
     public class UnderstandIn

@@ -32,8 +32,10 @@ NPCs, one choice set, gossip and words. Everything in it is checked when it load
 | `[npc.<id>.feels]` | How its drives move when it comes to believe something was done to it (it is the claim's `b`), by predicate: `insulted = { grudge = 4 }`, scaled by how sure it is |
 | `[npc.<id>.decay]` | Drives that fade: `grudge = { to = 0, half_life = 2, keep = 0.25 }` (below) |
 | `[npc.<id>.lines]` | Template lines by key: an action's kind for `decide`, a trigger for `react`. `{who}` and bindings fill them |
+| `[kind.<id>]` | A kind of person, for a cast that grows in play: what an `[npc.<id>]` holds, apart from `name` and `start` ([below](#a-cast-that-grows)) |
 | `[[npc.<id>.choices.<moment>]]` | What the NPC may do at that moment (below) |
-| `[gossip]` | `gossips`, `about`, `priority` by predicate, `threshold`, `decay`; with ties, `along` and `in_person` (below) |
+| `[gossip]` | `gossips`, `about` (ids, or `"everyone"`), `priority` by predicate, `threshold`, `decay`; with ties, `along` and `in_person` (below) |
+| `[claims]` | `one_actor`: deeds only one person can have done to another, and `caught` ([below](#a-cast-that-grows)) |
 | `[[tie]]` | `between = [a, b]`, `kind`: a relationship gossip travels along |
 | `[words.claims]`, `[words.events]` | A claim and an event in words, as the model reads them |
 | `[actions]` | What each action does, by kind, for the model |
@@ -118,6 +120,41 @@ report; a trusted one can overturn it.
 - **Its own prompt and hash.** It's a call type of its own, `tell`, so turning it on changes no other call's cache
   keys.
 
+### A cast that grows
+
+A game whose people are made in play can't name them in its file. It declares kinds of people, and the engine adds
+each person as one of a kind. [examples/town/game.toml](../examples/town/game.toml) names nobody.
+
+**Kinds.** `[kind.townsfolk]` holds what an `[npc.<id>]` holds (`persona`, `goal`, `drives`, `trust_in`, `feels`,
+`decay`, `settle`, `lines`, `choices`), apart from a name and a place. A game needs at least one NPC or one kind.
+
+**Joining.** `add("mara", "townsfolk", "Mara Reed", at="docks")` makes Mara an NPC like any the file names: she
+sees, believes, gossips, feels and chooses as her kind does.
+- Her id is the engine's to choose: letters, digits, `_`, `.` and `-`, and not one already taken.
+- `persona` and `goal`, if given, are her own; otherwise her kind's.
+- Her name can be used in a line from then on, by the checks every line passes.
+
+**Ties made in play.** `tie("wat", "edda", "kin")` ties two NPCs with a kind of tie `[gossip] along` declares, and
+`untie` breaks it. Ties in the game file stay as they are.
+
+**Leaving.** `retire("wat")` takes an NPC out of the story, dead or gone for good. He sees, hears, gossips, decides
+and says nothing more. What he believed is kept, and the town still holds its beliefs about him.
+
+**News of anyone.** `[gossip] about = "everyone"` lets any news travel, where a list names whose news does. Nobody
+is told what they did themselves.
+
+**One culprit.** `[claims] one_actor = ["robbed", "killed"]` says a robbery has one robber. An NPC who comes to
+believe two people did the same thing to the same one keeps one story:
+- **The more trusted source wins.** What it saw itself beats anyone's word. Between two tellers, its trust in each
+  decides.
+- **The loser's teller is caught.** Its trust in whoever told it the losing story falls by `caught` (2 unless
+  given), and everything else they said is weighed again at that trust.
+- **Sources trusted alike settle nothing:** it keeps both stories.
+
+So a lie found out costs the liar more than the lie. In the town example, the player tells Edda that Harl robbed
+Mara. Wat, who saw it, tells his friend Edda the truth along their tie. Edda drops the lie, trusts the player less,
+and believes less of whatever else the player told her.
+
 **Memory by meaning.** With `[memory] recall = "meaning"` and an embedder, what an NPC's pack holds is chosen by how
 well each memory bears on the moment, instead of its five surest beliefs and five latest events
 ([thespis/recall.py](../thespis/recall.py)):
@@ -140,6 +177,10 @@ the local runtime's BGE small (`thespis serve --embed local`).
 | `observe(verb, actor, target, at, claim, witnesses, said, true, amount)` | `POST .../observe` | Something happened. `witnesses` saw it. A deed's claim is believed for certain by whoever saw it or took part in it. A statement (`said`) is believed by whoever heard it, as far as each trusts the speaker. Its truth is the ledger's unless `true` says |
 | `update(npc, loc, drives, nudge, flags, trust_in)` | `POST .../update` | The engine's rules changed an NPC (or, with a player's id, moved that player) |
 | `join(player, name, at)` | `POST .../players` | A player joins, or one already here is renamed or moves |
+| `add(npc, kind, name, at, persona, goal)` | `POST .../npcs` | Someone joins the cast, as one of a kind the game declares |
+| `retire(npc)` | `DELETE .../npcs/{npc}` | An NPC leaves the story, dead or gone |
+| `tie(a, b, kind)` | `POST .../ties` | A tie between two NPCs, for gossip to travel along |
+| `untie(a, b)` | `DELETE .../ties/{a}/{b}` | Break a tie made in play |
 | `decide(npc, moment, bindings, situation, to, wait)` | `POST .../decide` | The NPC chooses among its declared choices, with the reason recorded, and says its line |
 | `react(npc, trigger, situation, cites, fill, wait)` | `POST .../react` | A line in reply to something |
 | `narrate(since, wait, to)` | `POST .../narrate` | The story since a phase, citing every event it tells; `to` a player, only what they saw |
@@ -344,6 +385,9 @@ Over a daily model cap a project isn't refused: its lines come from templates un
 ## Not yet
 
 These are still to come:
+
+- The Godot and Unity clients don't wrap `add`, `retire`, `tie` and `untie` yet. Their generated layers have the
+  routes and types.
 
 - A local reader that passes the words gate, so that offline play can act on the player's words without asking.
 - A reader that passes the words gate on lines it wasn't tuned on, so that the Crypt Road and the manor can act on a

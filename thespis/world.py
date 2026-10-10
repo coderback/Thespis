@@ -24,12 +24,15 @@ class World:
     brain_mode: str = "model"  # "model" or "fallback"
     counters: dict[str, int] = field(default_factory=dict)  # e.g. challenges so far, for seeded dice
     players: dict[str, dict] = field(default_factory=dict)  # more players than the one, by id: {"name", "loc"}
+    cast: dict[str, dict] = field(default_factory=dict)  # NPCs who joined in play, by id: {"kind", "name", "at"}
+    ties: list[list[str]] = field(default_factory=list)  # ties made in play: [a, b, kind]
+    gone: set[str] = field(default_factory=set)  # NPCs dead or gone: they see, say and decide nothing more
     ledger: Ledger = field(default_factory=Ledger)
     beliefs: BeliefStore = field(default_factory=BeliefStore)
     decisions: DecisionLog = field(default_factory=DecisionLog)
 
     def npcs_at(self, loc: str) -> list[NPC]:
-        return [n for n in self.npcs.values() if n.loc == loc]
+        return [n for n in self.npcs.values() if n.loc == loc and n.id not in self.gone]
 
     def is_player(self, who: str) -> bool:
         return who == "player" or who in self.players
@@ -54,6 +57,12 @@ class World:
         }
         if self.players:  # a one-player world serialises exactly as it always has
             out["players"] = {k: dict(v) for k, v in self.players.items()}
+        if self.cast:  # and so does one whose cast is the game file's
+            out["cast"] = {k: dict(v) for k, v in self.cast.items()}
+        if self.ties:
+            out["ties"] = [list(t) for t in self.ties]
+        if self.gone:
+            out["gone"] = sorted(self.gone)
         return out
 
     @classmethod
@@ -66,4 +75,6 @@ class World:
             beliefs=BeliefStore.from_json(d["beliefs"]),
             decisions=DecisionLog.from_json(d["decisions"]),
             players={k: dict(v) for k, v in d.get("players", {}).items()},
+            cast={k: dict(v) for k, v in d.get("cast", {}).items()},
+            ties=[list(t) for t in d.get("ties", [])], gone=set(d.get("gone", [])),
         )
