@@ -541,12 +541,15 @@ class Session:
     # ------------------------------------------------------------ the world, as the engine reports it
     def observe(self, verb: str, actor: str, target: str | None = None, at: str | None = None,
                 claim: Claim | Mapping | None = None, witnesses: Sequence[str] = (), said: bool = False,
-                true: bool | None = None, amount: int | None = None) -> Event:
+                true: bool | None = None, amount: int | None = None, conf: float | None = None) -> Event:
         """Something happened. `witnesses` saw it; the actor and target took part. A claim it carries is believed:
         a deed (`said` false) by everyone who saw it, for certain; a statement (`said`) by everyone who heard it, as
-        far as each trusts the speaker. Its truth, unless the engine says, is whether the ledger shows it happened."""
+        far as each trusts the speaker, or as far as `conf` says when the engine's own rules decide how well it was
+        told (a roll of the dice). Its truth, unless the engine says, is whether the ledger shows it happened."""
         with self._lock:
             w = self.world
+            if conf is not None and (not said or isinstance(conf, bool) or not 0 <= conf <= 1):
+                raise DefinitionError("conf is how far a statement (said) is believed, from 0 to 1")
             c = claim if isinstance(claim, Claim) or claim is None else Claim.from_json(dict(claim))
             unknown = [n for n in witnesses if n not in w.npcs and not w.is_player(n)]
             if unknown:
@@ -563,7 +566,7 @@ class Session:
                     for n in dict.fromkeys([target, *seen]):
                         if n in w.npcs and n != actor:
                             trust = w.npcs[n].trust_in.get(actor, 0)
-                            self._believe(n, c, credence(trust), actor, e)
+                            self._believe(n, c, credence(trust) if conf is None else float(conf), actor, e)
                 else:
                     for n in seen:
                         self._believe(n, c, 1.0, "witnessed", e)

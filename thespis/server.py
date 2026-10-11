@@ -71,6 +71,9 @@ class ObserveIn(BaseModel):
     said: bool = Field(False, description="The actor stated the claim: hearers believe it by their trust in them")
     true: bool | None = Field(None, description="Whether the claim is true; left out, the ledger decides")
     amount: int | None = None
+    conf: float | None = Field(None, ge=0, le=1, description=(
+        "With said: how far its hearers believe it, when the engine's own rules decide that (a roll of the dice); "
+        "left out, each hearer's trust in the speaker decides"))
 
 
 class UpdateIn(BaseModel):
@@ -374,7 +377,8 @@ def create_app(games: Mapping[str, Game] | None = None, gateway: ModelGateway | 
     def observe(p: Caller, sid: str, body: ObserveIn) -> EventOut:
         claim = body.claim.model_dump() if body.claim else None
         return _event(call(p, sid, lambda s: s.observe(body.verb, body.actor, body.target, body.at, claim,
-                                                       body.witnesses, body.said, body.true, body.amount)))
+                                                       body.witnesses, body.said, body.true, body.amount,
+                                                       body.conf)))
 
     @app.post(f"/{VERSION}/sessions/{{sid}}/update")
     def update(p: Caller, sid: str, body: UpdateIn) -> dict[str, Any]:
