@@ -37,7 +37,7 @@ NPCs, one choice set, gossip and words. Everything in it is checked when it load
 | `[npc.<id>.lines]` | Template lines by key: an action's kind for `decide`, a trigger for `react`. `{who}` and bindings fill them |
 | `[kind.<id>]` | A kind of person, for a cast that grows in play: what an `[npc.<id>]` holds, apart from `name` and `start` ([below](#a-cast-that-grows)) |
 | `[[npc.<id>.choices.<moment>]]` | What the NPC may do at that moment (below) |
-| `[gossip]` | `gossips`, `about` (ids, or `"everyone"`), `priority` by predicate, `threshold`, `decay`; with ties, `along`, `in_person` and `most` (below) |
+| `[gossip]` | `gossips` and `about` (ids, or `"everyone"`), `priority` by predicate, `threshold`, `decay`; with ties, `along`, `in_person` and `most` (below); `corroborate` ([below](#a-cast-that-grows)) |
 | `[claims]` | `one_actor`: deeds only one person can have done to another, with `caught` and `first_hand` ([below](#a-cast-that-grows)) |
 | `[[tie]]` | `between = [a, b]`, `kind`: a relationship gossip travels along |
 | `[words.claims]`, `[words.events]` | A claim and an event in words, as the model reads them |
@@ -146,10 +146,25 @@ and says nothing more. What he believed is kept, and the town still holds its be
 **News of anyone.** `[gossip] about = "everyone"` lets any news travel, where a list names whose news does. Nobody
 is told what they did themselves.
 
+**Told by anyone.** With ties, the people who pass news on are those tied to someone; `gossips` names others.
+`[gossip] gossips = "everyone"` has everyone pass it on, so a witness with no tie in town still tells whoever
+stands with them, at `in_person`.
+
 **So many things a tick.** With ties, `[gossip] most = 12` has a tick tell at most twelve things, the town over.
 - The tellers take turns, and whose turn comes next is kept in the save, so nobody is left unheard.
 - News ends up where it would have without the limit, a few ticks later.
 - Without it, a town of hundreds tells thousands of things in a tick, and each telling is an event in the ledger.
+
+**A second witness.** Gossip tells a listener one thing it hasn't heard, so someone who has a story from one
+teller is never told it by another. `[gossip] corroborate = true` lets a second teller tell it too, when their
+story goes back to a different witness:
+- **Two who saw it count twice.** The listener weighs the two reports as independent, and ends up surer than
+  either left it: two strangers' word at 0.36 each makes 0.53.
+- **One tale by two mouths counts once.** A report is followed back to whoever saw it, or first said it. A sister
+  passing on what her brother told her adds nothing for someone who has it from him, and a lie the player told
+  two people is still one liar's word.
+- **Nobody is told again** what they saw themselves, or by the teller they have it from.
+- Left out, gossip is as it was.
 
 **At town size.** [tools/town_bench.py](../tools/town_bench.py) plays 300 people through 2,000 events and 200 ticks
 with no model. On a Ryzen 7 5800H laptop: a tick takes 10 ms (p95 17 ms), an `observe` 0.1 ms, a `decide` 0.3 ms,

@@ -85,7 +85,8 @@ PROVISIONAL, FINAL, WITHDRAWN = "provisional", "final", "withdrawn"
 DRIVES, TRUST = (0, 10), (-5, 5)
 ID = re.compile(r"[A-Za-z0-9_.-]+")  # an id made in play: it goes into action ids ("confront:<id>") and paths
 RESERVED = ("player", "self", "narrator")
-EVERYONE = "everyone"  # `[gossip] about`: any news travels, not only news of the people listed
+# `[gossip] about`: any news travels, not only news of the people listed; `gossips`: anyone passes it on
+EVERYONE = "everyone"
 WORKERS = 4  # model calls one session has in flight at once
 
 
@@ -214,7 +215,10 @@ class Game:
         if not isinstance(claims.get("first_hand", 0), int) or isinstance(claims.get("first_hand", 0), bool) \
                 or claims.get("first_hand", 0) < 0:
             raise DefinitionError("claims.first_hand: how much more a teller who saw it counts, a whole number from 0")
-        for who in d.get("gossip", {}).get("gossips", []):
+        gossips = d.get("gossip", {}).get("gossips", [])
+        if gossips != EVERYONE and not isinstance(gossips, list):
+            raise DefinitionError(f"gossip.gossips: a list of npcs, or \"{EVERYONE}\"")
+        for who in gossips if gossips != EVERYONE else ():
             if who not in npcs:
                 raise DefinitionError(f"gossip.gossips: {who!r} is not an npc")
         start = d.get("player", {}).get("start")
@@ -228,6 +232,8 @@ class Game:
         most = d.get("gossip", {}).get("most")
         if most is not None and (not isinstance(most, int) or isinstance(most, bool) or most < 1):
             raise DefinitionError("gossip.most: how many things are told in a tick, a whole number from 1")
+        if not isinstance(d.get("gossip", {}).get("corroborate", False), bool):
+            raise DefinitionError("gossip.corroborate: true if a second witness's word makes a listener surer")
         about = d.get("gossip", {}).get("about", [])
         if about != EVERYONE and not (isinstance(about, list) and all(isinstance(x, str) for x in about)):
             raise DefinitionError(f"gossip.about: a list of ids, or \"{EVERYONE}\"")
@@ -725,17 +731,19 @@ class Session:
 
             def grapevine(t: Tick) -> None:
                 if g and g.get("along"):
-                    tellers = [t for t in g.get("gossips") or list(self._ties()) if t not in w.gone]
+                    tellers = [t for t in self._gossips() or list(self._ties()) if t not in w.gone]
                     most = g.get("most")
                     turn = spread(w, tellers, self._listeners, about, g.get("priority", {}),
                                   g.get("threshold", 0.5), lambda w, c: w.ledger.happened(c), hear,
                                   lambda listener, teller: credence(w.npcs[listener].trust_in.get(teller, 0)),
-                                  most, w.counters.get("grapevine", 0) if most and tellers else 0)
+                                  most, w.counters.get("grapevine", 0) if most and tellers else 0,
+                                  g.get("corroborate", False))
                     if most:
                         w.counters["grapevine"] = turn  # whose turn it is to tell, next tick
                 elif g:
-                    gossip(w, [t for t in g.get("gossips", []) if t not in w.gone], about, g.get("priority", {}),
-                           g.get("threshold", 0.5), g.get("decay", 0.8), lambda w, c: w.ledger.happened(c), hear)
+                    gossip(w, [t for t in self._gossips() if t not in w.gone], about, g.get("priority", {}),
+                           g.get("threshold", 0.5), g.get("decay", 0.8), lambda w, c: w.ledger.happened(c), hear,
+                           g.get("corroborate", False))
 
             def settling(t: Tick) -> None:
                 living = [n for n in w.npcs if n not in w.gone]
@@ -948,6 +956,12 @@ class Session:
                                                                              w.phase])
             left = max(0.5 ** ((w.phase + 1 - since) / c["half_life"]), c.get("keep", 0))
             n.drives[drive] = _clamp(math.floor(c.get("to", 0) + (peak - c.get("to", 0)) * left + 0.5), DRIVES)
+
+    def _gossips(self) -> list[str]:
+        """Who passes news on, as `[gossip] gossips` names them: a list of NPCs, or "everyone" there is. Empty if the
+        game names nobody (with ties, everyone tied then does)."""
+        names = self.cast.data.get("gossip", {}).get("gossips", [])
+        return list(self.world.npcs) if names == EVERYONE else list(names)
 
     def _listeners(self, teller: str) -> list[tuple[str, float]]:
         """Whom `teller` passes gossip to, and how much of it carries: everyone tied to it, wherever they are, by
