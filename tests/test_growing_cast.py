@@ -314,6 +314,120 @@ def test_first_hand_is_a_whole_number_from_nought(value):
     assert "claims.first_hand" in str(e.value)
 
 
+# ---------------------------------------------------------------- a second witness
+CORROBORATE = Game.parse(TOWN_TOML.replace("most = 12 ", "most = 12\ncorroborate = true #"), "town")
+
+
+def seen_by_two(game: Game) -> Session:
+    """The player robs Mara in front of Wat and Harl. Edda, in the market, is a friend of both."""
+    s = Session.new(game)
+    for npc, at in (("mara", "docks"), ("wat", "docks"), ("harl", "docks"), ("edda", "market")):
+        s.add(npc, "townsfolk", npc.title(), at)
+    s.observe("rob", "player", "mara", at="docks", claim=ROBBED, witnesses=["wat", "harl"])
+    s.tie("wat", "edda", "friend")
+    s.tie("harl", "edda", "friend")
+    return s
+
+
+def told(tick) -> list[tuple[str, str]]:
+    return [(e.actor, e.target) for e in tick.events if e.verb == "gossip"]
+
+
+def test_someone_is_told_a_thing_once_unless_the_game_says_a_second_witness_counts():
+    s = seen_by_two(TOWN)
+    assert told(s.tick()) == [("wat", "edda")] and conf(s, "edda", ROBBED) == 0.36
+    assert told(s.tick()) == [] and conf(s, "edda", ROBBED) == 0.36  # Harl saw it too, and has nothing to add
+
+
+def test_a_second_witness_makes_them_surer():
+    s = seen_by_two(CORROBORATE)
+    assert told(s.tick()) == [("wat", "edda"), ("harl", "edda")]
+    assert conf(s, "edda", ROBBED) == 0.5294  # two reports at 0.36, fused as independent
+    assert told(s.tick()) == []  # and each of them tells her once
+
+
+def test_the_same_tale_by_another_mouth_is_not_a_second_witness():
+    s = Session.new(CORROBORATE)
+    for npc, at in (("mara", "docks"), ("wat", "docks"), ("harl", "chapel"), ("edda", "market")):
+        s.add(npc, "townsfolk", npc.title(), at)
+    for a, b in (("wat", "harl"), ("wat", "edda"), ("harl", "edda")):
+        s.tie(a, b, "kin")
+    for npc in ("harl", "edda"):
+        s.update(npc, trust_in={"wat": 3, "harl": 3, "edda": 3})
+    s.observe("rob", "player", "mara", at="docks", claim=ROBBED, witnesses=["wat"])
+    assert told(s.tick()) == [("wat", "harl"), ("wat", "edda")]
+    for _ in range(3):  # Harl and Edda have only Wat's word between them, and it does not grow by going round
+        assert told(s.tick()) == []
+    assert conf(s, "harl", ROBBED) == conf(s, "edda", ROBBED) == 0.9
+
+
+def test_a_lie_told_to_two_people_is_still_one_liars_word():
+    from thespis.beliefs import origins
+
+    s = Session.new(CORROBORATE)
+    for npc, at in (("mara", "docks"), ("wat", "docks"), ("odo", "chapel"), ("edda", "market"), ("harl", "market")):
+        s.add(npc, "townsfolk", npc.title(), at)
+    for npc in ("wat", "odo"):  # the player tells each of them, apart, that Harl robbed Mara
+        s.update(npc, trust_in={"player": 3})
+        s.observe("tell", "player", npc, at=s.world.npcs[npc].loc, claim=BLAMED, said=True)
+        s.tie(npc, "edda", "friend")
+    blamed = Claim.from_json(BLAMED)
+    assert origins(s.world.beliefs, "wat", blamed) == origins(s.world.beliefs, "odo", blamed) == {"player"}
+
+    def to_edda() -> list[str]:
+        return [who for who, whom in told(s.tick()) if whom == "edda"]
+
+    assert to_edda() == ["wat"]  # Odo has the same story from the same mouth: nothing to add
+    assert origins(s.world.beliefs, "edda", blamed) == {"player"} and conf(s, "edda", BLAMED) == 0.32
+    assert [to_edda() for _ in range(3)] == [[], [], []]
+
+
+EVERYONE_TELLS = Game.parse(TOWN_TOML.replace("most = 12 ", 'most = 12\ngossips = "everyone" #'), "town")
+STRANGERS = Game.parse(
+    TOWN_TOML.replace("most = 12 ", 'most = 12\ngossips = "everyone"\ncorroborate = true #'), "town")
+
+
+def seen_by_strangers(game: Game) -> Session:
+    """The player robs Mara in front of Wat and Harl. Nobody in town is tied to anybody. Edda is in the market."""
+    s = Session.new(game)
+    for npc, at in (("mara", "chapel"), ("wat", "chapel"), ("harl", "chapel"), ("edda", "market")):
+        s.add(npc, "townsfolk", npc.title(), at)
+    s.observe("rob", "player", "mara", at="chapel", claim=ROBBED, witnesses=["wat", "harl"])
+    return s
+
+
+def test_with_ties_only_the_tied_pass_news_on_unless_the_game_says_everyone_does():
+    s = seen_by_strangers(TOWN)
+    s.update("wat", loc="market")
+    assert told(s.tick()) == [] and conf(s, "edda", ROBBED) == 0.0  # Wat has no tie, so he tells nobody
+    s = seen_by_strangers(EVERYONE_TELLS)
+    s.update("wat", loc="market")
+    assert told(s.tick()) == [("wat", "edda")] and conf(s, "edda", ROBBED) == 0.32  # a stranger's tale, in person
+
+
+def test_two_strangers_who_both_saw_it_leave_a_third_surer_than_one_does():
+    s = seen_by_strangers(STRANGERS)
+    s.update("wat", loc="market")
+    assert told(s.tick()) == [("wat", "edda")] and conf(s, "edda", ROBBED) == 0.32
+    s.update("wat", loc="docks")
+    s.update("harl", loc="market")
+    assert told(s.tick()) == [("harl", "edda")] and conf(s, "edda", ROBBED) == 0.4848
+
+
+@pytest.mark.parametrize("value", ['"all"', "3", '["nobody"]'])
+def test_gossips_is_a_list_of_npcs_or_everyone(value):
+    with pytest.raises(DefinitionError) as e:
+        Game.parse(TOWN_TOML.replace("most = 12 ", f"most = 12\ngossips = {value} #"), "town")
+    assert "gossip.gossips" in str(e.value)
+
+
+@pytest.mark.parametrize("value", ['"yes"', "1", "0.5"])
+def test_corroborate_is_true_or_false(value):
+    with pytest.raises(DefinitionError) as e:
+        Game.parse(TOWN_TOML.replace("most = 12 ", f"most = 12\ncorroborate = {value} #"), "town")
+    assert "gossip.corroborate" in str(e.value)
+
+
 # ---------------------------------------------------------------- told as the dice say
 def test_a_statement_is_believed_as_far_as_the_engine_says_when_its_rules_decide():
     s = town()

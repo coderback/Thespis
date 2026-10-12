@@ -11,6 +11,7 @@ from __future__ import annotations
 from collections.abc import Callable, Collection, Mapping, Sequence
 from dataclasses import dataclass, field
 
+from thespis.beliefs import FIRST_HAND, origins
 from thespis.decisions import Decision
 from thespis.ledger import Claim, Event
 from thespis.world import World
@@ -58,12 +59,25 @@ def _about(claim: Claim, about: Collection[str] | None) -> bool:
     return about is None or any(claim.mentions(x) for x in about)
 
 
+def _news(w: World, listener: str, teller: str, claim: Claim, corroborate: bool) -> bool:
+    """Is `claim` news to `listener` from `teller`? It is if the listener holds nothing on it. With `corroborate`, it
+    also is when the listener holds it only on someone else's word and the teller's story goes back to someone the
+    listener's does not (thespis.beliefs.origins): a second witness, not the same tale by another mouth."""
+    held = w.beliefs.get(listener, claim)
+    if held is None:
+        return True
+    if not corroborate or any(e.source in FIRST_HAND or e.source == teller for e in held.evidence):
+        return False
+    return not origins(w.beliefs, teller, claim) <= origins(w.beliefs, listener, claim)
+
+
 def gossip(w: World, gossips: Sequence[str], about: Collection[str] | None, priority: Mapping[str, int],
            threshold: float, decay: float, happened: Callable[[World, Claim], bool],
-           hear: Callable[[World, str, Claim, float, str, Event], None]) -> None:
+           hear: Callable[[World, str, Claim, float, str, Event], None], corroborate: bool = False) -> None:
     """Each gossip tells each listener at its stop one thing that listener hasn't heard: the worst news it holds about
     any of `about` (None: about anyone), then the surest. The listener believes it at the gossip's confidence times
-    `decay`. Nobody is told what they did themselves: they know."""
+    `decay`. Nobody is told what they did themselves: they know. With `corroborate`, a listener is also told what it
+    has heard already, by a gossip whose story goes back to a different witness."""
     for g in gossips:
         teller = w.npcs[g]
         mine = [b for b in w.beliefs.for_npc(g)
@@ -74,7 +88,7 @@ def gossip(w: World, gossips: Sequence[str], about: Collection[str] | None, prio
             if listener.id == g:
                 continue
             for b in mine:
-                if b.claim.a != listener.id and w.beliefs.get(listener.id, b.claim) is None:
+                if b.claim.a != listener.id and _news(w, listener.id, g, b.claim, corroborate):
                     e = w.ledger.append(w.phase, "gossip", g, listener.id, teller.loc, b.claim,
                                         happened(w, b.claim))
                     hear(w, listener.id, b.claim, round(b.conf * decay, 2), g, e)
@@ -84,7 +98,8 @@ def gossip(w: World, gossips: Sequence[str], about: Collection[str] | None, prio
 def spread(w: World, tellers: Sequence[str], listeners: Callable[[str], Sequence[tuple[str, float]]],
            about: Collection[str] | None, priority: Mapping[str, int], threshold: float,
            happened: Callable[[World, Claim], bool], hear: Callable[[World, str, Claim, float, str, Event], None],
-           trust: Callable[[str, str], float], most: int | None = None, start: int = 0) -> int:
+           trust: Callable[[str, str], float], most: int | None = None, start: int = 0,
+           corroborate: bool = False) -> int:
     """Gossip along ties. Each teller tells each of its `listeners` (with how much of a report carries to each) one
     thing that listener hasn't heard: the worst news it holds about any of `about` (None: about anyone), then the
     surest. The listener believes it as subjective logic discounts a report (Jøsang 2016, trust discounting): the
@@ -94,7 +109,10 @@ def spread(w: World, tellers: Sequence[str], listeners: Callable[[str], Sequence
     Nobody is told what they did themselves: they know.
 
     With `most`, at most that many things are told in a tick, the town over: the tellers take turns from `start`, and
-    the turn to begin the next tick from is returned, so in a town of hundreds nobody is left unheard."""
+    the turn to begin the next tick from is returned, so in a town of hundreds nobody is left unheard.
+
+    With `corroborate`, a listener is also told what it has already heard, by a teller it hasn't heard it from whose
+    story goes back to a different witness. The two reports are fused as independent, so it ends up surer."""
     known: dict[str, list[tuple[Claim, float]]] = {}
     for g in tellers:
         mine = [b for b in w.beliefs.for_npc(g)
@@ -108,7 +126,7 @@ def spread(w: World, tellers: Sequence[str], listeners: Callable[[str], Sequence
         teller = w.npcs[g]
         for listener, carry in listeners(g):
             for claim, conf in known[g]:
-                if claim.a != listener and w.beliefs.get(listener, claim) is None:
+                if claim.a != listener and _news(w, listener, g, claim, corroborate):
                     if most is not None and told >= most:
                         return (start + turn) % len(tellers)  # this teller has more to tell: the next turn is theirs
                     told += 1

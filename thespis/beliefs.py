@@ -204,6 +204,24 @@ FIRST_HAND = ("self", "witnessed")
 SEEN = 6  # what an NPC saw itself counts as more than the most trust it can have in anyone (5): beyond their word
 
 
+def origins(store: BeliefStore, npc: str, claim: Claim, upto: int | None = None,
+            _seen: frozenset[str] = frozenset()) -> frozenset[str]:
+    """Whose word `npc`'s belief in `claim` rests on in the end: everyone who saw it themselves, or first said it,
+    behind the evidence it holds for the claim (as far as phase `upto`, if given). A teller's evidence is followed
+    back through what that teller had been told by then. Two reports with the same origins are one story told
+    twice, however many mouths each came through."""
+    held = store.get(npc, claim)
+    out: set[str] = set()
+    for e in held.evidence if held is not None else ():
+        if e.against or (upto is not None and e.phase > upto):
+            continue
+        if e.source in FIRST_HAND:
+            out.add(npc)
+        elif e.source != npc and e.source not in _seen:
+            out |= origins(store, e.source, claim, e.phase, _seen | {npc}) or {e.source}
+    return frozenset(out)
+
+
 def credit(belief: Belief, trust: dict[str, int], store: BeliefStore | None = None, first_hand: int = 0) -> int:
     """How far the NPC trusts a belief's best source: what it saw itself beats anyone's word. With `first_hand`, a
     teller who saw it themselves counts for that much more than its trust in them, up to the most trust there is:
