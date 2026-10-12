@@ -191,7 +191,7 @@ class BeliefStore:
 
 
 FIRST_HAND = ("self", "witnessed")
-SEEN = 5  # what an NPC saw itself counts as trust 5: beyond anyone's word
+SEEN = 6  # what an NPC saw itself counts as more than the most trust it can have in anyone (5): beyond their word
 
 
 def credit(belief: Belief, trust: dict[str, int]) -> int:

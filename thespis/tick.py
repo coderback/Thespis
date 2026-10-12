@@ -53,22 +53,28 @@ def walks(w: World, tick: Tick, route_of: Callable[[str], Sequence[str] | None])
             walk(w, tick, npc.id, route[(w.phase + 1) % len(route)])
 
 
-def gossip(w: World, gossips: Sequence[str], about: Collection[str], priority: Mapping[str, int], threshold: float,
-           decay: float, happened: Callable[[World, Claim], bool],
+def _about(claim: Claim, about: Collection[str] | None) -> bool:
+    """Is the claim news of anyone in `about`? None: any news is."""
+    return about is None or any(claim.mentions(x) for x in about)
+
+
+def gossip(w: World, gossips: Sequence[str], about: Collection[str] | None, priority: Mapping[str, int],
+           threshold: float, decay: float, happened: Callable[[World, Claim], bool],
            hear: Callable[[World, str, Claim, float, str, Event], None]) -> None:
     """Each gossip tells each listener at its stop one thing that listener hasn't heard: the worst news it holds about
-    any of `about`, then the surest. The listener believes it at the gossip's confidence times `decay`."""
+    any of `about` (None: about anyone), then the surest. The listener believes it at the gossip's confidence times
+    `decay`. Nobody is told what they did themselves: they know."""
     for g in gossips:
         teller = w.npcs[g]
         mine = [b for b in w.beliefs.for_npc(g)
-                if b.active and b.conf >= threshold and any(b.claim.mentions(x) for x in about)]
+                if b.active and b.conf >= threshold and _about(b.claim, about)]
         mine.sort(key=lambda b: (priority.get(b.claim.pred, 0), b.conf, (b.claim.pred, b.claim.a, b.claim.b)),
                   reverse=True)
         for listener in w.npcs_at(teller.loc):
             if listener.id == g:
                 continue
             for b in mine:
-                if w.beliefs.get(listener.id, b.claim) is None:
+                if b.claim.a != listener.id and w.beliefs.get(listener.id, b.claim) is None:
                     e = w.ledger.append(w.phase, "gossip", g, listener.id, teller.loc, b.claim,
                                         happened(w, b.claim))
                     hear(w, listener.id, b.claim, round(b.conf * decay, 2), g, e)
@@ -76,19 +82,20 @@ def gossip(w: World, gossips: Sequence[str], about: Collection[str], priority: M
 
 
 def spread(w: World, tellers: Sequence[str], listeners: Callable[[str], Sequence[tuple[str, float]]],
-           about: Collection[str], priority: Mapping[str, int], threshold: float,
+           about: Collection[str] | None, priority: Mapping[str, int], threshold: float,
            happened: Callable[[World, Claim], bool], hear: Callable[[World, str, Claim, float, str, Event], None],
            trust: Callable[[str, str], float]) -> None:
     """Gossip along ties. Each teller tells each of its `listeners` (with how much of a report carries to each) one
-    thing that listener hasn't heard: the worst news it holds about any of `about`, then the surest. The listener
-    believes it as subjective logic discounts a report (Jøsang 2016, trust discounting): the teller's confidence,
-    times how far the listener trusts the teller (`trust(listener, teller)`), times what carries along the tie. So a
-    story weakens with every mouth it passes through, and stops once nobody holds it surely enough to pass it on.
-    Each teller tells what it knew as the tick began, so a story travels one tie per tick."""
+    thing that listener hasn't heard: the worst news it holds about any of `about` (None: about anyone), then the
+    surest. The listener believes it as subjective logic discounts a report (Jøsang 2016, trust discounting): the
+    teller's confidence, times how far the listener trusts the teller (`trust(listener, teller)`), times what carries
+    along the tie. So a story weakens with every mouth it passes through, and stops once nobody holds it surely
+    enough to pass it on. Each teller tells what it knew as the tick began, so a story travels one tie per tick.
+    Nobody is told what they did themselves: they know."""
     known: dict[str, list[tuple[Claim, float]]] = {}
     for g in tellers:
         mine = [b for b in w.beliefs.for_npc(g)
-                if b.active and b.conf >= threshold and any(b.claim.mentions(x) for x in about)]
+                if b.active and b.conf >= threshold and _about(b.claim, about)]
         mine.sort(key=lambda b: (priority.get(b.claim.pred, 0), b.conf, (b.claim.pred, b.claim.a, b.claim.b)),
                   reverse=True)
         known[g] = [(b.claim, b.conf) for b in mine]
@@ -96,7 +103,7 @@ def spread(w: World, tellers: Sequence[str], listeners: Callable[[str], Sequence
         teller = w.npcs[g]
         for listener, carry in listeners(g):
             for claim, conf in known[g]:
-                if w.beliefs.get(listener, claim) is None:
+                if claim.a != listener and w.beliefs.get(listener, claim) is None:
                     # Told face to face, it happened where they stand; along a tie between people apart, nowhere
                     # anyone else could overhear it.
                     where = teller.loc if w.npcs[listener].loc == teller.loc else ""

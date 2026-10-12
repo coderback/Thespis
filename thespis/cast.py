@@ -7,7 +7,7 @@ Content lives in data so a game's code is its rules. Every template is filled wi
 from __future__ import annotations
 
 import tomllib
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from functools import cached_property
 from pathlib import Path
 
@@ -35,7 +35,7 @@ class Cast:
         return self.data["npc"][npc]
 
     def ids(self) -> list[str]:
-        return list(self.data["npc"])
+        return list(self.data.get("npc", {}))
 
     def persona(self, world: World, npc: str) -> str:
         """The persona the model voices: this session's edit, if there is one, or the cast's."""
@@ -64,3 +64,32 @@ class Cast:
         for part in path.split("."):
             table = table.get(part, {})
         return key in table
+
+
+class LiveCast(Cast):
+    """One session's cast: the game's own, and whoever joined it since (Session.add). Someone who joined is defined
+    by their kind (`[kind.<id>]`: persona, goal, drives, feelings, lines, choices), with their own name and, if
+    given, their own persona and goal."""
+
+    def __init__(self, cast: Cast, joined: Mapping[str, Mapping]):
+        """`joined` is the session's own record of who joined, by id: {"kind", "name", "at"} and perhaps "persona"
+        and "goal". It is read as it stands, so someone added later is in the cast at once."""
+        super().__init__(cast.path, cast.inline)
+        self._cast, self._joined = cast, joined
+        self._data: dict = {}
+        self._count = -1
+
+    @property
+    def data(self) -> dict:  # type: ignore[override]  # the game's data, with the session's people among its NPCs
+        if self._count != len(self._joined):  # nobody leaves a cast (Session.retire), so its size says it changed
+            base = self._cast.data
+            kinds = base.get("kind", {})
+            own = {i: {**kinds[t["kind"]], "start": t["at"],
+                       **{k: t[k] for k in ("name", "persona", "goal") if t.get(k) is not None}}
+                   for i, t in self._joined.items()}
+            self._data, self._count = {**base, "npc": {**base.get("npc", {}), **own}}, len(self._joined)
+        return self._data
+
+    @property
+    def source(self) -> bytes:  # type: ignore[override]
+        return self._cast.source

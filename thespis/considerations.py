@@ -191,9 +191,10 @@ class Choices:
                 for c in self.choices if c.asserts}
 
 
-def compile_choices(npc: str, moment: str, declared: object) -> Choices:
-    """Compile `[[npc.<npc>.choices.<moment>]]`. Raises DefinitionError naming the faulty entry."""
-    where = f"npc.{npc}.choices.{moment}"
+def compile_choices(npc: str, moment: str, declared: object, table: str = "npc") -> Choices:
+    """Compile `[[npc.<npc>.choices.<moment>]]`, or a kind's (`table` "kind": whoever joins as one chooses by it).
+    Raises DefinitionError naming the faulty entry."""
+    where = f"{table}.{npc}.choices.{moment}"
     if not isinstance(declared, list) or not declared:
         raise DefinitionError(f"{where}: expected a list of choices")
     out = []
@@ -219,3 +220,10 @@ def declared(data: Mapping) -> dict[tuple[str, str], Choices]:
     """Every NPC's choices in a cast's data, by (npc, moment), compiled and checked at once."""
     return {(npc, moment): compile_choices(npc, moment, cs)
             for npc, d in data.get("npc", {}).items() for moment, cs in d.get("choices", {}).items()}
+
+
+def declared_kinds(data: Mapping) -> dict[tuple[str, str], Choices]:
+    """Every kind's choices in a cast's data, by (kind, moment): each stands for whoever joins as that kind
+    (`dataclasses.replace(choices, npc=...)`)."""
+    return {(kind, moment): compile_choices(kind, moment, cs, "kind")
+            for kind, d in data.get("kind", {}).items() for moment, cs in d.get("choices", {}).items()}

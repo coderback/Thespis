@@ -1,0 +1,102 @@
+# Wickby: a market town whose people the engine makes as it goes. The game file names nobody. What it shows
+# (thespis.session):
+#   - kinds: the file declares kinds of people, and the engine adds each person as one of a kind when the story
+#     first needs them (`add`), with their own id, name and place;
+#   - ties made in play: the engine ties them to their kin and friends (`tie`), and gossip travels along the ties;
+#   - leaving: someone who dies or goes for good is retired (`retire`): they see, say and decide nothing more, and
+#     the town still remembers them;
+#   - one culprit: a robbery has one robber. Someone told two stories keeps the one from the source they trust more,
+#     and trusts whoever told the other less, so a liar found out is doubted in everything else they said.
+
+[game]
+id = "town"
+name = "Wickby"
+setting = "Wickby, a market town on the salt road, in a dry autumn."
+
+[places]
+market = "the market square"
+docks = "the river docks"
+chapel = "the chapel"
+
+# ---------------------------------------------------------------- kinds of people
+# A kind holds what an [npc.<id>] holds, apart from a name and a place: those are each person's own.
+[kind.townsfolk]
+persona = "One of the townsfolk: plain-spoken, busy, and wary of strangers until they have earned better."
+goal = "Get through the day's work and keep out of trouble"
+drives = { anger = 0, fear = 0 }
+
+[kind.townsfolk.feels]
+robbed = { anger = 4 }
+threatened = { fear = 3, anger = 1 }
+
+[kind.townsfolk.decay]
+anger = { to = 0, half_life = 4, keep = 0.25 }
+fear = { to = 0, half_life = 2 }
+
+[kind.townsfolk.lines]
+greet = "Good day to you."
+accuse = "It was you. I know it was you."
+watch = "I'll not face you alone. The watch will hear of this."
+told = "Is that so."
+
+# When someone comes up to them (the engine binds `who`), they greet them, accuse them, or go for the watch.
+[[kind.townsfolk.choices.meet]]
+do = "greet:{who}"
+utility = [1]
+
+[[kind.townsfolk.choices.meet]]
+do = "accuse:{who}"
+utility = [{ drive = "anger", plus = 1 }]
+when = [{ with = "{who}" }, { believes = { pred = "robbed", a = "{who}", b = "self" } }]
+
+[[kind.townsfolk.choices.meet]]
+do = "watch:{who}"  # too frightened to face them
+utility = [{ drive = "fear", plus = 4 }]
+when = [{ drive = "fear", gte = 3 }, { believes = { pred = "robbed", a = "{who}", b = "self" } }]
+
+[kind.guard]
+persona = "One of the town watch: tired, fair, and not easily talked round."
+goal = "Keep the peace, and find out who did what"
+drives = { anger = 0, fear = 0 }
+
+[kind.guard.lines]
+greet = "Move along."
+told = "I'll look into it."
+
+[[kind.guard.choices.meet]]
+do = "greet:{who}"
+utility = [1]
+
+# ---------------------------------------------------------------- the grapevine, along ties made in play
+# News of anyone travels, not only news of the player: the file can't list people it has never heard of.
+[gossip]
+about = "everyone"
+priority = { killed = 4, robbed = 3, threatened = 2 }
+threshold = 0.5
+along = { kin = 1.0, friend = 0.9 }
+in_person = 0.8
+
+# ---------------------------------------------------------------- what can't both be true
+[claims]
+one_actor = ["robbed", "killed"]  # one person did it: believing two stories, the less trusted source loses
+caught = 2                        # and whoever told that story is trusted this much less
+
+# ---------------------------------------------------------------- words
+[words.claims]
+robbed = "{a} robbed {b}"
+killed = "{a} killed {b}"
+threatened = "{a} threatened {b}"
+helped = "{a} helped {b}"
+
+[words.events]
+rob = "{a} robbed {t} at {where}."
+kill = "{a} killed {t} at {where}."
+threaten = "{a} threatened {t} at {where}."
+help = "{a} helped {t} at {where}."
+tell = "{a} told {to} that {claim}."
+gossip = "{a} told {to} that {claim}."
+
+[actions]
+greet = "greets {who}"
+accuse = "accuses {who} to their face"
+watch = "goes to fetch the watch about {who}"

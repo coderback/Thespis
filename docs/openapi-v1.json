@@ -231,6 +231,14 @@
             "title": "Id",
             "type": "string"
           },
+          "kinds": {
+            "description": "Kinds of people the engine may add in play",
+            "items": {
+              "type": "string"
+            },
+            "title": "Kinds",
+            "type": "array"
+          },
           "name": {
             "title": "Name",
             "type": "string"
@@ -515,6 +523,62 @@
           }
         },
         "title": "NarrateIn",
+        "type": "object"
+      },
+      "NpcIn": {
+        "properties": {
+          "at": {
+            "default": "",
+            "description": "Where they are",
+            "title": "At",
+            "type": "string"
+          },
+          "goal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Their own goal; their kind's if left out",
+            "title": "Goal"
+          },
+          "id": {
+            "description": "A new NPC's id: letters, digits, _ . and -, and not one already taken",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "description": "A kind of person the game declares: [kind.<id>]",
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "description": "What others and the narrator call them",
+            "title": "Name",
+            "type": "string"
+          },
+          "persona": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Their own persona; their kind's if left out",
+            "title": "Persona"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "name"
+        ],
+        "title": "NpcIn",
         "type": "object"
       },
       "NpcOut": {
@@ -933,6 +997,51 @@
           "events"
         ],
         "title": "TickOut",
+        "type": "object"
+      },
+      "TieIn": {
+        "properties": {
+          "a": {
+            "title": "A",
+            "type": "string"
+          },
+          "b": {
+            "title": "B",
+            "type": "string"
+          },
+          "kind": {
+            "description": "A kind of tie the game's [gossip] along declares",
+            "title": "Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "a",
+          "b",
+          "kind"
+        ],
+        "title": "TieIn",
+        "type": "object"
+      },
+      "TieOut": {
+        "properties": {
+          "between": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Between",
+            "type": "array"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "between",
+          "kind"
+        ],
+        "title": "TieOut",
         "type": "object"
       },
       "UnderstandIn": {
@@ -1920,7 +2029,144 @@
         "summary": "Narrate"
       }
     },
+    "/v1/sessions/{sid}/npcs": {
+      "post": {
+        "description": "Someone joins the cast in play: an NPC of a kind the game declares, with its own id, name and place.\nFrom here on it is an NPC like any the game file names.",
+        "operationId": "add_v1_sessions__sid__npcs_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sid",
+            "required": true,
+            "schema": {
+              "title": "Sid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Bearer <the project's key, or the sidecar's token>",
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer <the project's key, or the sidecar's token>",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NpcIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Add V1 Sessions  Sid  Npcs Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add"
+      }
+    },
     "/v1/sessions/{sid}/npcs/{npc}": {
+      "delete": {
+        "description": "An NPC leaves the story, dead or gone for good: it sees, says and decides nothing more. What it believed\nis kept, and others still believe things about it.",
+        "operationId": "retire_v1_sessions__sid__npcs__npc__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sid",
+            "required": true,
+            "schema": {
+              "title": "Sid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "npc",
+            "required": true,
+            "schema": {
+              "title": "Npc",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Bearer <the project's key, or the sidecar's token>",
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer <the project's key, or the sidecar's token>",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Retire V1 Sessions  Sid  Npcs  Npc  Delete",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Retire"
+      },
       "get": {
         "operationId": "inspect_v1_sessions__sid__npcs__npc__get",
         "parameters": [
@@ -2314,6 +2560,143 @@
           }
         },
         "summary": "Tick"
+      }
+    },
+    "/v1/sessions/{sid}/ties": {
+      "post": {
+        "description": "A tie between two NPCs, made in play: gossip travels along it as [gossip] along says for its kind.",
+        "operationId": "tie_v1_sessions__sid__ties_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sid",
+            "required": true,
+            "schema": {
+              "title": "Sid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Bearer <the project's key, or the sidecar's token>",
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer <the project's key, or the sidecar's token>",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TieIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TieOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Tie"
+      }
+    },
+    "/v1/sessions/{sid}/ties/{a}/{b}": {
+      "delete": {
+        "description": "Break a tie made in play.",
+        "operationId": "untie_v1_sessions__sid__ties__a___b__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sid",
+            "required": true,
+            "schema": {
+              "title": "Sid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "a",
+            "required": true,
+            "schema": {
+              "title": "A",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "b",
+            "required": true,
+            "schema": {
+              "title": "B",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Bearer <the project's key, or the sidecar's token>",
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer <the project's key, or the sidecar's token>",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Untie"
       }
     },
     "/v1/sessions/{sid}/understand": {

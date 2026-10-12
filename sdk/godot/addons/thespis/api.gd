@@ -22,12 +22,16 @@ const ROUTES := {
 	"decide": ["POST", "/v1/sessions/{sid}/decide", "DecideIn", "LineOut"],
 	"line": ["GET", "/v1/sessions/{sid}/lines/{lid}", "", "LineOut"],
 	"narrate": ["POST", "/v1/sessions/{sid}/narrate", "NarrateIn", "LineOut"],
+	"add": ["POST", "/v1/sessions/{sid}/npcs", "NpcIn", ""],
+	"retire": ["DELETE", "/v1/sessions/{sid}/npcs/{npc}", "", ""],
 	"inspect": ["GET", "/v1/sessions/{sid}/npcs/{npc}", "", "NpcOut"],
 	"observe": ["POST", "/v1/sessions/{sid}/observe", "ObserveIn", "EventOut"],
 	"join": ["POST", "/v1/sessions/{sid}/players", "JoinIn", ""],
 	"react": ["POST", "/v1/sessions/{sid}/react", "ReactIn", "LineOut"],
 	"snapshot": ["GET", "/v1/sessions/{sid}/snapshot", "", ""],
 	"tick": ["POST", "/v1/sessions/{sid}/tick", "TickIn", "TickOut"],
+	"tie": ["POST", "/v1/sessions/{sid}/ties", "TieIn", "TieOut"],
+	"untie": ["DELETE", "/v1/sessions/{sid}/ties/{a}/{b}", "", ""],
 	"understand": ["POST", "/v1/sessions/{sid}/understand", "UnderstandIn", "UnderstandOut"],
 	"update": ["POST", "/v1/sessions/{sid}/update", "UpdateIn", ""],
 	"usage": ["GET", "/v1/usage", "", "UsageOut"],
@@ -59,6 +63,8 @@ static func make(name: String):
 			return ModelIn.new()
 		"NarrateIn":
 			return NarrateIn.new()
+		"NpcIn":
+			return NpcIn.new()
 		"NpcOut":
 			return NpcOut.new()
 		"ObserveIn":
@@ -79,6 +85,10 @@ static func make(name: String):
 			return TickIn.new()
 		"TickOut":
 			return TickOut.new()
+		"TieIn":
+			return TieIn.new()
+		"TieOut":
+			return TieOut.new()
 		"UnderstandIn":
 			return UnderstandIn.new()
 		"UnderstandOut":
@@ -200,6 +210,7 @@ class GameOut extends RefCounted:
 	var choices: Dictionary = {}  ## Each NPC's choice sets, by moment
 	var digest: String = ""
 	var id: String = ""
+	var kinds: Array[String] = []  ## Kinds of people the engine may add in play
 	var name: String = ""
 	var npcs: Array[String] = []
 	var places: Array[String] = []
@@ -208,6 +219,7 @@ class GameOut extends RefCounted:
 		if d.has("choices"): choices = d["choices"]
 		if d.has("digest"): digest = str(d["digest"])
 		if d.has("id"): id = str(d["id"])
+		kinds.assign(d.get("kinds", []).map(func(x): return str(x)))
 		if d.has("name"): name = str(d["name"])
 		npcs.assign(d.get("npcs", []).map(func(x): return str(x)))
 		places.assign(d.get("places", []).map(func(x): return str(x)))
@@ -218,6 +230,7 @@ class GameOut extends RefCounted:
 		d["choices"] = choices
 		d["digest"] = digest
 		d["id"] = id
+		d["kinds"] = kinds
 		d["name"] = name
 		d["npcs"] = npcs
 		d["places"] = places
@@ -353,6 +366,34 @@ class NarrateIn extends RefCounted:
 		d["since"] = since
 		if to != null: d["to"] = to
 		d["wait"] = wait
+		return d
+
+
+class NpcIn extends RefCounted:
+	var at: String = ""  ## Where they are
+	var goal = null  ## string, or null. Their own goal; their kind's if left out
+	var id: String = ""  ## A new NPC's id: letters, digits, _ . and -, and not one already taken
+	var kind: String = ""  ## A kind of person the game declares: [kind.<id>]
+	var name: String = ""  ## What others and the narrator call them
+	var persona = null  ## string, or null. Their own persona; their kind's if left out
+
+	func read(d: Dictionary):
+		if d.has("at"): at = str(d["at"])
+		goal = str(d["goal"]) if d.get("goal") != null else null
+		if d.has("id"): id = str(d["id"])
+		if d.has("kind"): kind = str(d["kind"])
+		if d.has("name"): name = str(d["name"])
+		persona = str(d["persona"]) if d.get("persona") != null else null
+		return self
+
+	func to_dict() -> Dictionary:
+		var d := {}
+		d["at"] = at
+		if goal != null: d["goal"] = goal
+		d["id"] = id
+		d["kind"] = kind
+		d["name"] = name
+		if persona != null: d["persona"] = persona
 		return d
 
 
@@ -582,6 +623,41 @@ class TickOut extends RefCounted:
 		d["events"] = events.map(func(x): return x.to_dict())
 		d["moves"] = moves
 		d["phase"] = phase
+		return d
+
+
+class TieIn extends RefCounted:
+	var a: String = ""
+	var b: String = ""
+	var kind: String = ""  ## A kind of tie the game's [gossip] along declares
+
+	func read(d: Dictionary):
+		if d.has("a"): a = str(d["a"])
+		if d.has("b"): b = str(d["b"])
+		if d.has("kind"): kind = str(d["kind"])
+		return self
+
+	func to_dict() -> Dictionary:
+		var d := {}
+		d["a"] = a
+		d["b"] = b
+		d["kind"] = kind
+		return d
+
+
+class TieOut extends RefCounted:
+	var between: Array[String] = []
+	var kind: String = ""
+
+	func read(d: Dictionary):
+		between.assign(d.get("between", []).map(func(x): return str(x)))
+		if d.has("kind"): kind = str(d["kind"])
+		return self
+
+	func to_dict() -> Dictionary:
+		var d := {}
+		d["between"] = between
+		d["kind"] = kind
 		return d
 
 
