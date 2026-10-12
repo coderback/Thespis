@@ -46,6 +46,8 @@ jobs:
         run: pyright
       - name: Test
         run: pytest -q
+      - name: Town size
+        run: python tools/town_bench.py --check
 
   client:
     name: client

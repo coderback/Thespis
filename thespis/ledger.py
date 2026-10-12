@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, replace
+from dataclasses import dataclass, replace
 from typing import overload
 
 SCHEMA_VERSION = 1
@@ -95,10 +95,11 @@ class Event:
         return self.claim
 
     def to_json(self) -> dict:
-        d = asdict(self)
-        d["claim"] = self.claim.to_json() if self.claim else None
-        if d["amount"] is None:
-            del d["amount"]  # so events without one serialise exactly as they always have
+        d = {"id": self.id, "phase": self.phase, "verb": self.verb, "actor": self.actor, "target": self.target,
+             "loc": self.loc, "claim": self.claim.to_json() if self.claim else None, "truth": self.truth,
+             "schema_version": self.schema_version}
+        if self.amount is not None:
+            d["amount"] = self.amount  # left out when there is none, so such events serialise as they always have
         return d
 
     @classmethod
@@ -112,12 +113,15 @@ class Ledger:
     def __init__(self, events: list[Event] | None = None):
         self._events: list[Event] = list(events or [])
         self._by_id = {e.id: e for e in self._events}
+        self._true = {e.claim for e in self._events if e.claim is not None and e.truth}  # what really happened
 
     def append(self, phase: int, verb: str, actor: str, target: str | None, loc: str,
                claim: Claim | None = None, truth: bool = True, amount: int | None = None) -> Event:
         event = Event(f"e{len(self._events) + 1:04d}", phase, verb, actor, target, loc, claim, truth, amount=amount)
         self._events.append(event)
         self._by_id[event.id] = event
+        if claim is not None and truth:
+            self._true.add(claim)
         return event
 
     def __len__(self) -> int:
@@ -139,7 +143,7 @@ class Ledger:
         """Ground truth: did an event that really happened carry this claim? A denial is true when the fact it denies
         never happened."""
         fact = claim.affirmed()
-        held = any(e.claim == fact and e.truth for e in self._events)
+        held = fact in self._true
         return not held if claim.neg else held
 
     def to_json(self) -> list[dict]:
