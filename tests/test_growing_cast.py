@@ -257,6 +257,38 @@ def test_a_game_that_declares_no_one_actor_keeps_both_stories():
     assert s.world.npcs["wat"].trust_in == {}
 
 
+# ---------------------------------------------------------------- told as the dice say
+def test_a_statement_is_believed_as_far_as_the_engine_says_when_its_rules_decide():
+    s = town()
+    s.update("edda", trust_in={"player": 5})
+    s.observe("tell", "player", "edda", at="market", claim=BLAMED, said=True, conf=0.2)  # a lie told badly
+    assert conf(s, "edda", BLAMED) == 0.2  # the roll decides, whatever she thinks of the player
+    s.observe("tell", "player", "mara", at="docks", claim=BLAMED, said=True, conf=0.7, witnesses=["wat"])
+    assert (conf(s, "mara", BLAMED), conf(s, "wat", BLAMED)) == (0.7, 0.7)  # everyone who heard it
+    s.observe("tell", "player", "edda", at="market", claim=ROBBED, said=True)
+    assert conf(s, "edda", ROBBED) == 0.9  # left out, her trust in the speaker decides, as ever
+
+
+@pytest.mark.parametrize("kw", [{"conf": 0.5}, {"said": True, "conf": 1.5}, {"said": True, "conf": -0.1},
+                                {"said": True, "conf": True}])
+def test_conf_is_for_a_statement_and_from_nought_to_one(kw):
+    s = town()
+    with pytest.raises(DefinitionError):
+        s.observe("tell", "player", "edda", at="market", claim=BLAMED, **kw)
+    assert len(s.world.ledger) == 0
+
+
+def test_conf_goes_over_http_too():
+    client = TestClient(create_app({"town": TOWN}))
+    sid = client.post("/v1/sessions", json={"game": "town"}).json()["session"]
+    client.post(f"/v1/sessions/{sid}/npcs", json={"id": "edda", "kind": "townsfolk", "name": "Edda", "at": "market"})
+    told = {"verb": "tell", "actor": "player", "target": "edda", "claim": BLAMED, "said": True}
+    assert client.post(f"/v1/sessions/{sid}/observe", json={**told, "conf": 0.7}).status_code == 201
+    beliefs = client.get(f"/v1/sessions/{sid}/npcs/edda").json()["beliefs"]
+    assert beliefs[0]["opinion"]["b"] == 0.7
+    assert client.post(f"/v1/sessions/{sid}/observe", json={**told, "conf": 7}).status_code == 400
+
+
 # ---------------------------------------------------------------- saves
 def test_a_save_holds_who_joined_their_ties_and_who_has_gone():
     s = town()
