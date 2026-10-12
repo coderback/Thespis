@@ -257,6 +257,63 @@ def test_a_game_that_declares_no_one_actor_keeps_both_stories():
     assert s.world.npcs["wat"].trust_in == {}
 
 
+# ---------------------------------------------------------------- who was there
+FIRST_HAND = Game.parse(TOWN_TOML.replace("caught = 2 ", "caught = 2\nfirst_hand = 3 #"), "town")
+
+
+def lied_to_then_told_by(game: Game, teller: str) -> Session:
+    """Edda thinks the world of the player, who robbed Mara in front of Wat and tells her Harl did it. Then someone
+    she hardly knows tells her who it was: Wat, who saw it, or Harl, who has only heard it from Wat."""
+    s = Session.new(game)
+    for npc, at in (("mara", "docks"), ("wat", "docks"), ("edda", "market"), ("harl", "chapel")):
+        s.add(npc, "townsfolk", npc.title(), at)
+    s.observe("rob", "player", "mara", at="docks", claim=ROBBED, witnesses=["wat"])
+    s.observe("tell", "wat", "harl", at="chapel", claim=ROBBED, said=True)
+    s.update("edda", trust_in={"player": 3, "wat": 1, "harl": 1})
+    s.observe("tell", "player", "edda", at="market", claim=BLAMED, said=True)
+    s.observe("tell", teller, "edda", at="market", claim=ROBBED, said=True)
+    return s
+
+
+def test_by_trust_alone_a_well_liked_liar_is_believed_over_someone_who_saw_it():
+    s = lied_to_then_told_by(TOWN, "wat")
+    assert conf(s, "edda", BLAMED) == 0.9 and conf(s, "edda", ROBBED) == 0.0
+    assert s.world.npcs["edda"].trust_in == {"player": 3, "wat": -1, "harl": 1}  # and Wat is doubted for it
+
+
+def test_someone_who_saw_it_counts_for_more_than_someone_who_only_says_so():
+    s = lied_to_then_told_by(FIRST_HAND, "wat")
+    assert s.world.npcs["edda"].trust_in == {"player": 1, "wat": 1, "harl": 1}  # the player is caught, not Wat
+    # How sure she is still goes by trust: Wat's word is worth 0.4 to her, and now so is the player's, against it.
+    assert conf(s, "edda", ROBBED) == 0.4 and conf(s, "edda", BLAMED) == 0.2857
+    s.observe("tell", "wat", "edda", at="market", claim=ROBBED, said=True, conf=0.8)  # or the engine says how sure
+    assert conf(s, "edda", ROBBED) == 0.8 and conf(s, "edda", BLAMED) == 0.0
+
+
+def test_someone_who_only_heard_it_gets_no_such_credit():
+    s = lied_to_then_told_by(FIRST_HAND, "harl")
+    assert conf(s, "edda", BLAMED) == 0.9 and conf(s, "edda", ROBBED) == 0.0
+    assert s.world.npcs["edda"].trust_in == {"player": 3, "wat": 1, "harl": -1}
+
+
+def test_a_word_from_someone_who_saw_it_is_still_a_word():
+    from thespis.beliefs import SEEN, BeliefStore, credit
+
+    robbed = Claim.from_json(ROBBED)
+    store = BeliefStore()
+    store.add_evidence("wat", robbed, 1.0, "witnessed", "e1", 0)
+    told, _ = store.add_evidence("edda", robbed, 0.9, "wat", "e2", 0)
+    assert credit(told, {"wat": 1}, store, 3) == 4 and credit(told, {"wat": 1}) == 1
+    assert credit(told, {"wat": 5}, store, 3) == 5 < SEEN  # never as good as her own eyes
+
+
+@pytest.mark.parametrize("value", ["-1", "true", '"a lot"', "1.5"])
+def test_first_hand_is_a_whole_number_from_nought(value):
+    with pytest.raises(DefinitionError) as e:
+        Game.parse(TOWN_TOML.replace("caught = 2 ", f"caught = 2\nfirst_hand = {value} #"), "town")
+    assert "claims.first_hand" in str(e.value)
+
+
 # ---------------------------------------------------------------- told as the dice say
 def test_a_statement_is_believed_as_far_as_the_engine_says_when_its_rules_decide():
     s = town()

@@ -204,18 +204,26 @@ FIRST_HAND = ("self", "witnessed")
 SEEN = 6  # what an NPC saw itself counts as more than the most trust it can have in anyone (5): beyond their word
 
 
-def credit(belief: Belief, trust: dict[str, int]) -> int:
-    """How far the NPC trusts a belief's best source: what it saw itself beats anyone's word."""
-    return max(SEEN if e.source in FIRST_HAND else trust.get(e.source, 0) for e in belief.evidence)
+def credit(belief: Belief, trust: dict[str, int], store: BeliefStore | None = None, first_hand: int = 0) -> int:
+    """How far the NPC trusts a belief's best source: what it saw itself beats anyone's word. With `first_hand`, a
+    teller who saw it themselves counts for that much more than its trust in them, up to the most trust there is:
+    their word is still a word, and its own eyes still beat it."""
+    def of(e: Evidence) -> int:
+        if e.source in FIRST_HAND:
+            return SEEN
+        theirs = store.get(e.source, belief.claim) if first_hand and store is not None else None
+        was_there = theirs is not None and any(x.source in FIRST_HAND and not x.against for x in theirs.evidence)
+        return min(trust.get(e.source, 0) + first_hand, SEEN - 1) if was_there else trust.get(e.source, 0)
+    return max(of(e) for e in belief.evidence)
 
 
 def reconcile(store: BeliefStore, npc: str, claim: Claim, trust: dict[str, int], phase: int,
               contradicts: Callable[[Claim, Claim], bool], penalty: int,
-              credence: Callable[[int], float] = credence) -> list[Belief]:
+              credence: Callable[[int], float] = credence, first_hand: int = 0) -> list[Belief]:
     """Settle what `claim` contradicts among the NPC's beliefs. Of two claims that can't both be true, the one from the
     less trusted source loses: what the more trusted one said counts against it, and whoever told it the loser is
-    trusted `penalty` less, so everything they said is re-weighed (`discredit`). A tie settles nothing. Returns the
-    beliefs that ended retracted."""
+    trusted `penalty` less, so everything they said is re-weighed (`discredit`). A tie settles nothing. A teller who
+    saw what they tell counts for `first_hand` more (`credit`). Returns the beliefs that ended retracted."""
     new = store.get(npc, claim)
     if new is None or not new.active:
         return []
@@ -223,9 +231,10 @@ def reconcile(store: BeliefStore, npc: str, claim: Claim, trust: dict[str, int],
     for old in store.for_npc(npc):
         if old is new or not old.active or not contradicts(old.claim, new.claim):
             continue
-        if credit(new, trust) > credit(old, trust):
+        mine, theirs = credit(new, trust, store, first_hand), credit(old, trust, store, first_hand)
+        if mine > theirs:
             loser, winner = old, new
-        elif credit(old, trust) > credit(new, trust):
+        elif theirs > mine:
             loser, winner = new, old
         else:
             continue

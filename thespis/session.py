@@ -22,7 +22,8 @@ words. Everything in it is checked when it loads. What a game declares there, it
     own name and place; `retire` takes someone out of the story (dead, or gone); `tie` and `untie` make and break
     the ties gossip travels along.
   - `[claims] one_actor`: deeds only one person can have done to another. Believing two culprits for one, an NPC
-    keeps the story from the source it trusts more, and trusts whoever told it the other less.
+    keeps the story from the source it trusts more, and trusts whoever told it the other less. With `first_hand`,
+    a teller who saw it themselves counts for that much more than one who only heard.
 A statement that denies a claim (`neg`) is evidence against the claim for everyone who hears it, as far as each
 trusts the one denying it.
 
@@ -147,6 +148,7 @@ class Game:
         claims = d.get("claims", {})
         self.one_actor = frozenset(claims.get("one_actor", ()))  # deeds only one person can have done to another
         self.caught = int(claims.get("caught", 2))  # how far trust falls in whoever told the story that lost
+        self.first_hand = int(claims.get("first_hand", 0))  # how much more a teller counts who saw it themselves
         self.ties: dict[str, list[tuple[str, str]]] = {}  # npc -> [(the other, kind)], in the order declared
         for t in d.get("tie", []):
             a, b = t["between"]
@@ -209,6 +211,9 @@ class Game:
         if not isinstance(claims.get("caught", 0), int) or isinstance(claims.get("caught", 0), bool) \
                 or claims.get("caught", 0) < 0:
             raise DefinitionError("claims.caught: how far trust falls, a whole number from 0")
+        if not isinstance(claims.get("first_hand", 0), int) or isinstance(claims.get("first_hand", 0), bool) \
+                or claims.get("first_hand", 0) < 0:
+            raise DefinitionError("claims.first_hand: how much more a teller who saw it counts, a whole number from 0")
         for who in d.get("gossip", {}).get("gossips", []):
             if who not in npcs:
                 raise DefinitionError(f"gossip.gossips: {who!r} is not an npc")
@@ -912,7 +917,8 @@ class Session:
         """`c` says who did a deed only one person can have done (`[claims] one_actor`). If the NPC also believes
         someone else did it, the two can't both be true: the story from the source it trusts less loses, whoever told
         it that story is trusted less (`[claims] caught`), and everything else they said is weighed again
-        (thespis.beliefs.reconcile). Sources it trusts alike settle nothing."""
+        (thespis.beliefs.reconcile). Sources it trusts alike settle nothing. A teller who saw it themselves counts
+        for more than one who only heard (`[claims] first_hand`)."""
         w, n = self.world, self.world.npcs[npc]
         mine = w.beliefs.get(npc, c)
         rivals = [b for b in w.beliefs.for_npc(npc) if _other_actor(b.claim, c) and b.active]
@@ -922,7 +928,8 @@ class Session:
             for ev in b.evidence:
                 if ev.source in w.npcs or w.is_player(ev.source):
                     n.trust_in.setdefault(ev.source, 0)
-        reconcile(w.beliefs, npc, c, n.trust_in, w.phase, _other_actor, self.game.caught)
+        reconcile(w.beliefs, npc, c, n.trust_in, w.phase, _other_actor, self.game.caught,
+                  first_hand=self.game.first_hand)
         for who, trust in n.trust_in.items():
             n.trust_in[who] = _clamp(trust, TRUST)
 

@@ -38,7 +38,7 @@ NPCs, one choice set, gossip and words. Everything in it is checked when it load
 | `[kind.<id>]` | A kind of person, for a cast that grows in play: what an `[npc.<id>]` holds, apart from `name` and `start` ([below](#a-cast-that-grows)) |
 | `[[npc.<id>.choices.<moment>]]` | What the NPC may do at that moment (below) |
 | `[gossip]` | `gossips`, `about` (ids, or `"everyone"`), `priority` by predicate, `threshold`, `decay`; with ties, `along`, `in_person` and `most` (below) |
-| `[claims]` | `one_actor`: deeds only one person can have done to another, and `caught` ([below](#a-cast-that-grows)) |
+| `[claims]` | `one_actor`: deeds only one person can have done to another, with `caught` and `first_hand` ([below](#a-cast-that-grows)) |
 | `[[tie]]` | `between = [a, b]`, `kind`: a relationship gossip travels along |
 | `[words.claims]`, `[words.events]` | A claim and an event in words, as the model reads them |
 | `[actions]` | What each action does, by kind, for the model |
@@ -162,6 +162,11 @@ believe two people did the same thing to the same one keeps one story:
 - **The loser's teller is caught.** Its trust in whoever told it the losing story falls by `caught` (2 unless
   given), and everything else they said is weighed again at that trust.
 - **Sources trusted alike settle nothing:** it keeps both stories.
+- **Who was there counts, if the game says so.** With `first_hand = 3`, a teller who saw it themselves counts for 3
+  more than the NPC's trust in them when the two stories are weighed, up to the most trust there is (5). So the
+  story of a neighbour who watched the robbery wins over a well-liked stranger's, and over a sibling's who is
+  passing on what they heard. The NPC's own eyes still beat any word, and how sure it is of what it was told
+  still goes by its trust in the teller. Left out, only trust decides. A player's word gets no such credit.
 
 So a lie found out costs the liar more than the lie. In the town example, the player tells Edda that Harl robbed
 Mara. Wat, who saw it, tells his friend Edda the truth along their tie. Edda drops the lie, trusts the player less,
