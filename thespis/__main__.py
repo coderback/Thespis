@@ -260,10 +260,8 @@ def serve(args: argparse.Namespace) -> int:
     if tracing.configure():
         print("tracing to $OTEL_EXPORTER_OTLP_ENDPOINT", file=sys.stderr)
 
-    family = socket.AF_INET6 if ":" in args.host else socket.AF_INET
-    sock = socket.socket(family, socket.SOCK_STREAM)
-    sock.bind((args.host, args.port))
-    port = sock.getsockname()[1]
+    sock = listening(args.host, args.port)
+    family, port = sock.family, sock.getsockname()[1]
     server = uvicorn.Server(uvicorn.Config(create_app(host=host), log_level="warning", access_log=False, ws="none",
                                            lifespan="off"))
     if args.parent:
@@ -288,6 +286,15 @@ def serve(args: argparse.Namespace) -> int:
             print(f"offline, refused {len(offline.refused)}: {'; '.join(sorted(set(offline.refused)))}",
                   file=sys.stderr)
     return 0
+
+
+def listening(host: str, port: int) -> socket.socket:
+    """A socket on `host`, already listening: a launcher connects as soon as it reads THESPIS_URL, and a socket only
+    bound would refuse it until the server got round to listening."""
+    sock = socket.socket(socket.AF_INET6 if ":" in host else socket.AF_INET, socket.SOCK_STREAM)
+    sock.bind((host, port))
+    sock.listen(2048)
+    return sock
 
 
 def _hostname(url: str) -> str:

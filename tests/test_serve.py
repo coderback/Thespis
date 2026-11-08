@@ -14,7 +14,7 @@ from fastapi.testclient import TestClient
 
 from tests.test_host import INSULT, TAVERN, Gated
 from thespis import offline
-from thespis.__main__ import main
+from thespis.__main__ import listening, main
 from thespis.gateway import OpenAICompatGateway, Provider
 from thespis.host import Host
 from thespis.runtime.local import watch_parent
@@ -126,6 +126,13 @@ def test_a_sidecar_on_a_port_of_its_choosing_stops_with_its_parent(tmp_path):
         parent.kill()
         proc.kill()
     assert proc.returncode == 0
+
+
+def test_the_port_it_prints_takes_a_connection_at_once():
+    """THESPIS_URL is printed before the server runs: the socket must already be listening, or a launcher that
+    connects at once is refused (tests/test_sdk_words.py was, now and then, on Linux)."""
+    with listening("127.0.0.1", 0) as sock, socket.create_connection(sock.getsockname()[:2], timeout=2):
+        pass
 
 
 def test_a_sidecar_listens_on_this_machine_only():
