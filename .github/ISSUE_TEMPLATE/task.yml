@@ -6,7 +6,7 @@ body:
     id: area
     attributes:
       label: Area
-      options: ["engine", "client", "shared contract", "devops", "content", "video and submission"]
+      options: ["core (thespis/)", "/v1 and the engine SDKs", "examples and docs", "demo games", "tooling and CI"]
     validations:
       required: true
   - type: textarea

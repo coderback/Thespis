@@ -12,7 +12,7 @@ body:
     id: steps
     attributes:
       label: Steps to reproduce
-      description: Session seed, verbs played, and where (local or hosted).
+      description: The Thespis version, the game file (or which example or demo), the calls made or the verbs played, and the model if one was set.
     validations:
       required: true
   - type: textarea
