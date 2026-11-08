@@ -1,6 +1,6 @@
 """Thespis in your own game, in about 30 lines: the README's "Use it in your game", run as it is written there.
 
-    pip install "thespis @ git+https://github.com/coderback/Thespis@v0.3.0"
+    pip install thespis-npc
     python quickstart.py        # with game.toml beside it
 
 The player steals a loaf from Mara while the miller Wat is watching. Word travels from Wat to his sister Edda, and

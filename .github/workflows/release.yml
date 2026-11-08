@@ -1,0 +1,66 @@
+name: Release
+
+# Pushing a tag like v0.3.1 releases that version: the package is built and checked, published to PyPI as
+# thespis-npc by trusted publishing (no token is stored here), then a GitHub Release is made with its notes from
+# CHANGELOG.md. The tag must match thespis.__version__, and the changelog must have a section for it.
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: The tag, the package's version and the changelog agree
+        run: python tools/release_notes.py --check "${GITHUB_REF_NAME}" > notes.md
+      - name: Build the wheel and the source archive, and check them
+        run: |
+          pip install "build>=1.2" "twine>=6"
+          python -m build
+          twine check --strict dist/*
+      - name: The wheel installs and imports
+        run: |
+          python -m venv /tmp/try
+          /tmp/try/bin/pip install dist/*.whl
+          /tmp/try/bin/python -c "import thespis.api as a; print(a.__version__)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: |
+            dist/
+            notes.md
+
+  pypi:
+    name: publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/thespis-npc/
+    permissions:
+      id-token: write  # trusted publishing: PyPI checks this workflow's identity, so no token is stored
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+      - uses: pypa/gh-action-pypi-publish@release/v1
+
+  github:
+    name: GitHub Release
+    needs: pypi
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+      - name: Release with its notes and files
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${GITHUB_REF_NAME}" dist/* --repo "${GITHUB_REPOSITORY}" --title "${GITHUB_REF_NAME}" --notes-file notes.md

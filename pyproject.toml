@@ -1,21 +1,41 @@
 [build-system]
-requires = ["hatchling>=1.25"]
+requires = ["hatchling>=1.25", "hatch-fancy-pypi-readme>=24.1"]
 build-backend = "hatchling.build"
 
 # The package is the core alone (thespis/): the games, Rehearsal, tools and client stay in the repo. Versions follow
 # semver at 0.x: a minor release may change anything outside thespis.api and /v1; those change only with a note.
+# On PyPI it is thespis-npc, since the name thespis was taken; it installs and imports as thespis.
 [project]
-name = "thespis"
-dynamic = ["version"]
-description = "Thespis: an AI/ML toolkit for game developers. First module: Thespis Cast (NPC minds)."
+name = "thespis-npc"
+dynamic = ["version", "readme"]
+description = "NPC minds for games: they remember, believe things that may be false, gossip, and act for reasons. The game owns the truth; a language model, if any, only voices it."
 requires-python = ">=3.12"
-readme = "README.md"
 license = "MIT"
+authors = [{ name = "Timothy Oluwatobi Ojebiyi" }]
+keywords = ["npc", "game-ai", "game-development", "llm", "beliefs", "gossip", "godot", "unity"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Games/Entertainment",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Typing :: Typed",
+]
 dependencies = ["httpx>=0.27"]
+
+[project.urls]
+Homepage = "https://github.com/coderback/Thespis"
+Documentation = "https://github.com/coderback/Thespis/blob/main/docs/getting-started.md"
+Changelog = "https://github.com/coderback/Thespis/blob/main/CHANGELOG.md"
+Issues = "https://github.com/coderback/Thespis/issues"
+Demo = "https://thespis-production.up.railway.app"
 
 [project.optional-dependencies]
 serve = ["fastapi>=0.115", "uvicorn[standard]>=0.30"]  # python -m thespis serve: the /v1 API, as a sidecar
-server = ["thespis[serve]", "cryptography>=43", "psycopg[binary,pool]>=3.2"]  # serve --server: Postgres, sealed keys
+server = ["thespis-npc[serve]", "cryptography>=43", "psycopg[binary,pool]>=3.2"]  # serve --server: Postgres, sealed keys
 otel = ["opentelemetry-sdk>=1.27", "opentelemetry-exporter-otlp-proto-http>=1.27"]  # traces over OTLP
 
 [project.scripts]
@@ -28,7 +48,23 @@ path = "thespis/__init__.py"
 packages = ["thespis"]
 
 [tool.hatch.build.targets.sdist]
-include = ["thespis", "README.md", "LICENSE", "docs/openapi-v1.json", "examples/tavern"]
+include = ["thespis", "README.md", "LICENSE", "CHANGELOG.md", "docs/openapi-v1.json", "examples/tavern",
+           "examples/quickstart"]
+
+# PyPI shows the README, where the repository's relative links and pictures would break: they point at GitHub.
+[tool.hatch.metadata.hooks.fancy-pypi-readme]
+content-type = "text/markdown"
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
+path = "README.md"
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.substitutions]]
+pattern = '\]\((docs/images/[^)\s]+)\)'
+replacement = '](https://raw.githubusercontent.com/coderback/Thespis/main/\1)'
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.substitutions]]
+pattern = '\]\((?!https?:|#|mailto:)([^)\s]+)\)'
+replacement = '](https://github.com/coderback/Thespis/blob/main/\1)'
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
