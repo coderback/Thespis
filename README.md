@@ -34,7 +34,7 @@ Your game keeps its own world and rules. It tells Thespis what happened and who 
 says. Thespis keeps the minds: what each NPC believes and why, who they tell, and what they choose to do about it.
 
 ```bash
-pip install "thespis @ git+https://github.com/coderback/Thespis@v0.3.0"
+pip install thespis-npc        # on PyPI as thespis-npc; it imports as thespis
 ```
 
 [examples/quickstart](examples/quickstart) is a village of three in one game file

@@ -68,6 +68,17 @@ Two things every change keeps:
 - Python 3.12, lines up to 120 characters, `ruff` and `pyright` as configured in `pyproject.toml`.
 - Docs and comments in plain words and short sentences, saying what a thing does and why.
 
+## Releasing
+
+For maintainers. A release is one pull request and one tag:
+
+1. Set the new number in `thespis/__init__.py`, and give it a section in [CHANGELOG.md](CHANGELOG.md).
+2. Merge it.
+3. Push the tag: `git tag -a v0.3.1 -m "Thespis 0.3.1" && git push origin v0.3.1`.
+
+The release workflow checks that the tag, the package and the changelog agree, builds and checks the package,
+publishes it to PyPI as `thespis-npc`, and makes the GitHub Release with the changelog's notes.
+
 ## If `main` breaks anyway
 
 Revert the offending squash commit with a pull request (`git revert <sha>`), get CI green, merge, then fix forward on

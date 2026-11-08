@@ -20,11 +20,12 @@ exactly the same, on its own lines.
 
 ## Install
 
-Thespis needs Python 3.12 or later. It isn't on PyPI yet, so pin a release tag:
+Thespis needs Python 3.12 or later. It's on PyPI as `thespis-npc` (the name `thespis` was taken), and it imports as
+`thespis`:
 
 ```bash
-pip install "thespis @ git+https://github.com/coderback/Thespis@v0.3.0"            # the library
-pip install "thespis[serve] @ git+https://github.com/coderback/Thespis@v0.3.0"     # and the sidecar, for other engines
+pip install thespis-npc              # the library
+pip install "thespis-npc[serve]"     # and the sidecar, for other engines
 ```
 
 The library has one dependency (`httpx`). Everything a game uses is in `thespis.api`; the rest of the package is
