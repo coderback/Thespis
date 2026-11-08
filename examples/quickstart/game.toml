@@ -1,0 +1,85 @@
+# Millbrook: the game file for the quickstart (quickstart.py, and the README's "Use it in your game"). Three people,
+# two ties and one decision: everything Thespis needs to know about their minds. Drives run 0 to 10; trust runs -5
+# to 5. docs/protocol.md explains every table.
+
+[game]
+id = "quickstart"
+name = "Millbrook"
+setting = "Millbrook, a village at harvest time: a bakery and a mill on either side of a square."
+
+[places]
+square = "the square"
+bakery = "the bakery"
+mill = "the mill"
+
+[player]
+start = "square"
+
+[npc.mara]
+name = "Mara"
+start = "bakery"
+goal = "Sell every loaf before dusk"
+persona = "The baker: brisk, fair, and nobody's fool."
+drives = { anger = 0 }
+trust_in = { edda = 2 }  # an old friend; everyone else starts at 0
+
+[npc.mara.feels]  # when she comes to believe something was done to her, scaled by how sure she is
+stole_from = { anger = 6 }
+
+[npc.mara.lines]  # the words when there's no model, and what a model's words must stay true to
+serve = "Fresh this morning. What'll it be?"
+refuse = "Not you. I know what you did."
+
+# When the player comes to her counter: serve them, or refuse if she believes they stole from her.
+[[npc.mara.choices.counter]]
+do = "serve:player"
+utility = 1
+
+[[npc.mara.choices.counter]]
+do = "refuse:player"
+utility = [{ drive = "anger" }]
+when = [{ believes = { pred = "stole_from", a = "player", b = "self" } }]
+
+[npc.wat]
+name = "Wat"
+start = "mill"
+goal = "Get the harvest milled"
+persona = "The miller: slow to speak and never wrong about what he saw."
+
+[npc.edda]
+name = "Edda"
+start = "mill"
+goal = "Know everything that happens in Millbrook"
+persona = "Wat's sister: quick, curious and fond of a story."
+trust_in = { wat = 2 }
+
+# ---------------------------------------------------------------- the grapevine
+# Each tick, everyone tied tells each tie one thing they haven't heard: the worst news first. A story weakens with
+# each mouth it passes through.
+[[tie]]
+between = ["wat", "edda"]
+kind = "kin"
+
+[[tie]]
+between = ["edda", "mara"]
+kind = "friend"
+
+[gossip]
+about = ["player", "wat"]
+priority = { stole_from = 3 }
+along = { kin = 1.0, friend = 0.9 }
+
+# ---------------------------------------------------------------- what can't both be true
+# A theft has one thief. Told two stories, Mara keeps the one from whoever she trusts more, and trusts the other
+# teller less, so a liar found out is doubted in everything else they said.
+[claims]
+one_actor = ["stole_from"]
+
+# ---------------------------------------------------------------- words, as a model reads them
+[words.claims]
+stole_from = "{a} stole from {b}"
+
+[words.events]
+steal = "{a} stole a loaf from the counter at {where}."
+tell = "{a} told {t} that {claim}."
+gossip = "{a} told {t} that {claim}."

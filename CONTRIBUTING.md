@@ -1,65 +1,78 @@
 # Contributing
 
-Two people, one weekend, no broken `main`. These rules keep us out of each other's way.
+Thespis is open to contributions: bug reports, fixes, docs, examples, and games built on it. For anything larger than
+a fix, open an issue first and say what you have in mind, so we can agree on the shape before you build it.
 
-## The rules
+## Set up
 
-1. **Nobody pushes to `main`.** GitHub enforces it: every change goes through a pull request.
-2. **CI must pass before merging.** The `ci` check runs lint and tests for the engine and the client.
-3. **Your branch must be up to date with `main` before it merges.** Use GitHub's "Update branch" button,
-   or `git pull --rebase origin main` locally.
-4. **Squash merge only.** One commit per PR keeps history readable and easy to revert.
-5. **Stay in your folders.** See the ownership map below. Touching someone else's folder is fine when needed,
-   but ask them to review.
-6. **The contract changes together.** If you change an API shape, update `docs/api.md` and `fixtures/` in
-   the same PR and request the other person's review.
-7. **No secrets in git.** Keys live in `.env`, which is ignored.
-
-## Ownership
-
-| Path | Owner |
-| --- | --- |
-| `thespis/`, `games/`, `tests/`, `tools/`, `.github/` | Tobi (@coderback) |
-| `client/` | Ahmed (@AhmedBokaniUsman) |
-| `docs/api.md`, `fixtures/` | Both: changes need the other's review |
-
-`CODEOWNERS` requests the right reviewer automatically.
-
-## Day-to-day flow
+You need Python 3.12 or later. Node 22 is only for the demo games' browser client.
 
 ```bash
-git checkout main
-git pull
-git checkout -b ahmed/13-play-ui        # <name>/<issue number>-<short-slug>
-
-# ...work, commit small and often...
-git push -u origin ahmed/13-play-ui
-gh pr create --fill                     # or open the PR on GitHub
+git clone https://github.com/coderback/Thespis
+cd Thespis
+python -m venv .venv
+source .venv/bin/activate              # Windows: .venv\Scripts\activate
+pip install -r requirements-dev.txt
+pytest                                 # the whole suite: no network and no model needed
 ```
 
-- Put `Closes #13` in the PR description so the issue closes when it merges.
-- Keep PRs small: one issue per PR where possible. Merge your own PR once CI is green,
-  unless it touches the contract or the other person's folder.
-- Use draft PRs for work in progress you want the other person to see early.
-- Commit messages: short imperative subject, e.g. `Add gate check to tick`.
+## Before you open a pull request
 
-## Where work is tracked
+Run what CI runs on the engine:
 
-- **Issues** are the to-do list. Each has an owner label, an area, a milestone and a "Done when" check.
-- **Milestones** follow the build plan:
+```bash
+ruff check .
+pyright
+pytest -q
+```
 
-| Milestone | Due (UK time) |
+Some changes need more:
+
+| If you change | Also |
 | --- | --- |
-| M0 Kickoff | Sat 12:00 |
-| M1 Fallback playable | Sat 18:00 (Integration 1) |
-| M2 Live model on host | Sat 22:00 (Integration 2) |
-| M3 Feature freeze | Sun 09:30 |
-| M4 Submitted | Sun 12:30 |
-| Stretch | Only after M2; switch off anything not working by Sun 08:30 |
+| `thespis.api` or the `/v1` routes | Update [docs/protocol.md](docs/protocol.md); regenerate the contract (`python -m thespis openapi --out docs/openapi-v1.json`) and the SDKs' typed layers (`python tools/sdk_gen.py all`) |
+| What NPCs believe, decide or say | `python -m tools.outcomes` shows what changed in the demo's 35 routes; `python -m rehearsal replay` what changed in the recorded scenarios. Accept an intended change with `--update`, and say why in the pull request |
+| Speed at town size | `python tools/town_bench.py --check` holds each call to its budget |
+| A dependency | Edit the `.in` file and recompile the lock files ([README](README.md#run-it-locally)); CI fails if they drift |
+| The demo client (`client/`) | `npm run lint`, `npm test` and `npm run build` in `client/` |
 
-- **Labels:** `owner:*`, `area:*`, `type:*`, priority `P0` to `P2`, and `stretch`.
-  `P0` items are the ones the demo cannot ship without.
+Two things every change keeps:
 
-## If main breaks anyway
+- **A game with no model plays the same.** Every line has the game's own words to fall back on, and the tests run
+  with no network.
+- **The core knows no game.** `thespis/` never imports from `games/`; a test checks.
 
-Revert the offending squash commit with a PR (`git revert <sha>`), get CI green, merge, then fix forward on a branch.
+## Pull requests
+
+- **One change per pull request,** on a branch named for what it does (`gossip-along-ties`, not `patch-1`).
+- **Say what changes, why, and how you tested it.** The template asks for each.
+- **CI must pass,** and the branch must be up to date with `main`. Pull requests are squash merged, one commit each.
+- **No secrets in git.** Keys live in `.env`, which is ignored.
+
+## Where things live
+
+| Path | What it is |
+| --- | --- |
+| `thespis/` | The core. `thespis.api` is the public surface; the rest may change between 0.x releases |
+| `examples/` | Small games in one TOML file each, and the quickstart |
+| `sdk/godot/`, `sdk/unity/` | The engine clients for `/v1` |
+| `games/` | The two demo games, as adapters on the core |
+| `client/` | The demo games' browser client |
+| `rehearsal/` | Scenarios, recordings and reports: the regression suite CI replays |
+| `tools/` | Benchmarks, the packager, the load test, generators |
+| `tests/` | The pytest suite |
+| `docs/` | The guides and the reference ([docs/README.md](docs/README.md)) |
+
+## Style
+
+- Python 3.12, lines up to 120 characters, `ruff` and `pyright` as configured in `pyproject.toml`.
+- Docs and comments in plain words and short sentences, saying what a thing does and why.
+
+## If `main` breaks anyway
+
+Revert the offending squash commit with a pull request (`git revert <sha>`), get CI green, merge, then fix forward on
+a branch.
+
+## Licence
+
+By contributing, you agree that your contribution is licensed under the project's [MIT licence](LICENSE).

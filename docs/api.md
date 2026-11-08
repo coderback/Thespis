@@ -1,10 +1,13 @@
-# API contract: engine to client
+# The Crypt Road's API: engine to client
+
+This is the demo game's own API, between its engine (`games/crypt_road/`) and its browser client (`client/`). It
+isn't Thespis's: a game of your own uses the library or `/v1` ([protocol.md](protocol.md)).
 
 The engine owns all game logic; the client sends verbs, renders state and animates moves.
 The session id lives in the URL (`?s=`), so a reload resumes the run, and every request sends it as the
 `X-Session` header.
 
-Changing anything here? Update `fixtures/` in the same PR and get the other person's review.
+Changing anything here? Update `fixtures/` in the same PR.
 
 ## Endpoints
 

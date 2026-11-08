@@ -28,6 +28,73 @@ checked by code before anyone hears it.
 
 *The why-chain: Captain Brenna's line, traced to the decision behind it, the beliefs it cites and the ledger events at the root. Click the picture to watch the video.*
 
+## Use it in your game
+
+Your game keeps its own world and rules. It tells Thespis what happened and who saw it, and asks what an NPC does and
+says. Thespis keeps the minds: what each NPC believes and why, who they tell, and what they choose to do about it.
+
+```bash
+pip install "thespis @ git+https://github.com/coderback/Thespis@v0.3.0"
+```
+
+[examples/quickstart](examples/quickstart) is a village of three in one game file
+([game.toml](examples/quickstart/game.toml)): a baker, a miller and his sister, two ties and one decision. The player
+steals a loaf with the miller watching, and lies about it:
+
+<!-- quickstart:start -->
+```python
+from pathlib import Path
+
+from thespis.api import Game, Session, gateway_from_env
+
+game = Game.load(Path(__file__).with_name("game.toml"))
+s = Session.new(game, gateway=gateway_from_env())
+
+# 1. Your game reports what happened, and who saw it. Thespis never decides what happened. Mara was in the back
+#    room, so she isn't the event's target: only Wat saw it.
+theft = {"pred": "stole_from", "a": "player", "b": "mara"}
+s.observe("steal", "player", at="bakery", claim=theft, witnesses=["wat"])
+
+# 2. Time passes in the minds: the story goes from Wat to Edda, then from Edda to Mara, weaker at each step.
+s.tick(2)
+
+# 3. The player lies. Mara believes a stranger only so far, and a theft has one thief.
+s.observe("tell", "player", "mara", claim={"pred": "stole_from", "a": "wat", "b": "mara"}, said=True)
+
+# 4. The player comes to Mara's counter. She chooses among the choices the game file gives her, and speaks.
+s.update("player", loc="bakery")
+line = s.decide("mara", "counter")
+print(f"Mara: {line.text}  ({line.reason})")
+
+# 5. Why: everything each of them believes, how sure, and the events behind it.
+for npc in ("wat", "edda", "mara"):
+    for b in s.inspect(npc)["beliefs"]:
+        c, sure = b["claim"], b["opinion"]["b"]
+        print(f"  {npc} {b['status']}: {c['a']} {c['pred']} {c['b']} at {sure:.2f}, from",
+              ", ".join(f"{e['source']} ({e['event']}{', against' if e.get('against') else ''})" for e in b["evidence"]))
+```
+<!-- quickstart:end -->
+
+With no model at all, it prints:
+
+```
+Mara: Not you. I know what you did.  (refuse:player scores 4)
+  wat active: player stole_from mara at 1.00, from witnessed (e0001)
+  edda active: player stole_from mara at 0.90, from wat (e0002)
+  mara active: player stole_from mara at 0.73, from edda (e0003)
+  mara retracted: wat stole_from mara at 0.06, from player (e0004), edda (e0003, against)
+```
+
+- **The story weakens as it travels:** Wat saw it, Edda has it from her brother, Mara from her friend.
+- **A lie loses to a source trusted more,** and costs the liar: Mara now believes less of anything else the player
+  tells her.
+- **No model is needed.** Every line falls back to the game's own words. With a model (`LLM_*`,
+  [docs/models.md](docs/models.md), or a local one offline), the model words the line, and code checks that it says
+  only what Mara knows.
+- **Other engines:** `thespis serve` runs the same calls over HTTP beside your game, with a
+  [Godot addon](sdk/godot/README.md) and a [Unity package](sdk/unity/README.md).
+- **Next:** [docs/getting-started.md](docs/getting-started.md) walks through the game file and the calls a game makes.
+
 ## The demo: The Crypt Road
 
 A race to a relic in a crypt, five stops down one road. Insult your rival Kael, beat him in a duel and take his
@@ -185,6 +252,9 @@ cites ids the validator checked; and NPCs can be wrong, act on it, and be correc
 
 ## Run it locally
 
+This runs the demo games from a clone of the repository. To put Thespis in a game of your own, see
+[Use it in your game](#use-it-in-your-game).
+
 You need Python 3.12 or later (CI uses 3.13) and Node 22.
 
 ```bash
@@ -304,7 +374,8 @@ To work on the client with hot reload, run `npm run dev` in `client/` next to th
 
 | Command | What it does |
 | --- | --- |
-| `python examples/minimal_client.py` | The core alone, no game: a ledger, a belief, allowed actions, and a cited line from the model or the fallback |
+| `python examples/quickstart/quickstart.py` | The README's quickstart: a theft, gossip, a lie and a decision, with no model |
+| `python examples/minimal_client.py` | The core's insides, no game: a ledger, a belief, allowed actions, and a cited line from the model or the fallback |
 | `python tools/crypt_road_sim.py` | The reference rules model: route outcomes and the demo-route acceptance test |
 | `python tools/harness.py <host>` | Plays every route on a host and writes `results.md` |
 | `python tools/warm_cache.py <host>` | Plays the client's autoplay route until the cache answers it all |
@@ -336,9 +407,11 @@ docker/             the hosted server's image (serve.Dockerfile); the root Docke
 games/crypt_road/   the demo game as a Thespis adapter: its cast and words (cast.toml), rules, views, web app
 games/manor/        a second adapter: the manor mystery, served at /manor (its client is client/manor/)
 client/             the browser client for both games: The Crypt Road (index.html) and the manor (manor/)
-docs/               the API contract (api.md), the protocol (protocol.md, openapi-v1.json), models.md, design docs
-examples/           the core alone (minimal_client.py), the tavern (a whole game in one TOML file), and Thornby
-                    (two players, ties, feelings that fade), each with its Rehearsal scenarios
+docs/               getting started, the reference (protocol.md, openapi-v1.json), serve.md, models.md; the demo
+                    games' design and API; research
+examples/           the quickstart (Millbrook), the tavern (a whole game in one TOML file), Thornby (two players,
+                    ties, feelings that fade), Wickby (people made in play), and the core's insides
+                    (minimal_client.py)
 sdk/godot/          the Godot 4 addon (addons/thespis), its example (the Lantern) and its headless test
 sdk/unity/          the Unity package (com.thespis.client), its example project (Lantern) and its tests
 fixtures/           real API responses along the demo route, for building the client
@@ -352,10 +425,10 @@ tests/              the pytest suite, run by CI on every pull request
 
 | Module | What it does | Status |
 | --- | --- | --- |
-| **Cast** | NPC minds: ledger, beliefs, drives, validator, model voice | Built for this hackathon |
+| **Cast** | NPC minds: ledger, beliefs, drives, validator, model voice | Built: v0.3.0 |
 | **Rehearsal** | Regression suite and benchmark | v1: `python -m rehearsal`, replayed in CI; `tools/harness.py` for a host |
 | **Director** | Story sifting, pacing, quests from the ledger | Planned; the registry is in `thespis/director.py` |
-| **Stage** | Game adapters and engine SDKs | The `/v1` protocol and the library (`thespis.api`); engine SDKs planned |
+| **Stage** | Game adapters and engine SDKs | The library (`thespis.api`), the `/v1` protocol, and clients for Godot 4 and Unity |
 
 ## Deploy
 
