@@ -8,6 +8,7 @@
 | [protocol.md](protocol.md) | The reference: every table of the game file, every call, in the library and over `/v1` HTTP; [openapi-v1.json](openapi-v1.json) is the HTTP contract |
 | [serve.md](serve.md) | `thespis serve`: a sidecar beside a game, or a server for many projects |
 | [models.md](models.md) | Which models voice the NPCs, any provider or none, and local models for playing offline |
+| [maintainers.md](maintainers.md) | Running the hosted demo: the Railway service, its settings, checks after a deploy, backups, releases |
 | [../sdk/godot/README.md](../sdk/godot/README.md) | The Godot 4 addon |
 | [../sdk/unity/README.md](../sdk/unity/README.md) | The Unity package |
 
