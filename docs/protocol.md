@@ -403,6 +403,19 @@ compares them. A snapshot of another game, or from a newer Thespis, is refused. 
 an engine with one number type (GDScript reads every JSON number as a float) can still hand it back parsed, and it
 restores the same, but there's no reason to unpack it.
 
+**A save outlives a patch.** A save made before the game file changed restores under the new file, brought up to it,
+and `Session.patched` says how, a line each. Ids are what a save goes by, so keep them stable from one release to
+the next:
+
+| In the new file | A save made before it |
+| --- | --- |
+| An NPC is gone, or its id changed | It retires: it sees, says and decides nothing more, and keeps what it believed. Others keep what they believe of it. A new id is a new NPC |
+| A new NPC | It joins at its `start`, knowing nothing yet |
+| A place is gone | Whoever stood there goes back to their start |
+| A new player | They join at their `start` |
+| A kind is gone, and the save has people of it | Refused: nothing is left to say who they are. Keep the `[kind]` |
+| Lines, words, choices, feelings, numbers | Used from then on. What each NPC already believes, and how it feels now, stand |
+
 ### Errors
 
 A call is checked against the game before it changes anything: who it names, where, which predicate, which drive,

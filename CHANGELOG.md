@@ -15,6 +15,9 @@ to PyPI and GitHub Releases from the section below that has its number.
   unknown person, place, predicate, drive, moment, trigger or binding, saying what was probably meant, instead of
   taking it as new (a misspelt drive used to become a new one) or failing with a Python `KeyError`. A damaged
   snapshot is a `DefinitionError` (HTTP 400), not a 500.
+- **A save outlives a patch.** A save made before the game file changed restores under the new one: an NPC the
+  file dropped (or renamed) retires with what it believed, a new one joins, whoever stood in a removed place goes
+  back to their start, and `Session.patched` says what changed. It used to load and then fail on the first tick.
 - **`[custom]`** holds a game's own data; any other table Thespis doesn't know is a mistake.
 - A file that loaded before may now be refused: a predicate a choice or feeling names must be in `[words.claims]`,
   and a drive a choice names must be some NPC's or kind's.
