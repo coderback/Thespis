@@ -7,6 +7,7 @@
 | [getting-started.md](getting-started.md) | Thespis in your own game: the game file, then the calls a game makes, in order |
 | [protocol.md](protocol.md) | The reference: every table of the game file, every call, in the library and over `/v1` HTTP; [openapi-v1.json](openapi-v1.json) is the HTTP contract |
 | [serve.md](serve.md) | `thespis serve`: a sidecar beside a game, or a server for many projects |
+| [tuning.md](tuning.md) | The numbers that decide outcomes: how sure a belief starts, how far a story travels, what happens when stories meet, and which knob to turn |
 | [models.md](models.md) | Which models voice the NPCs, any provider or none, and local models for playing offline |
 | [maintainers.md](maintainers.md) | Running the hosted demo: the Railway service, its settings, checks after a deploy, backups, releases |
 | [../sdk/godot/README.md](../sdk/godot/README.md) | The Godot 4 addon |
