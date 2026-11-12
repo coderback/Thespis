@@ -138,6 +138,7 @@ class Storage(Protocol):
     def session_version(self, sid: str) -> int | None: ...
     def delete_session(self, project: str, sid: str) -> bool: ...
     def open_sessions(self, project: str) -> int: ...
+    def oldest_sessions(self, project: str, n: int) -> list[str]: ...
 
     def record(self, events: Sequence[Usage]) -> None: ...
     def usage(self, project: str, since: float = 0, until: float | None = None,
@@ -265,6 +266,11 @@ class _Sql:
     def open_sessions(self, project: str) -> int:
         row = self._one("SELECT COUNT(*) FROM sessions WHERE project = ?", (project,))
         return row[0] if row else 0
+
+    def oldest_sessions(self, project: str, n: int) -> list[str]:
+        """The project's `n` sessions saved longest ago, oldest first."""
+        return [r[0] for r in self._all("SELECT id FROM sessions WHERE project = ? ORDER BY updated_at, id LIMIT ?",
+                                        (project, n))]
 
     # ------------------------------------------------------------ usage
     def record(self, events: Sequence[Usage]) -> None:

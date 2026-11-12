@@ -324,13 +324,28 @@ class Host:
 
     def open(self, project: Project, gid: str, seed: int = 0, snapshot: Mapping | None = None) -> tuple[str, Live]:
         game = self.game(project, gid)
-        if project.caps.max_sessions and self.storage.open_sessions(project.id) >= project.caps.max_sessions:
+        if project.caps.max_sessions and self.storage.open_sessions(project.id) >= project.caps.max_sessions                 and not self._make_room(project):
             raise HostError(503, "full", "The project holds as many sessions as it may; close one first")
         sid = secrets.token_urlsafe(12)
         session = self._session(project, sid, game, snapshot, seed)
         self.storage.create_session(project.id, sid, gid, session.snapshot())
         live = self._hold(sid, Live(session, project.id, gid, 1))
         return sid, live
+
+    def _make_room(self, project: Project) -> bool:
+        """A sidecar at its limit drops the session saved longest ago that nobody here is playing: a game killed on
+        quit never closes its session, so the sessions of runs long over would otherwise fill it, and a few hundred
+        launches in, refuse the game its NPCs. A server never drops a project's session."""
+        if self.mode != SIDECAR:
+            return False
+        with self._lock:
+            playing = set(self._live)
+        for sid in self.storage.oldest_sessions(project.id, len(playing) + 1):
+            if sid not in playing:
+                self.storage.delete_session(project.id, sid)
+                log.info("session %s: dropped, the oldest of %d, to make room", sid, project.caps.max_sessions)
+                return True
+        return False
 
     def live(self, project: Project, sid: str) -> Live:
         """The session, from memory if it is current there, otherwise from storage."""

@@ -18,6 +18,9 @@ to PyPI and GitHub Releases from the section below that has its number.
 - **A save outlives a patch.** A save made before the game file changed restores under the new one: an NPC the
   file dropped (or renamed) retires with what it believed, a new one joins, whoever stood in a removed place goes
   back to their start, and `Session.patched` says what changed. It used to load and then fail on the first tick.
+- **A shipped game's sidecar no longer fills up.** The engines' launchers kill it on quit, so its sessions were
+  never closed, and after 256 launches it refused new ones. At its limit a sidecar now drops the session saved
+  longest ago that nobody is playing. A server still refuses with 503.
 - **`[custom]`** holds a game's own data; any other table Thespis doesn't know is a mistake.
 - A file that loaded before may now be refused: a predicate a choice or feeling names must be in `[words.claims]`,
   and a drive a choice names must be some NPC's or kind's.

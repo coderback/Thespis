@@ -28,6 +28,9 @@ thespis serve --game game.toml --port 0 --db saves/thespis.sqlite --parent <the 
 - If `THESPIS_TOKEN` is set when it starts, every call must send `Authorization: Bearer <token>`. That keeps other
   programs on the machine out. A launcher makes one up per start.
 - `--db` is where sessions are kept: a SQLite file (the runtime's cache folder if left out), or `:memory:` for none.
+- It keeps up to `--max-sessions` (256). At that many, opening one more drops the session saved longest ago that
+  isn't being played, since a game killed on quit never closes its own. Keep a game's saves in its own save files
+  (`snapshot`), not in the sidecar.
 - A game can send its definition instead of a path: `PUT /v1/games/{id}` with `{"toml": "..."}`.
 - `--embed local` also starts the embedding model for memory by meaning (BGE small, on the CPU), for games that
   declare `[memory]`. `EMBED_*` points at any other.
@@ -117,7 +120,7 @@ somewhere private isn't caught; a firewall on the server's outbound traffic is t
 ### Caps and usage
 
 **Caps.** Each project has:
-- `max_sessions` open at once (503 `full` when reached);
+- `max_sessions` open at once (503 `full` when reached; a sidecar drops its oldest idle session instead);
 - `calls_per_day` and `tokens_per_day`, by UTC day;
 - `max_games` of its own.
 
