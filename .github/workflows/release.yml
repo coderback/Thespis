@@ -2,7 +2,10 @@ name: Release
 
 # Pushing a tag like v0.3.1 releases that version: the package is built and checked, published to PyPI as
 # thespis-sdk by trusted publishing (no token is stored here), then a GitHub Release is made with its notes from
-# CHANGELOG.md. The tag must match thespis.__version__, and the changelog must have a section for it.
+# CHANGELOG.md and the runtime a game ships beside it, one zip per platform (tools/package.py, which checks each
+# against its size and cold-start budgets and plays a turn through it). The tag must match thespis.__version__, and
+# the changelog must have a section for it. PyPI doesn't wait for the runtimes; the GitHub Release does, so a runtime
+# that fails a budget is fixed or re-run before the release is made.
 on:
   push:
     tags: ["v*"]
@@ -50,9 +53,31 @@ jobs:
           name: dist
       - uses: pypa/gh-action-pypi-publish@release/v1
 
+  runtimes:
+    name: runtime (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]  # linux-x64, windows-x64, macos-arm64
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install
+        run: |
+          pip install -r requirements.txt
+          pip install pyinstaller==6.22.3
+      - name: Build, check budgets, play a turn
+        run: python tools/package.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: runtime-${{ matrix.os }}
+          path: dist/thespis-*.zip
+
   github:
     name: GitHub Release
-    needs: pypi
+    needs: [pypi, runtimes]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -60,7 +85,15 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: dist
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: runtime-*
+          path: runtimes
+          merge-multiple: true
       - name: Release with its notes and files
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "${GITHUB_REF_NAME}" dist/* --repo "${GITHUB_REPOSITORY}" --title "${GITHUB_REF_NAME}" --notes-file notes.md
+        run: |
+          ls dist runtimes
+          gh release create "${GITHUB_REF_NAME}" dist/* runtimes/thespis-*.zip --repo "${GITHUB_REPOSITORY}" \
+            --title "${GITHUB_REF_NAME}" --notes-file notes.md

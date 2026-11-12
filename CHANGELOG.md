@@ -6,6 +6,9 @@ to PyPI and GitHub Releases from the section below that has its number.
 
 ## Unreleased
 
+- **Prebuilt runtimes.** Each GitHub Release attaches the sidecar a game ships beside it, for Windows (x64), macOS
+  (Apple silicon) and Linux (x64), each checked against its size and cold-start budgets: unzip as `thespis/` beside
+  the game's executable.
 - **`docs/tuning.md`:** the numbers that decide outcomes, worked through: the trust ladder (0.9, 0.4, 0.2), how far
   a story travels before the gossip threshold stops it, how stories fuse and conflict, and which knob to turn.
 - **A sidecar answers only this machine.** It refuses (403) a request whose `Host` isn't localhost, so a web page
