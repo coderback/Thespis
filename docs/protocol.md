@@ -405,7 +405,21 @@ restores the same, but there's no reason to unpack it.
 
 ### Errors
 
-HTTP errors carry `{error, reason}`:
+A call is checked against the game before it changes anything: who it names, where, which predicate, which drive,
+which moment, which line. A slip is refused with what was probably meant, rather than taken as new:
+
+- **`observe`:** the actor, the target, `at`, and the witnesses must be people (or, for the target, a place) the
+  session has. A claim needs `pred` and `a`, a predicate in `[words.claims]`, and people the session has (in a cast
+  that grows, a claim may name someone not yet added).
+- **`update`:** a place in `[places]`, drives some NPC or kind has, and trust in people the session has. A player
+  has only a place.
+- **`decide`:** a moment the NPC has, every binding its choices name, and a person for a binding they use as one
+  (`with = "{who}"`). Unknown moments are listed with the ones it has.
+- **`react`:** a trigger some NPC has a line for. An NPC with no line for a trigger others have stays silent.
+- **`tick`:** a whole number of steps from 0. **`restore`:** a snapshot `snapshot()` made.
+
+The library raises `Unknown` (a name it doesn't have) or `DefinitionError` (a call or definition put wrongly). HTTP
+errors carry `{error, reason}`:
 
 | Status | Error | Cause |
 | --- | --- | --- |

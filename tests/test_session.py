@@ -295,7 +295,7 @@ def test_http_errors_say_what_went_wrong():
     r = client.post(f"/v1/sessions/{sid}/decide", json={"npc": "garrick"})
     assert (r.status_code, r.json()["error"]) == (400, "bad_request")
     r = client.post(f"/v1/sessions/{sid}/decide", json={"npc": "wren", "moment": "turn"})
-    assert (r.status_code, r.json()["reason"]) == (404, "wren has no choices for 'turn'")
+    assert (r.status_code, r.json()["reason"]) == (404, "wren has no choices for 'turn'; the game declares none for it")
     assert client.delete(f"/v1/sessions/{sid}").status_code == 204
     assert client.get(f"/v1/sessions/{sid}/snapshot").status_code == 404
 

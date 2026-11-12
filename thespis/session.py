@@ -76,7 +76,7 @@ from thespis.ledger import Claim, Event
 from thespis.minds import NPC
 from thespis.perception import at_the_scene, reported
 from thespis.recall import Embedder, MeaningRetriever, Weights
-from thespis.schema import DRIVES, EVERYONE, TRUST, examine, refuse
+from thespis.schema import CLAIM_KEYS, DRIVES, EVERYONE, TRUST, examine, near, refuse
 from thespis.tick import Tick, gossip, run_tick, spread, walks
 from thespis.voice import View, Voice
 from thespis.world import World
@@ -492,10 +492,17 @@ class Session:
             w = self.world
             if conf is not None and (not said or isinstance(conf, bool) or not 0 <= conf <= 1):
                 raise DefinitionError("conf is how far a statement (said) is believed, from 0 to 1")
-            c = claim if isinstance(claim, Claim) or claim is None else Claim.from_json(dict(claim))
+            if isinstance(witnesses, str):
+                raise DefinitionError(f"witnesses: a list of ids, not one string: [{witnesses!r}]")
+            self._someone("actor", actor)
+            if target is not None:
+                self._someone("target", target, places=True)
+            self._place("at", at)
+            c = self._claim(claim)
             unknown = [n for n in witnesses if n not in w.npcs and not w.is_player(n)]
             if unknown:
-                raise Unknown(f"no npc or player {', '.join(unknown)}")
+                raise Unknown(f"witnesses: no npc or player {', '.join(map(repr, unknown))}"
+                              f"{near(unknown[0], self._people())}")
             where = at or self._where(actor)
             truth = true if true is not None else (w.ledger.happened(c) if said and c else True)
             e = w.ledger.append(w.phase, verb, actor, target, where, c, truth, amount)
@@ -523,15 +530,25 @@ class Session:
         """The engine's rules changed an NPC: where it is, its drives (set, or `nudge`d by a step), its flags, its
         trust. Drives stay within 0 to 10 and trust within -5 to 5. "player" takes only `loc`."""
         with self._lock:
-            if npc == "player":
-                if loc is not None:
-                    self.world.player["loc"] = loc
-                return dict(self.world.player)
-            if npc in self.world.players:
+            self._place("loc", loc)
+            if npc == "player" or npc in self.world.players:
+                if any(x is not None for x in (drives, nudge, flags, trust_in)):
+                    raise DefinitionError(f"a player has only a place: update({npc!r}, loc=...)")
+                if npc == "player":
+                    if loc is not None:
+                        self.world.player["loc"] = loc
+                    return dict(self.world.player)
                 if loc is not None:
                     self.world.players[npc]["loc"] = loc
                 return {"id": npc, **self.world.players[npc]}
             n = self._npc(npc)
+            for name, given in (("drives", drives), ("nudge", nudge)):
+                for k in given or {}:
+                    if k not in self._drives and k not in n.drives:
+                        raise Unknown(f"{name}.{k}: no NPC has a drive {k!r}{near(k, self._drives)}; a drive the "
+                                      "engine sets is declared in the game file, as drives = { " + k + " = 0 }")
+            for k in trust_in or {}:
+                self._someone(f"trust_in.{k}", k)
             if loc is not None:
                 n.loc = loc
             for k, v in (drives or {}).items():
@@ -557,7 +574,18 @@ class Session:
             self._npc(npc)
             cs = self._choices(npc, moment)
             if cs is None:
-                raise Unknown(f"{npc} has no choices for {moment!r}")
+                moments = self._moments(npc)
+                raise Unknown(f"{npc} has no choices for {moment!r}" + (
+                    f"; it has {', '.join(map(repr, moments))}{near(moment, moments)}" if moments else
+                    "; the game declares none for it"))
+            missing = sorted(cs.needs - set(b))
+            if missing:
+                raise DefinitionError(f"{npc}'s choices for {moment!r} need bindings: "
+                                      + ", ".join(f"{k!r}" for k in missing) + " (decide(..., bindings={"
+                                      + ", ".join(f"{k!r}: ..." for k in missing) + "}))")
+            for k in sorted(cs.people):
+                if isinstance(b[k], str):
+                    self._someone(f"bindings.{k}", b[k])
             if npc in w.gone:
                 return Line(None, npc, None)
             view = View(w.player["loc"])
@@ -588,6 +616,10 @@ class Session:
         with self._lock:
             w = self.world
             self._npc(npc)
+            if not any(trigger in (t.get("lines") or {}) for t in (*self.cast.data.get("npc", {}).values(),
+                                                                  *self.game.kinds.values())):
+                said_any = sorted({k for t in self.cast.data.get("npc", {}).values() for k in t.get("lines") or {}})
+                raise Unknown(f"no NPC has a line for {trigger!r}{near(trigger, said_any)}")
             said = None if npc in w.gone else \
                 self._template(npc, trigger, list(cites) or [self.voice.latest(w, npc)], dict(fill or {}))
             if said is None:
@@ -649,6 +681,8 @@ class Session:
     def tick(self, steps: int = 1) -> Tick:
         """The minds' own time, `steps` phases of it: scheduled walks, then gossip, then drives settling, then the
         next phase. Everyone at the scene of what it does sees it."""
+        if isinstance(steps, bool) or not isinstance(steps, int) or steps < 0:
+            raise DefinitionError(f"steps: how many ticks, a whole number from 0, got {steps!r}")
         with self._lock:
             w, d = self.world, self.cast.data
             g = d.get("gossip")
@@ -744,13 +778,19 @@ class Session:
         """A session from a snapshot of this game. A snapshot from a newer Thespis, or of another game, is refused.
         One that went through an engine with a single number type (GDScript reads every JSON number as a float)
         restores the same."""
+        if not isinstance(snapshot, Mapping) or "thespis" not in snapshot:
+            raise DefinitionError("not a Thespis save: a snapshot is the table Session.snapshot() returns")
         if snapshot.get("thespis") != SNAPSHOT_VERSION:
             raise DefinitionError(f"snapshot version {snapshot.get('thespis')!r}; this Thespis reads "
                                   f"{SNAPSHOT_VERSION}")
         if snapshot.get("game") != game.id:
             raise DefinitionError(f"snapshot of {snapshot.get('game')!r}, not {game.id!r}")
-        world = World.from_json(_numbers(dict(snapshot["world"])))
-        return cls(game, world, {k: list(v) for k, v in dict(snapshot.get("witnesses", {})).items()}, **kw)
+        try:
+            world = World.from_json(_numbers(dict(snapshot["world"])))
+            witnesses = {k: list(v) for k, v in dict(snapshot.get("witnesses", {})).items()}
+        except (KeyError, TypeError, ValueError, AttributeError) as e:
+            raise DefinitionError(f"a damaged snapshot: {type(e).__name__} {e}") from e
+        return cls(game, world, witnesses, **kw)
 
     def inspect(self, npc: str) -> dict:
         """One NPC's mind as it stands: its state and every belief, retracted ones included, with their evidence."""
@@ -774,6 +814,61 @@ class Session:
         if npc not in self.world.npcs:
             raise Unknown(f"no npc {npc!r}")
         return self.world.npcs[npc]
+
+    def _people(self) -> set[str]:
+        w = self.world
+        return {"player", *w.players, *w.npcs}
+
+    def _someone(self, where: str, x: object, places: bool = False) -> None:
+        """`x` names an NPC or a player (or, with `places`, a place); else Unknown, with what was probably meant."""
+        known = self._people() | (set(self.game.places) if places else set())
+        if not isinstance(x, str) or (x not in known and not (places and not self.game.places)):
+            what = "npc, player or place" if places else "npc or player"
+            raise Unknown(f"{where}: no {what} {x!r}{near(x, known)}")
+
+    def _place(self, where: str, x: object) -> None:
+        if x is not None and self.game.places and x not in self.game.places:
+            raise Unknown(f"{where}: no place {x!r} in [places]{near(x, self.game.places)}")
+
+    def _claim(self, claim: Claim | Mapping | None) -> Claim | None:
+        """A claim the engine reports, checked: its keys, a predicate the game declares, and who it names."""
+        if claim is None or isinstance(claim, Claim):
+            c = claim
+        else:
+            if not isinstance(claim, Mapping) or "pred" not in claim or "a" not in claim:
+                raise DefinitionError(f"claim: needs pred and a, as {{\"pred\": ..., \"a\": ..., \"b\": ...}}, "
+                                      f"got {claim!r}")
+            extra = [k for k in claim if k not in CLAIM_KEYS]
+            if extra:
+                raise DefinitionError(f"claim: unknown key {extra[0]!r}{near(extra[0], CLAIM_KEYS)}")
+            c = Claim.from_json(dict(claim))
+        if c is None:
+            return None
+        preds = self.game.claim_words
+        if preds and c.pred not in preds:
+            raise Unknown(f"claim.pred: no predicate {c.pred!r} in [words.claims]{near(c.pred, preds)}")
+        if not self.game.kinds:  # in a cast that grows, a claim may name someone not (yet) in it
+            self._someone("claim.a", c.a)
+            if c.b:
+                self._someone("claim.b", c.b, places=True)
+        self._place("claim.place", c.place)
+        return c
+
+    def _moments(self, npc: str) -> list[str]:
+        kind = self.world.cast.get(npc, {}).get("kind")
+        return [m for (who, m) in self.game.choices if who == npc] + \
+            [m for (k, m) in self.game.kind_choices if kind is not None and k == kind]
+
+    @cached_property
+    def _drives(self) -> frozenset[str]:
+        """Every drive the game file gives an NPC or kind."""
+        out: set[str] = set()
+        for t in (*self.game.cast.data.get("npc", {}).values(), *self.game.kinds.values()):
+            for key in ("drives", "settle", "decay"):
+                out |= set(t.get(key, {}))
+            for moves in t.get("feels", {}).values():
+                out |= set(moves)
+        return frozenset(out)
 
     def _where(self, who: str) -> str:
         return self.world.where(who)
