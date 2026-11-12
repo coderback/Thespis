@@ -44,7 +44,7 @@ def test_a_game_may_name_nobody_and_declare_kinds():
     ('[game]\nid = "x"', "at least one [npc.<id>], or a [kind.<id>]"),
     ('[kind.k]\npersona = "p"', 'kind.k: needs goal = "..."'),
     ('[kind.k]\npersona = "p"\ngoal = "g"\nname = "Ann"', "kind.k: name is each person's own"),
-    ('[places]\na = "A"\n[kind.k]\npersona = "p"\ngoal = "g"\nwalk = ["b"]', "kind.k: 'b' is not in [places]"),
+    ('[places]\na = "A"\n[kind.k]\npersona = "p"\ngoal = "g"\nwalk = ["b"]', "kind.k.walk[0]: 'b' is not in [places]"),
     ('[kind.k]\npersona = "p"\ngoal = "g"\n[kind.k.feels]\nrobbed = { anger = 0.5 }', "kind.k.feels.robbed"),
     ('[kind.k]\npersona = "p"\ngoal = "g"\n[[kind.k.choices.meet]]\ndo = "greet"', "kind.k.choices.meet[0]"),
     ('[kind.k]\npersona = "p"\ngoal = "g"\n[claims]\none_actor = "robbed"', "claims.one_actor: a list"),

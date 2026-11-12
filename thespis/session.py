@@ -6,7 +6,7 @@ people are and how they feel when its own rules change that (`update`), and asks
 settling back towards rest. `snapshot` and `restore` carry the minds in and out of the engine's own save files.
 
 A game is one TOML file (examples/tavern/game.toml): its cast, places, choices (thespis.considerations), lines and
-words. Everything in it is checked when it loads. What a game declares there, it gets; nothing more:
+words. Everything in it is checked when it loads (thespis.schema). What a game declares there, it gets; nothing more:
   - `[players.<id>]`: more players than the one, each with a name and a place, or the engine `join`s them. Each is
     an actor, a target and a witness like any character; NPCs hold beliefs about each by id; `narrate(to=...)` tells
     one of them only what they saw or took part in.
@@ -76,17 +76,15 @@ from thespis.ledger import Claim, Event
 from thespis.minds import NPC
 from thespis.perception import at_the_scene, reported
 from thespis.recall import Embedder, MeaningRetriever, Weights
+from thespis.schema import DRIVES, EVERYONE, TRUST, examine, refuse
 from thespis.tick import Tick, gossip, run_tick, spread, walks
 from thespis.voice import View, Voice
 from thespis.world import World
 
 SNAPSHOT_VERSION = 1
 PROVISIONAL, FINAL, WITHDRAWN = "provisional", "final", "withdrawn"
-DRIVES, TRUST = (0, 10), (-5, 5)
 ID = re.compile(r"[A-Za-z0-9_.-]+")  # an id made in play: it goes into action ids ("confront:<id>") and paths
 RESERVED = ("player", "self", "narrator")
-# `[gossip] about`: any news travels, not only news of the people listed; `gossips`: anyone passes it on
-EVERYONE = "everyone"
 WORKERS = 4  # model calls one session has in flight at once
 
 
@@ -142,10 +140,12 @@ class Game:
         self.players: dict[str, dict] = {k: dict(v) for k, v in d.get("players", {}).items()}
         self.kinds: dict[str, dict] = {k: dict(v) for k, v in d.get("kind", {}).items()} \
             if isinstance(d.get("kind", {}), dict) else {}  # kinds of people who may join in play (Session.add)
+        found, self.notes = examine(d)  # every mistake at once (thespis.schema); notes are likely slips, allowed
+        if found:
+            raise refuse(found)
         self.choices = declared(d)
         self.kind_choices = declared_kinds(d) if self.kinds else {}
         self.intents = declared_intents(d)
-        self._check()
         claims = d.get("claims", {})
         self.one_actor = frozenset(claims.get("one_actor", ()))  # deeds only one person can have done to another
         self.caught = int(claims.get("caught", 2))  # how far trust falls in whoever told the story that lost
@@ -168,7 +168,12 @@ class Game:
 
     @classmethod
     def load(cls, path: str | Path) -> Game:
-        return cls(Cast(Path(path)))
+        """The game in a TOML file, checked (thespis.schema): a mistake raises DefinitionError naming its entry, or
+        every one, a line each."""
+        try:
+            return cls(Cast(Path(path)))
+        except tomllib.TOMLDecodeError as e:
+            raise DefinitionError(f"not TOML: {e}") from e
 
     @classmethod
     def parse(cls, text: str, name: str = "game") -> Game:
@@ -182,80 +187,6 @@ class Game:
     def digest(self) -> str:
         """A fingerprint of the definition, saved in snapshots so a restore can tell the game changed under it."""
         return hashlib.sha256(self.cast.source).hexdigest()[:16]
-
-    def _check(self) -> None:
-        d = self.cast.data
-        npcs, kinds = d.get("npc", {}), d.get("kind", {})
-        if not isinstance(npcs, dict) or not isinstance(kinds, dict) or not (npcs or kinds):
-            raise DefinitionError("a game needs at least one [npc.<id>], or a [kind.<id>] for people who join in play")
-        for npc, t in npcs.items():
-            for key in ("name", "persona", "goal", "start"):
-                if not isinstance(t.get(key), str):
-                    raise DefinitionError(f"npc.{npc}: needs {key} = \"...\"")
-            for place in (t["start"], *t.get("walk", [])):
-                if self.places and place not in self.places:
-                    raise DefinitionError(f"npc.{npc}: {place!r} is not in [places]")
-        for kind, t in kinds.items():
-            for key in ("persona", "goal"):
-                if not isinstance(t, dict) or not isinstance(t.get(key), str):
-                    raise DefinitionError(f"kind.{kind}: needs {key} = \"...\"")
-            for key in ("name", "start"):
-                if key in t:
-                    raise DefinitionError(f"kind.{kind}: {key} is each person's own, given when they join")
-            for place in t.get("walk", []):
-                if self.places and place not in self.places:
-                    raise DefinitionError(f"kind.{kind}: {place!r} is not in [places]")
-        claims = d.get("claims", {})
-        one_actor = claims.get("one_actor", [])
-        if not isinstance(one_actor, list) or not all(isinstance(x, str) for x in one_actor):
-            raise DefinitionError("claims.one_actor: a list of predicates")
-        if not isinstance(claims.get("caught", 0), int) or isinstance(claims.get("caught", 0), bool) \
-                or claims.get("caught", 0) < 0:
-            raise DefinitionError("claims.caught: how far trust falls, a whole number from 0")
-        if not isinstance(claims.get("first_hand", 0), int) or isinstance(claims.get("first_hand", 0), bool) \
-                or claims.get("first_hand", 0) < 0:
-            raise DefinitionError("claims.first_hand: how much more a teller who saw it counts, a whole number from 0")
-        gossips = d.get("gossip", {}).get("gossips", [])
-        if gossips != EVERYONE and not isinstance(gossips, list):
-            raise DefinitionError(f"gossip.gossips: a list of npcs, or \"{EVERYONE}\"")
-        for who in gossips if gossips != EVERYONE else ():
-            if who not in npcs:
-                raise DefinitionError(f"gossip.gossips: {who!r} is not an npc")
-        start = d.get("player", {}).get("start")
-        if self.places and start is not None and start not in self.places:
-            raise DefinitionError(f"player.start: {start!r} is not in [places]")
-        for pid, p in d.get("players", {}).items():
-            if pid in npcs or pid == "player" or not isinstance(p, dict) or not isinstance(p.get("name"), str):
-                raise DefinitionError(f"players.{pid}: needs name = \"...\", and an id no NPC has")
-            if self.places and p.get("start") is not None and p["start"] not in self.places:
-                raise DefinitionError(f"players.{pid}.start: {p['start']!r} is not in [places]")
-        most = d.get("gossip", {}).get("most")
-        if most is not None and (not isinstance(most, int) or isinstance(most, bool) or most < 1):
-            raise DefinitionError("gossip.most: how many things are told in a tick, a whole number from 1")
-        if not isinstance(d.get("gossip", {}).get("corroborate", False), bool):
-            raise DefinitionError("gossip.corroborate: true if a second witness's word makes a listener surer")
-        about = d.get("gossip", {}).get("about", [])
-        if about != EVERYONE and not (isinstance(about, list) and all(isinstance(x, str) for x in about)):
-            raise DefinitionError(f"gossip.about: a list of ids, or \"{EVERYONE}\"")
-        along = d.get("gossip", {}).get("along", {})
-        for i, t in enumerate(d.get("tie", [])):
-            pair = t.get("between")
-            if not (isinstance(pair, list) and len(pair) == 2 and all(x in npcs for x in pair) and pair[0] != pair[1]):
-                raise DefinitionError(f"tie[{i}]: between = [two different npcs]")
-            if t.get("kind") not in along:
-                raise DefinitionError(f"tie[{i}]: kind {t.get('kind')!r} is not in [gossip] along")
-        for kind, carry in along.items():
-            if not isinstance(carry, int | float) or not 0 <= carry <= 1:
-                raise DefinitionError(f"gossip.along.{kind}: how much carries, 0 to 1")
-        for where, t in (*((f"npc.{k}", v) for k, v in npcs.items()), *((f"kind.{k}", v) for k, v in kinds.items())):
-            for pred, moves in t.get("feels", {}).items():
-                if not isinstance(moves, dict) or not all(isinstance(v, int) for v in moves.values()):
-                    raise DefinitionError(f"{where}.feels.{pred}: {{drive = steps, ...}}, whole numbers")
-            for drive, c in t.get("decay", {}).items():
-                if not isinstance(c, dict) or not isinstance(c.get("half_life"), int | float) or c["half_life"] <= 0:
-                    raise DefinitionError(f"{where}.decay.{drive}: needs half_life > 0 (ticks)")
-                if not 0 <= c.get("keep", 0) <= 1:
-                    raise DefinitionError(f"{where}.decay.{drive}: keep is a share of the peak, 0 to 1")
 
     # ------------------------------------------------------------ words, as the model reads them
     def who(self, x: str | None, names: Mapping[str, str] | None = None) -> str:
