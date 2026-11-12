@@ -11,8 +11,8 @@ their own model keys on a server (`PUT /v1/project/model`), and export their usa
 
 Errors carry `{error, reason}`: 400 for a malformed body or a definition the call breaks, 401 without the right key,
 404 for an unknown game, session, NPC, moment or line, 409 for a call the game doesn't allow now (or a session another
-instance moved on), 413 for a game too large, 429 over a project's cap, 503 when the project holds its limit of
-sessions. Sessions are kept by the host (thespis.host): in memory, in a sidecar's SQLite file, or in a server's
+instance moved on), 413 for a game or a body too large, 429 over a project's cap, 503 when the project holds its
+limit of sessions. A sidecar refuses (403) a request whose Host isn't this machine. Sessions are kept by the host (thespis.host): in memory, in a sidecar's SQLite file, or in a server's
 database.
 """
 
@@ -21,6 +21,7 @@ from __future__ import annotations
 import asyncio
 import csv
 import io
+import json
 from collections.abc import Mapping
 from typing import Annotated, Any
 
@@ -32,7 +33,7 @@ from pydantic import BaseModel, Field
 from thespis import offline
 from thespis.considerations import DefinitionError
 from thespis.gateway import ModelGateway
-from thespis.host import MEMORY, Host, HostError
+from thespis.host import MEMORY, SIDECAR, Host, HostError
 from thespis.ledger import Event
 from thespis.play import NotAllowed
 from thespis.session import Game, Session, Unknown
@@ -304,6 +305,80 @@ class _Traced:
             s.set_attribute("http.route", getattr(route, "path", scope["path"]))
 
 
+MAX_BODY_BYTES = 1024 * 1024  # any call's body at most, but one opening a session
+MAX_SNAPSHOT_BYTES = 64 * 1024 * 1024  # a session opened from a snapshot: a town of 200 after 2000 events is ~2 MB
+
+
+class _TooLarge(Exception):
+    pass
+
+
+class _Guarded:
+    """What every request passes before a route, as plain ASGI. A body over its limit is refused (413) before it is
+    read whole, whether it says its length or not. A sidecar answers only requests addressed to this machine: a web
+    page whose name an attacker points at 127.0.0.1 (DNS rebinding) sends its own name in Host, and is refused (403),
+    so a page in the player's browser can't play with the game's sidecar."""
+
+    def __init__(self, app, host: Host):
+        self.app, self.host = app, host
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http":
+            return await self.app(scope, receive, send)
+        headers = dict(scope.get("headers") or [])
+        if self.host.mode == SIDECAR and not offline.local(_hostname(headers.get(b"host", b"").decode("latin-1"))):
+            return await _refuse(send, 403, "forbidden", "a sidecar answers only to this machine: Host must be "
+                                                         "localhost, 127.0.0.1 or [::1]")
+        limit = MAX_SNAPSHOT_BYTES if (scope["method"], scope["path"]) == ("POST", "/v1/sessions") else MAX_BODY_BYTES
+        reason = f"a request body is at most {limit // 1024} KB"
+        try:
+            if int(headers.get(b"content-length", b"0")) > limit:
+                return await _refuse(send, 413, "too_large", reason)
+        except ValueError:
+            return await _refuse(send, 400, "bad_request", "Content-Length is not a number")
+        got, over, started = 0, False, False
+
+        async def counted():
+            nonlocal got, over
+            message = await receive()
+            if message["type"] == "http.request":
+                got += len(message.get("body", b""))
+                if got > limit:
+                    over = True
+                    raise _TooLarge
+            return message
+
+        async def sending(message):
+            nonlocal started
+            if over:  # what the app made of a body cut short is not sent: the refusal is
+                if message["type"] == "http.response.start" and not started:
+                    started = True
+                    await _refuse(send, 413, "too_large", reason)
+                return
+            started = started or message["type"] == "http.response.start"
+            await send(message)
+
+        try:
+            await self.app(scope, counted, sending)
+        except _TooLarge:
+            if not started:
+                await _refuse(send, 413, "too_large", reason)
+
+
+def _hostname(host: str) -> str:
+    """The name in a Host header, without its port: 'localhost:8123' -> 'localhost', '[::1]:80' -> '::1'."""
+    if host.startswith("["):
+        return host[1:host.find("]")] if "]" in host else host
+    return host.rsplit(":", 1)[0] if host.count(":") == 1 else host
+
+
+async def _refuse(send, status: int, error: str, reason: str) -> None:
+    body = json.dumps({"error": error, "reason": reason}).encode()
+    await send({"type": "http.response.start", "status": status,
+                "headers": [(b"content-type", b"application/json"), (b"content-length", str(len(body)).encode())]})
+    await send({"type": "http.response.body", "body": body})
+
+
 Caller = Annotated[Project, Depends(_caller)]
 
 
@@ -324,6 +399,7 @@ def create_app(games: Mapping[str, Game] | None = None, gateway: ModelGateway | 
     app.state.host = host
 
     app.add_middleware(_Traced)
+    app.add_middleware(_Guarded, host=host)  # added last, so it runs first
 
     @app.exception_handler(HostError)
     async def host_error(request: Request, exc: HostError):

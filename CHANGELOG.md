@@ -6,6 +6,9 @@ to PyPI and GitHub Releases from the section below that has its number.
 
 ## Unreleased
 
+- **A sidecar answers only this machine.** It refuses (403) a request whose `Host` isn't localhost, so a web page
+  can't reach it by DNS rebinding, and warns at start when it has no `THESPIS_TOKEN`. Every `/v1` body is at most
+  1 MB (64 MB to open a session from a snapshot), refused (413) before it is read whole.
 - **Docs for outsiders.** How the hosted demo is run moved from the README to `docs/maintainers.md`; `docs/models.md`
   opens with any provider or none, then what the demo uses. The PyPI page is the README up to running the repository.
   The scripts that set up the hackathon's GitHub project are gone.

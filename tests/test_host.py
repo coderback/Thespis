@@ -72,10 +72,10 @@ def test_a_server_wants_a_projects_key_and_keeps_projects_apart(tmp_path):
 
 def test_a_sidecar_serves_its_one_project_with_or_without_a_token(tmp_path):
     open_client = TestClient(create_app(host=Host(SqliteStorage(tmp_path / "a.sqlite"), {"tavern": TAVERN},
-                                                  mode=SIDECAR)))
+                                                  mode=SIDECAR)), base_url="http://127.0.0.1:8123")
     assert open_client.get("/v1/project").json()["name"] == "local"
     locked = TestClient(create_app(host=Host(SqliteStorage(tmp_path / "b.sqlite"), {"tavern": TAVERN},
-                                             mode=SIDECAR, token="t0k")))
+                                             mode=SIDECAR, token="t0k")), base_url="http://localhost")
     assert locked.get("/v1/games").status_code == 401
     assert locked.get("/v1/games", headers={"Authorization": "Bearer t0k"}).status_code == 200
     r = locked.put("/v1/project/model", json={"primary": {"model": "m", "base_url": "https://x.example"}},
@@ -243,12 +243,12 @@ def test_a_sidecar_at_its_limit_drops_the_oldest_session_nobody_is_playing(tmp_p
     db = tmp_path / "sessions.sqlite"
     for _ in range(3):  # three runs of the game, each opening a session and quitting without closing it
         host = Host(SqliteStorage(db), {"tavern": TAVERN}, mode=SIDECAR, max_sessions=2)
-        client = TestClient(create_app(host=host))
+        client = TestClient(create_app(host=host), base_url="http://127.0.0.1")
         r = client.post("/v1/sessions", json={"game": "tavern"})
         assert r.status_code == 201
         host.storage.close()
     host = Host(SqliteStorage(db), {"tavern": TAVERN}, mode=SIDECAR, max_sessions=2)
-    client = TestClient(create_app(host=host))
+    client = TestClient(create_app(host=host), base_url="http://127.0.0.1")
     first, second = (client.post("/v1/sessions", json={"game": "tavern"}).json()["session"] for _ in range(2))
     assert host.storage.open_sessions("local") == 2
     assert client.get(f"/v1/sessions/{first}/snapshot").status_code == 200  # this run's own sessions stay...
