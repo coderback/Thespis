@@ -160,8 +160,9 @@ await thespis.RestoreAsync("tavern", save.minds);   // sent back exactly as writ
 random token through its environment.
 - **When it stops:** the sidecar stops with the game. `ThespisBehaviour` kills it on quit, and `--parent` has the
   runtime watch the game's process in case the game is killed first.
-- **Shipping it:** ship the packaged runtime from `python tools/package.py` as `thespis/` beside the build's
-  executable.
+- **Shipping it:** ship the packaged runtime as `thespis/` beside the build's executable. Each
+  [release](https://github.com/coderback/Thespis/releases) has it for Windows (x64), macOS (Apple silicon) and Linux (x64): `thespis-<os>-<arch>.zip` unzips
+  to `thespis/`. For another platform, build it there with `python tools/package.py`.
 - **The local model:** it must be on the player's machine before the first offline run (`thespis models pull <id>`).
 - **Sessions:** they're kept under `Application.persistentDataPath/thespis/`.
 

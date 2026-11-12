@@ -53,7 +53,8 @@ that isn't to this machine ([thespis/offline.py](../thespis/offline.py)):
 
 `python tools/package.py` builds `dist/thespis-<os>-<arch>.zip`: one folder, holding one executable, that needs no
 Python. It also checks the build against its budgets and plays a turn through it. CI builds and checks it on Windows,
-macOS and Linux.
+macOS and Linux, and each [release](https://github.com/coderback/Thespis/releases) attaches all three (Windows x64, macOS arm64, Linux x64), built from the
+release's tag.
 
 | | Budget | Windows, CI | macOS, CI | Linux, CI | Windows, a Ryzen 7 5800H laptop |
 | --- | --- | --- | --- | --- | --- |

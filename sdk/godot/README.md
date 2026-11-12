@@ -136,8 +136,9 @@ Keep the snapshot as text. Parsed into a `Dictionary`, its whole numbers would b
 token through its environment, so no other program on the machine can use it.
 - **When it stops:** the sidecar stops with the game. The client kills it on the way out, and `--parent` has the
   runtime watch the game's process in case the game is killed first.
-- **Shipping it:** ship the packaged runtime from `python tools/package.py` (one folder, about 20 MB, no Python
-  needed) as `thespis/` beside the game's executable.
+- **Shipping it:** ship the packaged runtime (one folder, about 20 MB, no Python needed) as `thespis/` beside the
+  game's executable. Each [release](https://github.com/coderback/Thespis/releases) has it for Windows (x64), macOS (Apple silicon) and Linux (x64):
+  `thespis-<os>-<arch>.zip` unzips to `thespis/`. For another platform, build it there with `python tools/package.py`.
 - **The local model:** it must be on the player's machine before the first offline run. The runtime fetches it once
   while online with `thespis models pull <id>`, or your installer can.
 - **Sessions:** they're kept in `user://thespis/sessions.sqlite`.
