@@ -234,3 +234,30 @@ def test_idle_sessions_leave_memory_and_come_back_from_storage(tmp_path):
 def test_memory_mode_is_the_libraryish_default():
     host = Host(games={"tavern": TAVERN})
     assert host.mode == MEMORY and host.authenticate(None).name == "local"
+
+
+# ---------------------------------------------------------------- a sidecar that's been launched many times
+def test_a_sidecar_at_its_limit_drops_the_oldest_session_nobody_is_playing(tmp_path):
+    """The engines' launchers kill the sidecar on quit, so a session is never closed: a shipped game's sidecar would
+    fill up after max_sessions launches and refuse the game its NPCs."""
+    db = tmp_path / "sessions.sqlite"
+    for _ in range(3):  # three runs of the game, each opening a session and quitting without closing it
+        host = Host(SqliteStorage(db), {"tavern": TAVERN}, mode=SIDECAR, max_sessions=2)
+        client = TestClient(create_app(host=host))
+        r = client.post("/v1/sessions", json={"game": "tavern"})
+        assert r.status_code == 201
+        host.storage.close()
+    host = Host(SqliteStorage(db), {"tavern": TAVERN}, mode=SIDECAR, max_sessions=2)
+    client = TestClient(create_app(host=host))
+    first, second = (client.post("/v1/sessions", json={"game": "tavern"}).json()["session"] for _ in range(2))
+    assert host.storage.open_sessions("local") == 2
+    assert client.get(f"/v1/sessions/{first}/snapshot").status_code == 200  # this run's own sessions stay...
+    r = client.post("/v1/sessions", json={"game": "tavern"})
+    assert (r.status_code, r.json()["error"]) == (503, "full")  # ...and it never drops one it's playing
+
+
+def test_a_server_never_drops_a_projects_session(tmp_path):
+    host, client = server(tmp_path)
+    a = project(host, "a", max_sessions=1)
+    assert client.post("/v1/sessions", json={"game": "tavern"}, headers=a).status_code == 201
+    assert client.post("/v1/sessions", json={"game": "tavern"}, headers=a).status_code == 503
