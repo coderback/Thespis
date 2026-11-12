@@ -51,7 +51,7 @@ from functools import cached_property, partial
 from pathlib import Path
 from typing import Any
 
-from thespis.beliefs import credence, reconcile
+from thespis.beliefs import FIRST_HAND, credence, origins, reconcile
 from thespis.brain import Brain, UtilityBrain
 from thespis.cast import Cast, LiveCast
 from thespis.claims import ClaimVocabulary, EventPred, Facts
@@ -984,9 +984,12 @@ class Session:
         w = self.world
         if npc in w.gone:
             return
-        belief, new = w.beliefs.add_evidence(npc, c, conf, source, e.id, w.phase)
+        # Whose story it is: what the teller had it from, followed back to whoever saw it or first said it. A report of
+        # the same story, by however many mouths, counts once (thespis.beliefs.fuse).
+        story = () if source in FIRST_HAND else tuple(sorted(origins(w.beliefs, source, c, w.phase) or {source}))
+        belief, new = w.beliefs.add_evidence(npc, c, conf, source, e.id, w.phase, origin=story)
         if c.neg:
-            w.beliefs.add_evidence(npc, c.affirmed(), conf, source, e.id, w.phase, against=True)
+            w.beliefs.add_evidence(npc, c.affirmed(), conf, source, e.id, w.phase, against=True, origin=story)
             return
         if c.pred in self.game.one_actor and belief.active:
             self._one_culprit(npc, c)
@@ -1009,8 +1012,9 @@ class Session:
             return
         for b in (mine, *rivals):  # trust in a teller it had no view of starts at 0, so being caught can lower it
             for ev in b.evidence:
-                if ev.source in w.npcs or w.is_player(ev.source):
-                    n.trust_in.setdefault(ev.source, 0)
+                for who in (ev.source, *ev.origin):
+                    if who != npc and (who in w.npcs or w.is_player(who)):
+                        n.trust_in.setdefault(who, 0)
         reconcile(w.beliefs, npc, c, n.trust_in, w.phase, _other_actor, self.game.caught,
                   first_hand=self.game.first_hand)
         for who, trust in n.trust_in.items():

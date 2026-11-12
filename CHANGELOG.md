@@ -6,6 +6,17 @@ to PyPI and GitHub Releases from the section below that has its number.
 
 ## Unreleased
 
+- **One story, one weight, and its teller pays.** Three things a newcomer's game showed, settled:
+  - A listener weighs each story once, by whose it is (who saw it, or first said it): a lie passed on by a friend
+    and then told to its face no longer counts twice. Evidence records its `origin`.
+  - When one culprit's story beats another, whoever started the losing story is trusted less, not whoever only
+    passed it on.
+  - The losing story is always retracted, even when the winner is weakly believed. It could stay active, believed
+    more than the story that beat it.
+
+  The demo's 35 routes play as before. A game using `[claims] one_actor`, or one where the same story reaches an NPC
+  twice, may now play differently.
+
 - **A game file is checked whole when it loads.** A misspelled table or key, an id, place, predicate or drive the
   file never declares, a number out of range, or a template with more than a plain name in its braces is refused,
   every one named, a line each, with what was probably meant. These used to load and quietly switch a mechanic off.

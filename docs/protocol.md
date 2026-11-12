@@ -178,7 +178,9 @@ story goes back to a different witness:
   either left it: two strangers' word at 0.36 each makes 0.53.
 - **One tale by two mouths counts once.** A report is followed back to whoever saw it, or first said it. A sister
   passing on what her brother told her adds nothing for someone who has it from him, and a lie the player told
-  two people is still one liar's word.
+  two people is still one liar's word. This holds however a story arrives, with or without `corroborate`: a
+  listener weighs each story once, by whose it is, so the player's lie passed on by a friend and then told to the
+  listener's face is believed as much as the stronger of the two, not more.
 - **Nobody is told again** what they saw themselves, or by the teller they have it from.
 - Left out, gossip is as it was.
 
@@ -190,8 +192,12 @@ a save to text 120 ms and a load from it 290 ms, for a 3 MB save. CI holds each 
 believe two people did the same thing to the same one keeps one story:
 - **The more trusted source wins.** What it saw itself beats anyone's word. Between two tellers, its trust in each
   decides.
-- **The loser's teller is caught.** Its trust in whoever told it the losing story falls by `caught` (2 unless
-  given), and everything else they said is weighed again at that trust.
+- **Whoever started the losing story is caught.** Its trust in whoever the story goes back to, who saw it or first
+  said it, falls by `caught` (2 unless given), and everything else they said is weighed again at that trust,
+  however it came. Someone who only passed the story on keeps its trust: an honest gossip repeating a witness isn't
+  taken for a liar.
+- **The losing story is let go.** What the winning source said counts against it, at least as strongly as the NPC
+  still believed it, so it is retracted, even when the winner is only weakly believed.
 - **Sources trusted alike settle nothing:** it keeps both stories.
 - **Who was there counts, if the game says so.** With `first_hand = 3`, a teller who saw it themselves counts for 3
   more than the NPC's trust in them when the two stories are weighed, up to the most trust there is (5). So the

@@ -284,8 +284,9 @@ def test_by_trust_alone_a_well_liked_liar_is_believed_over_someone_who_saw_it():
 def test_someone_who_saw_it_counts_for_more_than_someone_who_only_says_so():
     s = lied_to_then_told_by(FIRST_HAND, "wat")
     assert s.world.npcs["edda"].trust_in == {"player": 1, "wat": 1, "harl": 1}  # the player is caught, not Wat
-    # How sure she is still goes by trust: Wat's word is worth 0.4 to her, and now so is the player's, against it.
-    assert conf(s, "edda", ROBBED) == 0.4 and conf(s, "edda", BLAMED) == 0.2857
+    # How sure she is still goes by trust: Wat's word is worth 0.4 to her. The lie lost, so she keeps one story.
+    assert conf(s, "edda", ROBBED) == 0.4 and conf(s, "edda", BLAMED) == 0.0
+    assert s.world.beliefs.get("edda", Claim.from_json(BLAMED)).status == "retracted"
     s.observe("tell", "wat", "edda", at="market", claim=ROBBED, said=True, conf=0.8)  # or the engine says how sure
     assert conf(s, "edda", ROBBED) == 0.8 and conf(s, "edda", BLAMED) == 0.0
 
@@ -293,7 +294,8 @@ def test_someone_who_saw_it_counts_for_more_than_someone_who_only_says_so():
 def test_someone_who_only_heard_it_gets_no_such_credit():
     s = lied_to_then_told_by(FIRST_HAND, "harl")
     assert conf(s, "edda", BLAMED) == 0.9 and conf(s, "edda", ROBBED) == 0.0
-    assert s.world.npcs["edda"].trust_in == {"player": 3, "wat": 1, "harl": -1}
+    # The story that lost is Wat's, which Harl only passed on: Wat, whose story it was, is trusted less, not Harl.
+    assert s.world.npcs["edda"].trust_in == {"player": 3, "wat": -1, "harl": 1}
 
 
 def test_a_word_from_someone_who_saw_it_is_still_a_word():
