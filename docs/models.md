@@ -1,28 +1,7 @@
 # Models
 
-Which language models voice the NPCs, why, and what they measured. Updated 8 Oct 2026.
-
-## In use
-
-| Role | Model | Where |
-| --- | --- | --- |
-| Primary | **GPT-6 Luna** (`gpt-6-luna`) | Azure AI Foundry, Global Standard deployment |
-| Backup | **GPT-5.4 nano** (`gpt-5.4-nano`) | The same Foundry resource, Global Standard |
-| Then | Template lines and the utility brain | In code, always available |
-
-Both deployments are on Tobi's own Azure subscription, pay as you go. **The hackathon credits had not arrived by 4 Oct, 03:30.** When they do, benchmark them with `tools/bench_models.py` before switching anything.
-
-## Settings
-
-Set as Railway variables, never in the repo: `LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL` and `LLM_EXTRA`, and the same with `LLM_BACKUP_`. Both point at the resource's OpenAI v1 endpoint (`https://<resource>.services.ai.azure.com/openai/v1`); the gateway sends the key as `api-key`, as Azure requires.
-
-Every call: the call type's fixed JSON schema as structured outputs (or JSON mode with `LLM_STRUCTURED=0`), a 4-second budget (1 s to connect), no retries, then the backup, then the code fallback. Both deployments use the same `LLM_EXTRA`:
-
-```json
-{"reasoning_effort": "none", "max_tokens": null, "max_completion_tokens": 300, "temperature": null}
-```
-
-Reasoning is off for speed. `max_tokens` is replaced by `max_completion_tokens`, and `temperature` is left at the model's default (a `null` in `LLM_EXTRA` removes that field from the request).
+Which language models can voice the NPCs: any provider, a local model, or none. Then what the hosted demo uses,
+why, and what it measured.
 
 ## Any provider, or none
 
@@ -41,6 +20,28 @@ The reply schema follows the provider. "Cite at least one" and the line's length
 
 **Measure, don't trust:** these are defaults. `python -m thespis models probe <url> --out <name>.json` asks an endpoint to break its schema and times it, then writes a profile from what it saw. Set `LLM_PROFILE=<name>.json` to use it. A key is read from the environment variable `--key-env` names, never from the command line.
 
+## The hosted demo
+
+| Role | Model | Where |
+| --- | --- | --- |
+| Primary | **GPT-6 Luna** (`gpt-6-luna`) | Azure AI Foundry, Global Standard deployment |
+| Backup | **GPT-5.4 nano** (`gpt-5.4-nano`) | The same Foundry resource, Global Standard |
+| Then | Template lines and the utility brain | In code, always available |
+
+Both are pay-as-you-go deployments on one Azure resource. Measured 4 to 8 October 2026.
+
+## Settings
+
+Set as host variables, never in the repo: `LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL` and `LLM_EXTRA`, and the same with `LLM_BACKUP_`. Both point at the resource's OpenAI v1 endpoint (`https://<resource>.services.ai.azure.com/openai/v1`); the gateway sends the key as `api-key`, as Azure requires.
+
+Every call: the call type's fixed JSON schema as structured outputs (or JSON mode with `LLM_STRUCTURED=0`), a 4-second budget (1 s to connect), no retries, then the backup, then the code fallback. Both deployments use the same `LLM_EXTRA`:
+
+```json
+{"reasoning_effort": "none", "max_tokens": null, "max_completion_tokens": 300, "temperature": null}
+```
+
+Reasoning is off for speed. `max_tokens` is replaced by `max_completion_tokens`, and `temperature` is left at the model's default (a `null` in `LLM_EXTRA` removes that field from the request).
+
 ## Measured
 
 **Each model alone, on the game's own state packs** (`tools/bench_models.py`): the 15 packs the demo route builds, 4 of them decisions, sent in turn to one deployment at a time, with no backup and no cache. A pick is valid when the reply passes the game's validator. Run on 4 Oct from a laptop in the UK, prompt version 3.
@@ -58,7 +59,7 @@ The design's rule: the primary is the lowest p95 among models with at least 95% 
 
 - **Luna is primary.** Both models are 100% valid and well under 3 s; Luna's p95 is lower, it's the newer model, and it's the cheaper one: $0.10 in / $0.50 out per million tokens against nano's $0.20 / $1.25 (OpenAI's list prices; Azure's pricing page still showed Luna as "in processing").
 - **Nano is backup, which breaks the rule:** both are OpenAI models on one Azure resource, so an outage of that resource, or a revoked key, takes out both. What covers it: if neither answers (at most 4 seconds each), every NPC falls back to code; the demo route is answered from the warmed cache with no model call at all, and `REPLAY=1` keeps it that way with the network off.
-- **To meet the rule**, deploy a model from another company. Foundry sells some, billed through Azure, so this doesn't need the hackathon credits: for example DeepSeek-V4-Flash or grok-4-1-fast-non-reasoning, both GA on Microsoft's retirement schedule. It would still be on Azure, though. Benchmark it, then set it as `LLM_BACKUP_*`.
+- **To meet the rule**, deploy a model from another company. Foundry sells some, billed through Azure: for example DeepSeek-V4-Flash or grok-4-1-fast-non-reasoning, both GA on Microsoft's retirement schedule. It would still be on Azure, though. Benchmark it, then set it as `LLM_BACKUP_*`.
 - **Not considered:** gpt-4.1-mini, gpt-4.1-nano and gpt-4o-mini are "Deprecated" on Microsoft's [retirement schedule](https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/model-retirement-schedule), which under its [lifecycle policy](https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/model-retirements) means a subscription that never deployed them can't create a deployment. gpt-4.1-nano also retires on 14 Oct 2026. GPT-5.4 nano is GA until 21 Sep 2027; GPT-6 Luna launched on 23 Sep 2026 and isn't on the schedule yet.
 
 ## Local models: playing offline

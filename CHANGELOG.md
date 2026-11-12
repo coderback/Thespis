@@ -6,6 +6,9 @@ to PyPI and GitHub Releases from the section below that has its number.
 
 ## Unreleased
 
+- **Docs for outsiders.** How the hosted demo is run moved from the README to `docs/maintainers.md`; `docs/models.md`
+  opens with any provider or none, then what the demo uses. The PyPI page is the README up to running the repository.
+  The scripts that set up the hackathon's GitHub project are gone.
 - **One story, one weight, and its teller pays.** Three things a newcomer's game showed, settled:
   - A listener weighs each story once, by whose it is (who saw it, or first said it): a lie passed on by a friend
     and then told to its face no longer counts twice. Evidence records its `origin`.

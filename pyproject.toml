@@ -56,8 +56,18 @@ include = ["thespis", "README.md", "LICENSE", "CHANGELOG.md", "docs/openapi-v1.j
 [tool.hatch.metadata.hooks.fancy-pypi-readme]
 content-type = "text/markdown"
 
+# Only what a game developer reading PyPI needs: running the repository, its tools and its layout are on GitHub.
 [[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
 path = "README.md"
+end-before = "## Run it locally"
+
+[[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
+text = """## More
+
+Running the repository locally, its tools, Rehearsal and the hosted demo are in the
+[README on GitHub](https://github.com/coderback/Thespis#run-it-locally). What changed in each release:
+[CHANGELOG.md](CHANGELOG.md). Licence: [MIT](LICENSE).
+"""
 
 [[tool.hatch.metadata.hooks.fancy-pypi-readme.substitutions]]
 pattern = '\]\((docs/images/[^)\s]+)\)'

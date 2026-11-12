@@ -6,7 +6,6 @@
 [![Watch the video](https://img.shields.io/badge/video-2%20min-red?logo=youtube&logoColor=white)](https://youtu.be/WD7oslaKQO4)
 [![MIT licence](https://img.shields.io/badge/licence-MIT-blue)](LICENSE)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-3776ab?logo=python&logoColor=white)](pyproject.toml)
-[![Cambridge x Arcade AI Hackathon 2026](https://img.shields.io/badge/Cambridge%20%C3%97%20Arcade%20AI-Hackathon%202026-6c5ce7)](#team)
 
 An AI toolkit for game developers. Its first module, **Thespis Cast**, gives NPCs minds of their own: they remember
 what happened, believe things that may be false, want things for reasons, and keep acting when the player isn't
@@ -432,86 +431,26 @@ tests/              the pytest suite, run by CI on every pull request
 
 ## Deploy
 
-One Docker image serves the engine API and the built client from one URL (`Dockerfile`). It's hosted on Railway,
-which rebuilds and redeploys every merge to `main`.
-
-- **Settings:** `.railway/railway.py` declares the service: the Dockerfile build, a `/health` check, one replica,
-  the volume, and the names of its variables. Railway doesn't read it on deploy. A change reaches the live service
-  only through `railway config plan` and then `railway config apply`, which need `railway-sdk` (a dev dependency).
-  Apply removes whatever the file leaves out, so add a new variable's name there before setting it in the
-  dashboard, and read the plan before every apply.
-- **Volume:** mounted at `/data`. The database is `/data/thespis.sqlite`, set by the image. Don't set `DB_PATH` on
-  Railway: with a volume attached, the app ignores any path off it and logs a warning.
-- **Model keys:** Railway variables, never in the repo.
-- **Admin token:** `ADMIN_TOKEN` opens `GET /dev/calls`, the call log across every session, which the harness and
-  smoke test read. Unset, the endpoint doesn't exist. Generate it yourself, e.g.
-  `python -c "import secrets; print(secrets.token_urlsafe(32))"`, and keep it out of the repo.
-- **Moderation:** with `CONTENT_SAFETY_ENDPOINT` and `CONTENT_SAFETY_KEY` set, Azure AI Content Safety checks what
-  players write before a model reads it and every model line before a player hears it. Thresholds per category:
-  Hate, Sexual and SelfHarm at 4, Violence at 6, overridden by `MODERATION_THRESHOLDS` (JSON). It fails closed: if the
-  service is down, NPCs use their code lines. It sends at most `CONTENT_SAFETY_RPS` requests a second (4, under the
-  free tier's 5; set 100 on the standard tier), one text per request, since joined texts hid a harmful line in tests. A game can also list words in `[moderation] blocklist` in its
-  `cast.toml`. The boot log says which moderation is active.
-- **Claim check:** off by default for now. `CLAIM_CHECK=consequential` checks the lines with consequences, and `all`
-  checks every model line. Each check is one more model call, counted against the caps, through the model that
-  spoke unless `LLM_CHECK_*` names another. The boot log says which.
-
-  Why off: in three rehearsals the check refused 9 lines that the extractor (gpt-6-luna) had misread, and no line it
-  should have refused. Marking whom each claim is credited to (`attributed_to`) stopped it refusing Lady Vane's
-  verdict, which repeats Sable's alibi, but extraction slowed to 1.5 s, and act p95 rose to 3.3 s from 2.3 s without
-  the check. gpt-5.4-nano thinking a little was slower still: 19 calls timed out. With so few lines actually wrong,
-  the check needs extraction both more accurate and faster than either. The reports are
-  `rehearsal/reports/claim-check-*.md`.
-- **Edges:** no CORS unless `CORS_ORIGINS` lists origins; no generated API docs unless `API_DOCS=1`; bodies over
-  64 KiB refused. After a deploy, `python tools/exposure.py <host>` should pass every check.
-- **Logs:** JSON lines (`LOG_FORMAT=json`, set by the image) with `message`, `level` and fields such as `path`,
-  `status`, `ms` and `call_type`, which Railway can filter by (`@status:500`). Sessions appear as a short hash, never
-  their id, and moderation logs why it flagged something, never the text.
-- **User:** the app runs as uid 10001, not root. The entrypoint gives it `/data` and then drops root.
-- **Caps:** `SESSION_CALL_CAP` (default 60) and `GLOBAL_CALL_CAP` (default 0, no cap) bound model calls; cache
-  hits are free, and past a cap NPCs fall back to code and the game plays on. `SESSIONS_PER_IP_HOUR` (default
-  30) limits new games per IP. The boot log shows the caps and the calls made so far.
-- **Model cache:** playing the demo route on the host warms it (`tools/warm_cache.py`). Re-warm after any change to a
-  prompt, a persona or the state pack. `REPLAY=1` then plays from the cache and the fallback alone. The boot log
-  shows `model cache: N replies`.
-- **Persistence check:** redeploy the service, and the log's `boot #N` should go up by one.
-- **Backups:** Railway's scheduled volume backups need the Pro plan, so on Hobby copy the volume down with the
-  [Railway CLI](https://docs.railway.com/cli/volume) before any risky deploy. It holds both games' databases and
-  their WAL files:
-
-  ```bash
-  railway login && railway link                      # once, in this folder
-  railway volume list                                # the volume's name
-  railway volume files --volume <name> download / ./backups/$(date +%F)
-  python -c "import sqlite3, sys; print(sqlite3.connect(sys.argv[1]).execute('PRAGMA integrity_check').fetchone()[0])" ./backups/$(date +%F)/thespis.sqlite
-  ```
-
-  The last line should print `ok`. To restore, upload the files back (`railway volume files --volume <name> upload
-  <folder> / --overwrite`) while the service is stopped. Keep `backups/` out of git; it's ignored.
-
-Test the image locally:
-
-```bash
-docker build -t thespis:dev .
-docker run --rm -p 8000:8000 -v thespis-data:/data thespis:dev
-sh scripts/check-image.sh thespis:dev       # what CI checks: non-root, JSON logs, the volume persists
-```
+How the hosted demo is built, configured, watched and backed up: [docs/maintainers.md](docs/maintainers.md). To run
+Thespis beside your own game, see [docs/serve.md](docs/serve.md).
 
 ## Credits
 
 - **Art and fonts:** drawn in code for this game; fonts are under the SIL Open Font License. See
   [client/CREDITS.md](client/CREDITS.md).
-- **NPC voices:** GPT-6 Luna, with GPT-5.4 nano as the backup, on Azure AI Foundry ([docs/models.md](docs/models.md)).
+- **NPC voices in the hosted demo:** GPT-6 Luna, with GPT-5.4 nano as the backup, on Azure AI Foundry
+  ([docs/models.md](docs/models.md)).
 - **Ideas:** the character-knowledge work of Talk of the Town, Versu and Viv, and Generative Agents, as cited above.
 
 ## Licence
 
 [MIT](LICENSE).
 
-## Team
+## Contributing
 
-- Tobi ([@coderback](https://github.com/coderback)): engine, model layer, harness, deployment
-- Ahmed ([@AhmedBokaniUsman](https://github.com/AhmedBokaniUsman)): client, inspector, autoplay, video
+Bug reports, fixes, docs, examples and games built on Thespis are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md)
+before your first pull request.
 
-Read [CONTRIBUTING.md](CONTRIBUTING.md) before your first pull request. Built for the Cambridge University x Arcade
-AI Hackathon, 3 to 4 October 2026.
+Thespis was started by Tobi ([@coderback](https://github.com/coderback)) and Ahmed
+([@AhmedBokaniUsman](https://github.com/AhmedBokaniUsman)) at the Cambridge University x Arcade AI Hackathon, 3 to 4
+October 2026.
