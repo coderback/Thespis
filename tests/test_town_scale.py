@@ -74,10 +74,15 @@ def test_events_and_evidence_serialise_as_their_fields():
     del whole["amount"]
     assert e.to_json() == whole and list(e.to_json()) == list(whole)
     assert dataclasses.replace(e, amount=5).to_json() == {**whole, "amount": 5}
-    for ev in (Evidence("wat", "e0002", 1, 0.9), Evidence("wat", "e0002", 1, 0.9, against=True)):
+    for ev in (Evidence("wat", "e0002", 1, 0.9), Evidence("wat", "e0002", 1, 0.9, against=True),
+               Evidence("harl", "e0002", 1, 0.9, origin=("wat",))):
         fields = dataclasses.asdict(ev)
         if not ev.against:
             del fields["against"]
+        if ev.origin:
+            fields["origin"] = list(ev.origin)
+        else:
+            del fields["origin"]
         assert ev.to_json() == fields and list(ev.to_json()) == list(fields)
 
 

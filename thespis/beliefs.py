@@ -5,10 +5,12 @@ A belief may be false: whether its claim really happened lives only in the ledge
 How sure an NPC is follows subjective logic (Jøsang, Subjective Logic, 2016). Each piece of evidence is an opinion
 about the claim: a report with confidence c, from someone trusted that far, is belief c and uncertainty 1 - c; a
 report against it (testimony that it never happened) is disbelief c instead. What the NPC saw itself (c = 1) is
-certain. A belief's opinion is the cumulative fusion of its evidence, one piece per source and side, the strongest:
-independent sources add up, a source repeating itself doesn't, and anything certain outweighs every report. Its
-confidence is the opinion's projected probability with a base rate of 0, the belief mass, so one report of c gives
-c, as it always has.
+certain. A belief's opinion is the cumulative fusion of its evidence, one piece per story and side, the strongest:
+independent stories add up, and one story doesn't however many mouths it came through, and anything certain outweighs
+every report. A report's story is its origin: whoever saw it or first said it, behind whoever told it (`origins`),
+so a lie the player told one NPC, passed on, and the same lie told again to its face, count once. Its confidence is
+the opinion's projected probability with a base rate of 0, the belief mass, so one report of c gives c, as it always
+has.
 
 A belief is retracted when its disbelief outweighs its belief. Nothing flips it: evidence against lowers it, and
 when trust in a source falls, `discredit` re-weighs everything that source said (the justifications of a truth
@@ -17,6 +19,7 @@ maintenance system, Doyle 1979), so the beliefs resting on it fall with it.
 
 from __future__ import annotations
 
+import math
 from collections.abc import Callable
 from dataclasses import dataclass, field, replace
 
@@ -64,19 +67,27 @@ class Evidence:
     phase: int
     conf: float
     against: bool = False  # it says the claim is false
+    origin: tuple[str, ...] = ()  # whose story it is in the end, if not its source's own: who saw it or first said it
+
+    @property
+    def story(self) -> tuple[str, ...]:
+        """Whose story this report tells: its origin, or its source if it has none."""
+        return self.origin or (self.source,)
 
     def to_json(self) -> dict:
         d: dict = {"source": self.source, "event": self.event, "phase": self.phase, "conf": self.conf}
         if self.against:
             d["against"] = True  # left out otherwise, so evidence for a claim serialises exactly as it always has
+        if self.origin:
+            d["origin"] = list(self.origin)  # likewise
         return d
 
 
 def fuse(evidence: list[Evidence]) -> Opinion:
-    """The opinion a body of evidence gives: the strongest piece per source and side, fused, in a fixed order."""
-    strongest: dict[tuple[str, bool], float] = {}
+    """The opinion a body of evidence gives: the strongest piece per story and side, fused, in a fixed order."""
+    strongest: dict[tuple[tuple[str, ...], bool], float] = {}
     for e in evidence:
-        key = (e.source, e.against)
+        key = (e.story, e.against)
         strongest[key] = max(strongest.get(key, 0.0), e.conf)
     out = VACUOUS
     for (_, against), conf in sorted(strongest.items()):
@@ -121,7 +132,7 @@ class Belief:
 
     @classmethod
     def from_json(cls, d: dict) -> Belief:
-        evidence = [Evidence(**e) for e in d["evidence"]]
+        evidence = [Evidence(**{**e, "origin": tuple(e.get("origin", ()))}) for e in d["evidence"]]
         belief = cls(d["id"], d["npc"], Claim.from_json(d["claim"]), evidence)
         if d.get("status") == RETRACTED and belief.active:
             # Saved before opinions, when testimony flipped a belief to retracted: keep it retracted, with certain
@@ -151,8 +162,9 @@ class BeliefStore:
             self._of.setdefault(b.npc, []).append(b)
 
     def add_evidence(self, npc: str, claim: Claim, conf: float, source: str, event: str,
-                     phase: int, against: bool = False) -> tuple[Belief, bool]:
-        """Store one report, for the claim or `against` it. Returns the belief and whether it is new.
+                     phase: int, against: bool = False, origin: tuple[str, ...] = ()) -> tuple[Belief, bool]:
+        """Store one report, for the claim or `against` it, with whose story it is (`origin`) if not its source's.
+        Returns the belief and whether it is new.
 
         Evidence counts whatever the belief's status: a retracted belief can come back if enough evidence says so.
         """
@@ -163,17 +175,19 @@ class BeliefStore:
             self._beliefs.append(belief)
             self._index[(npc, claim)] = belief
             self._of.setdefault(npc, []).append(belief)
-        belief.evidence.append(Evidence(source, event, phase, conf, against))
+        story = tuple(sorted(origin)) if origin and tuple(sorted(origin)) != (source,) else ()
+        belief.evidence.append(Evidence(source, event, phase, conf, against, story))
         return belief, is_new
 
     def discredit(self, npc: str, source: str, conf: float) -> list[Belief]:
-        """The NPC now trusts `source` only as far as `conf`: every piece of evidence it holds from them is capped
-        there, so everything they said is re-weighed. Returns the beliefs whose opinion changed."""
+        """The NPC now trusts `source` only as far as `conf`: every piece of evidence it holds from them, or that is
+        their story alone however it came, is capped there, so everything they said is re-weighed. Returns the beliefs
+        whose opinion changed."""
         changed = []
         for belief in self.for_npc(npc):
             before = belief.opinion
-            belief.evidence = [replace(e, conf=conf) if e.source == source and e.conf > conf else e
-                               for e in belief.evidence]
+            belief.evidence = [replace(e, conf=conf) if (e.source == source or e.origin == (source,)) and e.conf > conf
+                               else e for e in belief.evidence]
             if belief.opinion != before:
                 changed.append(belief)
         return changed
@@ -239,9 +253,11 @@ def reconcile(store: BeliefStore, npc: str, claim: Claim, trust: dict[str, int],
               contradicts: Callable[[Claim, Claim], bool], penalty: int,
               credence: Callable[[int], float] = credence, first_hand: int = 0) -> list[Belief]:
     """Settle what `claim` contradicts among the NPC's beliefs. Of two claims that can't both be true, the one from the
-    less trusted source loses: what the more trusted one said counts against it, and whoever told it the loser is
-    trusted `penalty` less, so everything they said is re-weighed (`discredit`). A tie settles nothing. A teller who
-    saw what they tell counts for `first_hand` more (`credit`). Returns the beliefs that ended retracted."""
+    less trusted source loses, and is retracted: the NPC keeps one story. Whoever the losing story goes back to (who
+    saw it or first said it, not whoever only passed it on) is trusted `penalty` less, so everything they said is
+    re-weighed (`discredit`); then what the more trusted source said counts against the loser, at least as strongly
+    as the NPC still believed it. A tie settles nothing. A teller who saw what they tell counts for `first_hand` more
+    (`credit`). Returns the beliefs that ended retracted."""
     new = store.get(npc, claim)
     if new is None or not new.active:
         return []
@@ -256,13 +272,16 @@ def reconcile(store: BeliefStore, npc: str, claim: Claim, trust: dict[str, int],
             loser, winner = new, old
         else:
             continue
-        sources = {e.source for e in loser.evidence if not e.against}
-        best = max(winner.evidence, key=lambda e: e.conf)
-        store.add_evidence(npc, loser.claim, best.conf, best.source, best.event, phase, against=True)
-        for src in sorted(sources):
+        blamed = {who for e in loser.evidence if not e.against for who in e.story} - {npc, *FIRST_HAND}
+        for src in sorted(blamed):
             if src in trust:
                 trust[src] -= penalty
                 store.discredit(npc, src, credence(trust[src]))
+        best = max(winner.evidence, key=lambda e: e.conf)
+        o = loser.opinion
+        enough = math.ceil(o.b / (o.b + o.u) * 10 ** PLACES + 1) / 10 ** PLACES if o.b + o.u else 0.0
+        store.add_evidence(npc, loser.claim, min(1.0, max(best.conf, enough)), best.source, best.event, phase,
+                           against=True, origin=best.origin)
         if not loser.active:
             retracted.append(loser)
     return retracted
