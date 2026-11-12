@@ -133,7 +133,7 @@ def test_told_apart_nobody_overhears_and_told_together_a_stranger_hears_less():
 
 
 def test_ties_are_checked_when_the_game_loads():
-    for bad, message in ((("between = [\"osric\", \"nobody\"]", "kind = \"kin\""), "tie[0]: between"),
+    for bad, message in ((("between = [\"osric\", \"nobody\"]", "kind = \"kin\""), "tie[0]: 'nobody' is not an npc"),
                          (("between = [\"osric\", \"hild\"]", "kind = \"enemy\""), "is not in [gossip] along")):
         text = HAMLET_TOML.replace('between = ["osric", "hild"]\nkind = "kin"', "\n".join(bad))
         with pytest.raises(DefinitionError, match=message.replace("[", r"\[")):

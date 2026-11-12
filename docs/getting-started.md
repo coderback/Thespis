@@ -33,8 +33,21 @@ internal and may change between 0.x releases.
 
 ## 1. Describe the people: the game file
 
-A game is one TOML file, checked when it loads: a mistake names its entry. The quickstart's
-[game.toml](../examples/quickstart/game.toml) has every part a small game needs.
+A game is one TOML file, checked when it loads: every mistake is named, with what was probably meant. The
+quickstart's [game.toml](../examples/quickstart/game.toml) has every part a small game needs. Check yours as you write
+it:
+
+```bash
+thespis check game.toml
+```
+
+```
+game.toml: npc.mara: unknown table 'feel'; did you mean feels?
+game.toml: npc.mara.choices.counter[1].when[0].believes.pred: predicate 'stolefrom' is not in [words.claims]; did you mean stole_from?
+```
+
+A file names only what it declares: people in `[npc]` or `[players]`, places in `[places]`, predicates in
+`[words.claims]`, and drives in some NPC's `drives`. Keep your game's own data in `[custom]`; Thespis never reads it.
 
 **The world, as names.** Thespis doesn't model places; it needs their ids, for who is where.
 

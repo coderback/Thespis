@@ -4,6 +4,17 @@ Thespis follows semantic versioning at 0.x: a minor release may change anything 
 protocol, and those change only with a note here. A release is made by pushing its tag (`v0.3.1`), which publishes it
 to PyPI and GitHub Releases from the section below that has its number.
 
+## Unreleased
+
+- **A game file is checked whole when it loads.** A misspelled table or key, an id, place, predicate or drive the
+  file never declares, a number out of range, or a template with more than a plain name in its braces is refused,
+  every one named, a line each, with what was probably meant. These used to load and quietly switch a mechanic off.
+- **`thespis check game.toml`** prints every mistake, and notes what is allowed but likely a slip (an action with no
+  line). `thespis serve` refuses a bad file the same way, without a traceback.
+- **`[custom]`** holds a game's own data; any other table Thespis doesn't know is a mistake.
+- A file that loaded before may now be refused: a predicate a choice or feeling names must be in `[words.claims]`,
+  and a drive a choice names must be some NPC's or kind's.
+
 ## 0.3.1
 
 The first release on PyPI, as `thespis-sdk` (the name `thespis` was taken). It installs and imports as `thespis`:

@@ -1,5 +1,6 @@
 """The thespis command.
 
+    python -m thespis check G.toml [...]                # every mistake in a game file, a line each, with notes
     python -m thespis serve [--game G.toml ...] [--port 7878 | 0] [--local auto] [--db FILE] [--parent PID]
                                                         # a sidecar: localhost, SQLite, offline unless --online
     python -m thespis serve --server --db postgres://... [--host 0.0.0.0] [--game G.toml ...]
@@ -33,6 +34,37 @@ import socket
 import sys
 import time
 from pathlib import Path
+
+
+def load_games(paths: list[str]) -> tuple[list, list[str]]:
+    """The games at `paths`, and what's wrong with any that can't load, a line each: "<path>: <problem>"."""
+    from thespis.considerations import DefinitionError
+    from thespis.session import Game
+
+    games, wrong = [], []
+    for path in paths:
+        try:
+            games.append(Game.load(path))
+        except OSError as e:
+            wrong.append(f"{path}: can't read it: {e.strerror or e}")
+        except DefinitionError as e:
+            wrong += [f"{path}: {p}" for p in getattr(e, "problems", None) or str(e).splitlines()]
+    return games, wrong
+
+
+def check(args: argparse.Namespace) -> int:
+    """Check game files as they'd load: each mistake a line, then notes (allowed, but likely slips). 1 if any is
+    wrong."""
+    games, wrong = load_games(args.games)
+    for line in wrong:
+        print(line)
+    for path, g in zip([p for p in args.games if not any(w.startswith(f"{p}: ") for w in wrong)], games, strict=True):
+        for note in g.notes:
+            print(f"{path}: note: {note}")
+        people = f"{len(g.cast.ids())} npcs" + (f", {len(g.kinds)} kinds" if g.kinds else "")
+        print(f"{path}: ok, {g.id}: {people}, {len(g.choices) + len(g.kind_choices)} choice sets, "
+              f"{len(g.intents)} intents")
+    return 1 if wrong else 0
 
 
 def openapi() -> str:
@@ -207,7 +239,6 @@ def serve(args: argparse.Namespace) -> int:
     from thespis.host import SERVER, SIDECAR, Host
     from thespis.runtime.download import cache_dir
     from thespis.server import create_app
-    from thespis.session import Game
     from thespis.storage import storage
     from thespis.vault import Vault
 
@@ -215,10 +246,14 @@ def serve(args: argparse.Namespace) -> int:
     if mode == SIDECAR and not offline.local(args.host):
         print("a sidecar listens on this machine only; use --server to listen elsewhere", file=sys.stderr)
         return 2
+    loaded, wrong = load_games(args.game)
+    if wrong:
+        print("\n".join(wrong), file=sys.stderr)
+        return 2
+    games = {g.id: g for g in loaded}
     online = args.online or mode == SERVER
     if not online:
         offline.guard()
-    games = {g.id: g for g in (Game.load(p) for p in args.game)}
     env = dict(os.environ)
     local = None
     if args.local:
@@ -305,6 +340,8 @@ def _hostname(url: str) -> str:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="thespis")
     sub = parser.add_subparsers(dest="command", required=True)
+    check_p = sub.add_parser("check", help="check game files: every mistake, a line each")
+    check_p.add_argument("games", nargs="+", metavar="game.toml")
     serve_p = sub.add_parser("serve", help="serve the /v1 API: a sidecar, or with --server a server")
     serve_p.add_argument("--game", action="append", default=[], help="a game.toml every project can play (repeatable)")
     serve_p.add_argument("--server", action="store_true", help="many projects, each calling with its own key")
@@ -351,6 +388,8 @@ def main(argv: list[str] | None = None) -> int:
     mdl.add_argument("--out", help="probe: write the profile here")
     args = parser.parse_args(argv)
 
+    if args.command == "check":
+        return check(args)
     if args.command == "openapi":
         if args.out:
             Path(args.out).write_bytes(openapi().encode())

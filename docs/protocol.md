@@ -22,8 +22,22 @@ the two drift, so a change to `/v1` shows up as a diff to review.
 ## The game definition
 
 A game is one TOML file. [examples/tavern/game.toml](../examples/tavern/game.toml) is a complete one: a tavern, three
-NPCs, one choice set, gossip and words. Everything in it is checked when it loads, and a mistake names its entry
-(`npc.garrick.choices.turn[2].when[1]: unknown key most`).
+NPCs, one choice set, gossip and words. Everything in it is checked when it loads, and every mistake is named, a
+line each, with what was probably meant (`npc.garrick: unknown table 'feel'; did you mean feels?`). `thespis check
+game.toml` prints them, and notes what is allowed but likely a slip: an action with no line, done in silence.
+
+A file names only what it declares ([thespis/schema.py](../thespis/schema.py)):
+- **People:** `[npc.<id>]`, `[players.<id>]` and `"player"`; `"self"` in a choice is the NPC choosing. A game with
+  `[kind]`s has people made in play, whose ids a file can't know, so its people aren't checked.
+- **Places:** `[places]`. A game with none may name any.
+- **Predicates:** `[words.claims]`. Every claim the file names, in a feeling, a choice, `one_actor` or a gossip
+  priority, uses one.
+- **Drives:** a choice may name a drive only if some NPC or kind has it (in `drives`, `settle`, `feels` or `decay`).
+  A drive only the engine sets is declared as `drives = { suspicion = 0 }`.
+- **Templates** hold plain names in braces, filled when they're said: `{a} stole from {b}`, never `{a:>9}` or
+  `{a.b}`. Words and actions may use only the names they're given: a claim `{a} {b} {place} {at}`, an event
+  `{a} {t} {where} {to} {claim} {amount}`, an action `{who}`. Lines and situations take the caller's bindings.
+- **`[custom]`** is the game's own: Thespis never reads it.
 
 | Table | What it holds |
 | --- | --- |
@@ -45,6 +59,8 @@ NPCs, one choice set, gossip and words. Everything in it is checked when it load
 | `[intents.<verb>]` | What the player may do by typing it: `means`, `reads`, `args`, `examples`, `consequential` ([below](#the-players-words)) |
 | `[situations]` | The situation a moment or trigger is spoken in, if the caller doesn't say |
 | `[narrator]` | `name` and `persona`, for `narrate` with a model |
+| `[memory]` | `recall = "meaning"` and its weights ([below](#a-cast-that-grows)) |
+| `[custom]` | The game's own data, which Thespis never reads |
 
 ### Choices
 
