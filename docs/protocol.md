@@ -10,11 +10,11 @@ There's one set of calls, made in one of two ways:
 | Runtime | For | How |
 | --- | --- | --- |
 | Library | Python games | `from thespis.api import Game, Session` |
-| `/v1` HTTP | Any engine | `thespis serve --game game.toml`, a sidecar beside the game, or `thespis serve --server`, many projects each with its key ([serve.md](serve.md)). Needs `pip install "thespis-npc[serve]"`, or `thespis-npc[server]` for a server |
+| `/v1` HTTP | Any engine | `thespis serve --game game.toml`, a sidecar beside the game, or `thespis serve --server`, many projects each with its key ([serve.md](serve.md)). Needs `pip install "thespis-sdk[serve]"`, or `thespis-sdk[server]` for a server |
 
 The two make the same calls with the same results; a test plays one scene both ways and compares them.
 
-The library is the core alone, with one dependency (`httpx`): `pip install thespis-npc`. It's `thespis-npc` on PyPI
+The library is the core alone, with one dependency (`httpx`): `pip install thespis-sdk`. It's `thespis-sdk` on PyPI
 because the name `thespis` was taken, and it imports as `thespis`.
 [openapi-v1.json](openapi-v1.json) is the HTTP contract, generated from the server and committed. A test fails when
 the two drift, so a change to `/v1` shows up as a diff to review.

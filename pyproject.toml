@@ -4,9 +4,10 @@ build-backend = "hatchling.build"
 
 # The package is the core alone (thespis/): the games, Rehearsal, tools and client stay in the repo. Versions follow
 # semver at 0.x: a minor release may change anything outside thespis.api and /v1; those change only with a note.
-# On PyPI it is thespis-npc, since the name thespis was taken; it installs and imports as thespis.
+# On PyPI it is thespis-sdk (the name thespis was taken, and the package is meant to hold more than the NPC
+# minds); it installs and imports as thespis.
 [project]
-name = "thespis-npc"
+name = "thespis-sdk"
 dynamic = ["version", "readme"]
 description = "NPC minds for games: they remember, believe things that may be false, gossip, and act for reasons. The game owns the truth; a language model, if any, only voices it."
 requires-python = ">=3.12"
@@ -35,7 +36,7 @@ Demo = "https://thespis-production.up.railway.app"
 
 [project.optional-dependencies]
 serve = ["fastapi>=0.115", "uvicorn[standard]>=0.30"]  # python -m thespis serve: the /v1 API, as a sidecar
-server = ["thespis-npc[serve]", "cryptography>=43", "psycopg[binary,pool]>=3.2"]  # serve --server: Postgres, sealed keys
+server = ["thespis-sdk[serve]", "cryptography>=43", "psycopg[binary,pool]>=3.2"]  # serve --server: Postgres, sealed keys
 otel = ["opentelemetry-sdk>=1.27", "opentelemetry-exporter-otlp-proto-http>=1.27"]  # traces over OTLP
 
 [project.scripts]

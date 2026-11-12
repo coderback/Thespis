@@ -77,7 +77,7 @@ For maintainers. A release is one pull request and one tag:
 3. Push the tag: `git tag -a v0.3.1 -m "Thespis 0.3.1" && git push origin v0.3.1`.
 
 The release workflow checks that the tag, the package and the changelog agree, builds and checks the package,
-publishes it to PyPI as `thespis-npc`, and makes the GitHub Release with the changelog's notes.
+publishes it to PyPI as `thespis-sdk`, and makes the GitHub Release with the changelog's notes.
 
 ## If `main` breaks anyway
 
