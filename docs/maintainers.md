@@ -72,7 +72,9 @@ sh scripts/check-image.sh thespis:dev       # what CI checks: non-root, JSON log
 
 ## After every merge to main
 
-Railway redeploys. Once the deploy is live, run the three checks against it:
+Railway redeploys. Once the deploy is live, run the three checks against it. Smoke and the manor solve read the
+call log, so they need `ADMIN_TOKEN` in the environment or in `.env` where they run; without it they fail with
+`KeyError: 'total'`.
 
 ```bash
 python tools/smoke.py https://thespis-production.up.railway.app
