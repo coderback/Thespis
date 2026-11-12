@@ -28,6 +28,7 @@ Strings may name what the game binds when it asks (`do = "detain:{culprit}"`), a
 
 from __future__ import annotations
 
+import string
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 
@@ -52,6 +53,35 @@ class DefinitionError(ValueError):
 
 def _fill(s: str, env: Env) -> str:
     return str(env["self"]) if s == "self" else s.format_map(env) if "{" in s else s
+
+
+def bound_names(x: object) -> set[str]:
+    """The names a declaration leaves for the caller to bind: every "{name}" in its strings, at any depth."""
+    if isinstance(x, str):
+        try:
+            return {f for _, f, _, _ in string.Formatter().parse(x) if f}
+        except ValueError:
+            return set()
+    if isinstance(x, Mapping):
+        return set().union(*(bound_names(v) for v in x.values())) if x else set()
+    if isinstance(x, list | tuple):
+        return set().union(*(bound_names(v) for v in x)) if x else set()
+    return set()
+
+
+def _people_names(x: object) -> set[str]:
+    """The bound names a declaration uses as people: in `with`, and as a claim's `a` or `b`."""
+    out: set[str] = set()
+    if isinstance(x, Mapping):
+        for k, v in x.items():
+            if k == "with" or (k in ("a", "b") and isinstance(v, str)):
+                out |= bound_names(v)
+            else:
+                out |= _people_names(v)
+    elif isinstance(x, list | tuple):
+        for v in x:
+            out |= _people_names(v)
+    return out
 
 
 def _number(v: object, where: str) -> float:
@@ -173,6 +203,8 @@ class Choices:
     npc: str
     moment: str
     choices: tuple[Choice, ...]
+    needs: frozenset[str] = frozenset()  # the names a caller must bind when it asks ("culprit"), "self" aside
+    people: frozenset[str] = frozenset()  # those among them that name someone: an NPC or a player
 
     def bind(self, **bindings) -> tuple[Affordance, ...]:
         env = {**bindings, "self": self.npc}
@@ -213,7 +245,8 @@ def compile_choices(npc: str, moment: str, declared: object, table: str = "npc")
     ids = [c.do for c in out]
     if len(set(ids)) != len(ids):
         raise DefinitionError(f"{where}: an action is declared twice")
-    return Choices(npc, moment, tuple(out))
+    return Choices(npc, moment, tuple(out), frozenset(bound_names(declared) - {"self"}),
+                   frozenset(_people_names(declared) - {"self"}))
 
 
 def declared(data: Mapping) -> dict[tuple[str, str], Choices]:

@@ -11,6 +11,10 @@ to PyPI and GitHub Releases from the section below that has its number.
   every one named, a line each, with what was probably meant. These used to load and quietly switch a mechanic off.
 - **`thespis check game.toml`** prints every mistake, and notes what is allowed but likely a slip (an action with no
   line). `thespis serve` refuses a bad file the same way, without a traceback.
+- **Calls check what they're given.** `observe`, `update`, `decide`, `react`, `tick` and `restore` refuse an
+  unknown person, place, predicate, drive, moment, trigger or binding, saying what was probably meant, instead of
+  taking it as new (a misspelt drive used to become a new one) or failing with a Python `KeyError`. A damaged
+  snapshot is a `DefinitionError` (HTTP 400), not a 500.
 - **`[custom]`** holds a game's own data; any other table Thespis doesn't know is a mistake.
 - A file that loaded before may now be refused: a predicate a choice or feeling names must be in `[words.claims]`,
   and a drive a choice names must be some NPC's or kind's.

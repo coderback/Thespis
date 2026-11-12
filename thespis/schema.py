@@ -49,7 +49,8 @@ NAME = re.compile(r"[A-Za-z_]\w*")
 _FORMAT = string.Formatter()
 
 
-def _near(word: object, choices) -> str:
+def near(word: object, choices) -> str:
+    """"; did you mean X?" for the closest of `choices` to a slip, or nothing."""
     match = difflib.get_close_matches(str(word), [str(c) for c in choices], n=1, cutoff=0.6)
     return f"; did you mean {match[0]}?" if match else ""
 
@@ -99,7 +100,7 @@ class _Check:
             if k not in allowed:
                 what = "table" if isinstance(v, Mapping) or (isinstance(v, list) and v and isinstance(v[0], Mapping)) \
                     else "key"
-                self.add(f"{where}: unknown {what} {k!r}{_near(k, allowed)}")
+                self.add(f"{where}: unknown {what} {k!r}{near(k, allowed)}")
 
     def table(self, where: str, v: object) -> Mapping:
         if not isinstance(v, Mapping):
@@ -133,26 +134,26 @@ class _Check:
                 self.add(f"{where}: {{{whole}}}: only a plain name goes in braces, like {{a}}")
             elif allowed is not None and field not in allowed:
                 self.add(f"{where}: {{{field}}} is never filled here; it may use "
-                         f"{', '.join('{' + a + '}' for a in allowed)}{_near(field, allowed)}")
+                         f"{', '.join('{' + a + '}' for a in allowed)}{near(field, allowed)}")
 
     # ------------------------------------------------------------ what a file names
     def person(self, where: str, x: object, also: tuple[str, ...] = ()) -> None:
         if not isinstance(x, str):
             self.add(f"{where}: an id in quotes, got {x!r}")
         elif not (_bound(x) or x in self.people or x in also or self.kinds):
-            self.add(f"{where}: no npc or player {x!r}{_near(x, (*self.people, *also))}")
+            self.add(f"{where}: no npc or player {x!r}{near(x, (*self.people, *also))}")
 
     def place(self, where: str, x: object) -> None:
         if not isinstance(x, str):
             self.add(f"{where}: a place id in quotes, got {x!r}")
         elif self.places and not _bound(x) and x not in self.places:
-            self.add(f"{where}: {x!r} is not in [places]{_near(x, self.places)}")
+            self.add(f"{where}: {x!r} is not in [places]{near(x, self.places)}")
 
     def pred(self, where: str, p: object) -> None:
         if not isinstance(p, str):
             self.add(f"{where}: a predicate in quotes, got {p!r}")
         elif not _bound(p) and p not in self.preds:
-            self.add(f"{where}: predicate {p!r} is not in [words.claims]{_near(p, self.preds)}"
+            self.add(f"{where}: predicate {p!r} is not in [words.claims]{near(p, self.preds)}"
                      if self.preds else f"{where}: predicate {p!r} needs words in [words.claims]: {p} = \"{{a}} ... "
                                          "{b}\"")
 
@@ -161,7 +162,7 @@ class _Check:
             self.add(f"{where}: a drive's name in quotes, got {d!r}")
         elif not _bound(d) and d not in self.drives:
             self.add(f"{where}: no NPC or kind has a drive {d!r}"
-                     + (_near(d, self.drives) or f"; if the game sets it, give an NPC drives = {{ {d} = 0 }}"))
+                     + (near(d, self.drives) or f"; if the game sets it, give an NPC drives = {{ {d} = 0 }}"))
 
     def claim(self, where: str, c: Mapping) -> None:
         self.keys(c, CLAIM_KEYS, where)
@@ -222,14 +223,14 @@ class _Check:
             if player.get("start") is not None:
                 start = player["start"]
                 if self.places and start not in self.places:
-                    self.add(f"player.start: {start!r} is not in [places]{_near(start, self.places)}")
+                    self.add(f"player.start: {start!r} is not in [places]{near(start, self.places)}")
         for pid, p in self.players.items():
             if pid in self.npcs or pid == "player" or not isinstance(p, Mapping) or not isinstance(p.get("name"), str):
                 self.add(f"players.{pid}: needs name = \"...\", and an id no NPC has")
                 continue
             self.keys(p, ("name", "start"), f"players.{pid}")
             if self.places and p.get("start") is not None and p["start"] not in self.places:
-                self.add(f"players.{pid}.start: {p['start']!r} is not in [places]{_near(p['start'], self.places)}")
+                self.add(f"players.{pid}.start: {p['start']!r} is not in [places]{near(p['start'], self.places)}")
         for npc, t in self.npcs.items():
             self.npc(f"npc.{npc}", npc, t, "npc")
         for kind, t in self.kinds.items():
@@ -326,7 +327,7 @@ class _Check:
         kind, _, arg = c["do"].partition(":")
         if arg and not _bound(arg) and not (arg in self.people or arg in self.places or arg == "self"
                                             or arg.lstrip("-").isdigit() or self.kinds):
-            self.add(f"{where}.do: {arg!r} is no npc, player or place{_near(arg, (*self.people, *self.places))}")
+            self.add(f"{where}.do: {arg!r} is no npc, player or place{near(arg, (*self.people, *self.places))}")
         if kind not in lines:
             self.notes.append(f"{where}.do: {me} has no line for {kind!r} in its lines, so it does this in silence")
         if isinstance(c.get("asserts"), Mapping):
@@ -350,7 +351,7 @@ class _Check:
             self.add(f"gossip.gossips: a list of npcs, or \"{EVERYONE}\"")
         for who in gossips if isinstance(gossips, list) else ():
             if who not in self.npcs:
-                self.add(f"gossip.gossips: {who!r} is not an npc{_near(who, self.npcs)}")
+                self.add(f"gossip.gossips: {who!r} is not an npc{near(who, self.npcs)}")
         about = g.get("about", [])
         if about != EVERYONE and not (isinstance(about, list) and all(isinstance(x, str) for x in about)):
             self.add(f"gossip.about: a list of ids, or \"{EVERYONE}\"")
@@ -388,10 +389,10 @@ class _Check:
             else:
                 for x in pair:
                     if x not in self.npcs:
-                        self.add(f"tie[{i}]: {x!r} is not an npc{_near(x, self.npcs)}")
+                        self.add(f"tie[{i}]: {x!r} is not an npc{near(x, self.npcs)}")
             if not isinstance(along, Mapping) or t.get("kind") not in along:
                 self.add(f"tie[{i}]: kind {t.get('kind')!r} is not in [gossip] along"
-                         f"{_near(t.get('kind'), along if isinstance(along, Mapping) else ())}")
+                         f"{near(t.get('kind'), along if isinstance(along, Mapping) else ())}")
 
     def claims(self) -> None:
         c = self.d.get("claims", {})
