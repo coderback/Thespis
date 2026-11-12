@@ -1,7 +1,7 @@
 name: Release
 
 # Pushing a tag like v0.3.1 releases that version: the package is built and checked, published to PyPI as
-# thespis-npc by trusted publishing (no token is stored here), then a GitHub Release is made with its notes from
+# thespis-sdk by trusted publishing (no token is stored here), then a GitHub Release is made with its notes from
 # CHANGELOG.md. The tag must match thespis.__version__, and the changelog must have a section for it.
 on:
   push:
@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/project/thespis-npc/
+      url: https://pypi.org/project/thespis-sdk/
     permissions:
       id-token: write  # trusted publishing: PyPI checks this workflow's identity, so no token is stored
     steps:

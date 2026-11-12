@@ -6,10 +6,10 @@ to PyPI and GitHub Releases from the section below that has its number.
 
 ## 0.3.1
 
-The first release on PyPI, as `thespis-npc` (the name `thespis` was taken). It installs and imports as `thespis`:
+The first release on PyPI, as `thespis-sdk` (the name `thespis` was taken). It installs and imports as `thespis`:
 
 ```bash
-pip install thespis-npc
+pip install thespis-sdk
 ```
 
 - **For newcomers:** a quickstart (`examples/quickstart`), and a guide to putting Thespis in your own game
