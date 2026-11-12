@@ -6,6 +6,8 @@ to PyPI and GitHub Releases from the section below that has its number.
 
 ## Unreleased
 
+- **`docs/tuning.md`:** the numbers that decide outcomes, worked through: the trust ladder (0.9, 0.4, 0.2), how far
+  a story travels before the gossip threshold stops it, how stories fuse and conflict, and which knob to turn.
 - **A sidecar answers only this machine.** It refuses (403) a request whose `Host` isn't localhost, so a web page
   can't reach it by DNS rebinding, and warns at start when it has no `THESPIS_TOKEN`. Every `/v1` body is at most
   1 MB (64 MB to open a session from a snapshot), refused (413) before it is read whole.

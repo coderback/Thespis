@@ -100,7 +100,8 @@ when = [{ believes = { pred = "stole_from", a = "player", b = "self" } }]
 ```
 
 **How news travels.** Ties carry gossip; `along` says how much survives each kind of tie. `[claims] one_actor` says
-a theft has one thief, so someone told two stories keeps the one from the source they trust more.
+a theft has one thief, so someone told two stories keeps the one from the source they trust more. How far news
+goes, and how sure it leaves people, is in [tuning.md](tuning.md).
 
 ```toml
 [[tie]]
