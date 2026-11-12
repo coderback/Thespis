@@ -286,8 +286,11 @@ def serve(args: argparse.Namespace) -> int:
         db = storage(args.db or os.environ.get("DATABASE_URL", "") or "")
     else:
         db = storage(args.db or str(cache_dir() / "sidecar.sqlite"))
-    host = Host(db, games, gateway, mode=mode, max_sessions=args.max_sessions,
-                token=os.environ.get("THESPIS_TOKEN") or None if mode == SIDECAR else None,
+    token = os.environ.get("THESPIS_TOKEN") or None if mode == SIDECAR else None
+    if mode == SIDECAR and not token:
+        print("no THESPIS_TOKEN: any program on this machine can call this sidecar. A launcher should set one (the "
+              "Godot and Unity SDKs do)", file=sys.stderr)
+    host = Host(db, games, gateway, mode=mode, max_sessions=args.max_sessions, token=token,
                 vault=Vault.from_env() if mode == SERVER else None, cache=not args.no_cache,
                 allow_private_models=args.allow_private_models, embedder=embedder)
     if sys.platform != "win32":  # kill -USR1 <pid>: every thread's stack to stderr, for a runtime that seems stuck

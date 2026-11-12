@@ -26,7 +26,12 @@ thespis serve --game game.toml --port 0 --db saves/thespis.sqlite --parent <the 
 - `--parent` ties its life to the game's. It stops when that process ends, however it ends, even if it's killed. The
   local model's server is tied to the sidecar in turn ([models.md](models.md#local-models-playing-offline)).
 - If `THESPIS_TOKEN` is set when it starts, every call must send `Authorization: Bearer <token>`. That keeps other
-  programs on the machine out. A launcher makes one up per start.
+  programs on the machine out. A launcher makes one up per start (the Godot and Unity SDKs do); without one, the
+  sidecar says so when it starts.
+- It answers only requests addressed to this machine: `Host` must be `localhost`, `127.0.0.1` or `[::1]`, or it
+  refuses (403). A web page in the player's browser can't reach it by pointing a name of its own at 127.0.0.1 (DNS
+  rebinding).
+- A request body is at most 1 MB, or 64 MB to open a session from a snapshot; a server holds the same limits.
 - `--db` is where sessions are kept: a SQLite file (the runtime's cache folder if left out), or `:memory:` for none.
 - It keeps up to `--max-sessions` (256). At that many, opening one more drops the session saved longest ago that
   isn't being played, since a game killed on quit never closes its own. Keep a game's saves in its own save files

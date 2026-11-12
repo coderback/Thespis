@@ -444,9 +444,10 @@ errors carry `{error, reason}`:
 | --- | --- | --- |
 | 400 | `bad_request` or `bad_definition` | A malformed body, or a snapshot of another game or version |
 | 401 | `unauthorized` | No key, or the wrong one: a server wants the project's, a sidecar its token if it has one |
+| 403 | `forbidden` | A sidecar asked by a name that isn't this machine's (`Host` must be localhost, 127.0.0.1 or [::1]) |
 | 404 | `unknown` | An unknown game, session, NPC, choice set or line, or another project's session |
 | 409 | `not_allowed` or `conflict` | A call the game doesn't allow now, or a session another instance moved on (call again) |
-| 413 | `too_large` | A game definition over 256 KB |
+| 413 | `too_large` | A game definition over 256 KB, or a body over 1 MB (64 MB to open a session from a snapshot) |
 | 429 | `over_cap` | A project at its limit of games |
 | 503 | `full` | The project holds its limit of sessions |
 
