@@ -207,6 +207,10 @@ saved = s.snapshot()                        # plain JSON: store it in your save 
 s = Session.restore(game, saved)            # the same minds, which go on to play the same
 ```
 
+A save made before you patched the game file still restores, brought up to the new file: an NPC you removed
+retires, one you added joins, and `s.patched` says what changed. Keep NPC ids stable between releases: a new id is
+a new NPC. [protocol.md](protocol.md#saves) has the rules.
+
 ## The player's words (optional)
 
 If players can type to NPCs, declare what typing may do (`[intents]`, as in the [tavern](../examples/tavern/game.toml))

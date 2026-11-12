@@ -128,6 +128,45 @@ def _numbers(world: dict) -> dict:
     return world
 
 
+def _patch(game: Game, w: World) -> list[str]:
+    """Bring a world saved under an earlier version of the game file up to this one (Session.restore), in place, and
+    say what changed, a line each."""
+    d, out = game.cast.data, []
+    orphans = sorted(f"{npc} ({t.get('kind')})" for npc, t in w.cast.items() if t.get("kind") not in game.kinds)
+    if orphans:
+        raise DefinitionError(f"this save has people of a kind the game file no longer has: {', '.join(orphans)}; "
+                              "keep their [kind] in the file")
+    file_npcs = d.get("npc", {})
+    for npc in w.npcs:
+        if npc not in file_npcs and npc not in w.cast and npc not in w.gone:
+            w.gone.add(npc)
+            out.append(f"{npc}: no longer in the game file, so retired; what it believed is kept")
+    for npc, t in file_npcs.items():
+        if npc not in w.npcs:
+            w.npcs[npc] = NPC(npc, t["start"], dict(t.get("drives", {})), dict(t.get("trust_in", {})))
+            out.append(f"{npc}: new in the game file, so joined at {t['start']}")
+    for pid, p in game.players.items():
+        if pid not in w.players:
+            w.players[pid] = {"name": p["name"], "loc": p.get("start", "")}
+            out.append(f"{pid}: a player new in the game file, so joined")
+    if game.places:
+        for n in w.npcs.values():
+            if n.id not in w.gone and n.loc and n.loc not in game.places:
+                start = file_npcs.get(n.id, {}).get("start") or w.cast.get(n.id, {}).get("at", "")
+                out.append(f"{n.id}: {n.loc!r} is no longer a place, so back to {start!r}")
+                n.loc = start
+        start = d.get("player", {}).get("start", "")
+        if w.player.get("loc") and w.player["loc"] not in game.places:
+            out.append(f"player: {w.player['loc']!r} is no longer a place, so back to {start!r}")
+            w.player["loc"] = start
+        for pid, p in w.players.items():
+            if p.get("loc") and p["loc"] not in game.places:
+                back = game.players.get(pid, {}).get("start", "")
+                out.append(f"{pid}: {p['loc']!r} is no longer a place, so back to {back!r}")
+                p["loc"] = back
+    return out
+
+
 class Game:
     """A game definition, compiled and checked: load once, play many sessions."""
 
@@ -397,6 +436,7 @@ class Session:
         self.on_pack: Callable[[StatePack], None] | None = None  # sees each state pack as it's built (Rehearsal)
         self.on_settle: Callable[[Line], None] | None = None  # sees each provisional line once it settles (a store)
         self._tied: dict[str, list[tuple[str, str]]] | None = None  # everyone's ties: the game's, and made in play
+        self.patched: list[str] = []  # how restore brought a save up to a changed game file, if it did
         for npc in world.cast:
             self._enrol(npc)
 
@@ -777,7 +817,13 @@ class Session:
     def restore(cls, game: Game, snapshot: Mapping, **kw) -> Session:
         """A session from a snapshot of this game. A snapshot from a newer Thespis, or of another game, is refused.
         One that went through an engine with a single number type (GDScript reads every JSON number as a float)
-        restores the same."""
+        restores the same.
+
+        A save made before the game file changed (a patch) is brought up to it, and `patched` says how: an NPC the
+        file no longer has is retired (it keeps what it believed, and others keep what they believe of it); one the
+        file has gained joins at its start; someone standing in a place the file no longer has goes back to their
+        start; a player the file has gained joins. A save with people of a kind the file no longer has is refused, as
+        there is nothing left to say who they are. Ids are what a save goes by: an NPC whose id changed is a new NPC."""
         if not isinstance(snapshot, Mapping) or "thespis" not in snapshot:
             raise DefinitionError("not a Thespis save: a snapshot is the table Session.snapshot() returns")
         if snapshot.get("thespis") != SNAPSHOT_VERSION:
@@ -790,7 +836,10 @@ class Session:
             witnesses = {k: list(v) for k, v in dict(snapshot.get("witnesses", {})).items()}
         except (KeyError, TypeError, ValueError, AttributeError) as e:
             raise DefinitionError(f"a damaged snapshot: {type(e).__name__} {e}") from e
-        return cls(game, world, witnesses, **kw)
+        patched = _patch(game, world) if snapshot.get("digest") != game.digest else []
+        session = cls(game, world, witnesses, **kw)
+        session.patched = patched
+        return session
 
     def inspect(self, npc: str) -> dict:
         """One NPC's mind as it stands: its state and every belief, retracted ones included, with their evidence."""
