@@ -3,6 +3,9 @@
 Thespis is open to contributions: bug reports, fixes, docs, examples, and games built on it. For anything larger than
 a fix, open an issue first and say what you have in mind, so we can agree on the shape before you build it.
 
+Everyone taking part follows the [code of conduct](CODE_OF_CONDUCT.md). A security problem goes privately, as
+[SECURITY.md](SECURITY.md) says, never in an issue.
+
 ## Set up
 
 You need Python 3.12 or later. Node 22 is only for the demo games' browser client.
