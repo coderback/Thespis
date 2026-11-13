@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def notes(version: str, changelog: str) -> str | None:
     """The body of the `## <version>` section (a date may follow the number), or None."""
-    m = re.search(rf"^## {re.escape(version)}(?: \(.*\))?\n(.*?)(?=^## |\Z)", changelog, re.M | re.S)
+    m = re.search(rf"^## {re.escape(version)}(?: \([^)\n]*\))?\n(.*?)(?=^## |\Z)", changelog, re.M | re.S)
     return m.group(1).strip() if m else None
 
 

@@ -27,3 +27,11 @@ def test_notes_are_one_section_whatever_follows_the_number():
     assert notes("0.2.0", log) == "New."
     assert notes("0.1.0", log) == "Old."
     assert notes("0.1", log) is None
+
+
+def test_a_dated_section_ends_at_the_next_one_not_at_the_last_date():
+    """The date's pattern once ran across lines to the last ")" in the file, so 0.4.0's notes were 0.1.0's."""
+    log = ("## 0.4.0 (13 November 2026)\n\nNew (really).\n\n### Checked\n\n- More.\n\n"
+           "## 0.3.1\n\nMiddle.\n\n## 0.1.0 (3 October 2026)\n\nOld.\n")
+    assert notes("0.4.0", log) == "New (really).\n\n### Checked\n\n- More."
+    assert notes("0.1.0", log) == "Old."
