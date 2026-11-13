@@ -6,6 +6,8 @@ to PyPI and GitHub Releases from the section below that has its number.
 
 ## Unreleased
 
+- **`SECURITY.md` and a code of conduct.** Vulnerabilities are reported privately through GitHub's "Report a
+  vulnerability"; the project follows the Contributor Covenant 2.1.
 - **Prebuilt runtimes.** Each GitHub Release attaches the sidecar a game ships beside it, for Windows (x64), macOS
   (Apple silicon) and Linux (x64), each checked against its size and cold-start budgets: unzip as `thespis/` beside
   the game's executable.
