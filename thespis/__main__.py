@@ -319,6 +319,9 @@ def serve(args: argparse.Namespace) -> int:
     print(f"THESPIS_URL=http://{shown}:{port}", flush=True)
     print(f"{mode} on {shown}:{port}, {'online' if online else 'offline'}, sessions in "
           f"{getattr(db, 'path', 'postgres')}", file=sys.stderr, flush=True)
+    print(f"inspect its sessions at http://{shown}:{port}/inspector/"
+          + ("#token=<THESPIS_TOKEN>" if token else "#token=<a project's key>" if mode == SERVER else ""),
+          file=sys.stderr, flush=True)
     try:
         server.run(sockets=[sock])
     finally:

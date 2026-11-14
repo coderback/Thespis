@@ -139,6 +139,7 @@ class Storage(Protocol):
     def delete_session(self, project: str, sid: str) -> bool: ...
     def open_sessions(self, project: str) -> int: ...
     def oldest_sessions(self, project: str, n: int) -> list[str]: ...
+    def list_sessions(self, project: str, n: int) -> list[tuple[str, str, float, float]]: ...
 
     def record(self, events: Sequence[Usage]) -> None: ...
     def usage(self, project: str, since: float = 0, until: float | None = None,
@@ -271,6 +272,12 @@ class _Sql:
         """The project's `n` sessions saved longest ago, oldest first."""
         return [r[0] for r in self._all("SELECT id FROM sessions WHERE project = ? ORDER BY updated_at, id LIMIT ?",
                                         (project, n))]
+
+    def list_sessions(self, project: str, n: int) -> list[tuple[str, str, float, float]]:
+        """The project's `n` sessions saved most recently, newest first: (id, game, created_at, updated_at)."""
+        return [(r[0], r[1], r[2], r[3]) for r in self._all(
+            "SELECT id, game, created_at, updated_at FROM sessions WHERE project = ? "
+            "ORDER BY updated_at DESC, id LIMIT ?", (project, n))]
 
     # ------------------------------------------------------------ usage
     def record(self, events: Sequence[Usage]) -> None:

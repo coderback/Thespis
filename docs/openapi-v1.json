@@ -1,6 +1,58 @@
 {
   "components": {
     "schemas": {
+      "ChoiceOut": {
+        "properties": {
+          "blocked": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What keeps it shut: \"grudge is 2, needs >= 4\"",
+            "title": "Blocked"
+          },
+          "chosen": {
+            "description": "The one the NPC would pick now",
+            "title": "Chosen",
+            "type": "boolean"
+          },
+          "do": {
+            "title": "Do",
+            "type": "string"
+          },
+          "open": {
+            "description": "Whether its when holds now",
+            "title": "Open",
+            "type": "boolean"
+          },
+          "terms": {
+            "description": "How its utility adds up: \"anger 5 x 2 + 1 = 11\"",
+            "items": {
+              "type": "string"
+            },
+            "title": "Terms",
+            "type": "array"
+          },
+          "utility": {
+            "description": "What it is worth to the NPC now, open or not",
+            "title": "Utility",
+            "type": "number"
+          }
+        },
+        "required": [
+          "do",
+          "open",
+          "utility",
+          "terms",
+          "chosen"
+        ],
+        "title": "ChoiceOut",
+        "type": "object"
+      },
       "ClaimIn": {
         "properties": {
           "a": {
@@ -200,6 +252,46 @@
           "truth"
         ],
         "title": "EventOut",
+        "type": "object"
+      },
+      "ExplainIn": {
+        "properties": {
+          "bindings": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "boolean"
+                }
+              ]
+            },
+            "description": "Values the choices name: {culprit}",
+            "title": "Bindings",
+            "type": "object"
+          },
+          "moment": {
+            "description": "Which of the NPC's declared choice sets: [[npc.<id>.choices.<moment>]]",
+            "title": "Moment",
+            "type": "string"
+          },
+          "npc": {
+            "title": "Npc",
+            "type": "string"
+          }
+        },
+        "required": [
+          "npc",
+          "moment"
+        ],
+        "title": "ExplainIn",
         "type": "object"
       },
       "GameIn": {
@@ -756,6 +848,73 @@
         "title": "OfferIn",
         "type": "object"
       },
+      "OverviewOut": {
+        "properties": {
+          "events": {
+            "description": "Events in the ledger",
+            "title": "Events",
+            "type": "integer"
+          },
+          "game": {
+            "title": "Game",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "npcs": {
+            "description": "Each NPC's state, as inspect has it, with its name, moments (what explain and decide take), and beliefs and retracted (how many it holds and has let go)",
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Npcs",
+            "type": "array"
+          },
+          "phase": {
+            "title": "Phase",
+            "type": "integer"
+          },
+          "places": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Places",
+            "type": "object"
+          },
+          "players": {
+            "description": "{id, name, loc}, the one player every game has first",
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Players",
+            "type": "array"
+          },
+          "ties": {
+            "description": "{between, kind, made}: made is game (the game file) or play",
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Ties",
+            "type": "array"
+          }
+        },
+        "required": [
+          "game",
+          "name",
+          "phase",
+          "events",
+          "npcs",
+          "players",
+          "places",
+          "ties"
+        ],
+        "title": "OverviewOut",
+        "type": "object"
+      },
       "ProjectOut": {
         "properties": {
           "caps": {
@@ -971,6 +1130,42 @@
           "game"
         ],
         "title": "SessionIn",
+        "type": "object"
+      },
+      "SessionInfoOut": {
+        "properties": {
+          "created": {
+            "description": "Unix time",
+            "title": "Created",
+            "type": "number"
+          },
+          "game": {
+            "title": "Game",
+            "type": "string"
+          },
+          "held": {
+            "description": "Held in memory by this instance now",
+            "title": "Held",
+            "type": "boolean"
+          },
+          "session": {
+            "title": "Session",
+            "type": "string"
+          },
+          "updated": {
+            "description": "Unix time it was last saved",
+            "title": "Updated",
+            "type": "number"
+          }
+        },
+        "required": [
+          "session",
+          "game",
+          "created",
+          "updated",
+          "held"
+        ],
+        "title": "SessionInfoOut",
         "type": "object"
       },
       "SessionOut": {
@@ -1463,7 +1658,7 @@
     }
   },
   "info": {
-    "description": "The /v1 HTTP API: the session calls (thespis.session), one route each, for engines that aren't Python.\n\nAn engine opens a session on a game the server loaded or the project sent, reports events and changes, and asks for\ndecisions and lines. Lines come back provisional by default and are polled until final (`GET .../lines/{id}?wait=2`).\nThe routes mirror the library's calls one for one, and the generated OpenAPI spec, committed as docs/openapi-v1.json,\nis the SDKs' contract: tests fail when the two drift apart.\n\nA server (`thespis serve --server`) wants the project's key on every call: `Authorization: Bearer tsk_...`. A sidecar\nwants the token its launcher gave it, if it was given one. Projects send their own games (`PUT /v1/games/{id}`), set\ntheir own model keys on a server (`PUT /v1/project/model`), and export their usage (`GET /v1/usage`).\n\nErrors carry `{error, reason}`: 400 for a malformed body or a definition the call breaks, 401 without the right key,\n404 for an unknown game, session, NPC, moment or line, 409 for a call the game doesn't allow now (or a session another\ninstance moved on), 413 for a game or a body too large, 429 over a project's cap, 503 when the project holds its\nlimit of sessions. A sidecar refuses (403) a request whose Host isn't this machine. Sessions are kept by the host (thespis.host): in memory, in a sidecar's SQLite file, or in a server's\ndatabase.\n",
+    "description": "The /v1 HTTP API: the session calls (thespis.session), one route each, for engines that aren't Python.\n\nAn engine opens a session on a game the server loaded or the project sent, reports events and changes, and asks for\ndecisions and lines. Lines come back provisional by default and are polled until final (`GET .../lines/{id}?wait=2`).\nThe routes mirror the library's calls one for one, and the generated OpenAPI spec, committed as docs/openapi-v1.json,\nis the SDKs' contract: tests fail when the two drift apart.\n\nA server (`thespis serve --server`) wants the project's key on every call: `Authorization: Bearer tsk_...`. A sidecar\nwants the token its launcher gave it, if it was given one. Projects send their own games (`PUT /v1/games/{id}`), set\ntheir own model keys on a server (`PUT /v1/project/model`), and export their usage (`GET /v1/usage`).\n\n`/inspector/` is a page that shows the sessions through these routes, read-only: the cast and its ties, each mind,\nwhy an NPC would choose what it would, the ledger, and where a story goes. It takes the token in its address's\nfragment (`/inspector/#token=...`), which the browser never sends, and loads nothing from anywhere else.\n\nErrors carry `{error, reason}`: 400 for a malformed body or a definition the call breaks, 401 without the right key,\n404 for an unknown game, session, NPC, moment or line, 409 for a call the game doesn't allow now (or a session another\ninstance moved on), 413 for a game or a body too large, 429 over a project's cap, 503 when the project holds its\nlimit of sessions. A sidecar refuses (403) a request whose Host isn't this machine. Sessions are kept by the host (thespis.host): in memory, in a sidecar's SQLite file, or in a server's\ndatabase.\n",
     "title": "Thespis",
     "version": "v1"
   },
@@ -1796,6 +1991,69 @@
       }
     },
     "/v1/sessions": {
+      "get": {
+        "description": "The project's sessions, saved most recently first: what an inspector picks from.",
+        "operationId": "list_sessions_v1_sessions_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "maximum": 1000,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Bearer <the project's key, or the sidecar's token>",
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer <the project's key, or the sidecar's token>",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SessionInfoOut"
+                  },
+                  "title": "Response List Sessions V1 Sessions Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Sessions"
+      },
       "post": {
         "operationId": "open_session_v1_sessions_post",
         "parameters": [
@@ -1901,6 +2159,62 @@
           }
         },
         "summary": "Close Session"
+      },
+      "get": {
+        "description": "The session at a glance, changing nothing: the phase, every NPC with its name, moments and how many\nbeliefs it holds, the players, and every tie, the game file's and those made in play.",
+        "operationId": "overview_v1_sessions__sid__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sid",
+            "required": true,
+            "schema": {
+              "title": "Sid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Bearer <the project's key, or the sidecar's token>",
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer <the project's key, or the sidecar's token>",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OverviewOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Overview"
       }
     },
     "/v1/sessions/{sid}/decide": {
@@ -2066,6 +2380,78 @@
           }
         },
         "summary": "Events"
+      }
+    },
+    "/v1/sessions/{sid}/explain": {
+      "post": {
+        "description": "Why the NPC would do what it would at the moment, now, without doing it: every choice, in order, whether\nit is open and what keeps it shut, its utility and how that adds up, and the one it would pick.",
+        "operationId": "explain_v1_sessions__sid__explain_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sid",
+            "required": true,
+            "schema": {
+              "title": "Sid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Bearer <the project's key, or the sidecar's token>",
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer <the project's key, or the sidecar's token>",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExplainIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ChoiceOut"
+                  },
+                  "title": "Response Explain V1 Sessions  Sid  Explain Post",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Explain"
       }
     },
     "/v1/sessions/{sid}/lines/{lid}": {

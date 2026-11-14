@@ -1,0 +1,123 @@
+:root {
+  --bg: #fbfaf7;
+  --panel: #ffffff;
+  --text: #1d1c1a;
+  --muted: #6b675f;
+  --line: #e4e0d8;
+  --accent: #8a4b14;
+  --accent-bg: #f6ead9;
+  --bad: #a3261b;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #161513;
+    --panel: #1f1d1a;
+    --text: #ece8e1;
+    --muted: #a39d92;
+    --line: #34312c;
+    --accent: #e3a35f;
+    --accent-bg: #3a2b1b;
+    --bad: #ff8a7d;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+h1 { font-size: 16px; margin: 0 8px 0 0; }
+h2 { font-size: 15px; margin: 0 0 6px; }
+h3 { font-size: 13px; margin: 18px 0 6px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+
+button, select, input {
+  font: inherit;
+  color: inherit;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+button { cursor: pointer; }
+button:hover { border-color: var(--accent); }
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+select { max-width: 100%; }
+label { display: inline-flex; align-items: center; gap: 6px; }
+label.check { gap: 4px; }
+code { font-family: var(--mono); font-size: 12px; }
+
+#status { margin-left: auto; color: var(--muted); font-size: 12px; }
+#status.bad { color: var(--bad); }
+
+#login { max-width: 520px; margin: 40px auto; padding: 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+#login input { width: 100%; margin: 8px 0; }
+
+main {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) 1fr;
+  gap: 16px;
+  padding: 16px;
+}
+@media (max-width: 760px) { main { grid-template-columns: 1fr; } }
+
+aside section, .work { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+aside { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.work { min-width: 0; overflow-x: auto; }
+
+.list { list-style: none; margin: 0; padding: 0; }
+.list li + li { margin-top: 4px; }
+.list button {
+  width: 100%;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  border-color: transparent;
+  background: transparent;
+}
+.list button.picked { background: var(--accent-bg); border-color: var(--accent); }
+.list .name { font-weight: 600; }
+ul.plain { list-style: none; margin: 0; padding: 0; }
+
+.muted { color: var(--muted); font-size: 12px; }
+.tag { margin-left: 6px; font-size: 11px; font-weight: 400; padding: 0 5px; border-radius: 4px; background: var(--line); }
+
+nav { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin: -4px 0 12px; padding-bottom: 8px; flex-wrap: wrap; }
+nav button { border-color: transparent; background: transparent; }
+nav button[aria-selected="true"] { background: var(--accent-bg); border-color: var(--accent); }
+
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 6px; }
+.row .grow { flex: 1 1 220px; }
+.row .grow input { flex: 1; min-width: 0; }
+
+dl.state { display: grid; grid-template-columns: max-content 1fr; gap: 2px 12px; margin: 0; }
+dl.state dt { color: var(--muted); }
+dl.state dd { margin: 0; }
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { text-align: left; vertical-align: top; padding: 5px 8px; border-bottom: 1px solid var(--line); }
+th { color: var(--muted); font-weight: 500; font-size: 12px; }
+td.num { font-family: var(--mono); text-align: right; white-space: nowrap; }
+tr.faded td { color: var(--muted); }
+tr.chosen td { background: var(--accent-bg); font-weight: 600; }
+tr.caught td { color: var(--bad); }
+td ul.plain li { font-size: 12px; }

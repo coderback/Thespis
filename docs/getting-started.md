@@ -214,6 +214,10 @@ for b in s.inspect("mara")["beliefs"]:
 Every belief, retracted ones too, with its evidence: who it came from, through which event, how sure. It's what to
 show in a debug panel, or a "why" view for players.
 
+Through a sidecar or a server, you needn't build that panel to see it: `thespis serve` serves an inspector at
+`/inspector/`. Open it beside the game (`http://127.0.0.1:7878/inspector/#token=<THESPIS_TOKEN>`) to watch the
+cast, each mind, why an NPC chose what it did, the ledger and the grapevine as you play. It only reads.
+
 ## 7. Save and load
 
 ```python
