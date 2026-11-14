@@ -554,7 +554,7 @@ Over a daily model cap a project isn't refused: its lines come from templates un
 | `GET /v1/project` | Its caps, today's calls and tokens, open sessions, and its model settings with the keys left out |
 | `PUT /v1/project/model` / `DELETE` | Its own models and keys, sealed at rest (a server only) |
 | `GET /v1/usage?since=&format=csv` | Its usage events: model calls, lines settled and where from, calls a cap refused |
-| `GET /v1/health` | Up, and whether it's offline: `{"ok", "offline", "refused"}` |
+| `GET /v1/health` | Up, its version, and whether it's offline: `{"ok", "version", "offline", "refused"}`. The Godot and Unity clients check the version when they start |
 
 ## Not yet
 

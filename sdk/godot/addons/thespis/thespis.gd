@@ -21,6 +21,11 @@ extends Node
 signal line_arrived(line: ThespisLine)  ## decide, react or narrate gave a line: show it (it may be provisional)
 signal line_settled(line: ThespisLine)  ## a line became final (show its new text) or withdrawn (take it down)
 signal state_changed(state: String)  ## starting, ready, failed or stopped
+signal warned(message: String)  ## something worth a developer's attention, such as a runtime older than this addon
+
+## The oldest runtime (thespis-sdk) this addon is written for: an older one lacks calls it makes.
+const MIN_RUNTIME := "0.5.0"
+var runtime_version := ""  ## the runtime's, from its health once start() has reached it; "" if it doesn't say
 
 const SETTINGS := {  # [default, type, hint, hint string, what it's for]
 	"thespis/connection/url": ["", TYPE_STRING, PROPERTY_HINT_NONE, "",
@@ -119,6 +124,8 @@ func start() -> ThespisResult:
 		url = sidecar.url
 		key = sidecar.token
 	var health := await _until_healthy(10.0)
+	if health.ok:
+		_check_version(health.value)
 	if health.ok and not game_file.is_empty():
 		var sent := await put_game_file(game_file)
 		if not sent.ok:
@@ -146,6 +153,32 @@ func is_sidecar() -> bool:
 
 func health() -> ThespisResult:
 	return await _call("health")
+
+
+func _check_version(h) -> void:
+	runtime_version = (h as ThespisApi.HealthOut).version if h is ThespisApi.HealthOut else ""
+	if runtime_version.is_empty():
+		_warn("the Thespis runtime doesn't say its version: it predates %s, which this addon needs" % MIN_RUNTIME)
+	elif ThespisClient.older(runtime_version, MIN_RUNTIME):
+		_warn("the Thespis runtime is %s; this addon needs %s or later, and some calls will fail" % [
+			runtime_version, MIN_RUNTIME])
+
+
+func _warn(message: String) -> void:
+	push_warning("Thespis: " + message)
+	warned.emit(message)
+
+
+## Is version `a` older than `b`? Both "major.minor.patch"; anything after a number (a pre-release) is ignored.
+static func older(a: String, b: String) -> bool:
+	var x := a.split(".")
+	var y := b.split(".")
+	for i in 3:
+		var p := int(x[i]) if i < x.size() else 0
+		var q := int(y[i]) if i < y.size() else 0
+		if p != q:
+			return p < q
+	return false
 
 
 ## Send a game's definition. Its id must be the one its [game] table gives.
@@ -203,6 +236,28 @@ func join(player: String, display_name := "", at := "") -> ThespisResult:
 	if not at.is_empty():
 		body["at"] = at
 	return await _call("join", {"sid": session_id}, body)
+
+
+## A new NPC of a kind the game declares, in play: add_npc("mara", "guard", "Mara Reed", "docks").
+## options: persona, goal (their own; their kind's if left out).
+func add_npc(id: String, kind: String, display_name: String, at := "", options := {}) -> ThespisResult:
+	return await _call("add", {"sid": session_id}, _with({"id": id, "kind": kind, "name": display_name, "at": at},
+		options))
+
+
+## Take an NPC out of the story, dead or gone for good: they see, say and decide nothing more.
+func retire(npc: String) -> ThespisResult:
+	return await _call("retire", {"sid": session_id, "npc": npc})
+
+
+## A tie between two NPCs, of a kind [gossip] along declares, for gossip to travel along. ok with a ThespisApi.TieOut.
+func tie(a: String, b: String, kind: String) -> ThespisResult:
+	return await _call("tie", {"sid": session_id}, {"a": a, "b": b, "kind": kind})
+
+
+## Break a tie made in play.
+func untie(a: String, b: String) -> ThespisResult:
+	return await _call("untie", {"sid": session_id, "a": a, "b": b})
 
 
 # ------------------------------------------------------------------------------------------------ the world

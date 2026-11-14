@@ -50,6 +50,13 @@ if (!begun.Ok)
 Check(thespis.IsSidecar == (expect == "sidecar"), $"it runs as a {expect}, with no change to the game", thespis.Url);
 var health = await thespis.HealthAsync();
 Check(health.Ok && health.Value!.Offline == (expect == "sidecar"), "the sidecar is offline; the server is online", health);
+Check(thespis.RuntimeVersion.Length > 0 && thespis.RuntimeVersion == health.Value!.Version,
+    "the client knows the runtime's version", thespis.RuntimeVersion);
+Check(ThespisClient.Older("0.4.9", "0.5.0") && !ThespisClient.Older("0.5.0", "0.5.0") &&
+      !ThespisClient.Older("1.0.0", "0.5.0") && ThespisClient.Older("0.5.0rc1", "0.5.1"),
+    "versions compare by number");
+var events = await thespis.EventsAsync();
+Check(events.Ok && events.Value!.Count == 0, "a new session's ledger is empty", events);
 
 var before = await game.AskGarrickAsync();
 var quiet = before.Value!;

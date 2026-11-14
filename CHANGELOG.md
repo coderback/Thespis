@@ -6,6 +6,11 @@ to PyPI and GitHub Releases from the section below that has its number.
 
 ## Unreleased
 
+- **Engine clients for the whole cast.** The Godot and Unity clients add NPCs in play, retire them, tie and untie
+  them (`add_npc`, `retire`, `tie`, `untie`; `AddAsync`, `RetireAsync`, `TieAsync`, `UntieAsync`), and read the
+  ledger (`events`, `EventsAsync`). `/v1/health` reports the runtime's version; the clients keep it
+  (`runtime_version`, `RuntimeVersion`) and warn when the runtime is older than they need. Each package carries its
+  licence and a README listing every call, and the Unity manifest its licence and links, for the asset stores.
 - **Secrets and silence.** `[gossip] secret` names predicates nobody passes on, and `[[npc.<id>.keeps]]` news one
   NPC (or a kind) won't pass on: of someone, of a predicate, or both, while its `when` holds. Hush money is a flag
   the game sets; loyalty is a trust condition. The trace says where a story stops for either.

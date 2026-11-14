@@ -303,10 +303,16 @@
             "description": "Connections off this machine it has refused since it started",
             "title": "Refused",
             "type": "integer"
+          },
+          "version": {
+            "description": "The runtime's version, thespis-sdk's: a client can check it supports it",
+            "title": "Version",
+            "type": "string"
           }
         },
         "required": [
           "ok",
+          "version",
           "offline",
           "refused"
         ],

@@ -188,6 +188,10 @@ namespace Thespis.Api
         /// <summary>Connections off this machine it has refused since it started</summary>
         [JsonProperty("refused")]
         public int Refused { get; set; }
+
+        /// <summary>The runtime's version, thespis-sdk's: a client can check it supports it</summary>
+        [JsonProperty("version")]
+        public string Version { get; set; } = "";
     }
 
     public class IntentOut

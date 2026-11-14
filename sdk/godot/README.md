@@ -9,7 +9,7 @@ through a Thespis server. Which one is a setting, not code.
 
 | Path | What it is |
 | --- | --- |
-| `addons/thespis/` | The addon: copy this folder into your project |
+| `addons/thespis/` | The addon: copy this folder into your project. Its README lists every call |
 | `addons/thespis/thespis.gd` | `ThespisClient`, the `Thespis` autoload: every call, as a coroutine |
 | `addons/thespis/api.gd` | `ThespisApi`: a typed class per `/v1` schema and the route table, **generated** from [docs/openapi-v1.json](../../docs/openapi-v1.json) |
 | `addons/thespis/line.gd`, `result.gd` | `ThespisLine` (a line that settles) and `ThespisResult` (what every call returns) |

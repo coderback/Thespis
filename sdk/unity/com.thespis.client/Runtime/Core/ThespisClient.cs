@@ -70,6 +70,13 @@ namespace Thespis
         public event Action<ThespisLine>? LineSettled;
         /// <summary>starting, ready, failed or stopped.</summary>
         public event Action<string>? StateChanged;
+        /// <summary>Something worth a developer's attention, such as a runtime older than this package.</summary>
+        public event Action<string>? Warned;
+
+        /// <summary>The oldest runtime (thespis-sdk) this package is written for: an older one lacks calls it makes.</summary>
+        public const string MinRuntime = "0.5.0";
+        /// <summary>The runtime's version, from its health once <see cref="StartAsync"/> reached it; "" if it doesn't say.</summary>
+        public string RuntimeVersion { get; private set; } = "";
 
         public ThespisOptions Options { get; }
         public string Url { get; private set; } = "";
@@ -154,6 +161,8 @@ namespace Thespis
                 _key = Sidecar.Token;
             }
             var health = await UntilHealthyAsync(TimeSpan.FromSeconds(10));
+            if (health.Ok)
+                CheckVersion(health.Value);
             if (health.Ok && Options.GameToml.Length > 0)
             {
                 var sent = await PutGameAsync(Options.GameToml);
@@ -162,6 +171,28 @@ namespace Thespis
             }
             SetState(health.Ok ? "ready" : "failed");
             return health;
+        }
+
+        private void CheckVersion(HealthOut? health)
+        {
+            RuntimeVersion = health?.Version ?? "";
+            if (RuntimeVersion.Length == 0)
+                Warned?.Invoke($"the Thespis runtime doesn't say its version: it predates {MinRuntime}, which this package needs");
+            else if (Older(RuntimeVersion, MinRuntime))
+                Warned?.Invoke($"the Thespis runtime is {RuntimeVersion}; this package needs {MinRuntime} or later, and some calls will fail");
+        }
+
+        /// <summary>Is version <paramref name="a"/> older than <paramref name="b"/>? Both "major.minor.patch".</summary>
+        public static bool Older(string a, string b)
+        {
+            static int Part(string[] v, int i) =>
+                i < v.Length && int.TryParse(new string(v[i].TakeWhile(char.IsDigit).ToArray()), out var n) ? n : 0;
+            var x = a.Split('.');
+            var y = b.Split('.');
+            for (var i = 0; i < 3; i++)
+                if (Part(x, i) != Part(y, i))
+                    return Part(x, i) < Part(y, i);
+            return false;
         }
 
         /// <summary>Close the session and stop the sidecar, if this client started one.</summary>
@@ -236,6 +267,28 @@ namespace Thespis
         /// <summary>Another player, for a game with several.</summary>
         public Task<Result<JToken?>> JoinAsync(string player, string? name = null, string? at = null) =>
             CallAsync<JToken?>(Routes.Join, Session(), new JoinIn { Player = player, Name = name, At = at });
+
+        /// <summary>A new NPC of a kind the game declares, in play. Persona and goal are their kind's if left out.</summary>
+        public Task<Result<JToken?>> AddAsync(string id, string kind, string name, string at = "",
+            string? persona = null, string? goal = null) =>
+            CallAsync<JToken?>(Routes.Add, Session(), new NpcIn { Id = id, Kind = kind, Name = name, At = at,
+                Persona = persona, Goal = goal });
+
+        /// <summary>Take an NPC out of the story, dead or gone for good: they see, say and decide nothing more.</summary>
+        public Task<Result<JToken?>> RetireAsync(string npc) => CallAsync<JToken?>(Routes.Retire, Session("npc", npc));
+
+        /// <summary>A tie between two NPCs, of a kind [gossip] along declares, for gossip to travel along.</summary>
+        public Task<Result<TieOut>> TieAsync(string a, string b, string kind) =>
+            CallAsync<TieOut>(Routes.Tie, Session(), new TieIn { A = a, B = b, Kind = kind });
+
+        /// <summary>Break a tie made in play.</summary>
+        public Task<Result<JToken?>> UntieAsync(string a, string b)
+        {
+            var p = Session();
+            p["a"] = a;
+            p["b"] = b;
+            return CallAsync<JToken?>(Routes.Untie, p);
+        }
 
         // ------------------------------------------------------------------------------------------ the world
 

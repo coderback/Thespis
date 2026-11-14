@@ -53,6 +53,12 @@ func _run() -> void:
 	var health: ThespisResult = await thespis.health()
 	check(health.value is ThespisApi.HealthOut and health.value.offline == (expect == "sidecar"),
 			"the sidecar is offline; the server is online", health)
+	check(not thespis.runtime_version.is_empty() and thespis.runtime_version == health.value.version,
+			"the client knows the runtime's version", thespis.runtime_version)
+	check(ThespisClient.older("0.4.9", "0.5.0") and not ThespisClient.older("0.5.0", "0.5.0")
+			and not ThespisClient.older("1.0.0", "0.5.0"), "versions compare by number")
+	var ledger: ThespisResult = await thespis.events()
+	check(ledger.ok and ledger.value is Array and ledger.value.is_empty(), "a new session's ledger is empty", ledger)
 
 	# Knowing nothing, Garrick leaves in silence, and no model is asked.
 	var before: ThespisResult = await scene.ask_garrick()

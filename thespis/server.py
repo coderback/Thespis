@@ -30,6 +30,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field
 
+import thespis
 from thespis import offline
 from thespis.considerations import DefinitionError
 from thespis.gateway import ModelGateway
@@ -261,6 +262,7 @@ class NpcOut(BaseModel):
 
 class HealthOut(BaseModel):
     ok: bool
+    version: str = Field(description="The runtime's version, thespis-sdk's: a client can check it supports it")
     offline: bool = Field(description="It refuses every connection off this machine (a sidecar, unless --online)")
     refused: int = Field(description="Connections off this machine it has refused since it started")
 
@@ -438,7 +440,7 @@ def create_app(games: Mapping[str, Game] | None = None, gateway: ModelGateway | 
     @app.get(f"/{VERSION}/health")
     def health() -> HealthOut:
         """Up, and whether it is offline (thespis.offline): a game promising offline play can check it is."""
-        return HealthOut(ok=True, offline=offline.active(), refused=len(offline.refused))
+        return HealthOut(ok=True, version=thespis.__version__, offline=offline.active(), refused=len(offline.refused))
 
     @app.get(f"/{VERSION}/games")
     def list_games(p: Caller) -> list[GameOut]:

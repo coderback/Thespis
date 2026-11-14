@@ -30,7 +30,12 @@ namespace Thespis
             {
                 if (_instance == null)
                     _instance = new GameObject("Thespis").AddComponent<ThespisBehaviour>();
-                return _instance._client ??= new ThespisClient(_instance.Settings().ToOptions());
+                if (_instance._client == null)
+                {
+                    _instance._client = new ThespisClient(_instance.Settings().ToOptions());
+                    _instance._client.Warned += message => Debug.LogWarning("Thespis: " + message);
+                }
+                return _instance._client;
             }
         }
 
