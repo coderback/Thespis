@@ -6,6 +6,10 @@ to PyPI and GitHub Releases from the section below that has its number.
 
 ## Unreleased
 
+- **A schema for editors.** `docs/game.schema.json` is the game file's JSON Schema, built from the loader's own
+  lists. With a `#:schema` line at the top of a game file (the quickstart's has it; docs/getting-started.md says
+  how), VS Code's Even Better TOML and other Taplo editors offer every table and key, explain it, and underline a
+  misspelt key or a number out of range. `python -m thespis schema` prints it.
 - **A story's trace.** `Session.trace(claim)` (and `POST .../trace`) follows a story on the grapevine without
   changing anything: who holds it and from whom, what the next tick would tell of it with the sum for each listener
   (`0.9 x 0.9 (trust 2) x 0.9 (friend) = 0.73`), and where it stops and why (under the threshold, something worse

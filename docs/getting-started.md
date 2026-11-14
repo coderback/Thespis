@@ -49,6 +49,17 @@ game.toml: npc.mara.choices.counter[1].when[0].believes.pred: predicate 'stolefr
 A file names only what it declares: people in `[npc]` or `[players]`, places in `[places]`, predicates in
 `[words.claims]`, and drives in some NPC's `drives`. Keep your game's own data in `[custom]`; Thespis never reads it.
 
+**In your editor.** Put this on your game file's first line, as the quickstart's does, and an editor that reads
+TOML schemas (VS Code with Even Better TOML, or any editor using Taplo) offers every table and key as you type, says
+what each is for, and underlines a misspelt key or a number out of range:
+
+```toml
+#:schema https://raw.githubusercontent.com/coderback/Thespis/main/docs/game.schema.json
+```
+
+The schema can't see everything `thespis check` does (that a place or a drive exists, what a template names), so
+run that too.
+
 **The world, as names.** Thespis doesn't model places; it needs their ids, for who is where.
 
 ```toml

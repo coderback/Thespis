@@ -45,6 +45,13 @@ CLAIM_FIELDS = ("a", "b", "place", "at")  # what fills a claim's words
 EVENT_FIELDS = ("a", "t", "where", "to", "claim", "amount")  # an event's
 ACTION_FIELDS = ("who",)  # an action's
 CLAIM_KEYS = ("pred", "a", "b", "place", "at", "neg")
+GAME = ("id", "name", "setting")
+PLAYER = ("start",)
+PLAYERS = ("name", "start")
+NARRATOR = ("name", "persona", "structured")
+DECAY = ("to", "half_life", "keep")
+TIE = ("between", "kind")
+WORDS = ("claims", "events")
 NAME = re.compile(r"[A-Za-z_]\w*")
 _FORMAT = string.Formatter()
 
@@ -211,15 +218,15 @@ class _Check:
             self.add("a game needs at least one [npc.<id>], or a [kind.<id>] for people who join in play")
         game = d.get("game", {})
         if isinstance(game, Mapping):
-            self.keys(game, ("id", "name", "setting"), "game")
-            for k in ("id", "name", "setting"):
+            self.keys(game, GAME, "game")
+            for k in GAME:
                 if k in game:
                     self.text(f"game.{k}", game[k])
         for p, name in self.places.items():
             self.text(f"places.{p}", name)
         player = d.get("player", {})
         if isinstance(player, Mapping):
-            self.keys(player, ("start",), "player")
+            self.keys(player, PLAYER, "player")
             if player.get("start") is not None:
                 start = player["start"]
                 if self.places and start not in self.places:
@@ -228,7 +235,7 @@ class _Check:
             if pid in self.npcs or pid == "player" or not isinstance(p, Mapping) or not isinstance(p.get("name"), str):
                 self.add(f"players.{pid}: needs name = \"...\", and an id no NPC has")
                 continue
-            self.keys(p, ("name", "start"), f"players.{pid}")
+            self.keys(p, PLAYERS, f"players.{pid}")
             if self.places and p.get("start") is not None and p["start"] not in self.places:
                 self.add(f"players.{pid}.start: {p['start']!r} is not in [places]{near(p['start'], self.places)}")
         for npc, t in self.npcs.items():
@@ -244,7 +251,7 @@ class _Check:
             self.template(f"situations.{k}", s, None)
         narrator = d.get("narrator", {})
         if isinstance(narrator, Mapping):
-            self.keys(narrator, ("name", "persona", "structured"), "narrator")
+            self.keys(narrator, NARRATOR, "narrator")
             for k in ("name", "persona"):
                 if k in narrator:
                     self.text(f"narrator.{k}", narrator[k])
@@ -305,7 +312,7 @@ class _Check:
             if not isinstance(c, Mapping) or not _number(c.get("half_life")) or c["half_life"] <= 0:
                 self.add(f"{where}.decay.{drive}: needs half_life > 0 (ticks)")
                 continue
-            self.keys(c, ("to", "half_life", "keep"), f"{where}.decay.{drive}")
+            self.keys(c, DECAY, f"{where}.decay.{drive}")
             if not _number(c.get("keep", 0)) or not 0 <= c.get("keep", 0) <= 1:
                 self.add(f"{where}.decay.{drive}: keep is a share of the peak, 0 to 1")
             if not _number(c.get("to", 0)):
@@ -382,7 +389,7 @@ class _Check:
             if not isinstance(t, Mapping):
                 self.add(f"tie[{i}]: a table, between = [a, b] and a kind")
                 continue
-            self.keys(t, ("between", "kind"), f"tie[{i}]")
+            self.keys(t, TIE, f"tie[{i}]")
             pair = t.get("between")
             if not (isinstance(pair, list) and len(pair) == 2 and pair[0] != pair[1]):
                 self.add(f"tie[{i}]: between = [two different npcs]")
@@ -416,7 +423,7 @@ class _Check:
         words = self.d.get("words", {})
         if not isinstance(words, Mapping):
             return
-        self.keys(words, ("claims", "events"), "words")
+        self.keys(words, WORDS, "words")
         for k, s in self.table("words.claims", words["claims"]).items() if "claims" in words else ():
             self.template(f"words.claims.{k}", s, CLAIM_FIELDS)
         for k, s in self.table("words.events", words["events"]).items() if "events" in words else ():

@@ -1,3 +1,4 @@
+#:schema https://raw.githubusercontent.com/coderback/Thespis/main/docs/game.schema.json
 # Millbrook: the game file for the quickstart (quickstart.py, and the README's "Use it in your game"). Three people,
 # two ties and one decision: everything Thespis needs to know about their minds. Drives run 0 to 10; trust runs -5
 # to 5. docs/protocol.md explains every table.

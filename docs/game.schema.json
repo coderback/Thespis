@@ -1,0 +1,1102 @@
+{
+  "$id": "https://raw.githubusercontent.com/coderback/Thespis/main/docs/game.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "definitions": {
+    "condition": {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "description": "A drive compared: {drive = \"anger\", gte = 4}",
+          "minProperties": 2,
+          "properties": {
+            "drive": {
+              "type": "string"
+            },
+            "eq": {
+              "type": "number"
+            },
+            "gt": {
+              "type": "number"
+            },
+            "gte": {
+              "type": "number"
+            },
+            "lt": {
+              "type": "number"
+            },
+            "lte": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "drive"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "A value the game passed when it asked: {bound = \"amount\", gte = 10}",
+          "properties": {
+            "bound": {
+              "type": "string"
+            },
+            "eq": {
+              "type": "number"
+            },
+            "gt": {
+              "type": "number"
+            },
+            "gte": {
+              "type": "number"
+            },
+            "is": {
+              "type": [
+                "string",
+                "number"
+              ]
+            },
+            "lt": {
+              "type": "number"
+            },
+            "lte": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "bound"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "Where the NPC is",
+          "properties": {
+            "at": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "at"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "In the same place as someone",
+          "properties": {
+            "with": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "with"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "A flag of the NPC's is set",
+          "properties": {
+            "flag": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "flag"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "A flag of the NPC's isn't set",
+          "properties": {
+            "not_flag": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "not_flag"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "The NPC believes a claim, at least as surely as `min` if given",
+          "properties": {
+            "believes": {
+              "additionalProperties": false,
+              "description": "A claim: something one can believe",
+              "properties": {
+                "a": {
+                  "description": "Who it's about: an npc, \"player\", or \"self\" (the NPC choosing)",
+                  "type": "string"
+                },
+                "at": {
+                  "description": "The phase it held",
+                  "type": "integer"
+                },
+                "b": {
+                  "description": "Whom or what it names",
+                  "type": "string"
+                },
+                "neg": {
+                  "description": "A denial: it never happened",
+                  "type": "boolean"
+                },
+                "place": {
+                  "description": "Where it held, from [places]",
+                  "type": "string"
+                },
+                "pred": {
+                  "description": "A predicate from [words.claims]",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "pred",
+                "a"
+              ],
+              "type": "object"
+            },
+            "min": {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            }
+          },
+          "required": [
+            "believes"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "Any of these holds",
+          "properties": {
+            "any": {
+              "items": {
+                "$ref": "#/definitions/condition"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "any"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "All of these hold",
+          "properties": {
+            "all": {
+              "items": {
+                "$ref": "#/definitions/condition"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "all"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "This doesn't hold",
+          "properties": {
+            "not": {
+              "$ref": "#/definitions/condition"
+            }
+          },
+          "required": [
+            "not"
+          ],
+          "type": "object"
+        }
+      ]
+    }
+  },
+  "description": "A game.toml: its people, places, words and rules (docs/protocol.md)",
+  "properties": {
+    "actions": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Every action's kind, in words: \"{who}\"",
+      "type": "object"
+    },
+    "claims": {
+      "additionalProperties": false,
+      "description": "What can't both be true",
+      "properties": {
+        "caught": {
+          "description": "How far trust falls in whoever started a losing story (2)",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "description": {
+          "type": "string"
+        },
+        "first_hand": {
+          "description": "How much more a teller who saw it counts",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "one_actor": {
+          "description": "Deeds only one person can have done to another",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "custom": {
+      "description": "The game's own data: Thespis never reads it",
+      "type": "object"
+    },
+    "game": {
+      "additionalProperties": false,
+      "description": "The game's id, name and setting",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "setting": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "gossip": {
+      "additionalProperties": false,
+      "description": "How news travels",
+      "properties": {
+        "about": {
+          "anyOf": [
+            {
+              "const": "everyone"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "description": "Whose news travels: ids, or \"everyone\" (the player's if left out)"
+        },
+        "along": {
+          "additionalProperties": {
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number"
+          },
+          "description": "By kind of tie: how much of a story carries along it",
+          "type": "object"
+        },
+        "corroborate": {
+          "description": "A second witness's word makes a listener surer",
+          "type": "boolean"
+        },
+        "decay": {
+          "description": "How much of a story survives each telling, without ties (0.8)",
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "gossips": {
+          "anyOf": [
+            {
+              "const": "everyone"
+            },
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          ],
+          "description": "Who passes news on: npc ids, or \"everyone\""
+        },
+        "in_person": {
+          "description": "How much carries to someone standing with the teller (0.8)",
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "most": {
+          "description": "At most this many things told a tick, the town over",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "priority": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "description": "By predicate: the higher, the sooner it's told",
+          "type": "object"
+        },
+        "threshold": {
+          "description": "How sure a teller must be to pass something on (0.5)",
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "intents": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "args": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "npc",
+                    "player",
+                    "place",
+                    "claim",
+                    "amount",
+                    "choice"
+                  ]
+                },
+                {
+                  "additionalProperties": false,
+                  "properties": {
+                    "denials": {
+                      "type": "boolean"
+                    },
+                    "max": {
+                      "type": "integer"
+                    },
+                    "min": {
+                      "type": "integer"
+                    },
+                    "optional": {
+                      "type": "boolean"
+                    },
+                    "options": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "preds": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "type": {
+                      "enum": [
+                        "npc",
+                        "player",
+                        "place",
+                        "claim",
+                        "amount",
+                        "choice"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            "type": "object"
+          },
+          "asks": {
+            "type": "boolean"
+          },
+          "consequential": {
+            "type": "boolean"
+          },
+          "examples": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "means": {
+            "description": "What doing it is",
+            "type": "string"
+          },
+          "reads": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "description": "What the player's words may do, by verb",
+      "type": "object"
+    },
+    "kind": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "choices": {
+            "additionalProperties": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "asserts": {
+                    "additionalProperties": false,
+                    "description": "The claim the action states",
+                    "properties": {
+                      "a": {
+                        "description": "Who it's about: an npc, \"player\", or \"self\" (the NPC choosing)",
+                        "type": "string"
+                      },
+                      "at": {
+                        "description": "The phase it held",
+                        "type": "integer"
+                      },
+                      "b": {
+                        "description": "Whom or what it names",
+                        "type": "string"
+                      },
+                      "neg": {
+                        "description": "A denial: it never happened",
+                        "type": "boolean"
+                      },
+                      "place": {
+                        "description": "Where it held, from [places]",
+                        "type": "string"
+                      },
+                      "pred": {
+                        "description": "A predicate from [words.claims]",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "pred",
+                      "a"
+                    ],
+                    "type": "object"
+                  },
+                  "do": {
+                    "description": "The action: \"serve:player\", \"accuse:{who}\"",
+                    "type": "string"
+                  },
+                  "utility": {
+                    "anyOf": [
+                      {
+                        "anyOf": [
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "additionalProperties": false,
+                            "description": "A drive times its weight plus a constant, counted only when its `if` holds",
+                            "properties": {
+                              "drive": {
+                                "type": "string"
+                              },
+                              "if": {
+                                "anyOf": [
+                                  {
+                                    "$ref": "#/definitions/condition"
+                                  },
+                                  {
+                                    "items": {
+                                      "$ref": "#/definitions/condition"
+                                    },
+                                    "type": "array"
+                                  }
+                                ]
+                              },
+                              "plus": {
+                                "type": "number"
+                              },
+                              "weight": {
+                                "type": "number"
+                              }
+                            },
+                            "type": "object"
+                          }
+                        ]
+                      },
+                      {
+                        "items": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "additionalProperties": false,
+                              "description": "A drive times its weight plus a constant, counted only when its `if` holds",
+                              "properties": {
+                                "drive": {
+                                  "type": "string"
+                                },
+                                "if": {
+                                  "anyOf": [
+                                    {
+                                      "$ref": "#/definitions/condition"
+                                    },
+                                    {
+                                      "items": {
+                                        "$ref": "#/definitions/condition"
+                                      },
+                                      "type": "array"
+                                    }
+                                  ]
+                                },
+                                "plus": {
+                                  "type": "number"
+                                },
+                                "weight": {
+                                  "type": "number"
+                                }
+                              },
+                              "type": "object"
+                            }
+                          ]
+                        },
+                        "type": "array"
+                      }
+                    ],
+                    "description": "How much it's worth: a number, a term, or a list of them added up"
+                  },
+                  "when": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/definitions/condition"
+                      },
+                      {
+                        "items": {
+                          "$ref": "#/definitions/condition"
+                        },
+                        "type": "array"
+                      }
+                    ],
+                    "description": "Every condition must hold for it to be open"
+                  }
+                },
+                "required": [
+                  "do",
+                  "utility"
+                ],
+                "type": "object"
+              },
+              "minItems": 1,
+              "type": "array"
+            },
+            "description": "What they may do at each moment the game asks: [[npc.<id>.choices.<moment>]]",
+            "type": "object"
+          },
+          "decay": {
+            "additionalProperties": {
+              "additionalProperties": false,
+              "properties": {
+                "half_life": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "keep": {
+                  "maximum": 1,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                "to": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "half_life"
+              ],
+              "type": "object"
+            },
+            "description": "Drives that fade towards `to` with a half-life, keeping a share `keep` of their peak",
+            "type": "object"
+          },
+          "drives": {
+            "additionalProperties": {
+              "maximum": 10,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "description": "Their drives and where each starts, 0 to 10",
+            "type": "object"
+          },
+          "feels": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "type": "object"
+            },
+            "description": "Drives moved when they come to believe a predicate was done to them, by how sure they are",
+            "type": "object"
+          },
+          "goal": {
+            "description": "What they want, for the model",
+            "type": "string"
+          },
+          "lines": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Their own words by key: an action's kind, or a trigger",
+            "type": "object"
+          },
+          "persona": {
+            "description": "Who they are, for the model",
+            "type": "string"
+          },
+          "settle": {
+            "additionalProperties": {
+              "maximum": 10,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "description": "The value each drive drifts back to, a step a tick",
+            "type": "object"
+          },
+          "trust_in": {
+            "additionalProperties": {
+              "maximum": 5,
+              "minimum": -5,
+              "type": "integer"
+            },
+            "description": "Trust in each person, -5 to 5 (0 if left out)",
+            "type": "object"
+          },
+          "walk": {
+            "description": "Places, one a tick, round and round",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "persona",
+          "goal"
+        ],
+        "type": "object"
+      },
+      "description": "Kinds of people who join in play (add), by kind",
+      "type": "object"
+    },
+    "memory": {
+      "additionalProperties": false,
+      "description": "Recall by meaning",
+      "properties": {
+        "confidence": {
+          "type": "number"
+        },
+        "events": {
+          "type": "number"
+        },
+        "half_life": {
+          "type": "number"
+        },
+        "k": {
+          "type": "number"
+        },
+        "meaning": {
+          "type": "number"
+        },
+        "recall": {
+          "const": "meaning"
+        },
+        "recency": {
+          "type": "number"
+        },
+        "salience": {
+          "type": "number"
+        },
+        "salient": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "narrator": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "persona": {
+          "type": "string"
+        },
+        "structured": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "npc": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "aliases": {
+            "description": "Other names the player may use",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "choices": {
+            "additionalProperties": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "asserts": {
+                    "additionalProperties": false,
+                    "description": "The claim the action states",
+                    "properties": {
+                      "a": {
+                        "description": "Who it's about: an npc, \"player\", or \"self\" (the NPC choosing)",
+                        "type": "string"
+                      },
+                      "at": {
+                        "description": "The phase it held",
+                        "type": "integer"
+                      },
+                      "b": {
+                        "description": "Whom or what it names",
+                        "type": "string"
+                      },
+                      "neg": {
+                        "description": "A denial: it never happened",
+                        "type": "boolean"
+                      },
+                      "place": {
+                        "description": "Where it held, from [places]",
+                        "type": "string"
+                      },
+                      "pred": {
+                        "description": "A predicate from [words.claims]",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "pred",
+                      "a"
+                    ],
+                    "type": "object"
+                  },
+                  "do": {
+                    "description": "The action: \"serve:player\", \"accuse:{who}\"",
+                    "type": "string"
+                  },
+                  "utility": {
+                    "anyOf": [
+                      {
+                        "anyOf": [
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "additionalProperties": false,
+                            "description": "A drive times its weight plus a constant, counted only when its `if` holds",
+                            "properties": {
+                              "drive": {
+                                "type": "string"
+                              },
+                              "if": {
+                                "anyOf": [
+                                  {
+                                    "$ref": "#/definitions/condition"
+                                  },
+                                  {
+                                    "items": {
+                                      "$ref": "#/definitions/condition"
+                                    },
+                                    "type": "array"
+                                  }
+                                ]
+                              },
+                              "plus": {
+                                "type": "number"
+                              },
+                              "weight": {
+                                "type": "number"
+                              }
+                            },
+                            "type": "object"
+                          }
+                        ]
+                      },
+                      {
+                        "items": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "additionalProperties": false,
+                              "description": "A drive times its weight plus a constant, counted only when its `if` holds",
+                              "properties": {
+                                "drive": {
+                                  "type": "string"
+                                },
+                                "if": {
+                                  "anyOf": [
+                                    {
+                                      "$ref": "#/definitions/condition"
+                                    },
+                                    {
+                                      "items": {
+                                        "$ref": "#/definitions/condition"
+                                      },
+                                      "type": "array"
+                                    }
+                                  ]
+                                },
+                                "plus": {
+                                  "type": "number"
+                                },
+                                "weight": {
+                                  "type": "number"
+                                }
+                              },
+                              "type": "object"
+                            }
+                          ]
+                        },
+                        "type": "array"
+                      }
+                    ],
+                    "description": "How much it's worth: a number, a term, or a list of them added up"
+                  },
+                  "when": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/definitions/condition"
+                      },
+                      {
+                        "items": {
+                          "$ref": "#/definitions/condition"
+                        },
+                        "type": "array"
+                      }
+                    ],
+                    "description": "Every condition must hold for it to be open"
+                  }
+                },
+                "required": [
+                  "do",
+                  "utility"
+                ],
+                "type": "object"
+              },
+              "minItems": 1,
+              "type": "array"
+            },
+            "description": "What they may do at each moment the game asks: [[npc.<id>.choices.<moment>]]",
+            "type": "object"
+          },
+          "decay": {
+            "additionalProperties": {
+              "additionalProperties": false,
+              "properties": {
+                "half_life": {
+                  "exclusiveMinimum": 0,
+                  "type": "number"
+                },
+                "keep": {
+                  "maximum": 1,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                "to": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "half_life"
+              ],
+              "type": "object"
+            },
+            "description": "Drives that fade towards `to` with a half-life, keeping a share `keep` of their peak",
+            "type": "object"
+          },
+          "drives": {
+            "additionalProperties": {
+              "maximum": 10,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "description": "Their drives and where each starts, 0 to 10",
+            "type": "object"
+          },
+          "feels": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "type": "object"
+            },
+            "description": "Drives moved when they come to believe a predicate was done to them, by how sure they are",
+            "type": "object"
+          },
+          "goal": {
+            "description": "What they want, for the model",
+            "type": "string"
+          },
+          "lines": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Their own words by key: an action's kind, or a trigger",
+            "type": "object"
+          },
+          "name": {
+            "description": "What others and the narrator call them",
+            "type": "string"
+          },
+          "persona": {
+            "description": "Who they are, for the model",
+            "type": "string"
+          },
+          "settle": {
+            "additionalProperties": {
+              "maximum": 10,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "description": "The value each drive drifts back to, a step a tick",
+            "type": "object"
+          },
+          "start": {
+            "description": "Where they start, from [places]",
+            "type": "string"
+          },
+          "trust_in": {
+            "additionalProperties": {
+              "maximum": 5,
+              "minimum": -5,
+              "type": "integer"
+            },
+            "description": "Trust in each person, -5 to 5 (0 if left out)",
+            "type": "object"
+          },
+          "walk": {
+            "description": "Places, one a tick, round and round",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "start",
+          "persona",
+          "goal"
+        ],
+        "type": "object"
+      },
+      "description": "The cast, by id",
+      "type": "object"
+    },
+    "places": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Every place, by id: its name",
+      "type": "object"
+    },
+    "player": {
+      "additionalProperties": false,
+      "description": "Where the player starts",
+      "properties": {
+        "start": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "players": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "start": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "description": "More players, by id",
+      "type": "object"
+    },
+    "situations": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "What's happening at a moment, for the model, by moment",
+      "type": "object"
+    },
+    "tie": {
+      "description": "Relationships gossip travels along: [[tie]] between = [a, b], kind = ...",
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "between": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 2,
+            "minItems": 2,
+            "type": "array"
+          },
+          "kind": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "between",
+          "kind"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "words": {
+      "additionalProperties": false,
+      "properties": {
+        "claims": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Every predicate, in words: \"{a} stole from {b}\"",
+          "type": "object"
+        },
+        "events": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Every event's verb, in words: \"{a} told {t} that {claim}.\"",
+          "type": "object"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "title": "Thespis game file",
+  "type": "object"
+}

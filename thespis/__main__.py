@@ -8,6 +8,7 @@
     python -m thespis projects create NAME | list | key NAME | caps NAME ... | model NAME ... | secret
     python -m thespis usage NAME [--since 2026-10-01] [--format csv | json] [--out usage.csv]
     python -m thespis openapi [--out docs/openapi-v1.json]                                # the API's contract
+    python -m thespis schema [--out docs/game.schema.json]                     # a game file's, for editors
     python -m thespis models list | hardware                       # what the runtime can run, and on what
     python -m thespis models pull [auto | <model>]                 # fetch a model (and llama.cpp), checked
     python -m thespis models serve [auto | <model>] [--device ID]  # run it locally; prints the LLM_* settings
@@ -65,6 +66,12 @@ def check(args: argparse.Namespace) -> int:
         print(f"{path}: ok, {g.id}: {people}, {len(g.choices) + len(g.kind_choices)} choice sets, "
               f"{len(g.intents)} intents")
     return 1 if wrong else 0
+
+
+def game_schema() -> str:
+    """The game file's JSON Schema, as committed: stable key order and a trailing newline."""
+    from thespis.gameschema import schema
+    return json.dumps(schema(), indent=2, sort_keys=True, ensure_ascii=False) + "\n"
 
 
 def openapi() -> str:
@@ -380,6 +387,8 @@ def main(argv: list[str] | None = None) -> int:
     use.add_argument("--out")
     spec = sub.add_parser("openapi", help="print the /v1 OpenAPI spec")
     spec.add_argument("--out", help="write it here instead")
+    gs = sub.add_parser("schema", help="print the game file's JSON Schema, for editors")
+    gs.add_argument("--out", help="write it here instead")
     mdl = sub.add_parser("models", help="local models and model endpoints")
     mdl.add_argument("action", choices=["list", "hardware", "pull", "serve", "probe"])
     mdl.add_argument("model", nargs="?", help="a model id or auto (pull, serve); an endpoint URL (probe)")
@@ -393,11 +402,12 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "check":
         return check(args)
-    if args.command == "openapi":
+    if args.command in ("openapi", "schema"):
+        text = openapi() if args.command == "openapi" else game_schema()
         if args.out:
-            Path(args.out).write_bytes(openapi().encode())
+            Path(args.out).write_bytes(text.encode())
         else:
-            sys.stdout.write(openapi())
+            sys.stdout.write(text)
         return 0
     if args.command == "models":
         if args.action == "probe":

@@ -51,6 +51,8 @@ COMPARE: dict[str, Callable[[float, float], bool]] = {
     "gte": lambda x, n: x >= n, "gt": lambda x, n: x > n, "lte": lambda x, n: x <= n, "lt": lambda x, n: x < n,
     "eq": lambda x, n: x == n}
 SIGN = {"gte": ">=", "gt": ">", "lte": "<=", "lt": "<", "eq": "="}
+CHOICE = ("do", "utility", "when", "asserts")  # what a choice may hold
+TERM = ("drive", "weight", "plus", "if")  # what a utility term may hold
 
 
 class Check:
@@ -265,7 +267,7 @@ def term(t: object, where: str) -> Term:
     if not isinstance(t, Mapping):
         k = _number(t, where)
         return Score(lambda w, n, v, env: k, lambda w, n, v, env: [_num(k)])
-    _only(t, {"drive", "weight", "plus", "if"}, where)
+    _only(t, set(TERM), where)
     d = str(t["drive"]) if "drive" in t else None
     weight, plus = _number(t.get("weight", 1), f"{where}.weight"), _number(t.get("plus", 0), f"{where}.plus")
     gate = conditions(t["if"], f"{where}.if") if "if" in t else None
@@ -353,7 +355,7 @@ def compile_choices(npc: str, moment: str, declared: object, table: str = "npc")
         at = f"{where}[{i}]"
         if not isinstance(c, Mapping) or not isinstance(c.get("do"), str):
             raise DefinitionError(f"{at}: a choice needs do = \"<action>\"")
-        _only(c, {"do", "utility", "when", "asserts"}, at)
+        _only(c, set(CHOICE), at)
         if "utility" not in c:
             raise DefinitionError(f"{at}: a choice needs a utility")
         asserts = c.get("asserts")
