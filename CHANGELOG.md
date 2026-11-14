@@ -4,6 +4,13 @@ Thespis follows semantic versioning at 0.x: a minor release may change anything 
 protocol, and those change only with a note here. A release is made by pushing its tag (`v0.3.1`), which publishes it
 to PyPI and GitHub Releases from the section below that has its number.
 
+## Unreleased
+
+- **Why, and why not.** `Session.explain(npc, moment, bindings)` lists every choice the NPC has: whether it is open,
+  what keeps it shut, with the values it saw (`anger is 2, needs >= 4`; `believes stole_from(player, mara) only at
+  0.73, needs 0.8`), and how its utility adds up (`anger 5 x 2 + 1 = 11`). `decide(..., explain=True)` puts the same
+  on the line, as it stood when the NPC chose, also when it chose nothing; over HTTP too.
+
 ## 0.4.0 (13 November 2026)
 
 Thespis you can trust with a real game: a game file and every call on it are checked, saves survive a patch, the

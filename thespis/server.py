@@ -93,6 +93,7 @@ class DecideIn(BaseModel):
     situation: str | None = Field(None, description="What just happened, from the NPC's side, for the model")
     to: str | None = Field(None, description="Whom an action that states a claim tells it to")
     wait: bool = Field(False, description="Wait for the model's line instead of returning it provisional")
+    explain: bool = Field(False, description="Also return every choice, open or not, and why (`explain`)")
 
 
 class ReactIn(BaseModel):
@@ -202,6 +203,8 @@ class LineOut(BaseModel):
     segments: list[dict[str, Any]] | None = Field(
         None, description="A told scene, for a game whose narrator is structured: in order, each the narrator's "
                           "words or one speaker's ({speaker, line, cites})")
+    explain: list[dict[str, Any]] | None = Field(
+        None, description="With decide's explain: every choice in order, {do, open, blocked, utility, terms, chosen}")
 
 
 class IntentOut(BaseModel):
@@ -464,7 +467,7 @@ def create_app(games: Mapping[str, Game] | None = None, gateway: ModelGateway | 
     @app.post(f"/{VERSION}/sessions/{{sid}}/decide")
     def decide(p: Caller, sid: str, body: DecideIn) -> LineOut:
         line = call(p, sid, lambda s: s.decide(body.npc, body.moment, body.bindings, body.situation, body.to,
-                                               body.wait))
+                                               body.wait, body.explain))
         return LineOut(**line.to_json())
 
     @app.post(f"/{VERSION}/sessions/{{sid}}/react")

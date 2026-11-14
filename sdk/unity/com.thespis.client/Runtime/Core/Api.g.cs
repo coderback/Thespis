@@ -87,6 +87,10 @@ namespace Thespis.Api
         [JsonProperty("bindings")]
         public Dictionary<string, object> Bindings { get; set; } = new();
 
+        /// <summary>Also return every choice, open or not, and why (`explain`)</summary>
+        [JsonProperty("explain")]
+        public bool Explain { get; set; } = false;
+
         /// <summary>Which of the NPC's declared choice sets: [[npc.<id>.choices.<moment>]]</summary>
         [JsonProperty("moment")]
         public string Moment { get; set; } = "";
@@ -225,6 +229,10 @@ namespace Thespis.Api
         /// <summary>The statement its action logged, if it states a claim</summary>
         [JsonProperty("event", NullValueHandling = NullValueHandling.Ignore)]
         public string? Event { get; set; }
+
+        /// <summary>With decide's explain: every choice in order, {do, open, blocked, utility, terms, chosen}</summary>
+        [JsonProperty("explain", NullValueHandling = NullValueHandling.Ignore)]
+        public List<JObject>? Explain { get; set; }
 
         /// <summary>Poll it at /lines/{id}; null when the NPC had nothing to say</summary>
         [JsonProperty("id", NullValueHandling = NullValueHandling.Ignore)]

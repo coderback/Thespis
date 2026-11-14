@@ -77,6 +77,12 @@
             "title": "Bindings",
             "type": "object"
           },
+          "explain": {
+            "default": false,
+            "description": "Also return every choice, open or not, and why (`explain`)",
+            "title": "Explain",
+            "type": "boolean"
+          },
           "moment": {
             "description": "Which of the NPC's declared choice sets: [[npc.<id>.choices.<moment>]]",
             "title": "Moment",
@@ -403,6 +409,22 @@
             ],
             "description": "The statement its action logged, if it states a claim",
             "title": "Event"
+          },
+          "explain": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "With decide's explain: every choice in order, {do, open, blocked, utility, terms, chosen}",
+            "title": "Explain"
           },
           "id": {
             "anyOf": [

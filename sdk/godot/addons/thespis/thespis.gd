@@ -232,7 +232,8 @@ func inspect(npc: String) -> ThespisResult:
 # ------------------------------------------------------------------------------------------------ lines
 
 ## What `npc` does at `moment`, among the actions the game declares, and what it says. ok with a ThespisLine whose
-## `action` is the choice. options: situation, bindings, to, wait (true waits for the model's line).
+## `action` is the choice. options: situation, bindings, to, wait (true waits for the model's line), explain
+## (true: the line's `explain` lists every choice, open or not, and why).
 func decide(npc: String, moment: String, options := {}) -> ThespisResult:
 	return await _line("decide", _with({"npc": npc, "moment": moment}, options))
 
