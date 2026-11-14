@@ -176,7 +176,7 @@ class _Check:
         self.pred(f"{where}.pred", c.get("pred"))
         for k in ("a", "b"):
             if k in c:
-                self.person(f"{where}.{k}", c[k], ("self",))
+                self.person(f"{where}.{k}", c[k], ("self", "someone"))
         if "place" in c:
             self.place(f"{where}.place", c["place"])
 

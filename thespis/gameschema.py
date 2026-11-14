@@ -79,7 +79,8 @@ def schema() -> J:
     """The JSON Schema (draft-07) of a game file."""
     claim = _table({
         "pred": _say("A predicate from [words.claims]", **TEXT),
-        "a": _say("Who it's about: an npc, \"player\", or \"self\" (the NPC choosing)", **TEXT),
+        "a": _say("Who it's about: an npc, \"player\", \"self\" (the NPC choosing), or \"someone\" (nobody knows "
+                  "who yet)", **TEXT),
         "b": _say("Whom or what it names", **TEXT),
         "place": _say("Where it held, from [places]", **TEXT),
         "at": _say("The phase it held", type="integer"),
