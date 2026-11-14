@@ -95,6 +95,47 @@ def gossip(w: World, gossips: Sequence[str], about: Collection[str] | None, prio
                     break
 
 
+@dataclass(frozen=True)
+class Telling:
+    """One thing a gossip would tell one listener next tick, and what its confidence is made of."""
+    teller: str
+    listener: str
+    claim: Claim
+    held: float  # how sure the teller is
+    trust: float  # what the listener's trust in the teller gives (1.0 for gossip without ties)
+    carry: float  # what the tie carries, `in_person`, or `decay` for gossip without ties
+
+    @property
+    def conf(self) -> float:
+        return round(self.held * self.trust * self.carry, 2)
+
+
+def tellings(w: World, tellers: Sequence[str], listeners: Callable[[str], Sequence[tuple[str, float]]],
+             about: Collection[str] | None, priority: Mapping[str, int], threshold: float,
+             trust: Callable[[str, str], float], corroborate: bool = False, start: int = 0) -> list[Telling]:
+    """What the grapevine would tell next tick, without telling it: `spread`'s choices (or `gossip`'s, given its
+    listeners and a trust of 1), each teller in turn from `start` telling each listener the first news it holds that
+    the listener hasn't heard. A story a listener is told by one teller isn't news from the next. In the order they
+    would be told, so a town that tells only `most` things a tick tells the first `most` of these."""
+    known: dict[str, list[tuple[Claim, float]]] = {}
+    for g in tellers:
+        mine = [b for b in w.beliefs.for_npc(g) if b.active and b.conf >= threshold and _about(b.claim, about)]
+        mine.sort(key=lambda b: (priority.get(b.claim.pred, 0), b.conf, (b.claim.pred, b.claim.a, b.claim.b)),
+                  reverse=True)
+        known[g] = [(b.claim, b.conf) for b in mine]
+    out: list[Telling] = []
+    told: set[tuple[str, Claim]] = set()
+    for turn in range(len(tellers)):
+        g = tellers[(start + turn) % len(tellers)]
+        for listener, carry in listeners(g):
+            for claim, conf in known[g]:
+                if claim.a != listener and (listener, claim) not in told and _news(w, listener, g, claim, corroborate):
+                    told.add((listener, claim))
+                    out.append(Telling(g, listener, claim, conf, trust(listener, g), carry))
+                    break
+    return out
+
+
 def spread(w: World, tellers: Sequence[str], listeners: Callable[[str], Sequence[tuple[str, float]]],
            about: Collection[str] | None, priority: Mapping[str, int], threshold: float,
            happened: Callable[[World, Claim], bool], hear: Callable[[World, str, Claim, float, str, Event], None],

@@ -207,6 +207,16 @@ class LineOut(BaseModel):
         None, description="With decide's explain: every choice in order, {do, open, blocked, utility, terms, chosen}")
 
 
+class TraceOut(BaseModel):
+    claim: str = Field(description="The story, as a report reads it: stole_from(player, mara)")
+    holders: list[dict[str, Any]] = Field(description="Who holds it: {npc, conf, status, from (their evidence)}")
+    next: list[dict[str, Any]] = Field(description=(
+        "What the next tick's gossip would tell of it: {teller, listener, conf, how}, how being the sum, "
+        "\"0.9 x 0.9 (trust 2) x 0.9 (friend) = 0.73\""))
+    stopped: list[dict[str, Any]] = Field(description=(
+        "Where it stops short of someone who hasn't heard it, and why: {npc, listener?, why}"))
+
+
 class IntentOut(BaseModel):
     verb: str
     args: dict[str, Any] = Field(description="Each argument: an id, a whole number, or a claim {pred, a, b, ...}")
@@ -541,6 +551,12 @@ def create_app(games: Mapping[str, Game] | None = None, gateway: ModelGateway | 
     @app.get(f"/{VERSION}/sessions/{{sid}}/npcs/{{npc}}")
     def inspect(p: Caller, sid: str, npc: str) -> NpcOut:
         return NpcOut(**call(p, sid, lambda s: s.inspect(npc), saves=False))
+
+    @app.post(f"/{VERSION}/sessions/{{sid}}/trace")
+    def trace(p: Caller, sid: str, body: ClaimIn) -> TraceOut:
+        """How a story stands on the grapevine, changing nothing: who holds it, what the next tick would tell of it
+        and how sure each listener would be, and where it stops and why."""
+        return TraceOut(**call(p, sid, lambda s: s.trace(body.model_dump(exclude_none=True)), saves=False))
 
     @app.get(f"/{VERSION}/sessions/{{sid}}/snapshot")
     def snapshot(p: Caller, sid: str) -> dict[str, Any]:

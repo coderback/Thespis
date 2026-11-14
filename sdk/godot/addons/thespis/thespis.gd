@@ -229,6 +229,13 @@ func inspect(npc: String) -> ThespisResult:
 	return await _call("inspect", {"sid": session_id, "npc": npc})
 
 
+## How a story stands on the grapevine, changing nothing: `trace({"pred": "stole_from", "a": "player", "b": "mara"})`.
+## ok with a ThespisApi.TraceOut: who holds it, what the next tick would tell of it and how sure each listener would
+## be (`next`, with the sum), and where it stops and why (`stopped`).
+func trace(claim: Dictionary) -> ThespisResult:
+	return await _call("trace", {"sid": session_id}, claim)
+
+
 # ------------------------------------------------------------------------------------------------ lines
 
 ## What `npc` does at `moment`, among the actions the game declares, and what it says. ok with a ThespisLine whose

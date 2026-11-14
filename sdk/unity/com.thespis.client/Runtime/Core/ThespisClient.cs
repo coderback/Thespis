@@ -252,6 +252,12 @@ namespace Thespis
         /// <summary>What an NPC believes and feels.</summary>
         public Task<Result<NpcOut>> InspectAsync(string npc) => CallAsync<NpcOut>(Routes.Inspect, Session("npc", npc));
 
+        /// <summary>
+        /// How a story stands on the grapevine, changing nothing: who holds it, what the next tick would tell of it
+        /// and how sure each listener would be (Next, with the sum), and where it stops and why (Stopped).
+        /// </summary>
+        public Task<Result<TraceOut>> TraceAsync(ClaimIn claim) => CallAsync<TraceOut>(Routes.Trace, Session(), claim);
+
         // ------------------------------------------------------------------------------------------ lines
 
         /// <summary>
