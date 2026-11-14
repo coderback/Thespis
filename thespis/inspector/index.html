@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Thespis inspector</title>
+<link rel="stylesheet" href="inspector.css">
+<script src="inspector.js" defer></script>
+</head>
+<body>
+<header>
+  <h1>Thespis inspector</h1>
+  <label>Session <select id="session"></select></label>
+  <button id="refresh" type="button">Refresh</button>
+  <label class="check"><input id="live" type="checkbox" checked> Live</label>
+  <span id="status" role="status"></span>
+</header>
+
+<form id="login" hidden>
+  <p>This runtime wants a token: the sidecar's <code>THESPIS_TOKEN</code>, or a server project's key. It stays in this
+    tab: open the page as <code>/inspector/#token=...</code> to skip this.</p>
+  <input id="token" type="password" autocomplete="off" placeholder="token" aria-label="token">
+  <button type="submit">Connect</button>
+</form>
+
+<main id="main" hidden>
+  <aside>
+    <section>
+      <h2 id="game"></h2>
+      <p id="phase" class="muted"></p>
+    </section>
+    <section>
+      <h2>Cast</h2>
+      <ul id="cast" class="list"></ul>
+    </section>
+    <section>
+      <h2>Players</h2>
+      <ul id="players" class="list plain"></ul>
+    </section>
+    <section>
+      <h2>Ties</h2>
+      <ul id="ties" class="list plain"></ul>
+    </section>
+  </aside>
+
+  <div class="work">
+    <nav role="tablist">
+      <button type="button" role="tab" data-tab="mind" aria-selected="true">Mind</button>
+      <button type="button" role="tab" data-tab="why">Why</button>
+      <button type="button" role="tab" data-tab="ledger">Ledger</button>
+      <button type="button" role="tab" data-tab="trace">Trace</button>
+    </nav>
+
+    <section id="tab-mind" role="tabpanel">
+      <p class="muted" id="mind-empty">Pick someone from the cast.</p>
+      <div id="mind" hidden>
+        <h2 id="mind-name"></h2>
+        <dl id="mind-state" class="state"></dl>
+        <h3>Beliefs</h3>
+        <label class="check"><input id="retracted" type="checkbox"> Show the ones let go</label>
+        <table>
+          <thead><tr><th>Believes</th><th>Sure</th><th>Status</th><th>From</th><th></th></tr></thead>
+          <tbody id="beliefs"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="tab-why" role="tabpanel" hidden>
+      <form id="why-form" class="row">
+        <label>NPC <select id="why-npc"></select></label>
+        <label>Moment <select id="why-moment"></select></label>
+        <label class="grow">Bindings <input id="why-bindings" placeholder="culprit=player, amount=5"></label>
+        <button type="submit">Explain</button>
+      </form>
+      <p class="muted">What the NPC would do at this moment now, and why every other choice lost or is shut. Nothing
+        changes.</p>
+      <table>
+        <thead><tr><th></th><th>Choice</th><th>Open</th><th>What keeps it shut</th><th>Utility</th><th>How it adds up</th></tr></thead>
+        <tbody id="why"></tbody>
+      </table>
+    </section>
+
+    <section id="tab-ledger" role="tabpanel" hidden>
+      <form id="ledger-form" class="row">
+        <label>Verb <input id="ledger-verb" placeholder="any, or caught"></label>
+        <button type="submit">Filter</button>
+      </form>
+      <p class="muted" id="ledger-count"></p>
+      <table>
+        <thead><tr><th>Id</th><th>Phase</th><th>Who</th><th>Did</th><th>To</th><th>Where</th><th>Shows</th><th>True</th></tr></thead>
+        <tbody id="ledger"></tbody>
+      </table>
+    </section>
+
+    <section id="tab-trace" role="tabpanel" hidden>
+      <p class="muted" id="trace-empty">Trace a belief from someone's mind to see where the story goes.</p>
+      <div id="trace" hidden>
+        <h2 id="trace-claim"></h2>
+        <h3>Who holds it</h3>
+        <table><thead><tr><th>NPC</th><th>Sure</th><th>Status</th><th>From</th></tr></thead><tbody id="holders"></tbody></table>
+        <h3>The next tick would tell</h3>
+        <table><thead><tr><th>Teller</th><th>Listener</th><th>Sure</th><th>How</th></tr></thead><tbody id="next"></tbody></table>
+        <h3>Where it stops</h3>
+        <table><thead><tr><th>NPC</th><th>Why</th></tr></thead><tbody id="stopped"></tbody></table>
+      </div>
+    </section>
+  </div>
+</main>
+</body>
+</html>

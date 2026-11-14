@@ -9,6 +9,10 @@ A server (`thespis serve --server`) wants the project's key on every call: `Auth
 wants the token its launcher gave it, if it was given one. Projects send their own games (`PUT /v1/games/{id}`), set
 their own model keys on a server (`PUT /v1/project/model`), and export their usage (`GET /v1/usage`).
 
+`/inspector/` is a page that shows the sessions through these routes, read-only: the cast and its ties, each mind,
+why an NPC would choose what it would, the ledger, and where a story goes. It takes the token in its address's
+fragment (`/inspector/#token=...`), which the browser never sends, and loads nothing from anywhere else.
+
 Errors carry `{error, reason}`: 400 for a malformed body or a definition the call breaks, 401 without the right key,
 404 for an unknown game, session, NPC, moment or line, 409 for a call the game doesn't allow now (or a session another
 instance moved on), 413 for a game or a body too large, 429 over a project's cap, 503 when the project holds its
@@ -20,14 +24,16 @@ from __future__ import annotations
 
 import asyncio
 import csv
+import functools
 import io
 import json
 from collections.abc import Mapping
+from pathlib import Path
 from typing import Annotated, Any
 
 from fastapi import Depends, FastAPI, Header, Query, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import JSONResponse, RedirectResponse, Response
 from pydantic import BaseModel, Field
 
 import thespis
@@ -95,6 +101,12 @@ class DecideIn(BaseModel):
     to: str | None = Field(None, description="Whom an action that states a claim tells it to")
     wait: bool = Field(False, description="Wait for the model's line instead of returning it provisional")
     explain: bool = Field(False, description="Also return every choice, open or not, and why (`explain`)")
+
+
+class ExplainIn(BaseModel):
+    npc: str
+    moment: str = Field(description="Which of the NPC's declared choice sets: [[npc.<id>.choices.<moment>]]")
+    bindings: dict[str, Scalar] = Field(default_factory=dict, description="Values the choices name: {culprit}")
 
 
 class ReactIn(BaseModel):
@@ -177,6 +189,36 @@ class SessionOut(BaseModel):
     session: str
     game: str
     phase: int
+
+
+class SessionInfoOut(BaseModel):
+    session: str
+    game: str
+    created: float = Field(description="Unix time")
+    updated: float = Field(description="Unix time it was last saved")
+    held: bool = Field(description="Held in memory by this instance now")
+
+
+class OverviewOut(BaseModel):
+    game: str
+    name: str
+    phase: int
+    events: int = Field(description="Events in the ledger")
+    npcs: list[dict[str, Any]] = Field(description=(
+        "Each NPC's state, as inspect has it, with its name, moments (what explain and decide take), and beliefs "
+        "and retracted (how many it holds and has let go)"))
+    players: list[dict[str, Any]] = Field(description="{id, name, loc}, the one player every game has first")
+    places: dict[str, str]
+    ties: list[dict[str, Any]] = Field(description="{between, kind, made}: made is game (the game file) or play")
+
+
+class ChoiceOut(BaseModel):
+    do: str
+    open: bool = Field(description="Whether its when holds now")
+    blocked: str | None = Field(None, description="What keeps it shut: \"grudge is 2, needs >= 4\"")
+    utility: float = Field(description="What it is worth to the NPC now, open or not")
+    terms: list[str] = Field(description="How its utility adds up: \"anger 5 x 2 + 1 = 11\"")
+    chosen: bool = Field(description="The one the NPC would pick now")
 
 
 class EventOut(BaseModel):
@@ -455,6 +497,17 @@ def create_app(games: Mapping[str, Game] | None = None, gateway: ModelGateway | 
     def delete_game(p: Caller, gid: str) -> None:
         host.delete_game(p, gid)
 
+    @app.get(f"/{VERSION}/sessions")
+    def list_sessions(p: Caller, limit: int = Query(100, ge=1, le=1000)) -> list[SessionInfoOut]:
+        """The project's sessions, saved most recently first: what an inspector picks from."""
+        return [SessionInfoOut(**s) for s in host.sessions(p, limit)]
+
+    @app.get(f"/{VERSION}/sessions/{{sid}}")
+    def overview(p: Caller, sid: str) -> OverviewOut:
+        """The session at a glance, changing nothing: the phase, every NPC with its name, moments and how many
+        beliefs it holds, the players, and every tie, the game file's and those made in play."""
+        return OverviewOut(**call(p, sid, lambda s: s.overview(), saves=False))
+
     @app.post(f"/{VERSION}/sessions", status_code=201)
     def open_session(p: Caller, body: SessionIn) -> SessionOut:
         sid, live = host.open(p, body.game, body.seed, body.snapshot)
@@ -481,6 +534,13 @@ def create_app(games: Mapping[str, Game] | None = None, gateway: ModelGateway | 
         line = call(p, sid, lambda s: s.decide(body.npc, body.moment, body.bindings, body.situation, body.to,
                                                body.wait, body.explain))
         return LineOut(**line.to_json())
+
+    @app.post(f"/{VERSION}/sessions/{{sid}}/explain")
+    def explain(p: Caller, sid: str, body: ExplainIn) -> list[ChoiceOut]:
+        """Why the NPC would do what it would at the moment, now, without doing it: every choice, in order, whether
+        it is open and what keeps it shut, its utility and how that adds up, and the one it would pick."""
+        return [ChoiceOut(**c) for c in call(p, sid, lambda s: s.explain(body.npc, body.moment, body.bindings),
+                                             saves=False)]
 
     @app.post(f"/{VERSION}/sessions/{{sid}}/react")
     def react(p: Caller, sid: str, body: ReactIn) -> LineOut:
@@ -602,4 +662,36 @@ def create_app(games: Mapping[str, Game] | None = None, gateway: ModelGateway | 
         writer.writerows(e.to_json() for e in events)
         return Response(out.getvalue(), media_type="text/csv")
 
+    @app.get("/inspector", include_in_schema=False)
+    def inspector_root() -> Response:
+        return RedirectResponse("/inspector/")  # a browser keeps the #token on the way
+
+    @app.get("/inspector/{name}", include_in_schema=False)
+    @app.get("/inspector/", include_in_schema=False)
+    def inspector_page(name: str = "") -> Response:
+        """The inspector: a page that reads the sessions through the routes above, with the caller's token. Its
+        files are served as they are, with a policy that lets them load nothing from anywhere else."""
+        page = INSPECTOR.get(name)
+        if page is None:
+            return JSONResponse({"error": "unknown", "reason": f"no inspector file {name!r}"}, status_code=404)
+        return Response(_inspector_file(page[0]), media_type=page[1], headers=INSPECTOR_HEADERS)
+
     return app
+
+
+INSPECTOR_DIR = Path(__file__).parent / "inspector"
+INSPECTOR = {"": ("index.html", "text/html; charset=utf-8"),
+             "inspector.js": ("inspector.js", "text/javascript; charset=utf-8"),
+             "inspector.css": ("inspector.css", "text/css; charset=utf-8")}
+INSPECTOR_HEADERS = {
+    "Content-Security-Policy": "default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; "
+                               "base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+    "Referrer-Policy": "no-referrer",
+    "X-Content-Type-Options": "nosniff",
+    "Cache-Control": "no-cache",
+}
+
+
+@functools.lru_cache(maxsize=None)
+def _inspector_file(name: str) -> bytes:
+    return (INSPECTOR_DIR / name).read_bytes()

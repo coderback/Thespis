@@ -1,5 +1,5 @@
 """Build the runtime a game ships beside it: `thespis` as one executable in one folder, zipped as one archive per
-platform, with PyInstaller. Then check it against its budgets and play a turn through it.
+platform, with PyInstaller. Then check it against its budgets, play a turn through it, and open the inspector's page.
 
     python tools/package.py                 # build dist/thespis-<os>-<arch>.zip and check it
     python tools/package.py --no-build      # check the build that's there
@@ -22,6 +22,7 @@ from __future__ import annotations
 import argparse
 import http.client
 import json
+import os
 import platform
 import shutil
 import statistics
@@ -55,6 +56,8 @@ def build() -> Path:
     args = [sys.executable, "-m", "PyInstaller", "--onedir", "--name", "thespis", "--paths", str(ROOT),
             "--distpath", str(DIST), "--workpath", str(BUILD / "work"), "--specpath", str(BUILD), "--noconfirm",
             "--log-level", "ERROR", *[a for m in EXCLUDE for a in ("--exclude-module", m)],
+            # The inspector's page isn't Python, so PyInstaller wouldn't find it: it goes where thespis.server looks.
+            "--add-data", f"{ROOT / 'thespis' / 'inspector'}{os.pathsep}thespis/inspector",
             # Linux's shared libraries carry their debug symbols; stripped, the archive halves. (macOS signs its
             # binaries, and stripping after would break the signature; Windows has nothing to strip.)
             *(["--strip"] if sys.platform.startswith("linux") else []), str(entry)]
@@ -125,6 +128,10 @@ def check(archive: Path) -> dict:
         assert status == 201
         status, line = get(url, f"/v1/sessions/{sid}/decide", {"npc": "garrick", "moment": "turn"})
         assert status == 200 and line["text"], line
+        c = http.client.HTTPConnection(*url.removeprefix("http://").rsplit(":", 1), timeout=10)
+        c.request("GET", "/inspector/")
+        page = c.getresponse()
+        assert page.status == 200 and b"Thespis inspector" in page.read(), "the inspector's page isn't served"
     finally:
         stop(proc)
     largest = sorted((f for f in (DIST / "thespis").rglob("*") if f.is_file()), key=lambda f: -f.stat().st_size)[:8]

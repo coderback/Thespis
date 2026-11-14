@@ -37,10 +37,13 @@ namespace Thespis.Api
         public static readonly Route GetProject = new Route("GET", "/v1/project", "", "ProjectOut");
         public static readonly Route DeleteModel = new Route("DELETE", "/v1/project/model", "", "");
         public static readonly Route PutModel = new Route("PUT", "/v1/project/model", "ModelIn", "");
+        public static readonly Route ListSessions = new Route("GET", "/v1/sessions", "", "SessionInfoOut");
         public static readonly Route OpenSession = new Route("POST", "/v1/sessions", "SessionIn", "SessionOut");
         public static readonly Route CloseSession = new Route("DELETE", "/v1/sessions/{sid}", "", "");
+        public static readonly Route Overview = new Route("GET", "/v1/sessions/{sid}", "", "OverviewOut");
         public static readonly Route Decide = new Route("POST", "/v1/sessions/{sid}/decide", "DecideIn", "LineOut");
         public static readonly Route Events = new Route("GET", "/v1/sessions/{sid}/events", "", "EventOut");
+        public static readonly Route Explain = new Route("POST", "/v1/sessions/{sid}/explain", "ExplainIn", "ChoiceOut");
         public static readonly Route Line = new Route("GET", "/v1/sessions/{sid}/lines/{lid}", "", "LineOut");
         public static readonly Route Narrate = new Route("POST", "/v1/sessions/{sid}/narrate", "NarrateIn", "LineOut");
         public static readonly Route Add = new Route("POST", "/v1/sessions/{sid}/npcs", "NpcIn", "");
@@ -57,6 +60,32 @@ namespace Thespis.Api
         public static readonly Route Understand = new Route("POST", "/v1/sessions/{sid}/understand", "UnderstandIn", "UnderstandOut");
         public static readonly Route Update = new Route("POST", "/v1/sessions/{sid}/update", "UpdateIn", "");
         public static readonly Route Usage = new Route("GET", "/v1/usage", "", "UsageOut");
+    }
+
+    public class ChoiceOut
+    {
+        /// <summary>What keeps it shut: "grudge is 2, needs >= 4"</summary>
+        [JsonProperty("blocked", NullValueHandling = NullValueHandling.Ignore)]
+        public string? Blocked { get; set; }
+
+        /// <summary>The one the NPC would pick now</summary>
+        [JsonProperty("chosen")]
+        public bool Chosen { get; set; }
+
+        [JsonProperty("do")]
+        public string Do { get; set; } = "";
+
+        /// <summary>Whether its when holds now</summary>
+        [JsonProperty("open")]
+        public bool Open { get; set; }
+
+        /// <summary>How its utility adds up: "anger 5 x 2 + 1 = 11"</summary>
+        [JsonProperty("terms")]
+        public List<string> Terms { get; set; } = new();
+
+        /// <summary>What it is worth to the NPC now, open or not</summary>
+        [JsonProperty("utility")]
+        public double Utility { get; set; }
     }
 
     public class ClaimIn
@@ -141,6 +170,20 @@ namespace Thespis.Api
 
         [JsonProperty("verb")]
         public string Verb { get; set; } = "";
+    }
+
+    public class ExplainIn
+    {
+        /// <summary>Values the choices name: {culprit}</summary>
+        [JsonProperty("bindings")]
+        public Dictionary<string, object> Bindings { get; set; } = new();
+
+        /// <summary>Which of the NPC's declared choice sets: [[npc.<id>.choices.<moment>]]</summary>
+        [JsonProperty("moment")]
+        public string Moment { get; set; } = "";
+
+        [JsonProperty("npc")]
+        public string Npc { get; set; } = "";
     }
 
     public class GameIn
@@ -376,6 +419,37 @@ namespace Thespis.Api
         public string Verb { get; set; } = "";
     }
 
+    public class OverviewOut
+    {
+        /// <summary>Events in the ledger</summary>
+        [JsonProperty("events")]
+        public int Events { get; set; }
+
+        [JsonProperty("game")]
+        public string Game { get; set; } = "";
+
+        [JsonProperty("name")]
+        public string Name { get; set; } = "";
+
+        /// <summary>Each NPC's state, as inspect has it, with its name, moments (what explain and decide take), and beliefs and retracted (how many it holds and has let go)</summary>
+        [JsonProperty("npcs")]
+        public List<JObject> Npcs { get; set; } = new();
+
+        [JsonProperty("phase")]
+        public int Phase { get; set; }
+
+        [JsonProperty("places")]
+        public Dictionary<string, string> Places { get; set; } = new();
+
+        /// <summary>{id, name, loc}, the one player every game has first</summary>
+        [JsonProperty("players")]
+        public List<JObject> Players { get; set; } = new();
+
+        /// <summary>{between, kind, made}: made is game (the game file) or play</summary>
+        [JsonProperty("ties")]
+        public List<JObject> Ties { get; set; } = new();
+    }
+
     public class ProjectOut
     {
         /// <summary>0 means no cap</summary>
@@ -467,6 +541,27 @@ namespace Thespis.Api
         /// <summary>Restore this snapshot instead of starting fresh</summary>
         [JsonProperty("snapshot", NullValueHandling = NullValueHandling.Ignore)]
         public JObject? Snapshot { get; set; }
+    }
+
+    public class SessionInfoOut
+    {
+        /// <summary>Unix time</summary>
+        [JsonProperty("created")]
+        public double Created { get; set; }
+
+        [JsonProperty("game")]
+        public string Game { get; set; } = "";
+
+        /// <summary>Held in memory by this instance now</summary>
+        [JsonProperty("held")]
+        public bool Held { get; set; }
+
+        [JsonProperty("session")]
+        public string Session { get; set; } = "";
+
+        /// <summary>Unix time it was last saved</summary>
+        [JsonProperty("updated")]
+        public double Updated { get; set; }
     }
 
     public class SessionOut
