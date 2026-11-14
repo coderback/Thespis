@@ -4,4 +4,5 @@
 pytest>=8
 ruff>=0.6
 pyright>=1.1.400
+jsonschema>=4.23  # tests: the game file's JSON Schema accepts what the loader does
 railway-sdk>=0.4  # for .railway/railway.py: railway config plan / apply

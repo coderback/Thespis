@@ -33,6 +33,7 @@ Some changes need more:
 
 | If you change | Also |
 | --- | --- |
+| What a game file may hold (`thespis/schema.py`) | Regenerate the editors' schema: `python -m thespis schema --out docs/game.schema.json` |
 | `thespis.api` or the `/v1` routes | Update [docs/protocol.md](docs/protocol.md); regenerate the contract (`python -m thespis openapi --out docs/openapi-v1.json`) and the SDKs' typed layers (`python tools/sdk_gen.py all`) |
 | What NPCs believe, decide or say | `python -m tools.outcomes` shows what changed in the demo's 35 routes; `python -m rehearsal replay` what changed in the recorded scenarios. Accept an intended change with `--update`, and say why in the pull request |
 | Speed at town size | `python tools/town_bench.py --check` holds each call to its budget; `python tools/long_game.py --check` that a call costs the same late in a long game |

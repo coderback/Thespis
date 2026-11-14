@@ -25,6 +25,8 @@ A game is one TOML file. [examples/tavern/game.toml](../examples/tavern/game.tom
 NPCs, one choice set, gossip and words. Everything in it is checked when it loads, and every mistake is named, a
 line each, with what was probably meant (`npc.garrick: unknown table 'feel'; did you mean feels?`). `thespis check
 game.toml` prints them, and notes what is allowed but likely a slip: an action with no line, done in silence.
+[game.schema.json](game.schema.json) is the file's JSON Schema, built from the same lists, for editors: `#:schema
+https://raw.githubusercontent.com/coderback/Thespis/main/docs/game.schema.json` on a game file's first line.
 
 A file names only what it declares ([thespis/schema.py](../thespis/schema.py)):
 - **People:** `[npc.<id>]`, `[players.<id>]` and `"player"`; `"self"` in a choice is the NPC choosing. A game with
