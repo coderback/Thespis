@@ -130,6 +130,7 @@ class ClaimIn extends RefCounted:
 
 class DecideIn extends RefCounted:
 	var bindings: Dictionary = {}  ## Values the choices name: {culprit}
+	var explain: bool = false  ## Also return every choice, open or not, and why (`explain`)
 	var moment: String = ""  ## Which of the NPC's declared choice sets: [[npc.<id>.choices.<moment>]]
 	var npc: String = ""
 	var situation = null  ## string, or null. What just happened, from the NPC's side, for the model
@@ -138,6 +139,7 @@ class DecideIn extends RefCounted:
 
 	func read(d: Dictionary):
 		if d.has("bindings"): bindings = d["bindings"]
+		if d.has("explain"): explain = bool(d["explain"])
 		if d.has("moment"): moment = str(d["moment"])
 		if d.has("npc"): npc = str(d["npc"])
 		situation = str(d["situation"]) if d.get("situation") != null else null
@@ -148,6 +150,7 @@ class DecideIn extends RefCounted:
 	func to_dict() -> Dictionary:
 		var d := {}
 		d["bindings"] = bindings
+		d["explain"] = explain
 		d["moment"] = moment
 		d["npc"] = npc
 		if situation != null: d["situation"] = situation
@@ -298,6 +301,7 @@ class LineOut extends RefCounted:
 	var action = null  ## string, or null. What the NPC decided to do, for decide
 	var cites: Array[String] = []
 	var event = null  ## string, or null. The statement its action logged, if it states a claim
+	var explain = null  ## array, or null. With decide's explain: every choice in order, {do, open, blocked, utility, terms, chosen}
 	var id = null  ## string, or null. Poll it at /lines/{id}; null when the NPC had nothing to say
 	var npc: String = ""
 	var reason: String = ""
@@ -310,6 +314,7 @@ class LineOut extends RefCounted:
 		action = str(d["action"]) if d.get("action") != null else null
 		cites.assign(d.get("cites", []).map(func(x): return str(x)))
 		event = str(d["event"]) if d.get("event") != null else null
+		explain = d["explain"] if d.get("explain") != null else null
 		id = str(d["id"]) if d.get("id") != null else null
 		if d.has("npc"): npc = str(d["npc"])
 		if d.has("reason"): reason = str(d["reason"])
@@ -324,6 +329,7 @@ class LineOut extends RefCounted:
 		if action != null: d["action"] = action
 		d["cites"] = cites
 		if event != null: d["event"] = event
+		if explain != null: d["explain"] = explain
 		if id != null: d["id"] = id
 		d["npc"] = npc
 		d["reason"] = reason

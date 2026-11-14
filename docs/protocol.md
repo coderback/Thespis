@@ -235,7 +235,8 @@ the local runtime's BGE small (`thespis serve --embed local`).
 | `retire(npc)` | `DELETE .../npcs/{npc}` | An NPC leaves the story, dead or gone |
 | `tie(a, b, kind)` | `POST .../ties` | A tie between two NPCs, for gossip to travel along |
 | `untie(a, b)` | `DELETE .../ties/{a}/{b}` | Break a tie made in play |
-| `decide(npc, moment, bindings, situation, to, wait)` | `POST .../decide` | The NPC chooses among its declared choices, with the reason recorded, and says its line |
+| `decide(npc, moment, bindings, situation, to, wait, explain)` | `POST .../decide` | The NPC chooses among its declared choices, with the reason recorded, and says its line. With `explain`, the line also says why ([below](#why-and-why-not)) |
+| `explain(npc, moment, bindings)` | `decide` with `explain` | What the NPC would do now and why, changing nothing (library only; over HTTP, ask `decide` with `explain`) |
 | `react(npc, trigger, situation, cites, fill, wait)` | `POST .../react` | A line in reply to something |
 | `narrate(since, wait, to)` | `POST .../narrate` | The story since a phase, citing every event it tells; `to` a player, only what they saw |
 | `tick(steps)` | `POST .../tick` | The minds' own time: scheduled walks, gossip, drives settling, the next phase |
@@ -245,6 +246,26 @@ the local runtime's BGE small (`thespis serve --embed local`).
 | `Session.restore(game, snapshot)` | `POST /v1/sessions {game, snapshot}` | A playthrough from a save |
 | `close()` | `DELETE /v1/sessions/{id}` | Stop; withdraw lines still on their way |
 | `understand(text, to, player, offered)` | `POST .../understand` | What the player's words do among the intents open now: `act`, `ask` or `talk`. Changes nothing ([below](#the-players-words)) |
+
+### Why, and why not
+
+`decide(..., explain=True)` puts on the line every choice the NPC had, in the order declared, as they stood when it
+chose, also when it chose nothing. `explain(npc, moment, bindings)` gives the same for now, without deciding.
+
+```json
+[{"do": "serve:player", "open": true, "utility": 1, "terms": ["1"], "chosen": false},
+ {"do": "refuse:player", "open": true, "utility": 4, "terms": ["anger 4"], "chosen": true},
+ {"do": "call_guard", "open": false, "blocked": "believes stole_from(player, mara) only at 0.73, needs 0.8",
+  "utility": 5, "terms": ["5"], "chosen": false}]
+```
+
+- **`blocked`** names every condition that kept a choice shut, with what it saw: `anger is 2, needs >= 4`,
+  `player is at square, mara at bakery`, `flag 'closed' is set`, `amount is 5, needs >= 10`,
+  `doesn't know of stole_from(player, mara)`, `no longer believes ... (retracted)`. `any` lists each of its own.
+- **`terms`** say how the utility adds up, a term each: `3`, `anger 5 x 2 + 1 = 11`, or
+  `0 (anger only if: flag 'tired' is not set)` for a term whose `if` didn't hold. A shut choice still shows what it
+  would have scored.
+- **`chosen`** marks the one taken: the highest utility among the open ones, the first declared on a tie.
 
 ### Lines
 

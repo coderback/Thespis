@@ -393,6 +393,7 @@ class Line:
     reason: str = ""
     event: str | None = None  # the statement its action logged, if it states a claim
     segments: list[dict] | None = None  # a told scene's, in order: {"speaker", "line", "cites"} (narrate)
+    explain: list[dict] | None = None  # with decide(explain=True): every choice, open or not, and why (Session.explain)
 
     def to_json(self) -> dict:
         return asdict(self)
@@ -605,34 +606,63 @@ class Session:
             return n.to_json()
 
     # ------------------------------------------------------------ the minds
+    def _choosing(self, npc: str, moment: str, b: Mapping) -> Choices:
+        """`npc`'s choices at `moment`, once the call is checked: the moment exists and every binding is given."""
+        self._npc(npc)
+        cs = self._choices(npc, moment)
+        if cs is None:
+            moments = self._moments(npc)
+            raise Unknown(f"{npc} has no choices for {moment!r}" + (
+                f"; it has {', '.join(map(repr, moments))}{near(moment, moments)}" if moments else
+                "; the game declares none for it"))
+        missing = sorted(cs.needs - set(b))
+        if missing:
+            raise DefinitionError(f"{npc}'s choices for {moment!r} need bindings: "
+                                  + ", ".join(f"{k!r}" for k in missing) + " (decide(..., bindings={"
+                                  + ", ".join(f"{k!r}: ..." for k in missing) + "}))")
+        for k in sorted(cs.people):
+            if isinstance(b[k], str):
+                self._someone(f"bindings.{k}", b[k])
+        return cs
+
+    def explain(self, npc: str, moment: str, bindings: Mapping | None = None) -> list[dict]:
+        """Why `npc` would do what it would at `moment`, now, without doing it: every choice the game declares, in
+        order, with `open` (whether its `when` holds), `blocked` (what keeps it shut: "grudge is 2, needs >= 4"),
+        its `utility` and `terms` (how that adds up), and `chosen` on the one it would pick. Changes nothing."""
+        with self._lock:
+            b = dict(bindings or {})
+            return self._explained(npc, self._choosing(npc, moment, b), b)
+
+    def _explained(self, npc: str, cs: Choices, b: Mapping, chosen: str | None = None) -> list[dict]:
+        w = self.world
+        out = cs.explain(w, View(w.player["loc"]), **b)
+        if npc in w.gone:
+            for e in out:
+                e.update(open=False, blocked=f"{npc} has left the story")
+            return out
+        allowed = {e["do"]: e["utility"] for e in out if e["open"]}
+        pick = chosen if chosen is not None else self.brain.choose(npc, allowed) if allowed else None
+        for e in out:
+            e["chosen"] = e["do"] == pick
+        return out
+
     def decide(self, npc: str, moment: str, bindings: Mapping | None = None, situation: str | None = None,
-               to: str | None = None, wait: bool = True) -> Line:
+               to: str | None = None, wait: bool = True, explain: bool = False) -> Line:
         """What `npc` does at `moment`, among the choices the game declares for it, and its line. The choice is
-        recorded with its reason. An action that states a claim logs the statement, told `to` someone."""
+        recorded with its reason. An action that states a claim logs the statement, told `to` someone. With
+        `explain`, the line carries every choice and why it was or wasn't taken (`Session.explain`), as it stood
+        when the NPC chose, also when it chose nothing."""
         with self._lock:
             w, b = self.world, dict(bindings or {})
-            self._npc(npc)
-            cs = self._choices(npc, moment)
-            if cs is None:
-                moments = self._moments(npc)
-                raise Unknown(f"{npc} has no choices for {moment!r}" + (
-                    f"; it has {', '.join(map(repr, moments))}{near(moment, moments)}" if moments else
-                    "; the game declares none for it"))
-            missing = sorted(cs.needs - set(b))
-            if missing:
-                raise DefinitionError(f"{npc}'s choices for {moment!r} need bindings: "
-                                      + ", ".join(f"{k!r}" for k in missing) + " (decide(..., bindings={"
-                                      + ", ".join(f"{k!r}: ..." for k in missing) + "}))")
-            for k in sorted(cs.people):
-                if isinstance(b[k], str):
-                    self._someone(f"bindings.{k}", b[k])
+            cs = self._choosing(npc, moment, b)
             if npc in w.gone:
-                return Line(None, npc, None)
+                return Line(None, npc, None, explain=self._explained(npc, cs, b) if explain else None)
             view = View(w.player["loc"])
             choices = cs.options(w, view, **b)
             if not choices:
-                return Line(None, npc, None)
+                return Line(None, npc, None, explain=self._explained(npc, cs, b) if explain else None)
             choice = self.brain.choose(npc, choices)
+            why = self._explained(npc, cs, b, choice) if explain else None
             claim = cs.asserts(**b).get(choice)
             said = self._template(npc, choice.partition(":")[0], [SAID] if claim else [], b, choice)
             text, cites = said or (None, [])
@@ -647,7 +677,10 @@ class Session:
             d = w.decisions.record(DECIDE, npc, w.phase, moment, allowed=list(choices), chosen=choice, line=text,
                                    cites=cites, reason=f"{choice} scores {choices[choice]}", source="fallback",
                                    asserted=statement.id if statement else None)
-            return self._speak("act", d, pack, Utterance(choice, text, cites, "fallback"), wait, statement)
+            line = self._speak("act", d, pack, Utterance(choice, text, cites, "fallback"), wait, statement)
+            if why is not None:
+                line.explain = why
+            return line
 
     def react(self, npc: str, trigger: str, situation: str | None = None, cites: Sequence[str] = (),
               fill: Mapping | None = None, wait: bool = True) -> Line:

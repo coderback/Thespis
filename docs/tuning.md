@@ -127,5 +127,6 @@ player tells her Wat did it.
 ## Check your numbers
 
 Play the scene in a test and read the minds: `observe`, `tick`, then `inspect(npc)["beliefs"]` gives each belief's
-opinion and the evidence behind it. [tests/test_one_story.py](../tests/test_one_story.py) is a scene written that
-way. `thespis check game.toml` catches a misspelt knob before you start.
+opinion and the evidence behind it, and `explain(npc, moment)` says which choices are open, what keeps the others
+shut and how each scores. [tests/test_one_story.py](../tests/test_one_story.py) is a scene written that way.
+`thespis check game.toml` catches a misspelt knob before you start.

@@ -186,6 +186,8 @@ line.reason   # "refuse:player scores 4"
 - `react(npc, trigger)` is a line with no decision behind it: a reply when the player insults them, a greeting. Its
   words are `[npc.<id>.lines]` by the trigger's name.
 - An NPC that knows nothing says nothing: `line.text` is `None`.
+- **Why (not)?** `s.explain("mara", "counter")`, or `decide(..., explain=True)`, lists every choice: whether it was
+  open, what kept it shut (`"doesn't know of stole_from(player, mara)"`), and how its utility added up.
 
 **With a model**, the library waits for it by default, so the line comes back final. Pass `wait=False` to get your
 own line at once (`status == "provisional"`) and fetch the model's later with `s.line(line.id, wait=2)`. Either way
