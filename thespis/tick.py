@@ -59,6 +59,20 @@ def _about(claim: Claim, about: Collection[str] | None) -> bool:
     return about is None or any(claim.mentions(x) for x in about)
 
 
+Quiet = Callable[[str, Claim], bool]  # (teller, claim): does the teller keep it to itself?
+
+
+def _tells(w: World, g: str, about: Collection[str] | None, priority: Mapping[str, int], threshold: float,
+           quiet: Quiet | None) -> list:
+    """What `g` would pass on, in the order it would: its active beliefs sure enough to tell, news of anyone in
+    `about`, and not kept quiet (a secret, or something it keeps), the worst news first, then the surest."""
+    mine = [b for b in w.beliefs.for_npc(g) if b.active and b.conf >= threshold and _about(b.claim, about)
+            and not (quiet is not None and quiet(g, b.claim))]
+    mine.sort(key=lambda b: (priority.get(b.claim.pred, 0), b.conf, (b.claim.pred, b.claim.a, b.claim.b)),
+              reverse=True)
+    return mine
+
+
 def _news(w: World, listener: str, teller: str, claim: Claim, corroborate: bool) -> bool:
     """Is `claim` news to `listener` from `teller`? It is if the listener holds nothing on it. With `corroborate`, it
     also is when the listener holds it only on someone else's word and the teller's story goes back to someone the
@@ -73,17 +87,15 @@ def _news(w: World, listener: str, teller: str, claim: Claim, corroborate: bool)
 
 def gossip(w: World, gossips: Sequence[str], about: Collection[str] | None, priority: Mapping[str, int],
            threshold: float, decay: float, happened: Callable[[World, Claim], bool],
-           hear: Callable[[World, str, Claim, float, str, Event], None], corroborate: bool = False) -> None:
+           hear: Callable[[World, str, Claim, float, str, Event], None], corroborate: bool = False,
+           quiet: Quiet | None = None) -> None:
     """Each gossip tells each listener at its stop one thing that listener hasn't heard: the worst news it holds about
     any of `about` (None: about anyone), then the surest. The listener believes it at the gossip's confidence times
     `decay`. Nobody is told what they did themselves: they know. With `corroborate`, a listener is also told what it
     has heard already, by a gossip whose story goes back to a different witness."""
     for g in gossips:
         teller = w.npcs[g]
-        mine = [b for b in w.beliefs.for_npc(g)
-                if b.active and b.conf >= threshold and _about(b.claim, about)]
-        mine.sort(key=lambda b: (priority.get(b.claim.pred, 0), b.conf, (b.claim.pred, b.claim.a, b.claim.b)),
-                  reverse=True)
+        mine = _tells(w, g, about, priority, threshold, quiet)
         for listener in w.npcs_at(teller.loc):
             if listener.id == g:
                 continue
@@ -112,17 +124,15 @@ class Telling:
 
 def tellings(w: World, tellers: Sequence[str], listeners: Callable[[str], Sequence[tuple[str, float]]],
              about: Collection[str] | None, priority: Mapping[str, int], threshold: float,
-             trust: Callable[[str, str], float], corroborate: bool = False, start: int = 0) -> list[Telling]:
+             trust: Callable[[str, str], float], corroborate: bool = False, start: int = 0,
+             quiet: Quiet | None = None) -> list[Telling]:
     """What the grapevine would tell next tick, without telling it: `spread`'s choices (or `gossip`'s, given its
     listeners and a trust of 1), each teller in turn from `start` telling each listener the first news it holds that
     the listener hasn't heard. A story a listener is told by one teller isn't news from the next. In the order they
     would be told, so a town that tells only `most` things a tick tells the first `most` of these."""
     known: dict[str, list[tuple[Claim, float]]] = {}
     for g in tellers:
-        mine = [b for b in w.beliefs.for_npc(g) if b.active and b.conf >= threshold and _about(b.claim, about)]
-        mine.sort(key=lambda b: (priority.get(b.claim.pred, 0), b.conf, (b.claim.pred, b.claim.a, b.claim.b)),
-                  reverse=True)
-        known[g] = [(b.claim, b.conf) for b in mine]
+        known[g] = [(b.claim, b.conf) for b in _tells(w, g, about, priority, threshold, quiet)]
     out: list[Telling] = []
     told: set[tuple[str, Claim]] = set()
     for turn in range(len(tellers)):
@@ -140,7 +150,7 @@ def spread(w: World, tellers: Sequence[str], listeners: Callable[[str], Sequence
            about: Collection[str] | None, priority: Mapping[str, int], threshold: float,
            happened: Callable[[World, Claim], bool], hear: Callable[[World, str, Claim, float, str, Event], None],
            trust: Callable[[str, str], float], most: int | None = None, start: int = 0,
-           corroborate: bool = False) -> int:
+           corroborate: bool = False, quiet: Quiet | None = None) -> int:
     """Gossip along ties. Each teller tells each of its `listeners` (with how much of a report carries to each) one
     thing that listener hasn't heard: the worst news it holds about any of `about` (None: about anyone), then the
     surest. The listener believes it as subjective logic discounts a report (Jøsang 2016, trust discounting): the
@@ -156,11 +166,7 @@ def spread(w: World, tellers: Sequence[str], listeners: Callable[[str], Sequence
     story goes back to a different witness. The two reports are fused as independent, so it ends up surer."""
     known: dict[str, list[tuple[Claim, float]]] = {}
     for g in tellers:
-        mine = [b for b in w.beliefs.for_npc(g)
-                if b.active and b.conf >= threshold and _about(b.claim, about)]
-        mine.sort(key=lambda b: (priority.get(b.claim.pred, 0), b.conf, (b.claim.pred, b.claim.a, b.claim.b)),
-                  reverse=True)
-        known[g] = [(b.claim, b.conf) for b in mine]
+        known[g] = [(b.claim, b.conf) for b in _tells(w, g, about, priority, threshold, quiet)]
     told = 0
     for turn in range(len(tellers)):
         g = tellers[(start + turn) % len(tellers)]

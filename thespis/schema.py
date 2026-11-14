@@ -27,16 +27,17 @@ import string
 from collections.abc import Mapping
 from typing import Any
 
-from thespis.considerations import DefinitionError, compile_choices
+from thespis.considerations import DefinitionError, compile_choices, compile_keeps
 from thespis.intents import declared_intents
 
 DRIVES, TRUST = (0, 10), (-5, 5)
 EVERYONE = "everyone"
 TABLES = ("game", "places", "player", "players", "npc", "kind", "tie", "gossip", "claims", "words", "actions",
           "intents", "situations", "narrator", "memory", "custom")
-PERSON = ("persona", "goal", "drives", "trust_in", "walk", "settle", "feels", "decay", "lines", "choices")
+PERSON = ("persona", "goal", "drives", "trust_in", "walk", "settle", "feels", "decay", "lines", "choices", "keeps")
 NPC_KEYS = ("name", "start", "aliases", *PERSON)
-GOSSIP = ("gossips", "about", "priority", "threshold", "decay", "along", "in_person", "most", "corroborate")
+GOSSIP = ("gossips", "about", "priority", "threshold", "decay", "along", "in_person", "most", "corroborate",
+          "secret")
 CLAIMS = ("one_actor", "caught", "first_hand", "description")
 INTENT = ("means", "reads", "args", "examples", "consequential", "asks")
 ARG = ("type", "options", "min", "max", "preds", "optional", "denials")
@@ -321,6 +322,18 @@ class _Check:
                 self.add(f"{where}.decay.{drive}: keep is a share of the peak, 0 to 1")
             if not _number(c.get("to", 0)):
                 self.add(f"{where}.decay.{drive}.to: the drive's resting value, a number")
+        if "keeps" in t:
+            try:
+                compile_keeps(me, t["keeps"], table)
+            except DefinitionError as e:
+                self.add(str(e))
+            else:
+                for i, k in enumerate(t["keeps"]):
+                    if "about" in k:
+                        self.person(f"{where}.keeps[{i}].about", k["about"])
+                    if "pred" in k:
+                        self.pred(f"{where}.keeps[{i}].pred", k["pred"])
+                    self.conditions(f"{where}.keeps[{i}].when", k.get("when"))
         lines = self.table(f"{where}.lines", t["lines"]) if "lines" in t else {}
         for k, s in lines.items():
             self.template(f"{where}.lines.{k}", s, None)
@@ -380,6 +393,12 @@ class _Check:
         most = g.get("most")
         if most is not None and (not _whole(most) or most < 1):
             self.add("gossip.most: how many things are told in a tick, a whole number from 1")
+        secret = g.get("secret", [])
+        if not isinstance(secret, list) or not all(isinstance(p, str) for p in secret):
+            self.add("gossip.secret: a list of predicates nobody passes on")
+        else:
+            for i, p in enumerate(secret):
+                self.pred(f"gossip.secret[{i}]", p)
         if not isinstance(g.get("corroborate", False), bool):
             self.add("gossip.corroborate: true if a second witness's word makes a listener surer")
         along = g.get("along", {})

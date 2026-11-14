@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from thespis.considerations import CHOICE, COMPARE, TERM
+from thespis.considerations import CHOICE, COMPARE, KEEP, TERM
 from thespis.intents import TYPES
 from thespis.schema import (
     ARG,
@@ -139,6 +139,10 @@ def schema() -> J:
         "lines": _say("Their own words by key: an action's kind, or a trigger", **WORDS_OF),
         "choices": _say("What they may do at each moment the game asks: [[npc.<id>.choices.<moment>]]",
                         **_of({"type": "array", "items": choice, "minItems": 1})),
+        "keeps": _say("What they won't pass on: news of `about`, of the predicate `pred`, or both, while `when` "
+                      "holds (hush money, loyalty)", type="array",
+                      items={**_table({"about": TEXT, "pred": TEXT, "when": conditions}, KEEP),
+                             "anyOf": [{"required": ["about"]}, {"required": ["pred"]}]}),
     }
     arg = {"anyOf": [{"enum": list(TYPES)}, _table({
         "type": {"enum": list(TYPES)}, "options": NAMES, "min": {"type": "integer"}, "max": {"type": "integer"},
@@ -166,6 +170,7 @@ def schema() -> J:
             "in_person": _say("How much carries to someone standing with the teller (0.8)", **SHARE),
             "most": _say("At most this many things told a tick, the town over", type="integer", minimum=1),
             "corroborate": _say("A second witness's word makes a listener surer", type="boolean"),
+            "secret": _say("Predicates nobody ever passes on", **NAMES),
         }, GOSSIP, (), "How news travels"),
         "claims": _table({
             "one_actor": _say("Deeds only one person can have done to another", **NAMES),
