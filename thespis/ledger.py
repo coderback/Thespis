@@ -37,6 +37,11 @@ class Claim:
         """The fact this claim affirms or denies, affirmed."""
         return replace(self, neg=False) if self.neg else self
 
+    def same_deed(self, other: Claim) -> bool:
+        """Whether two claims say the same thing was done to the same one, whoever did it."""
+        return (self.pred, self.b, self.place, self.at, self.neg) == (other.pred, other.b, other.place, other.at,
+                                                                       other.neg)
+
     def same_fact(self, other: Claim) -> bool:
         """Whether two claims are about the same fact, whether they affirm or deny it."""
         return self.affirmed() == other.affirmed()
@@ -108,6 +113,7 @@ class Event:
 
 
 CAUGHT = "caught"  # an event's verb: its actor caught its target in a lie, the event's claim
+SOMEONE = "someone"  # who did it, when nobody knows yet: robbed(someone, mara)
 
 
 class Ledger:

@@ -171,7 +171,7 @@
               "description": "A claim: something one can believe",
               "properties": {
                 "a": {
-                  "description": "Who it's about: an npc, \"player\", or \"self\" (the NPC choosing)",
+                  "description": "Who it's about: an npc, \"player\", \"self\" (the NPC choosing), or \"someone\" (nobody knows who yet)",
                   "type": "string"
                 },
                 "at": {
@@ -497,7 +497,7 @@
                     "description": "The claim the action states",
                     "properties": {
                       "a": {
-                        "description": "Who it's about: an npc, \"player\", or \"self\" (the NPC choosing)",
+                        "description": "Who it's about: an npc, \"player\", \"self\" (the NPC choosing), or \"someone\" (nobody knows who yet)",
                         "type": "string"
                       },
                       "at": {
@@ -811,7 +811,7 @@
                     "description": "The claim the action states",
                     "properties": {
                       "a": {
-                        "description": "Who it's about: an npc, \"player\", or \"self\" (the NPC choosing)",
+                        "description": "Who it's about: an npc, \"player\", \"self\" (the NPC choosing), or \"someone\" (nobody knows who yet)",
                         "type": "string"
                       },
                       "at": {

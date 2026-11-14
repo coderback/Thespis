@@ -6,6 +6,9 @@ to PyPI and GitHub Releases from the section below that has its number.
 
 ## Unreleased
 
+- **Someone did it.** A claim, and an event's actor, may name `"someone"` when nobody knows who did a deed yet. A
+  condition on `a = "someone"` holds for the deed by anyone, known or not; a name learned later is no rival story
+  (nobody is caught) and no second offence (feelings move once).
 - **Caught in a lie.** When an NPC's story from someone loses to a truer one (`[claims] one_actor`), Thespis writes
   a `caught` event: the NPC caught that teller, and its claim is the lie. `Session.events(after=..., verb=...)` (and
   `GET .../events`) lists the ledger after an event, so after an `observe` the game sees what it led to; `tick`

@@ -72,7 +72,7 @@ from thespis.intents import (
     declared_intents,
     people,
 )
-from thespis.ledger import CAUGHT, Claim, Event
+from thespis.ledger import CAUGHT, SOMEONE, Claim, Event
 from thespis.minds import NPC
 from thespis.perception import at_the_scene, reported
 from thespis.recall import Embedder, MeaningRetriever, Weights
@@ -104,8 +104,10 @@ def _clamp(v: int, bounds: tuple[int, int]) -> int:
 
 
 def _other_actor(x: Claim, y: Claim) -> bool:
-    """Two claims that the same thing was done to the same one, by different people: they can't both be true."""
-    return (x.pred, x.b, x.place, x.at) == (y.pred, y.b, y.place, y.at) and x.a != y.a and not (x.neg or y.neg)
+    """Two claims that the same thing was done to the same one, by different people: they can't both be true. That
+    "someone" did it is no rival to a name: it's what a name tells more of."""
+    return (x.pred, x.b, x.place, x.at) == (y.pred, y.b, y.place, y.at) and x.a != y.a and not (x.neg or y.neg) \
+        and SOMEONE not in (x.a, y.a)
 
 
 PLAIN = (str, int, bool, type(None))  # what a saved world holds that is never a number to put right
@@ -538,7 +540,8 @@ class Session:
                 raise DefinitionError("conf is how far a statement (said) is believed, from 0 to 1")
             if isinstance(witnesses, str):
                 raise DefinitionError(f"witnesses: a list of ids, not one string: [{witnesses!r}]")
-            self._someone("actor", actor)
+            if actor != SOMEONE:  # who did it, when nobody knows yet
+                self._someone("actor", actor)
             if target is not None:
                 self._someone("target", target, places=True)
             self._place("at", at)
@@ -931,8 +934,9 @@ class Session:
         if preds and c.pred not in preds:
             raise Unknown(f"claim.pred: no predicate {c.pred!r} in [words.claims]{near(c.pred, preds)}")
         if not self.game.kinds:  # in a cast that grows, a claim may name someone not (yet) in it
-            self._someone("claim.a", c.a)
-            if c.b:
+            if c.a != SOMEONE:
+                self._someone("claim.a", c.a)
+            if c.b and c.b != SOMEONE:
                 self._someone("claim.b", c.b, places=True)
         self._place("claim.place", c.place)
         return c
@@ -1028,10 +1032,17 @@ class Session:
         if c.pred in self.game.one_actor and belief.active:
             self._one_culprit(npc, c)
         feels = self.cast.data["npc"][npc].get("feels", {}).get(c.pred)
-        if new and feels and c.b == npc and belief.active:  # done to it: `b` is whom a claim names
+        if new and feels and c.b == npc and belief.active and not self._felt(npc, belief):  # done to it: `b` is whom
             n = w.npcs[npc]
             for drive, steps in feels.items():
                 self._drive(n, drive, _clamp(n.drives.get(drive, 0) + math.floor(steps * belief.conf + 0.5), DRIVES))
+
+    def _felt(self, npc: str, belief) -> bool:
+        """Whether the NPC already felt this deed: it held it as done by "someone" and now learns who, or the other
+        way round. Learning who did it is no second offence."""
+        c = belief.claim
+        return any(b is not belief and b.active and b.claim.same_deed(c) and SOMEONE in (b.claim.a, c.a)
+                   for b in self.world.beliefs.for_npc(npc))
 
     def _one_culprit(self, npc: str, c: Claim) -> None:
         """`c` says who did a deed only one person can have done (`[claims] one_actor`). If the NPC also believes

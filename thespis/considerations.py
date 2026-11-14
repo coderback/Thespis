@@ -15,7 +15,9 @@ Conditions:
 - `{at = place}`: where the NPC is. `{with = who}`: in the same place as `who`, an NPC or a player ("player" is where
   the player was seen).
 - `{flag = f}` / `{not_flag = f}`: the NPC's flag is set, or isn't.
-- `{believes = claim, min = c}`: the NPC holds the claim with at least `min` confidence, or actively at all.
+- `{believes = claim, min = c}`: the NPC holds the claim with at least `min` confidence, or actively at all. A
+  claim whose `a` is "someone" holds for the deed by anyone, known or not: robbed(someone, self) once she knows she
+  was robbed, whoever she thinks did it.
 - `{trust = who, gte | gt | lte | lt | eq = n}`: the NPC's trust in someone (-5 to 5; 0 when it has no view).
 - `{caught = who}`: the NPC has caught `who` in a lie: their story lost to a truer one (`[claims] one_actor`).
 - `{bound = name}`: a value the game passed when it asked is truthy. `{bound = name, is = v}`: it is exactly `v`, a
@@ -39,7 +41,7 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 
 from thespis.affordances import Affordance, options
-from thespis.ledger import Claim
+from thespis.ledger import SOMEONE, Claim
 from thespis.minds import NPC
 from thespis.voice import View
 from thespis.world import World
@@ -243,18 +245,27 @@ def condition(c: object, where: str) -> Cond:
             def of(env: Env) -> Claim:
                 return Claim.from_json({k: _fill(x, env) if isinstance(x, str) else x for k, x in claim.items()})
 
+            def sure(w: World, n: NPC, held: Claim) -> float:
+                """How sure the NPC is of the claim: 0 unless held and active. Of a deed by "someone", its surest
+                belief in that deed by anyone."""
+                if held.a != SOMEONE:
+                    return w.beliefs.conf(n.id, held)
+                return max((b.conf for b in w.beliefs.for_npc(n.id) if b.active and b.claim.same_deed(held)),
+                           default=0.0)
+
             def believes(w: World, n: NPC, v: View, env: Env) -> bool:
-                conf = w.beliefs.conf(n.id, of(env))  # 0 unless held and active
+                conf = sure(w, n, of(env))
                 return conf >= least if least else conf > 0
 
             def doubts(w: World, n: NPC, v: View, env: Env) -> str:
                 held = of(env)
+                conf = sure(w, n, held)
+                if conf > 0:
+                    return f"believes {held.label()} only at {_num(round(conf, 2))}, needs {_num(least)}"
                 b = w.beliefs.get(n.id, held)
-                if b is None:
-                    return f"doesn't know of {held.label()}"
-                if not b.active:
+                if b is not None and not b.active:
                     return f"no longer believes {held.label()} (retracted)"
-                return f"believes {held.label()} only at {_num(round(b.conf, 2))}, needs {_num(least)}"
+                return f"doesn't know of {held.label()}"
             return _held(believes, doubts)
         case "any" | "all":
             if not isinstance(val, Sequence) or isinstance(val, str):

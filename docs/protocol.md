@@ -84,7 +84,7 @@ when = [{ with = "player" }, { drive = "grudge", gte = 4 },
 | `{ at = place }` | The NPC is there |
 | `{ with = who }` | The NPC shares a place with `who`; `"player"` is where the player is |
 | `{ flag = f }`, `{ not_flag = f }` | The NPC's flag is set, or isn't |
-| `{ believes = claim, min = c }` | The NPC holds the claim actively, with at least `min` confidence if given; `"self"` is the NPC |
+| `{ believes = claim, min = c }` | The NPC holds the claim actively, with at least `min` confidence if given; `"self"` is the NPC. With `a = "someone"`, the deed by anyone, known or not ([below](#a-cast-that-grows)) |
 | `{ trust = who, gte = n }` (or `gt`, `lte`, `lt`, `eq`) | The NPC's trust in `who` compares so (-5 to 5; 0 with no view) |
 | `{ caught = who }` | The NPC has caught `who` in a lie: their story lost to a truer one ([one culprit](#a-cast-that-grows)) |
 | `{ bound = name }` | A value the caller bound is truthy; with `is = v`, it is exactly `v`; with `gte = n` and the rest, a number that compares so |
@@ -199,6 +199,17 @@ game as early. [tools/long_game.py](../tools/long_game.py) plays 30 people throu
 told again and again: an `observe` takes 0.42 ms (median) over the last 2,000 events as over the first, where keeping
 every report took it from 0.41 ms to 1.45 ms, and the save is 5.8 MB instead of 12.3 MB. An NPC can still cite the
 first and latest of a repeated report; the ones between are forgotten.
+
+**Someone did it.** When nobody knows who did a deed yet, its claim names `"someone"`, and so may its event's actor:
+`observe("steal", "someone", "mara", claim={"pred": "stole_from", "a": "someone", "b": "mara"})`, for a till found
+empty. It's believed, gossiped and told like any claim ("Someone stole a loaf..."). When a name comes later:
+- **A condition on "someone" holds for the deed by anyone.** `{ believes = { pred = "stole_from", a = "someone",
+  b = "self" } }` is open once she knows she was robbed, whoever she thinks did it; `a = "{who}"` opens only once
+  she believes a name.
+- **The name is no rival story.** She keeps both beliefs, and nobody is caught: "someone" did it, and now she
+  thinks she knows who. Two names still conflict, under one culprit as below.
+- **It's no second offence.** What she feels about the deed (`feels`) moves once, whether she learned of it as
+  someone's or a name's first.
 
 **One culprit.** `[claims] one_actor = ["robbed", "killed"]` says a robbery has one robber. An NPC who comes to
 believe two people did the same thing to the same one keeps one story:
