@@ -890,6 +890,30 @@ class Session:
             self._npc(npc)
             return {"npc": self._card(npc), "beliefs": [b.to_json() for b in self.world.beliefs.for_npc(npc)]}
 
+    def overview(self) -> dict:
+        """The whole session at a glance, for an inspector: the phase; each NPC's state with its name, its moments
+        (what `explain` and `decide` take) and how many beliefs it holds and has let go; the players; and every tie,
+        the game file's (`made: "game"`) and those made in play (`made: "play"`). Changes nothing."""
+        with self._lock:
+            w = self.world
+            npcs = []
+            for npc in w.npcs:
+                held = w.beliefs.for_npc(npc)
+                active = sum(1 for b in held if b.active)
+                npcs.append({**self._card(npc), "name": self.who(npc), "moments": self._moments(npc),
+                             "beliefs": active, "retracted": len(held) - active})
+            players = [{"id": "player", "name": self.who("player"), "loc": w.player.get("loc", "")}]
+            players += [{"id": pid, "name": self.who(pid), "loc": p.get("loc", "")} for pid, p in w.players.items()]
+            ties, seen = [], set()
+            for a, others in self.game.ties.items():
+                for b, kind in others:
+                    if frozenset((a, b)) not in seen:
+                        seen.add(frozenset((a, b)))
+                        ties.append({"between": [a, b], "kind": kind, "made": "game"})
+            ties += [{"between": [a, b], "kind": kind, "made": "play"} for a, b, kind in w.ties]
+            return {"game": self.game.id, "name": self.game.name, "phase": w.phase, "events": len(w.ledger),
+                    "npcs": npcs, "players": players, "places": dict(self.game.places), "ties": ties}
+
     def sentence(self, e: Event) -> str:
         return self.game.sentence(e, self._names())
 

@@ -282,12 +282,14 @@ the local runtime's BGE small (`thespis serve --embed local`).
 | `tie(a, b, kind)` | `POST .../ties` | A tie between two NPCs, for gossip to travel along |
 | `untie(a, b)` | `DELETE .../ties/{a}/{b}` | Break a tie made in play |
 | `decide(npc, moment, bindings, situation, to, wait, explain)` | `POST .../decide` | The NPC chooses among its declared choices, with the reason recorded, and says its line. With `explain`, the line also says why ([below](#why-and-why-not)) |
-| `explain(npc, moment, bindings)` | `decide` with `explain` | What the NPC would do now and why, changing nothing (library only; over HTTP, ask `decide` with `explain`) |
+| `explain(npc, moment, bindings)` | `POST .../explain` | What the NPC would do now and why, every choice, changing nothing ([below](#why-and-why-not)) |
 | `react(npc, trigger, situation, cites, fill, wait)` | `POST .../react` | A line in reply to something |
 | `narrate(since, wait, to)` | `POST .../narrate` | The story since a phase, citing every event it tells; `to` a player, only what they saw |
 | `tick(steps)` | `POST .../tick` | The minds' own time: scheduled walks, gossip, drives settling, the next phase |
 | `line(id, wait)` | `GET .../lines/{id}?wait=2` | A line as it stands now; `wait` holds the request up to that many seconds for the model |
 | `inspect(npc)` | `GET .../npcs/{npc}` | The NPC's state and every belief, with its evidence |
+| `overview()` | `GET /v1/sessions/{id}` | The session at a glance: the phase, every NPC with its name, moments and how many beliefs it holds, the players, and every tie. Changes nothing |
+| | `GET /v1/sessions?limit=100` | The project's sessions, saved most recently first |
 | `events(after, verb)` | `GET .../events?after=e0012&verb=caught` | The ledger's events after one, in order, of one verb if given: after an `observe`, what it led to |
 | `trace(claim)` | `POST .../trace` | How a story stands on the grapevine: who holds it, what the next tick would tell of it, and where it stops and why ([below](#a-storys-trace)). Changes nothing |
 | `snapshot()` | `GET .../snapshot` | The minds, for the engine's save file |
@@ -337,6 +339,18 @@ chose, also when it chose nothing. `explain(npc, moment, bindings)` gives the sa
   `0 (anger only if: flag 'tired' is not set)` for a term whose `if` didn't hold. A shut choice still shows what it
   would have scored.
 - **`chosen`** marks the one taken: the highest utility among the open ones, the first declared on a tie.
+
+### The inspector
+
+`thespis serve` serves a page at `/inspector/` that shows its sessions through the calls above and changes nothing:
+the cast and its ties, each NPC's state and beliefs with their evidence, why an NPC would choose what it would
+(`explain`), the ledger as it grows, and where a story goes (`trace`). It refreshes every two seconds while the game
+plays.
+
+Open it with the token in the address's fragment, which a browser never sends to a server:
+`http://127.0.0.1:7878/inspector/#token=<THESPIS_TOKEN>` for a sidecar, a project's key for a server; without one
+it asks. The page loads nothing from anywhere else (its Content-Security-Policy allows only its own files and the
+runtime it came from), so it works offline, and it sets everything a game wrote as text.
 
 ### Lines
 

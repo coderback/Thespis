@@ -17,10 +17,13 @@ const ROUTES := {
 	"get_project": ["GET", "/v1/project", "", "ProjectOut"],
 	"delete_model": ["DELETE", "/v1/project/model", "", ""],
 	"put_model": ["PUT", "/v1/project/model", "ModelIn", ""],
+	"list_sessions": ["GET", "/v1/sessions", "", "SessionInfoOut"],
 	"open_session": ["POST", "/v1/sessions", "SessionIn", "SessionOut"],
 	"close_session": ["DELETE", "/v1/sessions/{sid}", "", ""],
+	"overview": ["GET", "/v1/sessions/{sid}", "", "OverviewOut"],
 	"decide": ["POST", "/v1/sessions/{sid}/decide", "DecideIn", "LineOut"],
 	"events": ["GET", "/v1/sessions/{sid}/events", "", "EventOut"],
+	"explain": ["POST", "/v1/sessions/{sid}/explain", "ExplainIn", "ChoiceOut"],
 	"line": ["GET", "/v1/sessions/{sid}/lines/{lid}", "", "LineOut"],
 	"narrate": ["POST", "/v1/sessions/{sid}/narrate", "NarrateIn", "LineOut"],
 	"add": ["POST", "/v1/sessions/{sid}/npcs", "NpcIn", ""],
@@ -43,12 +46,16 @@ const ROUTES := {
 ## A new, empty instance of the class with this name, or null.
 static func make(name: String):
 	match name:
+		"ChoiceOut":
+			return ChoiceOut.new()
 		"ClaimIn":
 			return ClaimIn.new()
 		"DecideIn":
 			return DecideIn.new()
 		"EventOut":
 			return EventOut.new()
+		"ExplainIn":
+			return ExplainIn.new()
 		"GameIn":
 			return GameIn.new()
 		"GameOut":
@@ -73,6 +80,8 @@ static func make(name: String):
 			return ObserveIn.new()
 		"OfferIn":
 			return OfferIn.new()
+		"OverviewOut":
+			return OverviewOut.new()
 		"ProjectOut":
 			return ProjectOut.new()
 		"ProviderIn":
@@ -81,6 +90,8 @@ static func make(name: String):
 			return ReactIn.new()
 		"SessionIn":
 			return SessionIn.new()
+		"SessionInfoOut":
+			return SessionInfoOut.new()
 		"SessionOut":
 			return SessionOut.new()
 		"TickIn":
@@ -102,6 +113,34 @@ static func make(name: String):
 		"UsageOut":
 			return UsageOut.new()
 	return null
+
+
+class ChoiceOut extends RefCounted:
+	var blocked = null  ## string, or null. What keeps it shut: "grudge is 2, needs >= 4"
+	var chosen: bool = false  ## The one the NPC would pick now
+	var do: String = ""
+	var open: bool = false  ## Whether its when holds now
+	var terms: Array[String] = []  ## How its utility adds up: "anger 5 x 2 + 1 = 11"
+	var utility: float = 0.0  ## What it is worth to the NPC now, open or not
+
+	func read(d: Dictionary):
+		blocked = str(d["blocked"]) if d.get("blocked") != null else null
+		if d.has("chosen"): chosen = bool(d["chosen"])
+		if d.has("do"): do = str(d["do"])
+		if d.has("open"): open = bool(d["open"])
+		terms.assign(d.get("terms", []).map(func(x): return str(x)))
+		if d.has("utility"): utility = float(d["utility"])
+		return self
+
+	func to_dict() -> Dictionary:
+		var d := {}
+		if blocked != null: d["blocked"] = blocked
+		d["chosen"] = chosen
+		d["do"] = do
+		d["open"] = open
+		d["terms"] = terms
+		d["utility"] = utility
+		return d
 
 
 class ClaimIn extends RefCounted:
@@ -197,6 +236,25 @@ class EventOut extends RefCounted:
 		if target != null: d["target"] = target
 		d["truth"] = truth
 		d["verb"] = verb
+		return d
+
+
+class ExplainIn extends RefCounted:
+	var bindings: Dictionary = {}  ## Values the choices name: {culprit}
+	var moment: String = ""  ## Which of the NPC's declared choice sets: [[npc.<id>.choices.<moment>]]
+	var npc: String = ""
+
+	func read(d: Dictionary):
+		if d.has("bindings"): bindings = d["bindings"]
+		if d.has("moment"): moment = str(d["moment"])
+		if d.has("npc"): npc = str(d["npc"])
+		return self
+
+	func to_dict() -> Dictionary:
+		var d := {}
+		d["bindings"] = bindings
+		d["moment"] = moment
+		d["npc"] = npc
 		return d
 
 
@@ -482,6 +540,40 @@ class OfferIn extends RefCounted:
 		return d
 
 
+class OverviewOut extends RefCounted:
+	var events: int = 0  ## Events in the ledger
+	var game: String = ""
+	var name: String = ""
+	var npcs: Array = []  ## Each NPC's state, as inspect has it, with its name, moments (what explain and decide take), and beliefs and retracted (how many it holds and has let go)
+	var phase: int = 0
+	var places: Dictionary = {}
+	var players: Array = []  ## {id, name, loc}, the one player every game has first
+	var ties: Array = []  ## {between, kind, made}: made is game (the game file) or play
+
+	func read(d: Dictionary):
+		if d.has("events"): events = int(d["events"])
+		if d.has("game"): game = str(d["game"])
+		if d.has("name"): name = str(d["name"])
+		npcs = d.get("npcs", [])
+		if d.has("phase"): phase = int(d["phase"])
+		if d.has("places"): places = d["places"]
+		players = d.get("players", [])
+		ties = d.get("ties", [])
+		return self
+
+	func to_dict() -> Dictionary:
+		var d := {}
+		d["events"] = events
+		d["game"] = game
+		d["name"] = name
+		d["npcs"] = npcs
+		d["phase"] = phase
+		d["places"] = places
+		d["players"] = players
+		d["ties"] = ties
+		return d
+
+
 class ProjectOut extends RefCounted:
 	var caps: Dictionary = {}  ## 0 means no cap
 	var id: String = ""
@@ -588,6 +680,31 @@ class SessionIn extends RefCounted:
 		d["game"] = game
 		d["seed"] = seed
 		if snapshot != null: d["snapshot"] = snapshot
+		return d
+
+
+class SessionInfoOut extends RefCounted:
+	var created: float = 0.0  ## Unix time
+	var game: String = ""
+	var held: bool = false  ## Held in memory by this instance now
+	var session: String = ""
+	var updated: float = 0.0  ## Unix time it was last saved
+
+	func read(d: Dictionary):
+		if d.has("created"): created = float(d["created"])
+		if d.has("game"): game = str(d["game"])
+		if d.has("held"): held = bool(d["held"])
+		if d.has("session"): session = str(d["session"])
+		if d.has("updated"): updated = float(d["updated"])
+		return self
+
+	func to_dict() -> Dictionary:
+		var d := {}
+		d["created"] = created
+		d["game"] = game
+		d["held"] = held
+		d["session"] = session
+		d["updated"] = updated
 		return d
 
 

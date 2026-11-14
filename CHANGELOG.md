@@ -4,6 +4,16 @@ Thespis follows semantic versioning at 0.x: a minor release may change anything 
 protocol, and those change only with a note here. A release is made by pushing its tag (`v0.3.1`), which publishes it
 to PyPI and GitHub Releases from the section below that has its number.
 
+## Unreleased
+
+- **An inspector.** `thespis serve` serves a page at `/inspector/` that shows its sessions as the game plays: the
+  cast and its ties, each NPC's beliefs with their evidence, why an NPC would choose what it would, the ledger, and
+  where a story goes. It only reads, takes the token in its address's fragment, and loads nothing from anywhere else,
+  so it works offline. The runtimes on GitHub Releases carry it too.
+- **Read-only calls for it, and for tools.** `GET /v1/sessions` lists a project's sessions; `GET /v1/sessions/{id}`
+  (`Session.overview()`) shows one at a glance; `POST .../explain` gives over HTTP what `Session.explain` gives.
+  The Godot and Unity clients' generated layers have them.
+
 ## 0.5.0 (14 November 2026)
 
 Thespis you can design with: it says why an NPC did or didn't do something, follows a story along the grapevine,

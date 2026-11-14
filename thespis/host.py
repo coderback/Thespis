@@ -378,6 +378,13 @@ class Host:
                 self._save(sid, live)
         return out
 
+    def sessions(self, project: Project, n: int) -> list[dict]:
+        """The project's `n` sessions saved most recently, newest first, and whether each is held in memory here."""
+        with self._lock:
+            held = set(self._live)
+        return [{"session": sid, "game": game, "created": created, "updated": updated, "held": sid in held}
+                for sid, game, created, updated in self.storage.list_sessions(project.id, n)]
+
     def close(self, project: Project, sid: str) -> None:
         live = self.live(project, sid)
         self.storage.delete_session(project.id, sid)
