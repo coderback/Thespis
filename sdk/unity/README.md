@@ -20,6 +20,8 @@ through a Thespis server. Which one is a setting, not code.
 
 ## Install
 
+The package's own [README](com.thespis.client/README.md) lists every call.
+
 1. Package Manager → **+** → *Install package from disk*, and pick `com.thespis.client/package.json`. Or add it to
    `Packages/manifest.json` as a git URL with `?path=/sdk/unity/com.thespis.client`. It depends on Unity's Newtonsoft
    JSON package, which Unity installs with it.

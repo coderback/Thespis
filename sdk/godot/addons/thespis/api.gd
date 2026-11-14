@@ -248,11 +248,13 @@ class HealthOut extends RefCounted:
 	var offline: bool = false  ## It refuses every connection off this machine (a sidecar, unless --online)
 	var ok: bool = false
 	var refused: int = 0  ## Connections off this machine it has refused since it started
+	var version: String = ""  ## The runtime's version, thespis-sdk's: a client can check it supports it
 
 	func read(d: Dictionary):
 		if d.has("offline"): offline = bool(d["offline"])
 		if d.has("ok"): ok = bool(d["ok"])
 		if d.has("refused"): refused = int(d["refused"])
+		if d.has("version"): version = str(d["version"])
 		return self
 
 	func to_dict() -> Dictionary:
@@ -260,6 +262,7 @@ class HealthOut extends RefCounted:
 		d["offline"] = offline
 		d["ok"] = ok
 		d["refused"] = refused
+		d["version"] = version
 		return d
 
 

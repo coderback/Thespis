@@ -5,10 +5,20 @@
   "description": "NPC minds through the Thespis /v1 protocol: beliefs, choices and lines, offline through a sidecar or online through a server.",
   "unity": "6000.0",
   "author": {
-    "name": "Thespis"
+    "name": "Thespis",
+    "url": "https://github.com/coderback/Thespis"
   },
-  "keywords": ["npc", "ai", "dialogue", "llm"],
+  "keywords": [
+    "npc",
+    "ai",
+    "dialogue",
+    "llm"
+  ],
   "dependencies": {
     "com.unity.nuget.newtonsoft-json": "3.2.1"
-  }
+  },
+  "license": "MIT",
+  "documentationUrl": "https://github.com/coderback/Thespis/blob/main/sdk/unity/README.md",
+  "changelogUrl": "https://github.com/coderback/Thespis/blob/main/CHANGELOG.md",
+  "licensesUrl": "https://github.com/coderback/Thespis/blob/main/LICENSE"
 }
