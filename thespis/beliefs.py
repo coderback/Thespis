@@ -95,6 +95,27 @@ def fuse(evidence: list[Evidence]) -> Opinion:
     return out.rounded()
 
 
+KEPT = 3  # reports kept per teller, story and side: the first, the strongest and the latest
+
+
+def bounded(evidence: list[Evidence]) -> list[Evidence]:
+    """The evidence worth keeping: of the reports one teller gave of one story on one side, the first (what
+    `origins` follows back), the strongest (all that fusion and discrediting use) and the latest (how recent the
+    belief is, and an event to cite). The rest are repeats that change nothing, and a long game would otherwise
+    weigh every one of them on every call. Order is kept."""
+    first: dict[tuple, int] = {}
+    best: dict[tuple, int] = {}
+    last: dict[tuple, int] = {}
+    for i, e in enumerate(evidence):
+        k = (e.source, e.story, e.against)
+        first.setdefault(k, i)
+        if k not in best or e.conf > evidence[best[k]].conf:
+            best[k] = i
+        last[k] = i
+    keep = set(first.values()) | set(best.values()) | set(last.values())
+    return evidence if len(keep) == len(evidence) else [e for i, e in enumerate(evidence) if i in keep]
+
+
 @dataclass
 class Belief:
     id: str
@@ -132,7 +153,7 @@ class Belief:
 
     @classmethod
     def from_json(cls, d: dict) -> Belief:
-        evidence = [Evidence(**{**e, "origin": tuple(e.get("origin", ()))}) for e in d["evidence"]]
+        evidence = bounded([Evidence(**{**e, "origin": tuple(e.get("origin", ()))}) for e in d["evidence"]])
         belief = cls(d["id"], d["npc"], Claim.from_json(d["claim"]), evidence)
         if d.get("status") == RETRACTED and belief.active:
             # Saved before opinions, when testimony flipped a belief to retracted: keep it retracted, with certain
@@ -176,7 +197,10 @@ class BeliefStore:
             self._index[(npc, claim)] = belief
             self._of.setdefault(npc, []).append(belief)
         story = tuple(sorted(origin)) if origin and tuple(sorted(origin)) != (source,) else ()
-        belief.evidence.append(Evidence(source, event, phase, conf, against, story))
+        e = Evidence(source, event, phase, conf, against, story)
+        belief.evidence.append(e)
+        if sum(x.source == source and x.against == against and x.story == e.story for x in belief.evidence) >= KEPT:
+            belief.evidence = bounded(belief.evidence)  # a repeat: drop what it made redundant
         return belief, is_new
 
     def discredit(self, npc: str, source: str, conf: float) -> list[Belief]:
@@ -186,8 +210,8 @@ class BeliefStore:
         changed = []
         for belief in self.for_npc(npc):
             before = belief.opinion
-            belief.evidence = [replace(e, conf=conf) if (e.source == source or e.origin == (source,)) and e.conf > conf
-                               else e for e in belief.evidence]
+            belief.evidence = bounded([replace(e, conf=conf) if (e.source == source or e.origin == (source,))
+                                       and e.conf > conf else e for e in belief.evidence])
             if belief.opinion != before:
                 changed.append(belief)
         return changed
