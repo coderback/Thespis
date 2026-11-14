@@ -19,7 +19,7 @@ from games.hosting import ApiError, SessionLocks, budget, client_ip, db_path
 from games.manor import content as C
 from games.manor import rules, views
 from games.manor.content import new_world
-from thespis.store import SessionNotFound, Store
+from games.store import SessionNotFound, Store
 from thespis.world import World
 
 PAGE = Path(__file__).resolve().parents[2] / "client" / "dist" / "manor" / "index.html"  # built by the client

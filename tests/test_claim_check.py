@@ -142,7 +142,7 @@ def test_only_lines_with_stakes_are_checked():
 
 
 def test_a_refused_line_falls_back_and_is_never_cached(tmp_path):
-    from thespis.store import Store
+    from games.store import Store
 
     def accusing(request):  # Kael's accusation claims Odo robbed him, which never happened
         return {"claims": [{"pred": "robbed", "a": "odo", "b": "kael", "happened": True}]}             if request["speaker"] == "kael" else {"claims": []}
@@ -158,7 +158,7 @@ def test_a_refused_line_falls_back_and_is_never_cached(tmp_path):
 
 
 def test_a_checked_line_is_cached_under_its_own_key(tmp_path):
-    from thespis.store import Store
+    from games.store import Store
 
     cache = Store(tmp_path / "c.sqlite")
     first = FakeModel()

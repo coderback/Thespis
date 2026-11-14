@@ -6,6 +6,9 @@ to PyPI and GitHub Releases from the section below that has its number.
 
 ## Unreleased
 
+- **The core sheds the demo's leftovers.** `inspect` and `add` no longer report `frozen_until` and `last_seen`,
+  which only the demo games set, unless they're set. The demo's SQLite store and story-hook registry moved from
+  `thespis/` to `games/`, so the package no longer ships them.
 - **Engine clients for the whole cast.** The Godot and Unity clients add NPCs in play, retire them, tie and untie
   them (`add_npc`, `retire`, `tie`, `untie`; `AddAsync`, `RetireAsync`, `TieAsync`, `UntieAsync`), and read the
   ledger (`events`, `EventsAsync`). `/v1/health` reports the runtime's version; the clients keep it

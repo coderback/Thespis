@@ -6,9 +6,9 @@ import sqlite3
 import pytest
 
 from games.crypt_road.content import new_world
+from games.store import LedgerMismatch, SessionNotFound, Store
 from thespis.decisions import REACT
 from thespis.ledger import Claim
-from thespis.store import LedgerMismatch, SessionNotFound, Store
 
 ROBBED = Claim("robbed", "player", "kael")
 

@@ -5,7 +5,7 @@ from __future__ import annotations
 from games.crypt_road import content as C
 from games.crypt_road import hooks, narrator, voice  # importing hooks registers the story patterns
 from games.crypt_road.rules import ActResult, Tick, happened
-from thespis.director import sift
+from games.director import sift
 from thespis.expression import Mind
 from thespis.intents import Reading, Understood
 from thespis.ledger import Claim

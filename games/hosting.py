@@ -20,8 +20,8 @@ from pathlib import Path
 
 from fastapi import Request
 
+from games.store import Store
 from thespis.moderation import Blocklist
-from thespis.store import Store
 from thespis.world import World
 
 log = logging.getLogger("thespis")

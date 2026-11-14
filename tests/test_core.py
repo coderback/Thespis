@@ -2,7 +2,7 @@
 
 import pytest
 
-from thespis import director
+from games import director
 from thespis.beliefs import ACTIVE, RETRACTED, VACUOUS, Belief, BeliefStore, Evidence, Opinion, fuse
 from thespis.brain import UtilityBrain
 from thespis.decisions import DECIDE, DecisionLog

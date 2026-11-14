@@ -61,7 +61,7 @@ def test_someone_joins_as_one_of_a_kind():
     s = Session.new(TOWN)
     card = s.add("mara", "townsfolk", "Mara Reed", "docks")
     assert card == {"id": "mara", "loc": "docks", "drives": {"anger": 0, "fear": 0}, "trust_in": {},
-                    "frozen_until": None, "last_seen": None, "flags": {}, "kind": "townsfolk", "name": "Mara Reed"}
+                    "flags": {}, "kind": "townsfolk", "name": "Mara Reed"}
     assert s.inspect("mara") == {"npc": card, "beliefs": []}
     assert s.who("mara") == "Mara Reed"
     pack = s.voice.pack(s.world, "mara", "x")

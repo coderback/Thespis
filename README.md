@@ -426,7 +426,7 @@ tests/              the pytest suite, run by CI on every pull request
 | --- | --- | --- |
 | **Cast** | NPC minds: ledger, beliefs, drives, validator, model voice | Built: v0.4.0 |
 | **Rehearsal** | Regression suite and benchmark | v1: `python -m rehearsal`, replayed in CI; `tools/harness.py` for a host |
-| **Director** | Story sifting, pacing, quests from the ledger | Planned; the registry is in `thespis/director.py` |
+| **Director** | Story sifting, pacing, quests from the ledger | Planned; a first registry is in `games/director.py`, used by the demo |
 | **Stage** | Game adapters and engine SDKs | The library (`thespis.api`), the `/v1` protocol, and clients for Godot 4 and Unity |
 
 ## Deploy

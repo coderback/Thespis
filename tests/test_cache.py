@@ -6,9 +6,9 @@ import pytest
 
 from games.crypt_road import rules, voice
 from games.crypt_road.content import new_world
+from games.store import Store
 from tests.test_model_voice import FakeModel, play_demo
 from thespis import expression
-from thespis.store import Store
 
 KAEL_ACTS = "You are at the tavern."
 

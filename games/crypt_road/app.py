@@ -38,11 +38,11 @@ from games.hosting import budget as _budget
 from games.hosting import env_int as _env_int
 from games.manor import api as manor
 from games.manor.content import load_cast as manor_cast
+from games.store import SessionNotFound, Store
 from thespis.claims import checking_from_env
 from thespis.expression import PROMPT_HASH, Mind
 from thespis.gateway import OpenAICompatGateway, gateway_from_env
 from thespis.moderation import Layered, content_safety_from_env
-from thespis.store import SessionNotFound, Store
 
 ROOT = Path(__file__).resolve().parents[2]
 CLIENT_DIST = ROOT / "client" / "dist"

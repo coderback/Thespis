@@ -974,10 +974,12 @@ class Session:
 
     def _card(self, npc: str) -> dict:
         """An NPC's state, as the engine sees it: with its kind and name if it joined in play, and whether it has
-        gone. An NPC the game file names, still in the story, reads as it always has."""
+        gone. What only the demo games set (`frozen_until`, `last_seen`) is left out unless it is set."""
         w = self.world
         own = w.cast.get(npc, {})
-        return {**w.npcs[npc].to_json(), **{k: own[k] for k in ("kind", "name") if k in own},
+        state = {k: v for k, v in w.npcs[npc].to_json().items()
+                 if not (k in ("frozen_until", "last_seen") and v is None)}
+        return {**state, **{k: own[k] for k in ("kind", "name") if k in own},
                 **({"gone": True} if npc in w.gone else {})}
 
     def _enrol(self, npc: str) -> None:

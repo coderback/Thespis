@@ -4,11 +4,11 @@ A game declares, per NPC and per moment it chooses in, the actions it may take: 
 condition must hold) and how much it is worth (`utility`, a sum of terms). The highest utility wins; the first
 declared wins a tie. Nothing here calls `eval`, so a definition is safe to load from any engine or any file.
 
-    [[npc.kael.choices.tick]]
+    [[npc.mara.choices.counter]]
     do = "accuse:player"
-    utility = [{drive = "grudge", plus = 3}]
-    when = [{with = "brenna"}, {drive = "grudge", gte = 4}, {not_flag = "accused"},
-            {any = [{believes = {pred = "robbed", a = "player", b = "self"}}]}]
+    utility = [{drive = "anger", plus = 3}]
+    when = [{with = "player"}, {drive = "anger", gte = 4}, {not_flag = "accused"},
+            {any = [{believes = {pred = "stole_from", a = "player", b = "self"}}]}]
 
 Conditions:
 - `{drive = d, gte | gt | lte | lt | eq = n}`: a drive, which is 0 when the NPC doesn't have it.
@@ -26,7 +26,8 @@ Conditions:
 
 Utility terms: a number, or `{drive = d, weight = 1, plus = 0, if = {...}}` (a drive times its weight plus a constant,
 counted only when its `if` holds), or `{bound = name, weight = 1, plus = 0, if = {...}}` (a number the game passed
-when it asked, such as a bribe's amount, likewise; 0 when it isn't a number). Whole numbers stay whole, so a reason reads "go_to scores 6".
+when it asked, such as a bribe's amount, likewise; 0 when it isn't a number). Whole numbers stay whole, so a reason
+reads "go_to scores 6".
 
 Every compiled condition can also say why it doesn't hold (`Check.why`: "grudge is 2, needs >= 4"), and every
 utility how it added up (`Score.parts`), so `Choices.explain` can answer "why didn't she do X?".
