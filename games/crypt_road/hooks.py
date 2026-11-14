@@ -1,13 +1,13 @@
 """The Crypt Road's story hooks (#19): arcs the director sifts from the ledger, shown under the Dungeon Master's telling.
 
-Importing this module registers them with the core's registry (thespis/director.py).
+Importing this module registers them with the director's registry (games/director.py).
 """
 
 from __future__ import annotations
 
 from games.crypt_road import content as C
 from games.crypt_road.words import claim_text, who
-from thespis.director import Hook, register
+from games.director import Hook, register
 from thespis.ledger import Event
 from thespis.world import World
 

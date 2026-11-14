@@ -10,7 +10,7 @@ SCHEMA_VERSION = 1
 
 @dataclass(frozen=True)
 class Claim:
-    """Something one character can believe about the world, e.g. robbed(player, kael), or was_in(sable) in the study
+    """Something one character can believe about the world, e.g. stole_from(player, mara), or was_in(edda) at the mill
     at mid-morning.
 
     The predicates are defined by the game adapter; the core never interprets them. `a` is who the claim is about and
@@ -47,7 +47,8 @@ class Claim:
         return self.affirmed() == other.affirmed()
 
     def label(self) -> str:
-        """The claim as it reads in a report: robbed(odo, kael), was_in(sable, kitchen@1), not robbed(odo, kael)."""
+        """The claim as it reads in a report: stole_from(player, mara), was_in(edda, mill@1), or
+        not stole_from(wat, mara)."""
         b = self.b or (f"{self.place}@{self.at}" if self.place is not None and self.at is not None else self.place or "")
         text = f"{self.pred}({self.a}, {b})"
         return f"not {text}" if self.neg else text

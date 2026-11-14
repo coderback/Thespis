@@ -6,7 +6,7 @@ from pathlib import Path
 from fastapi.testclient import TestClient
 
 from games.crypt_road import app as app_module
-from thespis.store import Store
+from games.store import Store
 
 
 def test_health(tmp_path, monkeypatch):
