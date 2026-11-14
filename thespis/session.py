@@ -77,7 +77,7 @@ from thespis.minds import NPC
 from thespis.perception import at_the_scene, reported
 from thespis.recall import Embedder, MeaningRetriever, Weights
 from thespis.schema import CLAIM_KEYS, DRIVES, EVERYONE, TRUST, examine, near, refuse
-from thespis.tick import Tick, gossip, run_tick, spread, walks
+from thespis.tick import Tick, gossip, run_tick, spread, tellings, walks
 from thespis.voice import View, Voice
 from thespis.world import World
 
@@ -769,19 +769,17 @@ class Session:
 
             def grapevine(t: Tick) -> None:
                 if g and g.get("along"):
-                    tellers = [t for t in self._gossips() or list(self._ties()) if t not in w.gone]
+                    tellers = self._tellers()
                     most = g.get("most")
                     turn = spread(w, tellers, self._listeners, about, g.get("priority", {}),
                                   g.get("threshold", 0.5), lambda w, c: w.ledger.happened(c), hear,
-                                  lambda listener, teller: credence(w.npcs[listener].trust_in.get(teller, 0)),
-                                  most, w.counters.get("grapevine", 0) if most and tellers else 0,
+                                  self._trusting, most, w.counters.get("grapevine", 0) if most and tellers else 0,
                                   g.get("corroborate", False))
                     if most:
                         w.counters["grapevine"] = turn  # whose turn it is to tell, next tick
                 elif g:
-                    gossip(w, [t for t in self._gossips() if t not in w.gone], about, g.get("priority", {}),
-                           g.get("threshold", 0.5), g.get("decay", 0.8), lambda w, c: w.ledger.happened(c), hear,
-                           g.get("corroborate", False))
+                    gossip(w, self._tellers(), about, g.get("priority", {}), g.get("threshold", 0.5),
+                           g.get("decay", 0.8), lambda w, c: w.ledger.happened(c), hear, g.get("corroborate", False))
 
             def settling(t: Tick) -> None:
                 living = [n for n in w.npcs if n not in w.gone]
@@ -1074,6 +1072,93 @@ class Session:
         game names nobody (with ties, everyone tied then does)."""
         names = self.cast.data.get("gossip", {}).get("gossips", [])
         return list(self.world.npcs) if names == EVERYONE else list(names)
+
+    def _tellers(self) -> list[str]:
+        """Who passes news on this tick: with ties, those `gossips` names, or else everyone tied; without, those it
+        names. Nobody who has left the story."""
+        w, g = self.world, self.cast.data.get("gossip") or {}
+        return [t for t in (self._gossips() or list(self._ties()) if g.get("along") else self._gossips())
+                if t not in w.gone]
+
+    def _trusting(self, listener: str, teller: str) -> float:
+        """How far a listener believes what a teller tells it along the grapevine: as it would face to face."""
+        return credence(self.world.npcs[listener].trust_in.get(teller, 0))
+
+    def trace(self, claim: Claim | Mapping) -> dict:
+        """How a story stands on the grapevine, changing nothing: who holds it (`holders`: how sure, and the evidence
+        they have it from), what the next tick's gossip would tell of it and how sure each listener would be
+        (`next`, with the sum: "0.9 x 0.9 (trust 2) x 0.9 (friend) = 0.73"), and where it stops short of someone who
+        doesn't hold it, and why (`stopped`: under the threshold, something worse told first, nobody to tell)."""
+        with self._lock:
+            c = self._claim(claim)
+            assert c is not None
+            w, g = self.world, self.cast.data.get("gossip")
+            holders = [{"npc": b.npc, "conf": b.conf, "status": b.status,
+                        "from": [e.to_json() for e in b.evidence]} for b in w.beliefs.all() if b.claim == c]
+            out: dict = {"claim": c.label(), "holders": holders, "next": [], "stopped": []}
+            if not g:
+                out["stopped"].append({"npc": None, "why": "the game declares no [gossip]"})
+                return out
+            along, threshold = bool(g.get("along")), float(g.get("threshold", 0.5))
+            about = None if g.get("about") == EVERYONE else g.get("about", ["player"])
+            tellers = self._tellers()
+            decay = float(g.get("decay", 0.8))
+
+            def heard_by(teller: str) -> list[tuple[str, float]]:
+                if along:
+                    return self._listeners(teller)
+                return [(n.id, decay) for n in w.npcs_at(w.npcs[teller].loc) if n.id != teller]
+            plan = tellings(w, tellers, heard_by, about, g.get("priority", {}), threshold,
+                            self._trusting if along else lambda listener, teller: 1.0, g.get("corroborate", False),
+                            w.counters.get("grapevine", 0) if along and g.get("most") and tellers else 0)
+            most = int(g["most"]) if along and g.get("most") else None
+            plan, later = (plan[:most], plan[most:]) if most is not None else (plan, [])
+            kinds = {(a, b): kind for a, ts in self._ties().items() for b, kind in ts}
+            for t in plan:
+                if t.claim != c:
+                    continue
+                how = f"{t.held:g}"
+                if along:
+                    trust = w.npcs[t.listener].trust_in.get(t.teller, 0)
+                    how += f" x {t.trust:g} (trust {trust}) x {t.carry:g} " \
+                           f"({kinds.get((t.teller, t.listener), 'in person')})"
+                else:
+                    how += f" x {t.carry:g} (decay)"
+                out["next"].append({"teller": t.teller, "listener": t.listener, "conf": t.conf,
+                                    "how": f"{how} = {t.conf:g}"})
+            told = {(t.teller, t.listener): t.claim for t in plan}
+            stopped = out["stopped"]
+            waiting = {(t.teller, t.listener) for t in later if t.claim == c}
+            for b in (b for b in w.beliefs.all() if b.claim == c and b.npc not in w.gone):
+                h = b.npc
+                if h not in tellers:
+                    stopped.append({"npc": h, "why": "doesn't pass news on" + (
+                        " (no ties, and not in [gossip] gossips)" if along else " (not in [gossip] gossips)")})
+                elif not b.active:
+                    stopped.append({"npc": h, "why": "no longer believes it"})
+                elif about is not None and not any(c.mentions(x) for x in about):
+                    stopped.append({"npc": h, "why": "it isn't news of anyone [gossip] about names"})
+                elif b.conf < threshold:
+                    stopped.append({"npc": h, "why": f"holds it at {b.conf:g}, under the threshold {threshold:g}"})
+                elif not heard_by(h):
+                    stopped.append({"npc": h, "why": "has nobody to tell" + (
+                        ": no ties, and nobody where they stand" if along else ": nobody where they stand")})
+                else:
+                    for listener, _ in heard_by(h):
+                        if told.get((h, listener)) == c:
+                            continue
+                        if (h, listener) in waiting:
+                            why = f"waits: the town tells at most {most} things a tick"
+                        elif c.a == listener:
+                            why = "it is about them: they know what they did"
+                        elif (other := told.get((h, listener))) is not None:
+                            why = f"tells them {other.label()} first"
+                        elif any(t.listener == listener and t.claim == c for t in plan):
+                            why = "hears it from someone else first"
+                        else:
+                            continue  # they hold it already: the story reached them
+                        stopped.append({"npc": h, "listener": listener, "why": why})
+            return out
 
     def _listeners(self, teller: str) -> list[tuple[str, float]]:
         """Whom `teller` passes gossip to, and how much of it carries: everyone tied to it, wherever they are, by

@@ -249,10 +249,34 @@ the local runtime's BGE small (`thespis serve --embed local`).
 | `tick(steps)` | `POST .../tick` | The minds' own time: scheduled walks, gossip, drives settling, the next phase |
 | `line(id, wait)` | `GET .../lines/{id}?wait=2` | A line as it stands now; `wait` holds the request up to that many seconds for the model |
 | `inspect(npc)` | `GET .../npcs/{npc}` | The NPC's state and every belief, with its evidence |
+| `trace(claim)` | `POST .../trace` | How a story stands on the grapevine: who holds it, what the next tick would tell of it, and where it stops and why ([below](#a-storys-trace)). Changes nothing |
 | `snapshot()` | `GET .../snapshot` | The minds, for the engine's save file |
 | `Session.restore(game, snapshot)` | `POST /v1/sessions {game, snapshot}` | A playthrough from a save |
 | `close()` | `DELETE /v1/sessions/{id}` | Stop; withdraw lines still on their way |
 | `understand(text, to, player, offered)` | `POST .../understand` | What the player's words do among the intents open now: `act`, `ask` or `talk`. Changes nothing ([below](#the-players-words)) |
+
+### A story's trace
+
+`trace(claim)` follows one story on the grapevine, changing nothing:
+
+```json
+{"claim": "stole_from(player, mara)",
+ "holders": [{"npc": "wat", "conf": 1.0, "status": "active", "from": [...]},
+             {"npc": "edda", "conf": 0.9, "status": "active", "from": [...]}],
+ "next": [{"teller": "edda", "listener": "mara", "conf": 0.73,
+           "how": "0.9 x 0.9 (trust 2) x 0.9 (friend) = 0.73"}],
+ "stopped": [{"npc": "bess", "why": "holds it at 0.4, under the threshold 0.5"},
+             {"npc": "wat", "listener": "edda", "why": "tells them robbed(player, wat) first"}]}
+```
+
+- **`holders`:** everyone who holds it, how sure, and the evidence they have it from.
+- **`next`:** what the next tick's gossip would tell of it, exactly as the tick will (a test plays a random town and
+  checks), with the sum for each listener: the teller's confidence x what the listener's trust in them gives x what
+  the tie carries, or x `decay` for gossip without ties.
+- **`stopped`:** where it stops short of someone who hasn't heard it: under the threshold, no longer believed, not
+  news of anyone `about` names, a teller who doesn't pass news on, nobody to tell, something worse told first (one
+  thing a tick to each listener), heard from someone else first, about the listener themselves, or waiting on
+  `most`. Someone who already holds it isn't listed.
 
 ### Why, and why not
 

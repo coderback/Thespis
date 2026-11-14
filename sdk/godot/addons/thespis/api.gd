@@ -32,6 +32,7 @@ const ROUTES := {
 	"tick": ["POST", "/v1/sessions/{sid}/tick", "TickIn", "TickOut"],
 	"tie": ["POST", "/v1/sessions/{sid}/ties", "TieIn", "TieOut"],
 	"untie": ["DELETE", "/v1/sessions/{sid}/ties/{a}/{b}", "", ""],
+	"trace": ["POST", "/v1/sessions/{sid}/trace", "ClaimIn", "TraceOut"],
 	"understand": ["POST", "/v1/sessions/{sid}/understand", "UnderstandIn", "UnderstandOut"],
 	"update": ["POST", "/v1/sessions/{sid}/update", "UpdateIn", ""],
 	"usage": ["GET", "/v1/usage", "", "UsageOut"],
@@ -89,6 +90,8 @@ static func make(name: String):
 			return TieIn.new()
 		"TieOut":
 			return TieOut.new()
+		"TraceOut":
+			return TraceOut.new()
 		"UnderstandIn":
 			return UnderstandIn.new()
 		"UnderstandOut":
@@ -667,6 +670,28 @@ class TieOut extends RefCounted:
 		var d := {}
 		d["between"] = between
 		d["kind"] = kind
+		return d
+
+
+class TraceOut extends RefCounted:
+	var claim: String = ""  ## The story, as a report reads it: stole_from(player, mara)
+	var holders: Array = []  ## Who holds it: {npc, conf, status, from (their evidence)}
+	var next: Array = []  ## What the next tick's gossip would tell of it: {teller, listener, conf, how}, how being the sum, "0.9 x 0.9 (trust 2) x 0.9 (friend) = 0.73"
+	var stopped: Array = []  ## Where it stops short of someone who hasn't heard it, and why: {npc, listener?, why}
+
+	func read(d: Dictionary):
+		if d.has("claim"): claim = str(d["claim"])
+		holders = d.get("holders", [])
+		next = d.get("next", [])
+		stopped = d.get("stopped", [])
+		return self
+
+	func to_dict() -> Dictionary:
+		var d := {}
+		d["claim"] = claim
+		d["holders"] = holders
+		d["next"] = next
+		d["stopped"] = stopped
 		return d
 
 

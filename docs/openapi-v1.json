@@ -1080,6 +1080,50 @@
         "title": "TieOut",
         "type": "object"
       },
+      "TraceOut": {
+        "properties": {
+          "claim": {
+            "description": "The story, as a report reads it: stole_from(player, mara)",
+            "title": "Claim",
+            "type": "string"
+          },
+          "holders": {
+            "description": "Who holds it: {npc, conf, status, from (their evidence)}",
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Holders",
+            "type": "array"
+          },
+          "next": {
+            "description": "What the next tick's gossip would tell of it: {teller, listener, conf, how}, how being the sum, \"0.9 x 0.9 (trust 2) x 0.9 (friend) = 0.73\"",
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Next",
+            "type": "array"
+          },
+          "stopped": {
+            "description": "Where it stops short of someone who hasn't heard it, and why: {npc, listener?, why}",
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Stopped",
+            "type": "array"
+          }
+        },
+        "required": [
+          "claim",
+          "holders",
+          "next",
+          "stopped"
+        ],
+        "title": "TraceOut",
+        "type": "object"
+      },
       "UnderstandIn": {
         "properties": {
           "offered": {
@@ -2733,6 +2777,74 @@
           }
         },
         "summary": "Untie"
+      }
+    },
+    "/v1/sessions/{sid}/trace": {
+      "post": {
+        "description": "How a story stands on the grapevine, changing nothing: who holds it, what the next tick would tell of it\nand how sure each listener would be, and where it stops and why.",
+        "operationId": "trace_v1_sessions__sid__trace_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sid",
+            "required": true,
+            "schema": {
+              "title": "Sid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Bearer <the project's key, or the sidecar's token>",
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer <the project's key, or the sidecar's token>",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClaimIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TraceOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Trace"
       }
     },
     "/v1/sessions/{sid}/understand": {

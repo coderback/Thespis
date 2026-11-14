@@ -52,6 +52,7 @@ namespace Thespis.Api
         public static readonly Route Tick = new Route("POST", "/v1/sessions/{sid}/tick", "TickIn", "TickOut");
         public static readonly Route Tie = new Route("POST", "/v1/sessions/{sid}/ties", "TieIn", "TieOut");
         public static readonly Route Untie = new Route("DELETE", "/v1/sessions/{sid}/ties/{a}/{b}", "", "");
+        public static readonly Route Trace = new Route("POST", "/v1/sessions/{sid}/trace", "ClaimIn", "TraceOut");
         public static readonly Route Understand = new Route("POST", "/v1/sessions/{sid}/understand", "UnderstandIn", "UnderstandOut");
         public static readonly Route Update = new Route("POST", "/v1/sessions/{sid}/update", "UpdateIn", "");
         public static readonly Route Usage = new Route("GET", "/v1/usage", "", "UsageOut");
@@ -513,6 +514,25 @@ namespace Thespis.Api
 
         [JsonProperty("kind")]
         public string Kind { get; set; } = "";
+    }
+
+    public class TraceOut
+    {
+        /// <summary>The story, as a report reads it: stole_from(player, mara)</summary>
+        [JsonProperty("claim")]
+        public string Claim { get; set; } = "";
+
+        /// <summary>Who holds it: {npc, conf, status, from (their evidence)}</summary>
+        [JsonProperty("holders")]
+        public List<JObject> Holders { get; set; } = new();
+
+        /// <summary>What the next tick's gossip would tell of it: {teller, listener, conf, how}, how being the sum, "0.9 x 0.9 (trust 2) x 0.9 (friend) = 0.73"</summary>
+        [JsonProperty("next")]
+        public List<JObject> Next { get; set; } = new();
+
+        /// <summary>Where it stops short of someone who hasn't heard it, and why: {npc, listener?, why}</summary>
+        [JsonProperty("stopped")]
+        public List<JObject> Stopped { get; set; } = new();
     }
 
     public class UnderstandIn

@@ -6,6 +6,10 @@ to PyPI and GitHub Releases from the section below that has its number.
 
 ## Unreleased
 
+- **A story's trace.** `Session.trace(claim)` (and `POST .../trace`) follows a story on the grapevine without
+  changing anything: who holds it and from whom, what the next tick would tell of it with the sum for each listener
+  (`0.9 x 0.9 (trust 2) x 0.9 (friend) = 0.73`), and where it stops and why (under the threshold, something worse
+  told first, nobody to tell, waiting on `most`). Its predictions are the tick's own.
 - **A long game no longer slows down.** A belief keeps, of the reports one teller gave of one story on one side, the
   first, the strongest and the latest, which is all the minds ever read. Over 20,000 events an `observe` stays near
   0.42 ms where it climbed to 1.45 ms, and the save is half the size. Older saves are trimmed the same way when they
