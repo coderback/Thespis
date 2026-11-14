@@ -4,4 +4,4 @@ Rule for this package: nothing in thespis/ may import from games/.
 The core knows nothing about crypts, guards or relics.
 """
 
-__version__ = "0.4.0"
+__version__ = "0.5.0"

@@ -4,45 +4,62 @@ Thespis follows semantic versioning at 0.x: a minor release may change anything 
 protocol, and those change only with a note here. A release is made by pushing its tag (`v0.3.1`), which publishes it
 to PyPI and GitHub Releases from the section below that has its number.
 
-## Unreleased
+## 0.5.0 (14 November 2026)
 
-- **The core sheds the demo's leftovers.** `inspect` and `add` no longer report `frozen_until` and `last_seen`,
-  which only the demo games set, unless they're set. The demo's SQLite store and story-hook registry moved from
-  `thespis/` to `games/`, so the package no longer ships them.
-- **Engine clients for the whole cast.** The Godot and Unity clients add NPCs in play, retire them, tie and untie
-  them (`add_npc`, `retire`, `tie`, `untie`; `AddAsync`, `RetireAsync`, `TieAsync`, `UntieAsync`), and read the
-  ledger (`events`, `EventsAsync`). `/v1/health` reports the runtime's version; the clients keep it
-  (`runtime_version`, `RuntimeVersion`) and warn when the runtime is older than they need. Each package carries its
-  licence and a README listing every call, and the Unity manifest its licence and links, for the asset stores.
-- **Secrets and silence.** `[gossip] secret` names predicates nobody passes on, and `[[npc.<id>.keeps]]` news one
-  NPC (or a kind) won't pass on: of someone, of a predicate, or both, while its `when` holds. Hush money is a flag
-  the game sets; loyalty is a trust condition. The trace says where a story stops for either.
+Thespis you can design with: it says why an NPC did or didn't do something, follows a story along the grapevine,
+stays as fast late in a long game as early, underlines a game file's mistakes as you type, and has the words crime
+and social games asked for: an unknown culprit, a liar caught, secrets kept, a bribe that counts by its size.
+
+```bash
+pip install --upgrade thespis-sdk
+```
+
+**Before you upgrade.** These can change what an existing game sees:
+- **A liar caught is now an event.** When one culprit's story loses (`[claims] one_actor`), Thespis writes a
+  `caught` event to the ledger, so the ids of events written after it move on by one. A game that stores event ids
+  keeps working; one that predicts them may not.
+- **A long game keeps less evidence.** Of the repeats of one report, an NPC keeps the first, the strongest and the
+  latest; what it believes and does is unchanged, but it can no longer cite the repeats in between. Older saves are
+  trimmed when they load.
+- **`inspect` and `add`** leave out `frozen_until` and `last_seen` unless they're set (only the demo games set them).
+- **The Godot and Unity clients are 0.5.0** and warn when the runtime is older than 0.5.0.
+
+### Why, and why not
+
+- **`Session.explain(npc, moment, bindings)`** lists every choice the NPC has: whether it is open, what keeps it shut
+  with the values it saw (`anger is 2, needs >= 4`; `believes stole_from(player, mara) only at 0.73, needs 0.8`),
+  and how its utility adds up (`anger 5 x 2 + 1 = 11`). `decide(..., explain=True)` puts the same on the line, as it
+  stood when the NPC chose, also when it chose nothing; over HTTP too.
+- **`Session.trace(claim)`** (and `POST .../trace`) follows a story on the grapevine without changing anything: who
+  holds it and from whom, what the next tick would tell of it with the sum for each listener (`0.9 x 0.9 (trust 2) x
+  0.9 (friend) = 0.73`), and where it stops and why. Its predictions are the tick's own.
+- **`Session.events(after, verb)`** (and `GET .../events`) lists the ledger after an event: after an `observe`, what
+  it led to.
+
+### New words for the game file
+
+- **Caught in a lie.** A `caught` event when an NPC's story from someone loses to a truer one, and a condition
+  `{ caught = "{who}" }`.
 - **Someone did it.** A claim, and an event's actor, may name `"someone"` when nobody knows who did a deed yet. A
-  condition on `a = "someone"` holds for the deed by anyone, known or not; a name learned later is no rival story
-  (nobody is caught) and no second offence (feelings move once).
-- **Caught in a lie.** When an NPC's story from someone loses to a truer one (`[claims] one_actor`), Thespis writes
-  a `caught` event: the NPC caught that teller, and its claim is the lie. `Session.events(after=..., verb=...)` (and
-  `GET .../events`) lists the ledger after an event, so after an `observe` the game sees what it led to; `tick`
-  returns it too. Choices can turn on it: `{ caught = "{who}" }`.
-- **Trust and amounts in choices.** `{ trust = who, gte = n }` is open by the NPC's trust in someone, and a utility
-  term `{ bound = "amount", weight = 0.5 }` counts a number the game passed, so a bribe counts by its size.
-- **A schema for editors.** `docs/game.schema.json` is the game file's JSON Schema, built from the loader's own
-  lists. With a `#:schema` line at the top of a game file (the quickstart's has it; docs/getting-started.md says
-  how), VS Code's Even Better TOML and other Taplo editors offer every table and key, explain it, and underline a
+  condition on `a = "someone"` holds for the deed by anyone; a name learned later is no rival story and no second
+  offence.
+- **Secrets and silence.** `[gossip] secret` names predicates nobody passes on, and `[[npc.<id>.keeps]]` news one NPC
+  (or a kind) won't pass on, while its `when` holds: hush money is a flag the game sets, loyalty a trust condition.
+- **Trust and amounts in choices.** `{ trust = who, gte = n }`, and a utility term `{ bound = "amount", weight = 0.5 }`
+  so a bribe counts by its size.
+
+### Speed, editors and engines
+
+- **A long game no longer slows down.** Over 20,000 events an `observe` stays near 0.42 ms where it climbed to
+  1.45 ms, and the save is half the size (`tools/long_game.py`).
+- **A schema for editors.** `docs/game.schema.json`, built from the loader's own lists: with a `#:schema` line at the
+  top of a game file, VS Code's Even Better TOML and other Taplo editors offer every table and key and underline a
   misspelt key or a number out of range. `python -m thespis schema` prints it.
-- **A story's trace.** `Session.trace(claim)` (and `POST .../trace`) follows a story on the grapevine without
-  changing anything: who holds it and from whom, what the next tick would tell of it with the sum for each listener
-  (`0.9 x 0.9 (trust 2) x 0.9 (friend) = 0.73`), and where it stops and why (under the threshold, something worse
-  told first, nobody to tell, waiting on `most`). Its predictions are the tick's own.
-- **A long game no longer slows down.** A belief keeps, of the reports one teller gave of one story on one side, the
-  first, the strongest and the latest, which is all the minds ever read. Over 20,000 events an `observe` stays near
-  0.42 ms where it climbed to 1.45 ms, and the save is half the size. Older saves are trimmed the same way when they
-  load. What NPCs believe and do is unchanged (the demo's 35 routes and the recorded scenarios play the same); an NPC
-  can no longer cite the repeats between the first and latest of a report.
-- **Why, and why not.** `Session.explain(npc, moment, bindings)` lists every choice the NPC has: whether it is open,
-  what keeps it shut, with the values it saw (`anger is 2, needs >= 4`; `believes stole_from(player, mara) only at
-  0.73, needs 0.8`), and how its utility adds up (`anger 5 x 2 + 1 = 11`). `decide(..., explain=True)` puts the same
-  on the line, as it stood when the NPC chose, also when it chose nothing; over HTTP too.
+- **Engine clients for the whole cast.** The Godot and Unity clients add, retire, tie and untie NPCs in play, trace
+  stories and read the ledger. `/v1/health` reports the runtime's version, which the clients check. Each package
+  carries its licence and a README listing every call, for the asset stores.
+- **The core sheds the demo's leftovers.** The demo's SQLite store and story-hook registry moved to `games/`, so the
+  package no longer ships them.
 
 ## 0.4.0 (13 November 2026)
 
