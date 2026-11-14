@@ -223,6 +223,12 @@ func close() -> ThespisResult:
 	return r
 
 
+## The project's sessions, saved most recently first: ok with an Array of ThespisApi.SessionInfoOut. A debug menu
+## can list them to pick one, then set session_id to look inside it.
+func sessions(limit := 100) -> ThespisResult:
+	return await _call("list_sessions", {}, null, "?limit=%d" % limit)
+
+
 ## The session as save text, for the game's own save file. ok with a String.
 func snapshot() -> ThespisResult:
 	return await _call("snapshot", {"sid": session_id})
@@ -282,6 +288,20 @@ func tick(steps := 1) -> ThespisResult:
 ## What an NPC believes and feels. ok with a ThespisApi.NpcOut.
 func inspect(npc: String) -> ThespisResult:
 	return await _call("inspect", {"sid": session_id, "npc": npc})
+
+
+## The whole session at a glance, changing nothing: ok with a ThespisApi.OverviewOut. Its `npcs` carry each one's
+## name, moments (what decide and explain take) and how many beliefs it holds; `ties` says whether each came from the
+## game file or was made in play.
+func overview() -> ThespisResult:
+	return await _call("overview", {"sid": session_id})
+
+
+## Why `npc` would do what it would at `moment`, now, without doing it: ok with an Array of ThespisApi.ChoiceOut,
+## every choice in order, with `open`, `blocked` (what keeps it shut: "grudge is 2, needs >= 4"), `utility`, `terms`
+## (how it adds up) and `chosen`. bindings: the values its choices name, such as {"culprit": "player"}.
+func explain(npc: String, moment: String, bindings := {}) -> ThespisResult:
+	return await _call("explain", {"sid": session_id}, {"npc": npc, "moment": moment, "bindings": bindings})
 
 
 ## The ledger's events, in order: after an observe, `events(event.id)` is what it led to, such as an NPC catching

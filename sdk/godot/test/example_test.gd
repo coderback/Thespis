@@ -92,6 +92,19 @@ func _run() -> void:
 
 	var wren: ThespisResult = await thespis.inspect("wren")
 	check(wren.value is ThespisApi.NpcOut and wren.value.beliefs.size() == 1, "Wren, who saw it, believes it", wren)
+	var glance: ThespisResult = await thespis.overview()
+	check(glance.value is ThespisApi.OverviewOut and glance.value.npcs.size() == 3 and glance.value.events >= 1
+			and glance.value.npcs[0]["name"] == "Garrick" and "turn" in glance.value.npcs[0]["moments"],
+			"the session at a glance: the cast, its names and moments", glance)
+	var explained: ThespisResult = await thespis.explain("garrick", "turn")
+	var chosen: Array = explained.value.filter(func(c): return c.chosen) if explained.ok else []
+	var shut: Array = explained.value.filter(func(c): return c.do == "share_drink:player") if explained.ok else []
+	check(chosen.size() == 1 and chosen[0] is ThespisApi.ChoiceOut and chosen[0].do == "confront:player"
+			and shut.size() == 1 and not shut[0].open and shut[0].blocked == "respect is 1, needs >= 4",
+			"why he would confront the player, and what keeps the drink shut", explained)
+	var listed: ThespisResult = await thespis.sessions()
+	check(listed.ok and listed.value.any(func(x): return x is ThespisApi.SessionInfoOut
+			and x.session == thespis.session_id), "the session is among the project's", listed)
 	var nobody: ThespisResult = await thespis.inspect("nobody")
 	check(not nobody.ok and nobody.status == 404 and not nobody.error.is_empty(),
 			"a failed call is a result, not a crash", nobody)

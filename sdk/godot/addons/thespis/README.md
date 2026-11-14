@@ -22,6 +22,7 @@ Every call is a coroutine on the `Thespis` autoload that returns a `ThespisResul
 | `understand(text, to, options)` | What the player's words do, among the game's intents |
 | `join(player, ...)`, `add_npc(id, kind, name, at)`, `retire(npc)`, `tie(a, b, kind)`, `untie(a, b)` | The cast in play |
 | `inspect(npc)`, `trace(claim)`, `events(after, verb)` | Look inside: beliefs, a story on the grapevine, the ledger |
+| `overview()`, `explain(npc, moment, bindings)`, `sessions(limit)` | The session at a glance, why an NPC would choose what it would, the project's sessions (runtime 0.6.0 on) |
 
 `runtime_version` is the runtime's version once `start()` reaches it. A runtime older than this addon needs
 (`MIN_RUNTIME`) gives a warning (`warned`), since some calls will fail on it.

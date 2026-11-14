@@ -12,7 +12,8 @@ to PyPI and GitHub Releases from the section below that has its number.
   so it works offline. The runtimes on GitHub Releases carry it too.
 - **Read-only calls for it, and for tools.** `GET /v1/sessions` lists a project's sessions; `GET /v1/sessions/{id}`
   (`Session.overview()`) shows one at a glance; `POST .../explain` gives over HTTP what `Session.explain` gives.
-  The Godot and Unity clients' generated layers have them.
+  The Godot and Unity clients call them: `overview`, `explain` and `sessions` (`OverviewAsync`, `ExplainAsync`,
+  `SessionsAsync`), for a debug overlay in the game itself.
 
 ## 0.5.0 (14 November 2026)
 
