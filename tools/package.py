@@ -128,7 +128,8 @@ def check(archive: Path) -> dict:
         assert status == 201
         status, line = get(url, f"/v1/sessions/{sid}/decide", {"npc": "garrick", "moment": "turn"})
         assert status == 200 and line["text"], line
-        c = http.client.HTTPConnection(*url.removeprefix("http://").rsplit(":", 1), timeout=10)
+        host, port = url.removeprefix("http://").rsplit(":", 1)
+        c = http.client.HTTPConnection(host, int(port), timeout=10)
         c.request("GET", "/inspector/")
         page = c.getresponse()
         assert page.status == 200 and b"Thespis inspector" in page.read(), "the inspector's page isn't served"
