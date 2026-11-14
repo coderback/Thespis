@@ -16,12 +16,15 @@ Conditions:
   the player was seen).
 - `{flag = f}` / `{not_flag = f}`: the NPC's flag is set, or isn't.
 - `{believes = claim, min = c}`: the NPC holds the claim with at least `min` confidence, or actively at all.
+- `{trust = who, gte | gt | lte | lt | eq = n}`: the NPC's trust in someone (-5 to 5; 0 when it has no view).
+- `{caught = who}`: the NPC has caught `who` in a lie: their story lost to a truer one (`[claims] one_actor`).
 - `{bound = name}`: a value the game passed when it asked is truthy. `{bound = name, is = v}`: it is exactly `v`, a
   string or a number. `{bound = name, gte | gt | lte | lt | eq = n}`: it is a number, and compares so.
 - `{any = [...]}`, `{all = [...]}`, `{not = {...}}`.
 
 Utility terms: a number, or `{drive = d, weight = 1, plus = 0, if = {...}}` (a drive times its weight plus a constant,
-counted only when its `if` holds). Whole numbers stay whole, so a reason reads "go_to scores 6".
+counted only when its `if` holds), or `{bound = name, weight = 1, plus = 0, if = {...}}` (a number the game passed
+when it asked, such as a bribe's amount, likewise; 0 when it isn't a number). Whole numbers stay whole, so a reason reads "go_to scores 6".
 
 Every compiled condition can also say why it doesn't hold (`Check.why`: "grudge is 2, needs >= 4"), and every
 utility how it added up (`Score.parts`), so `Choices.explain` can answer "why didn't she do X?".
@@ -52,7 +55,7 @@ COMPARE: dict[str, Callable[[float, float], bool]] = {
     "eq": lambda x, n: x == n}
 SIGN = {"gte": ">=", "gt": ">", "lte": "<=", "lt": "<", "eq": "="}
 CHOICE = ("do", "utility", "when", "asserts")  # what a choice may hold
-TERM = ("drive", "weight", "plus", "if")  # what a utility term may hold
+TERM = ("drive", "bound", "weight", "plus", "if")  # what a utility term may hold
 
 
 class Check:
@@ -163,6 +166,19 @@ def condition(c: object, where: str) -> Cond:
         return _held(lambda w, n, v, env: all(op(n.drives.get(d, 0), x) for op, x in ops),
                      lambda w, n, v, env: f"{d} is {_num(n.drives.get(d, 0))}, needs "
                                           + " and ".join(f"{s} {_num(x)}" for s, x in signs))
+    if "trust" in c:
+        _only(c, {"trust", *COMPARE}, where)
+        ops = [(COMPARE[k], _number(v, f"{where}.{k}")) for k, v in c.items() if k in COMPARE]
+        if not ops:
+            raise DefinitionError(f"{where}: a trust condition needs one of {', '.join(COMPARE)}")
+        who_t = str(c["trust"])
+        signs = [(SIGN[k], _number(v, k)) for k, v in c.items() if k in COMPARE]
+
+        def trusts(n: NPC, env: Env) -> int:
+            return n.trust_in.get(_fill(who_t, env), 0)
+        return _held(lambda w, n, v, env: all(op(trusts(n, env), x) for op, x in ops),
+                     lambda w, n, v, env: f"trust in {_fill(who_t, env)} is {trusts(n, env)}, needs "
+                                          + " and ".join(f"{s} {_num(x)}" for s, x in signs))
     if "bound" in c:
         _only(c, {"bound", "is", *COMPARE}, where)
         name, same = str(c["bound"]), c.get("is")
@@ -210,6 +226,10 @@ def condition(c: object, where: str) -> Cond:
                 x, at = there(w, v, env)
                 return f"{x} is at {at or 'nowhere known'}, {n.id} at {n.loc or 'nowhere'}"
             return _held(lambda w, n, v, env: n.loc == there(w, v, env)[1], apart)
+        case "caught":
+            liar = str(val)
+            return _held(lambda w, n, v, env: _fill(liar, env) in w.ledger.caught(n.id),
+                         lambda w, n, v, env: f"hasn't caught {_fill(liar, env)} in a lie")
         case "flag" | "not_flag":
             flag, want = str(val), key == "flag"
             return _held(lambda w, n, v, env: bool(n.flags.get(flag)) == want,
@@ -268,22 +288,33 @@ def term(t: object, where: str) -> Term:
         k = _number(t, where)
         return Score(lambda w, n, v, env: k, lambda w, n, v, env: [_num(k)])
     _only(t, set(TERM), where)
+    if "drive" in t and "bound" in t:
+        raise DefinitionError(f"{where}: a term counts a drive or a bound value, not both")
     d = str(t["drive"]) if "drive" in t else None
+    name = str(t["bound"]) if "bound" in t else None
     weight, plus = _number(t.get("weight", 1), f"{where}.weight"), _number(t.get("plus", 0), f"{where}.plus")
     gate = conditions(t["if"], f"{where}.if") if "if" in t else None
+
+    def base(n: NPC, env: Env) -> float:
+        if d is not None:
+            return n.drives.get(d, 0)
+        x = env.get(name) if name is not None else None
+        return x if isinstance(x, int | float) and not isinstance(x, bool) else 0
 
     def value(w: World, n: NPC, v: View, env: Env) -> float:
         if gate and not gate(w, n, v, env):
             return 0
-        return (n.drives.get(d, 0) * weight if d else 0) + plus
+        return (base(n, env) * weight if d or name else 0) + plus
 
     def parts(w: World, n: NPC, v: View, env: Env) -> list[str]:
-        """'anger 6', 'grudge 4 x 2 + 1 = 9', '3', or '0 (grudge only if: ...)' when its `if` doesn't hold."""
+        """'anger 6', 'grudge 4 x 2 + 1 = 9', 'amount 20 x 0.5 = 10', '3', or '0 (grudge only if: ...)' when its `if`
+        doesn't hold."""
+        what = d or name
         if gate and (why := gate.why(w, n, v, env)):
-            return [f"0 ({d or _num(plus)} only if: {why})"]
-        if d is None:
+            return [f"0 ({what or _num(plus)} only if: {why})"]
+        if what is None:
             return [_num(plus)]
-        text = f"{d} {_num(n.drives.get(d, 0))}" + (f" x {_num(weight)}" if weight != 1 else "") + \
+        text = f"{what} {_num(base(n, env))}" + (f" x {_num(weight)}" if weight != 1 else "") + \
             (f" + {_num(plus)}" if plus else "")
         return [f"{text} = {_num(value(w, n, v, env))}" if weight != 1 or plus else text]
     return Score(value, parts)

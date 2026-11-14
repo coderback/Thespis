@@ -95,6 +95,9 @@ def schema() -> J:
                ("bound",), "A value the game passed when it asked: {bound = \"amount\", gte = 10}"),
         _table({"at": TEXT}, ("at",), ("at",), "Where the NPC is"),
         _table({"with": TEXT}, ("with",), ("with",), "In the same place as someone"),
+        {**_table({"trust": TEXT, **compare}, ("trust", *COMPARE), ("trust",),
+                  "The NPC's trust in someone, -5 to 5: {trust = \"player\", gte = 2}"), "minProperties": 2},
+        _table({"caught": TEXT}, ("caught",), ("caught",), "The NPC has caught someone in a lie"),
         _table({"flag": TEXT}, ("flag",), ("flag",), "A flag of the NPC's is set"),
         _table({"not_flag": TEXT}, ("not_flag",), ("not_flag",), "A flag of the NPC's isn't set"),
         _table({"believes": claim, "min": SHARE}, ("believes", "min"), ("believes",),
@@ -103,8 +106,10 @@ def schema() -> J:
         _table({"all": {"type": "array", "items": ref}}, ("all",), ("all",), "All of these hold"),
         _table({"not": ref}, ("not",), ("not",), "This doesn't hold"),
     ]}
-    term = _table({"drive": TEXT, "weight": {"type": "number"}, "plus": {"type": "number"}, "if": conditions},
-                  TERM, (), "A drive times its weight plus a constant, counted only when its `if` holds")
+    term = _table({"drive": TEXT, "bound": TEXT, "weight": {"type": "number"}, "plus": {"type": "number"},
+                   "if": conditions}, TERM, (),
+                  "A drive (or a number the game passed, `bound`) times its weight plus a constant, counted only "
+                  "when its `if` holds")
     one = {"anyOf": [{"type": "number"}, term]}
     choice = _table({
         "do": _say("The action: \"serve:player\", \"accuse:{who}\"", **TEXT),

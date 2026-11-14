@@ -72,7 +72,7 @@ from thespis.intents import (
     declared_intents,
     people,
 )
-from thespis.ledger import Claim, Event
+from thespis.ledger import CAUGHT, Claim, Event
 from thespis.minds import NPC
 from thespis.perception import at_the_scene, reported
 from thespis.recall import Embedder, MeaningRetriever, Weights
@@ -167,6 +167,9 @@ def _patch(game: Game, w: World) -> list[str]:
     return out
 
 
+DEFAULT_EVENTS = {CAUGHT: "{a} caught {t} in a lie: that {claim}."}  # what Thespis writes itself, unless the game words it
+
+
 class Game:
     """A game definition, compiled and checked: load once, play many sessions."""
 
@@ -252,7 +255,7 @@ class Game:
 
     def sentence(self, e: Event, names: Mapping[str, str] | None = None) -> str:
         who = partial(self.who, names=names)
-        template = self.cast.data.get("words", {}).get("events", {}).get(e.verb)
+        template = self.cast.data.get("words", {}).get("events", {}).get(e.verb) or DEFAULT_EVENTS.get(e.verb)
         fmt = _Fill(a=who(e.actor), t=who(e.target), where=who(e.loc), to=who(e.target),
                     claim=self.claim_text(e.claim, names) if e.claim else "", amount=e.amount)
         text = template.format_map(fmt) if template else " ".join(
@@ -1046,8 +1049,11 @@ class Session:
                 for who in (ev.source, *ev.origin):
                     if who != npc and (who in w.npcs or w.is_player(who)):
                         n.trust_in.setdefault(who, 0)
+        def caught(liar: str, lie: Claim) -> None:  # in the ledger, where the game (events, tick) and choices see it
+            w.ledger.append(w.phase, CAUGHT, npc, liar, n.loc, lie, w.ledger.happened(lie))
+
         reconcile(w.beliefs, npc, c, n.trust_in, w.phase, _other_actor, self.game.caught,
-                  first_hand=self.game.first_hand)
+                  first_hand=self.game.first_hand, caught=caught)
         for who, trust in n.trust_in.items():
             n.trust_in[who] = _clamp(trust, TRUST)
 
@@ -1083,6 +1089,23 @@ class Session:
     def _trusting(self, listener: str, teller: str) -> float:
         """How far a listener believes what a teller tells it along the grapevine: as it would face to face."""
         return credence(self.world.npcs[listener].trust_in.get(teller, 0))
+
+    def events(self, after: str | None = None, verb: str | None = None) -> list[Event]:
+        """The ledger's events after the event `after` (all of them if None), in order, of one `verb` if given. After
+        an `observe`, `events(after=event.id)` is what it led to, such as an NPC catching someone in a lie
+        (`caught`: its actor caught its target; its claim is the lie)."""
+        with self._lock:
+            w = self.world
+            if after is not None and not self._has_event(after):
+                raise Unknown(f"no event {after!r}")
+            return [e for e in w.ledger.after(after) if verb is None or e.verb == verb]
+
+    def _has_event(self, event_id: str) -> bool:
+        try:
+            self.world.ledger.get(event_id)
+        except KeyError:
+            return False
+        return True
 
     def trace(self, claim: Claim | Mapping) -> dict:
         """How a story stands on the grapevine, changing nothing: who holds it (`holders`: how sure, and the evidence

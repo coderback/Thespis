@@ -1964,6 +1964,104 @@
         "summary": "Decide"
       }
     },
+    "/v1/sessions/{sid}/events": {
+      "get": {
+        "description": "The ledger's events, in order: after an observe, `?after=<its id>` is what it led to, such as an NPC\ncatching someone in a lie (`caught`: the actor caught the target; the claim is the lie).",
+        "operationId": "events_v1_sessions__sid__events_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sid",
+            "required": true,
+            "schema": {
+              "title": "Sid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Only events after this one",
+            "in": "query",
+            "name": "after",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only events after this one",
+              "title": "After"
+            }
+          },
+          {
+            "description": "Only events of this verb, such as caught",
+            "in": "query",
+            "name": "verb",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only events of this verb, such as caught",
+              "title": "Verb"
+            }
+          },
+          {
+            "description": "Bearer <the project's key, or the sidecar's token>",
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Bearer <the project's key, or the sidecar's token>",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EventOut"
+                  },
+                  "title": "Response Events V1 Sessions  Sid  Events Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Events"
+      }
+    },
     "/v1/sessions/{sid}/lines/{lid}": {
       "get": {
         "operationId": "line_v1_sessions__sid__lines__lid__get",

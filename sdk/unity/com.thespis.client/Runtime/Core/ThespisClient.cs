@@ -253,6 +253,19 @@ namespace Thespis
         public Task<Result<NpcOut>> InspectAsync(string npc) => CallAsync<NpcOut>(Routes.Inspect, Session("npc", npc));
 
         /// <summary>
+        /// The ledger's events, in order: after an observe, <c>EventsAsync(ev.Id)</c> is what it led to, such as an NPC
+        /// catching someone in a lie (verb "caught": the actor caught the target; the claim is the lie).
+        /// <paramref name="verb"/>, if given, keeps only events of that verb.
+        /// </summary>
+        public Task<Result<List<EventOut>>> EventsAsync(string? after = null, string? verb = null)
+        {
+            var q = new List<string>();
+            if (!string.IsNullOrEmpty(after)) q.Add("after=" + Uri.EscapeDataString(after));
+            if (!string.IsNullOrEmpty(verb)) q.Add("verb=" + Uri.EscapeDataString(verb));
+            return CallAsync<List<EventOut>>(Routes.Events, Session(), null, q.Count > 0 ? "?" + string.Join("&", q) : "");
+        }
+
+        /// <summary>
         /// How a story stands on the grapevine, changing nothing: who holds it, what the next tick would tell of it
         /// and how sure each listener would be (Next, with the sum), and where it stops and why (Stopped).
         /// </summary>

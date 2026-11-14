@@ -40,6 +40,7 @@ namespace Thespis.Api
         public static readonly Route OpenSession = new Route("POST", "/v1/sessions", "SessionIn", "SessionOut");
         public static readonly Route CloseSession = new Route("DELETE", "/v1/sessions/{sid}", "", "");
         public static readonly Route Decide = new Route("POST", "/v1/sessions/{sid}/decide", "DecideIn", "LineOut");
+        public static readonly Route Events = new Route("GET", "/v1/sessions/{sid}/events", "", "EventOut");
         public static readonly Route Line = new Route("GET", "/v1/sessions/{sid}/lines/{lid}", "", "LineOut");
         public static readonly Route Narrate = new Route("POST", "/v1/sessions/{sid}/narrate", "NarrateIn", "LineOut");
         public static readonly Route Add = new Route("POST", "/v1/sessions/{sid}/npcs", "NpcIn", "");

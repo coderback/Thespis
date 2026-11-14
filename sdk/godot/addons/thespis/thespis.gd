@@ -229,6 +229,18 @@ func inspect(npc: String) -> ThespisResult:
 	return await _call("inspect", {"sid": session_id, "npc": npc})
 
 
+## The ledger's events, in order: after an observe, `events(event.id)` is what it led to, such as an NPC catching
+## someone in a lie (verb "caught": the actor caught the target; the claim is the lie). ok with an Array of
+## ThespisApi.EventOut. verb, if given, keeps only events of that verb.
+func events(after := "", verb := "") -> ThespisResult:
+	var q := PackedStringArray()
+	if not after.is_empty():
+		q.append("after=" + after.uri_encode())
+	if not verb.is_empty():
+		q.append("verb=" + verb.uri_encode())
+	return await _call("events", {"sid": session_id}, null, ("?" + "&".join(q)) if q.size() > 0 else "")
+
+
 ## How a story stands on the grapevine, changing nothing: `trace({"pred": "stole_from", "a": "player", "b": "mara"})`.
 ## ok with a ThespisApi.TraceOut: who holds it, what the next tick would tell of it and how sure each listener would
 ## be (`next`, with the sum), and where it stops and why (`stopped`).

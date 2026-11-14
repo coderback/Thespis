@@ -20,6 +20,7 @@ const ROUTES := {
 	"open_session": ["POST", "/v1/sessions", "SessionIn", "SessionOut"],
 	"close_session": ["DELETE", "/v1/sessions/{sid}", "", ""],
 	"decide": ["POST", "/v1/sessions/{sid}/decide", "DecideIn", "LineOut"],
+	"events": ["GET", "/v1/sessions/{sid}/events", "", "EventOut"],
 	"line": ["GET", "/v1/sessions/{sid}/lines/{lid}", "", "LineOut"],
 	"narrate": ["POST", "/v1/sessions/{sid}/narrate", "NarrateIn", "LineOut"],
 	"add": ["POST", "/v1/sessions/{sid}/npcs", "NpcIn", ""],

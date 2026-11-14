@@ -85,11 +85,14 @@ when = [{ with = "player" }, { drive = "grudge", gte = 4 },
 | `{ with = who }` | The NPC shares a place with `who`; `"player"` is where the player is |
 | `{ flag = f }`, `{ not_flag = f }` | The NPC's flag is set, or isn't |
 | `{ believes = claim, min = c }` | The NPC holds the claim actively, with at least `min` confidence if given; `"self"` is the NPC |
-| `{ bound = name }` | A value the caller bound is truthy |
+| `{ trust = who, gte = n }` (or `gt`, `lte`, `lt`, `eq`) | The NPC's trust in `who` compares so (-5 to 5; 0 with no view) |
+| `{ caught = who }` | The NPC has caught `who` in a lie: their story lost to a truer one ([one culprit](#a-cast-that-grows)) |
+| `{ bound = name }` | A value the caller bound is truthy; with `is = v`, it is exactly `v`; with `gte = n` and the rest, a number that compares so |
 | `{ any = [...] }`, `{ all = [...] }`, `{ not = {...} }` | As named |
 
-A utility term is a number, or `{ drive = d, weight = 1, plus = 0, if = {...} }`. Whole numbers stay whole, so a
-decision's reason reads `confront:player scores 7`. An action may name values the caller binds when it asks
+A utility term is a number, or `{ drive = d, weight = 1, plus = 0, if = {...} }`, or the same with `bound = name` in
+place of `drive`: a number the caller passed, so a bribe counts by its size (`{ bound = "amount", weight = 0.5 }`).
+Whole numbers stay whole, so a decision's reason reads `confront:player scores 7`. An action may name values the caller binds when it asks
 (`do = "detain:{culprit}"`), and may state a claim (`asserts = { pred = "was_in", a = "self", place = "kitchen", at = 1 }`):
 the statement is logged with its real truth, and the listener `to` believes it as far as it trusts the speaker.
 
@@ -208,6 +211,10 @@ believe two people did the same thing to the same one keeps one story:
 - **The losing story is let go.** What the winning source said counts against it, at least as strongly as the NPC
   still believed it, so it is retracted, even when the winner is only weakly believed.
 - **Sources trusted alike settle nothing:** it keeps both stories.
+- **Being caught is an event.** For each teller blamed, Thespis writes `caught` to the ledger: its actor caught its
+  target in a lie, and its claim is the lie. `tick` returns it with the rest; after an `observe`,
+  `events(after=event.id)` lists what it led to. A choice can turn on it: `{ caught = "{who}" }`. Unless the game's
+  `[words.events]` words it, it reads "Mara caught the player in a lie: that Wat stole from Mara."
 - **Who was there counts, if the game says so.** With `first_hand = 3`, a teller who saw it themselves counts for 3
   more than the NPC's trust in them when the two stories are weighed, up to the most trust there is (5). So the
   story of a neighbour who watched the robbery wins over a well-liked stranger's, and over a sibling's who is
@@ -251,6 +258,7 @@ the local runtime's BGE small (`thespis serve --embed local`).
 | `tick(steps)` | `POST .../tick` | The minds' own time: scheduled walks, gossip, drives settling, the next phase |
 | `line(id, wait)` | `GET .../lines/{id}?wait=2` | A line as it stands now; `wait` holds the request up to that many seconds for the model |
 | `inspect(npc)` | `GET .../npcs/{npc}` | The NPC's state and every belief, with its evidence |
+| `events(after, verb)` | `GET .../events?after=e0012&verb=caught` | The ledger's events after one, in order, of one verb if given: after an `observe`, what it led to |
 | `trace(claim)` | `POST .../trace` | How a story stands on the grapevine: who holds it, what the next tick would tell of it, and where it stops and why ([below](#a-storys-trace)). Changes nothing |
 | `snapshot()` | `GET .../snapshot` | The minds, for the engine's save file |
 | `Session.restore(game, snapshot)` | `POST /v1/sessions {game, snapshot}` | A playthrough from a save |
