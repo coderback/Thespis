@@ -386,6 +386,38 @@ class Choices:
                 for c in self.choices if c.asserts}
 
 
+KEEP = ("about", "pred", "when")  # what a keep may hold
+
+
+@dataclass(frozen=True)
+class Keep:
+    """Something an NPC won't pass on: news of `about`, of the predicate `pred`, or both, while `when` holds."""
+    about: str | None
+    pred: str | None
+    when: Cond
+
+    def covers(self, claim: Claim) -> bool:
+        return (self.about is None or claim.mentions(self.about)) and (self.pred is None or claim.pred == self.pred)
+
+
+def compile_keeps(npc: str, declared: object, table: str = "npc") -> list[Keep]:
+    """Compile `[[npc.<npc>.keeps]]` (or a kind's). Raises DefinitionError naming the faulty entry."""
+    where = f"{table}.{npc}.keeps"
+    if not isinstance(declared, list):
+        raise DefinitionError(f"{where}: [[{where}]] tables, each with about = \"...\" or pred = \"...\"")
+    out = []
+    for i, k in enumerate(declared):
+        at = f"{where}[{i}]"
+        if not isinstance(k, Mapping) or not ("about" in k or "pred" in k):
+            raise DefinitionError(f"{at}: needs about = \"<whose news>\", pred = \"<what news>\", or both")
+        _only(k, set(KEEP), at)
+        for key in ("about", "pred"):
+            if key in k and not isinstance(k[key], str):
+                raise DefinitionError(f"{at}.{key}: an id in quotes, got {k[key]!r}")
+        out.append(Keep(k.get("about"), k.get("pred"), conditions(k.get("when"), f"{at}.when")))
+    return out
+
+
 def compile_choices(npc: str, moment: str, declared: object, table: str = "npc") -> Choices:
     """Compile `[[npc.<npc>.choices.<moment>]]`, or a kind's (`table` "kind": whoever joins as one chooses by it).
     Raises DefinitionError naming the faulty entry."""

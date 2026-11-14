@@ -55,7 +55,7 @@ from thespis.beliefs import FIRST_HAND, credence, origins, reconcile
 from thespis.brain import Brain, UtilityBrain
 from thespis.cast import Cast, LiveCast
 from thespis.claims import ClaimVocabulary, EventPred, Facts
-from thespis.considerations import Choices, DefinitionError, declared, declared_kinds
+from thespis.considerations import Choices, DefinitionError, Keep, compile_keeps, declared, declared_kinds
 from thespis.deception import SAID, log_statement
 from thespis.decisions import DECIDE, REACT, Decision
 from thespis.expression import Mind, StatePack, Utterance, Validator
@@ -193,7 +193,11 @@ class Game:
         claims = d.get("claims", {})
         self.one_actor = frozenset(claims.get("one_actor", ()))  # deeds only one person can have done to another
         self.caught = int(claims.get("caught", 2))  # how far trust falls in whoever told the story that lost
-        self.first_hand = int(claims.get("first_hand", 0))  # how much more a teller counts who saw it themselves
+        self.first_hand = int(claims.get("first_hand", 0))
+        # Does anyone keep anything quiet? If not, the grapevine needn't ask of every story it weighs.
+        self.quiet = bool((d.get("gossip") or {}).get("secret")) or any(
+            "keeps" in t for table in ("npc", "kind") for t in (d.get(table) or {}).values() if isinstance(t, dict))
+        self.secret = frozenset((d.get("gossip") or {}).get("secret", []))  # predicates nobody passes on  # how much more a teller counts who saw it themselves
         self.ties: dict[str, list[tuple[str, str]]] = {}  # npc -> [(the other, kind)], in the order declared
         for t in d.get("tie", []):
             a, b = t["between"]
@@ -442,6 +446,7 @@ class Session:
         self.on_pack: Callable[[StatePack], None] | None = None  # sees each state pack as it's built (Rehearsal)
         self.on_settle: Callable[[Line], None] | None = None  # sees each provisional line once it settles (a store)
         self._tied: dict[str, list[tuple[str, str]]] | None = None  # everyone's ties: the game's, and made in play
+        self._keeps: dict[str, list[Keep]] = {}  # each NPC's keeps, compiled when first asked
         self.patched: list[str] = []  # how restore brought a save up to a changed game file, if it did
         for npc in world.cast:
             self._enrol(npc)
@@ -780,12 +785,13 @@ class Session:
                     turn = spread(w, tellers, self._listeners, about, g.get("priority", {}),
                                   g.get("threshold", 0.5), lambda w, c: w.ledger.happened(c), hear,
                                   self._trusting, most, w.counters.get("grapevine", 0) if most and tellers else 0,
-                                  g.get("corroborate", False))
+                                  g.get("corroborate", False), self._quiet if self.game.quiet else None)
                     if most:
                         w.counters["grapevine"] = turn  # whose turn it is to tell, next tick
                 elif g:
                     gossip(w, self._tellers(), about, g.get("priority", {}), g.get("threshold", 0.5),
-                           g.get("decay", 0.8), lambda w, c: w.ledger.happened(c), hear, g.get("corroborate", False))
+                           g.get("decay", 0.8), lambda w, c: w.ledger.happened(c), hear, g.get("corroborate", False),
+                           self._quiet if self.game.quiet else None)
 
             def settling(t: Tick) -> None:
                 living = [n for n in w.npcs if n not in w.gone]
@@ -1097,6 +1103,24 @@ class Session:
         return [t for t in (self._gossips() or list(self._ties()) if g.get("along") else self._gossips())
                 if t not in w.gone]
 
+    def _quiet(self, teller: str, claim: Claim) -> bool:
+        """Does `teller` keep `claim` to itself: a secret (`[gossip] secret`), or something it keeps
+        (`[[npc.<id>.keeps]]`) while that keep's `when` holds?"""
+        return self._keeping(teller, claim) is not None
+
+    def _keeping(self, teller: str, claim: Claim) -> str | None:
+        """Why `teller` keeps `claim` to itself, or None if it doesn't."""
+        if claim.pred in self.game.secret:
+            return "it's a secret: [gossip] secret"
+        keeps = self._keeps.get(teller)
+        if keeps is None:
+            keeps = self._keeps[teller] = compile_keeps(teller, self.cast.data["npc"][teller].get("keeps", []))
+        w = self.world
+        for i, k in enumerate(keeps):
+            if k.covers(claim) and k.when(w, w.npcs[teller], View(w.player["loc"]), {"self": teller}):
+                return f"keeps it quiet ([[npc.{teller}.keeps]] {i + 1})"
+        return None
+
     def _trusting(self, listener: str, teller: str) -> float:
         """How far a listener believes what a teller tells it along the grapevine: as it would face to face."""
         return credence(self.world.npcs[listener].trust_in.get(teller, 0))
@@ -1144,7 +1168,8 @@ class Session:
                 return [(n.id, decay) for n in w.npcs_at(w.npcs[teller].loc) if n.id != teller]
             plan = tellings(w, tellers, heard_by, about, g.get("priority", {}), threshold,
                             self._trusting if along else lambda listener, teller: 1.0, g.get("corroborate", False),
-                            w.counters.get("grapevine", 0) if along and g.get("most") and tellers else 0)
+                            w.counters.get("grapevine", 0) if along and g.get("most") and tellers else 0,
+                            self._quiet if self.game.quiet else None)
             most = int(g["most"]) if along and g.get("most") else None
             plan, later = (plan[:most], plan[most:]) if most is not None else (plan, [])
             kinds = {(a, b): kind for a, ts in self._ties().items() for b, kind in ts}
@@ -1170,6 +1195,8 @@ class Session:
                         " (no ties, and not in [gossip] gossips)" if along else " (not in [gossip] gossips)")})
                 elif not b.active:
                     stopped.append({"npc": h, "why": "no longer believes it"})
+                elif (keeping := self._keeping(h, c)) is not None:
+                    stopped.append({"npc": h, "why": keeping})
                 elif about is not None and not any(c.mentions(x) for x in about):
                     stopped.append({"npc": h, "why": "it isn't news of anyone [gossip] about names"})
                 elif b.conf < threshold:

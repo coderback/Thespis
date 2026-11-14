@@ -189,6 +189,25 @@ story goes back to a different witness:
 - **Nobody is told again** what they saw themselves, or by the teller they have it from.
 - Left out, gossip is as it was.
 
+**Secrets and silence.** Some news isn't passed on:
+- **Secrets:** `[gossip] secret = ["confessed"]` names predicates nobody ever passes on. Whoever saw or was told
+  one still believes it, and acts on it.
+- **What one NPC keeps:** `[[npc.bess.keeps]]` names news it won't pass on: of someone (`about = "player"`), of a
+  predicate (`pred = "robbed"`), or both. With `when = [...]`, in the conditions of a choice, it keeps it only while
+  they hold:
+
+  ```toml
+  [[npc.bess.keeps]]
+  about = "player"
+  when = [{ flag = "paid_off" }]          # hush money: the game sets the flag when the player pays
+
+  [[npc.nell.keeps]]
+  pred = "robbed"
+  when = [{ trust = "player", gte = 3 }]  # loyalty: while she trusts the player
+  ```
+
+  A kind keeps for everyone who joins as it. `trace` says where a story stops for either.
+
 **At town size.** [tools/town_bench.py](../tools/town_bench.py) plays 300 people through 2,000 events and 200 ticks
 with no model. On a Ryzen 7 5800H laptop: a tick takes 10 ms (p95 17 ms), an `observe` 0.1 ms, a `decide` 0.3 ms,
 a save to text 120 ms and a load from it 290 ms, for a 3 MB save. CI holds each to a budget.
@@ -296,8 +315,8 @@ the local runtime's BGE small (`thespis serve --embed local`).
   the tie carries, or x `decay` for gossip without ties.
 - **`stopped`:** where it stops short of someone who hasn't heard it: under the threshold, no longer believed, not
   news of anyone `about` names, a teller who doesn't pass news on, nobody to tell, something worse told first (one
-  thing a tick to each listener), heard from someone else first, about the listener themselves, or waiting on
-  `most`. Someone who already holds it isn't listed.
+  thing a tick to each listener), heard from someone else first, about the listener themselves, waiting on
+  `most`, a secret, or kept quiet by the teller. Someone who already holds it isn't listed.
 
 ### Why, and why not
 

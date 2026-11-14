@@ -385,6 +385,13 @@
           "description": "By predicate: the higher, the sooner it's told",
           "type": "object"
         },
+        "secret": {
+          "description": "Predicates nobody ever passes on",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
         "threshold": {
           "description": "How sure a teller must be to pass something on (0.5)",
           "maximum": 1,
@@ -691,6 +698,47 @@
           "goal": {
             "description": "What they want, for the model",
             "type": "string"
+          },
+          "keeps": {
+            "description": "What they won't pass on: news of `about`, of the predicate `pred`, or both, while `when` holds (hush money, loyalty)",
+            "items": {
+              "additionalProperties": false,
+              "anyOf": [
+                {
+                  "required": [
+                    "about"
+                  ]
+                },
+                {
+                  "required": [
+                    "pred"
+                  ]
+                }
+              ],
+              "properties": {
+                "about": {
+                  "type": "string"
+                },
+                "pred": {
+                  "type": "string"
+                },
+                "when": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/definitions/condition"
+                    },
+                    {
+                      "items": {
+                        "$ref": "#/definitions/condition"
+                      },
+                      "type": "array"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
           },
           "lines": {
             "additionalProperties": {
@@ -1005,6 +1053,47 @@
           "goal": {
             "description": "What they want, for the model",
             "type": "string"
+          },
+          "keeps": {
+            "description": "What they won't pass on: news of `about`, of the predicate `pred`, or both, while `when` holds (hush money, loyalty)",
+            "items": {
+              "additionalProperties": false,
+              "anyOf": [
+                {
+                  "required": [
+                    "about"
+                  ]
+                },
+                {
+                  "required": [
+                    "pred"
+                  ]
+                }
+              ],
+              "properties": {
+                "about": {
+                  "type": "string"
+                },
+                "pred": {
+                  "type": "string"
+                },
+                "when": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/definitions/condition"
+                    },
+                    {
+                      "items": {
+                        "$ref": "#/definitions/condition"
+                      },
+                      "type": "array"
+                    }
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
           },
           "lines": {
             "additionalProperties": {

@@ -6,6 +6,9 @@ to PyPI and GitHub Releases from the section below that has its number.
 
 ## Unreleased
 
+- **Secrets and silence.** `[gossip] secret` names predicates nobody passes on, and `[[npc.<id>.keeps]]` news one
+  NPC (or a kind) won't pass on: of someone, of a predicate, or both, while its `when` holds. Hush money is a flag
+  the game sets; loyalty is a trust condition. The trace says where a story stops for either.
 - **Someone did it.** A claim, and an event's actor, may name `"someone"` when nobody knows who did a deed yet. A
   condition on `a = "someone"` holds for the deed by anyone, known or not; a name learned later is no rival story
   (nobody is caught) and no second offence (feelings move once).
