@@ -189,6 +189,10 @@ class _Check:
             self.place(f"{where}.at", c["at"])
         elif "with" in c:
             self.person(f"{where}.with", c["with"])
+        elif "trust" in c:
+            self.person(f"{where}.trust", c["trust"])
+        elif "caught" in c:
+            self.person(f"{where}.caught", c["caught"])
         elif "believes" in c and isinstance(c["believes"], Mapping):
             self.claim(f"{where}.believes", c["believes"])
         elif "any" in c or "all" in c:

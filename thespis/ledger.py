@@ -107,22 +107,43 @@ class Event:
         return cls(**{**d, "claim": Claim.from_json(d["claim"])})
 
 
+CAUGHT = "caught"  # an event's verb: its actor caught its target in a lie, the event's claim
+
+
 class Ledger:
     """Events in the order they happened. There is deliberately no way to change or remove one."""
 
     def __init__(self, events: list[Event] | None = None):
         self._events: list[Event] = list(events or [])
         self._by_id = {e.id: e for e in self._events}
+        self._at = {e.id: i for i, e in enumerate(self._events)}
         self._true = {e.claim for e in self._events if e.claim is not None and e.truth}  # what really happened
+        self._caught: dict[str, set[str]] = {}  # who each NPC caught in a lie (CAUGHT events), kept as they come
+        for e in self._events:
+            self._note(e)
+
+    def _note(self, e: Event) -> None:
+        if e.verb == CAUGHT and e.target:
+            self._caught.setdefault(e.actor, set()).add(e.target)
 
     def append(self, phase: int, verb: str, actor: str, target: str | None, loc: str,
                claim: Claim | None = None, truth: bool = True, amount: int | None = None) -> Event:
         event = Event(f"e{len(self._events) + 1:04d}", phase, verb, actor, target, loc, claim, truth, amount=amount)
         self._events.append(event)
         self._by_id[event.id] = event
+        self._at[event.id] = len(self._events) - 1
         if claim is not None and truth:
             self._true.add(claim)
+        self._note(event)
         return event
+
+    def after(self, event_id: str | None = None) -> list[Event]:
+        """Every event after `event_id` (all of them with None), in order. KeyError for an id the ledger hasn't."""
+        return list(self._events) if event_id is None else self._events[self._at[event_id] + 1:]
+
+    def caught(self, npc: str) -> set[str]:
+        """Whom `npc` has caught in a lie: the tellers whose story lost to a truer one in its mind."""
+        return self._caught.get(npc, set())
 
     def __len__(self) -> int:
         return len(self._events)

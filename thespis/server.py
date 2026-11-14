@@ -552,6 +552,14 @@ def create_app(games: Mapping[str, Game] | None = None, gateway: ModelGateway | 
     def inspect(p: Caller, sid: str, npc: str) -> NpcOut:
         return NpcOut(**call(p, sid, lambda s: s.inspect(npc), saves=False))
 
+    @app.get(f"/{VERSION}/sessions/{{sid}}/events")
+    def events(p: Caller, sid: str, after: str | None = Query(None, description="Only events after this one"),
+               verb: str | None = Query(None, description="Only events of this verb, such as caught")
+               ) -> list[EventOut]:
+        """The ledger's events, in order: after an observe, `?after=<its id>` is what it led to, such as an NPC
+        catching someone in a lie (`caught`: the actor caught the target; the claim is the lie)."""
+        return [_event(e) for e in call(p, sid, lambda s: s.events(after, verb), saves=False)]
+
     @app.post(f"/{VERSION}/sessions/{{sid}}/trace")
     def trace(p: Caller, sid: str, body: ClaimIn) -> TraceOut:
         """How a story stands on the grapevine, changing nothing: who holds it, what the next tick would tell of it

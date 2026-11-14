@@ -6,6 +6,12 @@ to PyPI and GitHub Releases from the section below that has its number.
 
 ## Unreleased
 
+- **Caught in a lie.** When an NPC's story from someone loses to a truer one (`[claims] one_actor`), Thespis writes
+  a `caught` event: the NPC caught that teller, and its claim is the lie. `Session.events(after=..., verb=...)` (and
+  `GET .../events`) lists the ledger after an event, so after an `observe` the game sees what it led to; `tick`
+  returns it too. Choices can turn on it: `{ caught = "{who}" }`.
+- **Trust and amounts in choices.** `{ trust = who, gte = n }` is open by the NPC's trust in someone, and a utility
+  term `{ bound = "amount", weight = 0.5 }` counts a number the game passed, so a bribe counts by its size.
 - **A schema for editors.** `docs/game.schema.json` is the game file's JSON Schema, built from the loader's own
   lists. With a `#:schema` line at the top of a game file (the quickstart's has it; docs/getting-started.md says
   how), VS Code's Even Better TOML and other Taplo editors offer every table and key, explain it, and underline a

@@ -96,6 +96,48 @@
         },
         {
           "additionalProperties": false,
+          "description": "The NPC's trust in someone, -5 to 5: {trust = \"player\", gte = 2}",
+          "minProperties": 2,
+          "properties": {
+            "eq": {
+              "type": "number"
+            },
+            "gt": {
+              "type": "number"
+            },
+            "gte": {
+              "type": "number"
+            },
+            "lt": {
+              "type": "number"
+            },
+            "lte": {
+              "type": "number"
+            },
+            "trust": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "trust"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "The NPC has caught someone in a lie",
+          "properties": {
+            "caught": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "caught"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
           "description": "A flag of the NPC's is set",
           "properties": {
             "flag": {
@@ -498,8 +540,11 @@
                           },
                           {
                             "additionalProperties": false,
-                            "description": "A drive times its weight plus a constant, counted only when its `if` holds",
+                            "description": "A drive (or a number the game passed, `bound`) times its weight plus a constant, counted only when its `if` holds",
                             "properties": {
+                              "bound": {
+                                "type": "string"
+                              },
                               "drive": {
                                 "type": "string"
                               },
@@ -535,8 +580,11 @@
                             },
                             {
                               "additionalProperties": false,
-                              "description": "A drive times its weight plus a constant, counted only when its `if` holds",
+                              "description": "A drive (or a number the game passed, `bound`) times its weight plus a constant, counted only when its `if` holds",
                               "properties": {
+                                "bound": {
+                                  "type": "string"
+                                },
                                 "drive": {
                                   "type": "string"
                                 },
@@ -806,8 +854,11 @@
                           },
                           {
                             "additionalProperties": false,
-                            "description": "A drive times its weight plus a constant, counted only when its `if` holds",
+                            "description": "A drive (or a number the game passed, `bound`) times its weight plus a constant, counted only when its `if` holds",
                             "properties": {
+                              "bound": {
+                                "type": "string"
+                              },
                               "drive": {
                                 "type": "string"
                               },
@@ -843,8 +894,11 @@
                             },
                             {
                               "additionalProperties": false,
-                              "description": "A drive times its weight plus a constant, counted only when its `if` holds",
+                              "description": "A drive (or a number the game passed, `bound`) times its weight plus a constant, counted only when its `if` holds",
                               "properties": {
+                                "bound": {
+                                  "type": "string"
+                                },
                                 "drive": {
                                   "type": "string"
                                 },

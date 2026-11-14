@@ -275,13 +275,15 @@ def credit(belief: Belief, trust: dict[str, int], store: BeliefStore | None = No
 
 def reconcile(store: BeliefStore, npc: str, claim: Claim, trust: dict[str, int], phase: int,
               contradicts: Callable[[Claim, Claim], bool], penalty: int,
-              credence: Callable[[int], float] = credence, first_hand: int = 0) -> list[Belief]:
+              credence: Callable[[int], float] = credence, first_hand: int = 0,
+              caught: Callable[[str, Claim], None] | None = None) -> list[Belief]:
     """Settle what `claim` contradicts among the NPC's beliefs. Of two claims that can't both be true, the one from the
     less trusted source loses, and is retracted: the NPC keeps one story. Whoever the losing story goes back to (who
     saw it or first said it, not whoever only passed it on) is trusted `penalty` less, so everything they said is
     re-weighed (`discredit`); then what the more trusted source said counts against the loser, at least as strongly
     as the NPC still believed it. A tie settles nothing. A teller who saw what they tell counts for `first_hand` more
-    (`credit`). Returns the beliefs that ended retracted."""
+    (`credit`). `caught` is told of each teller blamed, with the losing claim. Returns the beliefs that ended
+    retracted."""
     new = store.get(npc, claim)
     if new is None or not new.active:
         return []
@@ -301,6 +303,8 @@ def reconcile(store: BeliefStore, npc: str, claim: Claim, trust: dict[str, int],
             if src in trust:
                 trust[src] -= penalty
                 store.discredit(npc, src, credence(trust[src]))
+                if caught is not None:
+                    caught(src, loser.claim)
         best = max(winner.evidence, key=lambda e: e.conf)
         o = loser.opinion
         enough = math.ceil(o.b / (o.b + o.u) * 10 ** PLACES + 1) / 10 ** PLACES if o.b + o.u else 0.0
