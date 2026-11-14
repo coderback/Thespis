@@ -35,7 +35,7 @@ Some changes need more:
 | --- | --- |
 | `thespis.api` or the `/v1` routes | Update [docs/protocol.md](docs/protocol.md); regenerate the contract (`python -m thespis openapi --out docs/openapi-v1.json`) and the SDKs' typed layers (`python tools/sdk_gen.py all`) |
 | What NPCs believe, decide or say | `python -m tools.outcomes` shows what changed in the demo's 35 routes; `python -m rehearsal replay` what changed in the recorded scenarios. Accept an intended change with `--update`, and say why in the pull request |
-| Speed at town size | `python tools/town_bench.py --check` holds each call to its budget |
+| Speed at town size | `python tools/town_bench.py --check` holds each call to its budget; `python tools/long_game.py --check` that a call costs the same late in a long game |
 | A dependency | Edit the `.in` file and recompile the lock files ([README](README.md#run-it-locally)); CI fails if they drift |
 | The demo client (`client/`) | `npm run lint`, `npm test` and `npm run build` in `client/` |
 

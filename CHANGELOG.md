@@ -6,6 +6,11 @@ to PyPI and GitHub Releases from the section below that has its number.
 
 ## Unreleased
 
+- **A long game no longer slows down.** A belief keeps, of the reports one teller gave of one story on one side, the
+  first, the strongest and the latest, which is all the minds ever read. Over 20,000 events an `observe` stays near
+  0.42 ms where it climbed to 1.45 ms, and the save is half the size. Older saves are trimmed the same way when they
+  load. What NPCs believe and do is unchanged (the demo's 35 routes and the recorded scenarios play the same); an NPC
+  can no longer cite the repeats between the first and latest of a report.
 - **Why, and why not.** `Session.explain(npc, moment, bindings)` lists every choice the NPC has: whether it is open,
   what keeps it shut, with the values it saw (`anger is 2, needs >= 4`; `believes stole_from(player, mara) only at
   0.73, needs 0.8`), and how its utility adds up (`anger 5 x 2 + 1 = 11`). `decide(..., explain=True)` puts the same

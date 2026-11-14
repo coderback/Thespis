@@ -188,6 +188,13 @@ story goes back to a different witness:
 with no model. On a Ryzen 7 5800H laptop: a tick takes 10 ms (p95 17 ms), an `observe` 0.1 ms, a `decide` 0.3 ms,
 a save to text 120 ms and a load from it 290 ms, for a 3 MB save. CI holds each to a budget.
 
+**Over a long game.** A belief keeps, of the reports one teller gave of one story on one side, the first, the
+strongest and the latest: the rest are repeats that change nothing it believes. So a call costs the same late in a
+game as early. [tools/long_game.py](../tools/long_game.py) plays 30 people through 20,000 events with the same lies
+told again and again: an `observe` takes 0.42 ms (median) over the last 2,000 events as over the first, where keeping
+every report took it from 0.41 ms to 1.45 ms, and the save is 5.8 MB instead of 12.3 MB. An NPC can still cite the
+first and latest of a repeated report; the ones between are forgotten.
+
 **One culprit.** `[claims] one_actor = ["robbed", "killed"]` says a robbery has one robber. An NPC who comes to
 believe two people did the same thing to the same one keeps one story:
 - **The more trusted source wins.** What it saw itself beats anyone's word. Between two tellers, its trust in each
