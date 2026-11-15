@@ -261,6 +261,13 @@ namespace Thespis
             return r;
         }
 
+        /// <summary>
+        /// The project's sessions, saved most recently first. A debug menu can list them to pick one, then set
+        /// <see cref="SessionId"/> to look inside it.
+        /// </summary>
+        public Task<Result<List<SessionInfoOut>>> SessionsAsync(int limit = 100) =>
+            CallAsync<List<SessionInfoOut>>(Routes.ListSessions, null, null, "?limit=" + limit);
+
         /// <summary>The session as save text, for the game's own save file.</summary>
         public Task<Result<string>> SnapshotAsync() => CallAsync<string>(Routes.Snapshot, Session());
 
@@ -304,6 +311,26 @@ namespace Thespis
 
         /// <summary>What an NPC believes and feels.</summary>
         public Task<Result<NpcOut>> InspectAsync(string npc) => CallAsync<NpcOut>(Routes.Inspect, Session("npc", npc));
+
+        /// <summary>
+        /// The whole session at a glance, changing nothing: each NPC with its name, moments (what DecideAsync and
+        /// ExplainAsync take) and how many beliefs it holds; the players; and every tie, from the game file or made
+        /// in play.
+        /// </summary>
+        public Task<Result<OverviewOut>> OverviewAsync() => CallAsync<OverviewOut>(Routes.Overview, Session());
+
+        /// <summary>
+        /// Why <paramref name="npc"/> would do what it would at <paramref name="moment"/>, now, without doing it: every
+        /// choice in order, whether it is Open, what keeps it shut (Blocked: "grudge is 2, needs >= 4"), its Utility
+        /// and how that adds up (Terms), and the one it would pick (Chosen). <paramref name="bindings"/>: the values
+        /// its choices name, such as culprit.
+        /// </summary>
+        public Task<Result<List<ChoiceOut>>> ExplainAsync(string npc, string moment,
+            Dictionary<string, object>? bindings = null) =>
+            CallAsync<List<ChoiceOut>>(Routes.Explain, Session(), new ExplainIn
+            {
+                Npc = npc, Moment = moment, Bindings = bindings ?? new Dictionary<string, object>(),
+            });
 
         /// <summary>
         /// The ledger's events, in order: after an observe, <c>EventsAsync(ev.Id)</c> is what it led to, such as an NPC

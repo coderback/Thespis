@@ -22,6 +22,7 @@ Every call on `ThespisClient` (`ThespisBehaviour.Client` in a scene) returns a `
 | `UnderstandAsync` | What the player's words do, among the game's intents |
 | `JoinAsync`, `AddAsync`, `RetireAsync`, `TieAsync`, `UntieAsync` | The cast in play |
 | `InspectAsync`, `TraceAsync`, `EventsAsync` | Look inside: beliefs, a story on the grapevine, the ledger |
+| `OverviewAsync`, `ExplainAsync`, `SessionsAsync` | The session at a glance, why an NPC would choose what it would, the project's sessions (runtime 0.6.0 on) |
 
 `RuntimeVersion` is the runtime's version once `StartAsync` reaches it. A runtime older than this package needs
 (`MinRuntime`) raises `Warned` (logged by `ThespisBehaviour`), since some calls will fail on it.

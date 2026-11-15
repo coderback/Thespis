@@ -83,6 +83,17 @@ Check(arrived.GetValueOrDefault(spoken.Id!) == 1 && settled.GetValueOrDefault(sp
 
 var wren = await thespis.InspectAsync("wren");
 Check(wren.Ok && wren.Value!.Beliefs.Count == 1, "Wren, who saw it, believes it", wren);
+var glance = await thespis.OverviewAsync();
+Check(glance.Ok && glance.Value!.Npcs.Count == 3 && glance.Value.Events >= 1
+      && (string?)glance.Value.Npcs[0]["name"] == "Garrick",
+      "the session at a glance: the cast and its names", glance);
+var explained = await thespis.ExplainAsync("garrick", "turn");
+var chosen = explained.Ok ? explained.Value!.Where(c => c.Chosen).ToList() : new List<ChoiceOut>();
+var shut = explained.Ok ? explained.Value!.FirstOrDefault(c => c.Do == "share_drink:player") : null;
+Check(chosen.Count == 1 && chosen[0].Do == "confront:player" && shut != null && !shut.Open
+      && shut.Blocked == "respect is 1, needs >= 4", "why he would confront the player, and what keeps the drink shut", explained);
+var listed = await thespis.SessionsAsync();
+Check(listed.Ok && listed.Value!.Any(x => x.Session == thespis.SessionId), "the session is among the project's", listed);
 var nobody = await thespis.InspectAsync("nobody");
 Check(!nobody.Ok && nobody.Status == 404 && nobody.Error.Length > 0, "a failed call is a result, not an exception", nobody);
 
