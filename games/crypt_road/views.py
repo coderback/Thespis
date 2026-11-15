@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from games import race
 from games.crypt_road import content as C
 from games.crypt_road import hooks, narrator, voice  # importing hooks registers the story patterns
 from games.crypt_road.rules import ActResult, Tick, happened
@@ -18,7 +19,7 @@ DIGEST_EVENTS = 12  # the narrator sees at most this many events
 def state_view(w: World) -> dict:
     return {
         "seed": w.seed, "phase": w.phase, "day": w.phase // 4 + 1, "phase_name": C.PHASES[w.phase % 4],
-        "status": w.status, "brain": w.brain_mode, "pending": w.pending, "ended_at": w.ended_at,
+        "status": race.status(w), "brain": w.brain_mode, "pending": race.pending(w), "ended_at": race.ended_at(w),
         "player": dict(w.player),
         "npcs": [{"id": n.id, "loc": n.loc, "last_seen": n.last_seen, "drives": dict(n.drives),
                   "trust_in": dict(n.trust_in), "frozen_until": n.frozen_until,

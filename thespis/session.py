@@ -81,7 +81,8 @@ from thespis.tick import Tick, gossip, run_tick, spread, tellings, walks
 from thespis.voice import View, Voice
 from thespis.world import World
 
-SNAPSHOT_VERSION = 1
+SNAPSHOT_VERSION = 2  # 2 (0.6.0): the world no longer carries the demo games' race
+READS = (1, 2)  # what restore reads: a version 1 save is brought up to 2 as it loads
 PROVISIONAL, FINAL, WITHDRAWN = "provisional", "final", "withdrawn"
 ID = re.compile(r"[A-Za-z0-9_.-]+")  # an id made in play: it goes into action ids ("confront:<id>") and paths
 RESERVED = ("player", "self", "narrator")
@@ -858,7 +859,8 @@ class Session:
 
     @classmethod
     def restore(cls, game: Game, snapshot: Mapping, **kw) -> Session:
-        """A session from a snapshot of this game. A snapshot from a newer Thespis, or of another game, is refused.
+        """A session from a snapshot of this game, made by this Thespis or an older one. A snapshot from
+        a newer Thespis, or of another game, is refused.
         One that went through an engine with a single number type (GDScript reads every JSON number as a float)
         restores the same.
 
@@ -869,9 +871,9 @@ class Session:
         there is nothing left to say who they are. Ids are what a save goes by: an NPC whose id changed is a new NPC."""
         if not isinstance(snapshot, Mapping) or "thespis" not in snapshot:
             raise DefinitionError("not a Thespis save: a snapshot is the table Session.snapshot() returns")
-        if snapshot.get("thespis") != SNAPSHOT_VERSION:
+        if snapshot.get("thespis") not in READS:
             raise DefinitionError(f"snapshot version {snapshot.get('thespis')!r}; this Thespis reads "
-                                  f"{SNAPSHOT_VERSION}")
+                                  f"{' and '.join(map(str, READS))}")
         if snapshot.get("game") != game.id:
             raise DefinitionError(f"snapshot of {snapshot.get('game')!r}, not {game.id!r}")
         try:

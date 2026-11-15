@@ -2,11 +2,12 @@
 
 import pytest
 
+from games import race
 from games.crypt_road import content as C
 from games.crypt_road import rules
 from games.crypt_road.content import new_world
+from games.race import PLAYING
 from thespis.ledger import Claim
-from thespis.world import PLAYING
 from tools import crypt_road_sim as sim
 
 ROBBED = {"pred": "robbed", "a": "player", "b": "kael"}
@@ -19,7 +20,7 @@ def enabled(w, verb):
 
 def advance(w):
     """Like the sim's advance(): head for the crypt, take the relic on arrival. A blocked move is a wait."""
-    while w.status == PLAYING and w.phase < 14:
+    while race.status(w) == PLAYING and w.phase < 14:
         if enabled(w, "take_relic"):
             rules.act(w, "take_relic")
         else:
@@ -29,7 +30,7 @@ def advance(w):
 def provoke(w):
     rules.act(w, "insult", "kael")
     rules.act(w, "challenge", "kael")
-    if w.pending == rules.DUEL_WON:
+    if race.pending(w) == rules.DUEL_WON:
         rules.act(w, "humiliate", "kael")
         return True
     return False
@@ -51,7 +52,7 @@ def route_provoke(seed, pay=True, frame=False, wait_after=False):
         rules.act(w, "wait")
     rules.act(w, "move")
     rules.act(w, "move")
-    if w.status == PLAYING and w.player["loc"] == "guard_post":
+    if race.status(w) == PLAYING and w.player["loc"] == "guard_post":
         if frame:
             rules.act(w, "bribe", "brenna")
             rules.act(w, "bribe", "brenna")
@@ -69,11 +70,11 @@ def route_haggle(seed, offer=10):
         return w
     rules.act(w, "move")
     rules.act(w, "move")
-    if w.status == PLAYING and w.player["loc"] == "guard_post" and w.npcs["brenna"].trust_in["player"] < 0:
+    if race.status(w) == PLAYING and w.player["loc"] == "guard_post" and w.npcs["brenna"].trust_in["player"] < 0:
         rules.act(w, "bribe", "brenna", amount=offer)
         if list(w.ledger)[-1].verb == "refuse":
             rules.act(w, "wait")  # stuck at the gate: the refusal costs a phase
-        if w.status == PLAYING:
+        if race.status(w) == PLAYING:
             rules.act(w, "bribe", "brenna", amount=C.asking_price(w.npcs["brenna"].trust_in["player"]))
     advance(w)
     return w
@@ -93,7 +94,7 @@ def route_spare(seed):
     w = new_world(seed)
     rules.act(w, "insult", "kael")
     rules.act(w, "challenge", "kael")
-    if w.pending == rules.DUEL_WON:
+    if race.pending(w) == rules.DUEL_WON:
         rules.act(w, "spare", "kael")
     advance(w)
     return w
@@ -132,7 +133,7 @@ def test_route_matches_rules_model(name, seed):
     if name == "lie_unpaid" and C.dice(seed, "challenge:1") >= C.DUEL_WIN_CHANCE:
         pytest.skip("the rules model's lie_unpaid route assumes the first duel is won")
     w, ref = engine_route(seed, **kwargs), sim_route(seed, **kwargs)
-    assert f"{w.status}@{w.ended_at}" == ref.status
+    assert f"{race.status(w)}@{race.ended_at(w)}" == ref.status
     assert w.player["coins"] == ref.player["coins"]
     assert w.npcs["kael"].drives["grudge"] == ref.kael["grudge"]
 
@@ -176,7 +177,7 @@ def test_demo_route_step_by_step():
         sim_step()
         same_state(w, ref)
     result = rules.act(w, "take_relic")
-    assert ref.take_relic() and (w.status, w.ended_at) == ("won", 5)
+    assert ref.take_relic() and (race.status(w), race.ended_at(w)) == ("won", 5)
     ref.status = "epilogue"
     ref.tick("wait")
     ref.tick("wait")
@@ -189,7 +190,8 @@ def test_demo_route_beats():
     w = new_world(sim.DEMO_SEED)
     rules.act(w, "insult", "kael")
     rules.act(w, "challenge", "kael")
-    assert w.pending == "duel_won" and {o["verb"] for o in rules.allowed(w) if o["enabled"]} == {"humiliate", "spare"}
+    assert race.pending(w) == "duel_won"
+    assert {o["verb"] for o in rules.allowed(w) if o["enabled"]} == {"humiliate", "spare"}
     tick0 = rules.act(w, "humiliate", "kael").tick
     assert [d.chosen for d in tick0.decisions] == ["go_to"]
     for npc in ("mags", "odo"):
@@ -221,7 +223,7 @@ def test_demo_route_beats():
 
     rules.act(w, "move")
     end = rules.act(w, "take_relic")
-    assert (w.status, w.ended_at) == ("won", 5)
+    assert (race.status(w), race.ended_at(w)) == ("won", 5)
     epilogue_decisions = [d for t in end.epilogue for d in t.decisions]
     assert any(d.npc == "brenna" and d.chosen == "question:odo" and d.phase == 6 for d in epilogue_decisions)
     testify = next(e for t in end.epilogue for e in t.events if e.verb == "testify")
@@ -236,7 +238,7 @@ def test_dice_use_the_challenge_count_not_event_ids():
     w = new_world(sim.DEMO_SEED)
     w.ledger.append(0, "move", "odo", "market", "tavern")  # an extra event before the duel
     rules.act(w, "challenge", "kael")
-    assert w.pending == "duel_won"  # seed 1 still wins its first duel
+    assert race.pending(w) == "duel_won"  # seed 1 still wins its first duel
 
 
 def test_invalid_acts_are_refused():

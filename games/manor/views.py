@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import asdict
 
+from games import race
 from games.manor import content as C
 from games.manor import words
 from games.manor.rules import ActResult
@@ -26,7 +27,7 @@ def state_view(w: World) -> dict:
     return {
         "game": "manor", "phase": w.phase, "clock": clock(w.phase), "deadline": clock(C.DEADLINE),
         "clocks": [clock(p) for p in range(len(C.PHASES))],
-        "status": w.status, "ended_at": w.ended_at, "outcome": w.player.get("outcome"), "brain": w.brain_mode,
+        "status": race.status(w), "ended_at": race.ended_at(w), "outcome": w.player.get("outcome"), "brain": w.brain_mode,
         "player": {"loc": w.player["loc"], "asked": list(w.player["asked"])},
         "rooms": [{"id": r, "name": C.ROOM_NAMES[r]} for r in C.ROOMS],
         "npcs": [{"id": n.id, "name": cast[n.id]["name"], "loc": n.loc, "drives": dict(n.drives),

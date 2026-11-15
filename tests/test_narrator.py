@@ -4,6 +4,7 @@ import json
 
 import pytest
 
+from games import race
 from games.crypt_road import rules, views, voice
 from games.crypt_road.content import new_world
 from tests.test_model_voice import FakeModel
@@ -33,7 +34,7 @@ def test_hooks_follow_the_demo_story():
     act(w, ROUTE[10])  # to the crypt
     assert views.digest_view(w, 4)["hook"] is None  # a window with no thread in it
     act(w, ROUTE[11])  # take the relic; the epilogue plays out
-    end = views.digest_view(w, w.ended_at)
+    end = views.digest_view(w, race.ended_at(w))
     assert "Odo told Brenna that Kael never robbed him." in end["epilogue"]
     assert end["hook"] == "The lie is out: Odo told Brenna that Kael never robbed him."
 

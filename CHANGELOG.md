@@ -19,6 +19,10 @@ to PyPI and GitHub Releases from the section below that has its number.
   game. They are placeholders now (X, Y, Z), so another game's model isn't shown names from a game it isn't in, and a
   game with a character of that name isn't misread. A model's cached answers to these calls are asked again once.
   Rehearsal's measurements from here on aren't one-for-one comparable with reports made under the old prompt.
+- **Saves are version 2.** A world no longer carries the demo games' race (`status`, `pending`, `ended_at`), which
+  no other game used: a game keeps its own state in `World.custom`, saved with the world and never read by Thespis.
+  A version 1 save (0.5.0 and before) restores as before, its race moved into `custom`; 0.5.0 refuses a version 2
+  save rather than misreading it. The hosted demo's saves load across the upgrade.
 - **Rehearsal's judge thinks harder.** Azure now refuses the `low` reasoning effort the DeepSeek V4 Pro judge ran at,
   so every judged line came back empty; it runs at `high` now (`none` misread who did what to whom).
 
