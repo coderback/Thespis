@@ -160,8 +160,8 @@ def _route(name: str, seed: int, question: str) -> Callable[[Stage], World]:
             play(s, name)
         except ApiError:
             pass  # a route that can't go on (no purse after a lost duel) still counts what was said
-        if race.ended_at(s.w) is not None:
-            s.digest(race.ended_at(s.w))  # the end card's telling
+        if (ended := race.ended_at(s.w)) is not None:
+            s.digest(ended)  # the end card's telling
         return s.w
     return run
 
