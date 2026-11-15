@@ -24,7 +24,7 @@ signal state_changed(state: String)  ## starting, ready, failed or stopped
 signal warned(message: String)  ## something worth a developer's attention, such as a runtime older than this addon
 
 ## The oldest runtime (thespis-sdk) this addon is written for: an older one lacks calls it makes.
-const MIN_RUNTIME := "0.5.0"
+const MIN_RUNTIME := "0.6.0"
 var runtime_version := ""  ## the runtime's, from its health once start() has reached it; "" if it doesn't say
 
 const SETTINGS := {  # [default, type, hint, hint string, what it's for]

@@ -74,7 +74,7 @@ namespace Thespis
         public event Action<string>? Warned;
 
         /// <summary>The oldest runtime (thespis-sdk) this package is written for: an older one lacks calls it makes.</summary>
-        public const string MinRuntime = "0.5.0";
+        public const string MinRuntime = "0.6.0";
         /// <summary>The runtime's version, from its health once <see cref="StartAsync"/> reached it; "" if it doesn't say.</summary>
         public string RuntimeVersion { get; private set; } = "";
 
