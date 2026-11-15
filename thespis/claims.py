@@ -75,33 +75,34 @@ class ClaimVocabulary:
 _HEAD = (
     "You read one line of dialogue spoken by a character in a game and list the facts it asserts about the game "
     "world, in the game's vocabulary.\n{vocab}\n"
+    "In the examples below, X, Y and Z stand for any of the game's characters.\n"
     "Rules:\n"
     "- Only what the line says has already happened or is true now. Leave out what anyone intends, plans, threatens, "
-    "promises or says will happen (\"I'm taking the relic\", \"You'll pay for that\"), claims of ownership or "
-    "entitlement (\"The relic is mine\"), opinions, feelings, questions, orders and greetings. A line may assert "
+    "promises or says will happen (\"I'm taking it\", \"You'll pay for that\"), claims of ownership or "
+    "entitlement (\"That's mine\"), opinions, feelings, questions, orders and greetings. A line may assert "
     "nothing.\n"
     "- Resolve \"I\" and \"me\" to the speaker. \"You\" is whoever the speaker is talking to: the player, unless the "
-    "situation or the line shows it is someone else (\"Captain\", \"Sable\"). Resolve every other pronoun to the "
-    "person it refers to in that sentence.\n")
+    "situation or the line shows it is someone else (a name or title the line addresses, such as \"Captain\" or "
+    "\"Z\"). Resolve every other pronoun to the person it refers to in that sentence.\n")
 _TAIL = (
     "- a and b are ids from the lists above, nothing else. Set happened to false when the line says it did not "
     "happen.\n"
     'Reply with JSON only: {{"claims": [{{"pred": "...", "a": "...", "b": "...", "happened": true}}]}}')
 EXTRACT_PROMPT = _HEAD + (  # measuring: the paper's rule
-    "- Reported speech (\"Kael says you robbed him\", said by brenna) asserts both that the teller told the speaker "
-    "(told(kael, brenna)) and the fact reported (robbed(player, kael)).\n") + _TAIL
+    "- Reported speech (\"X says you robbed him\", said by Y) asserts both that the teller told the speaker "
+    "(told(x, y)) and the fact reported (that the player robbed X, in the game's predicate for it).\n") + _TAIL
 CHECK_PROMPT = _HEAD + (  # checking: each claim says whose it is, and only the speaker's own are checked
-    "- Reported speech (\"Kael says you robbed him\", said by brenna) asserts that the teller told the speaker, "
-    "told(kael, brenna), which is the speaker's own claim, and repeats the fact reported, robbed(player, kael), which "
-    "is Kael's.\n"
+    "- Reported speech (\"X says you robbed him\", said by Y) asserts that the teller told the speaker, told(x, y), "
+    "which is the speaker's own claim, and repeats the fact reported (that the player robbed X, in the game's "
+    "predicate for it), which is X's.\n"
     # Two misreadings the first live rehearsal of the check found:
     "- When the situation says someone other than the player is speaking to the speaker or asking it something "
-    "(\"Captain Brenna asks you\"), \"you\" in the line is them.\n"
+    "(\"Z asks you\"), \"you\" in the line is them.\n"
     "- A journey \"from A to B\" asserts that they went to B; it doesn't say they went to A.\n"
     "- a and b are ids from the lists above, nothing else. Set happened to false when the line says it did not "
     "happen.\n"
-    "- attributed_to is the id of whoever the speaker credits the claim to: someone it quotes or reports (\"Kael "
-    "says\", \"you told me\", \"your account\", \"Pell saw\"), even when the speaker rejects what they said. It is "
+    "- attributed_to is the id of whoever the speaker credits the claim to: someone it quotes or reports (\"X "
+    "says\", \"you told me\", \"your account\", \"Z saw\"), even when the speaker rejects what they said. It is "
     "\"\" when the speaker says it is so itself.\n"
     'Reply with JSON only: {{"claims": [{{"attributed_to": "", "pred": "...", "a": "...", "b": "...", '
     '"happened": true}}]}}')

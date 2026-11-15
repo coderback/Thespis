@@ -34,7 +34,10 @@ BOOT = 2000
 GATE = {"protocol": 0.01, "p95": 1.10}  # the most a new rehearsal may give: refusals per reply, p95 against the base
 PROTOCOL = ("action ", "no line", "line is ", "no cites", "cites ", "states something without citing")
 # Each judge reasons a little: DeepSeek V4 Pro missed the leak this metric exists to catch without thinking (paper-m1).
-JUDGE_EXTRA = {"deepseek-v4-pro": {"reasoning_effort": "low", "max_tokens": 4000}}
+# DeepSeek V4 Pro on Azure takes reasoning_effort none, high or max (from November 2026 it refuses low, which it was
+# calibrated at). Without reasoning it misread who did what to whom on a sample; high is the nearest setting that
+# still reasons, and its longer thinking needs the room.
+JUDGE_EXTRA = {"deepseek-v4-pro": {"reasoning_effort": "high", "max_tokens": 8000}}
 GAMES = {"crypt_road": "games.crypt_road.claims", "manor": "games.manor.claims"}
 REFERENCE_JUDGES = frozenset({"DeepSeek-V4-Pro"})  # the judge others are calibrated against (rehearsal/calibrate.py)
 
