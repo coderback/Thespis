@@ -2,6 +2,9 @@
 against what its speaker could know, and a line that leaks, hallucinates, contradicts itself or fails to state what
 its action asserts falls back to its template."""
 
+import re
+from pathlib import Path
+
 import pytest
 
 from games.crypt_road import claims as cr_claims
@@ -15,6 +18,8 @@ from thespis import claims
 from thespis.claims import CHECK_PROMPT, EXTRACT_PROMPT, ClaimCheck, ClaimChecking, checking_from_env
 from thespis.expression import Mind, StatePack, Utterance, Validator
 from thespis.gateway import ModelReply
+
+ROOT = Path(__file__).resolve().parents[1]
 
 CHECKING = ClaimChecking()
 
@@ -261,3 +266,18 @@ def test_checking_reads_journeys_and_who_is_addressed():
     assert "A journey \"from A to B\" asserts that they went to B" in CHECK_PROMPT
     assert "\"you\" in the line is them" in CHECK_PROMPT
     assert "A journey" not in EXTRACT_PROMPT  # measuring keeps the paper's prompt, so reports stay comparable
+
+
+def test_the_prompts_name_no_games_characters():
+    """The extractor reads every game's lines, so its examples use placeholders (X, Y, Z), not one game's cast: a
+    name from another game is noise to the model, and a game with a character of that name would be misread."""
+    from thespis.session import Game
+    games = [Game.load(p) for p in sorted((ROOT / "examples").glob("*/game.toml"))]
+    names = {w.lower() for g in games for npc, t in g.cast.data.get("npc", {}).items() for w in (npc, str(t["name"]))}
+    names |= {c.lower() for v in (cr_claims.VOCABULARY, mn_rules.claims.VOCABULARY) for c in v.characters}
+    names |= {"relic", "captain brenna"}
+    names -= {"player"}
+    for prompt in (EXTRACT_PROMPT, CHECK_PROMPT):
+        words = set(re.findall(r"[a-z]+(?: [a-z]+)?", prompt.lower()))
+        assert not names & words, names & words
+    assert "X, Y and Z stand for any of the game's characters" in CHECK_PROMPT

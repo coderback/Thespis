@@ -14,6 +14,13 @@ to PyPI and GitHub Releases from the section below that has its number.
   (`Session.overview()`) shows one at a glance; `POST .../explain` gives over HTTP what `Session.explain` gives.
   The Godot and Unity clients call them: `overview`, `explain` and `sessions` (`OverviewAsync`, `ExplainAsync`,
   `SessionsAsync`), for a debug overlay in the game itself.
+- **The claim reader no longer speaks Crypt Road.** The prompt that reads what a line claims, for the claim check and
+  for Rehearsal's measuring, gave its examples with the demo's characters (Kael, Brenna, "the relic") whatever the
+  game. They are placeholders now (X, Y, Z), so another game's model isn't shown names from a game it isn't in, and a
+  game with a character of that name isn't misread. A model's cached answers to these calls are asked again once.
+  Rehearsal's measurements from here on aren't one-for-one comparable with reports made under the old prompt.
+- **Rehearsal's judge thinks harder.** Azure now refuses the `low` reasoning effort the DeepSeek V4 Pro judge ran at,
+  so every judged line came back empty; it runs at `high` now (`none` misread who did what to whom).
 
 ## 0.5.0 (14 November 2026)
 
