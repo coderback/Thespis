@@ -4,7 +4,25 @@ Thespis follows semantic versioning at 0.x: a minor release may change anything 
 protocol, and those change only with a note here. A release is made by pushing its tag (`v0.3.1`), which publishes it
 to PyPI and GitHub Releases from the section below that has its number.
 
-## Unreleased
+## 0.6.0 (15 November 2026)
+
+Thespis you can watch: an inspector shows what every NPC believes and why while the game runs, the engines can ask
+the same from inside the game, and the parts that were still the demo's leave the core.
+
+```bash
+pip install --upgrade thespis-sdk
+```
+
+**Before you upgrade.** These can change what an existing game sees:
+- **Saves are version 2.** 0.6.0 restores every older save, but 0.5.0 and before refuse a save 0.6.0 made, so don't
+  downgrade a game whose players have saved under 0.6.0. A world no longer carries the demo games' race (`status`,
+  `pending`, `ended_at`), which no other game used; a game keeps its own state in `World.custom`, saved with the
+  world and never read by Thespis, and an older save's race moves there as it loads.
+- **The claim check asks its model again once.** Its prompt changed (below), so answers cached under the old one
+  aren't reused.
+- **The Godot and Unity clients are 0.6.0** and warn when the runtime is older than 0.6.0.
+
+### Watch it play
 
 - **An inspector.** `thespis serve` serves a page at `/inspector/` that shows its sessions as the game plays: the
   cast and its ties, each NPC's beliefs with their evidence, why an NPC would choose what it would, the ledger, and
@@ -12,19 +30,22 @@ to PyPI and GitHub Releases from the section below that has its number.
   so it works offline. The runtimes on GitHub Releases carry it too.
 - **Read-only calls for it, and for tools.** `GET /v1/sessions` lists a project's sessions; `GET /v1/sessions/{id}`
   (`Session.overview()`) shows one at a glance; `POST .../explain` gives over HTTP what `Session.explain` gives.
-  The Godot and Unity clients call them: `overview`, `explain` and `sessions` (`OverviewAsync`, `ExplainAsync`,
-  `SessionsAsync`), for a debug overlay in the game itself.
+- **In the engines.** The Godot and Unity clients call them: `overview`, `explain` and `sessions` (`OverviewAsync`,
+  `ExplainAsync`, `SessionsAsync`), for a debug overlay in the game itself.
+
+### Any game's, not the demo's
+
 - **The claim reader no longer speaks Crypt Road.** The prompt that reads what a line claims, for the claim check and
   for Rehearsal's measuring, gave its examples with the demo's characters (Kael, Brenna, "the relic") whatever the
   game. They are placeholders now (X, Y, Z), so another game's model isn't shown names from a game it isn't in, and a
-  game with a character of that name isn't misread. A model's cached answers to these calls are asked again once.
-  Rehearsal's measurements from here on aren't one-for-one comparable with reports made under the old prompt.
-- **Saves are version 2.** A world no longer carries the demo games' race (`status`, `pending`, `ended_at`), which
-  no other game used: a game keeps its own state in `World.custom`, saved with the world and never read by Thespis.
-  A version 1 save (0.5.0 and before) restores as before, its race moved into `custom`; 0.5.0 refuses a version 2
-  save rather than misreading it. The hosted demo's saves load across the upgrade.
-- **Rehearsal's judge thinks harder.** Azure now refuses the `low` reasoning effort the DeepSeek V4 Pro judge ran at,
-  so every judged line came back empty; it runs at `high` now (`none` misread who did what to whom).
+  game with a character of that name isn't misread.
+- **The race leaves `World`** for `World.custom`, as above; the hosted demo's saves load across the upgrade.
+
+### Rehearsal
+
+- **Its judge thinks harder.** Azure now refuses the `low` reasoning effort the DeepSeek V4 Pro judge ran at, so
+  every judged line came back empty; it runs at `high` now (`none` misread who did what to whom). With the new claim
+  prompt, measurements from here on aren't one-for-one comparable with reports made before 0.6.0.
 
 ## 0.5.0 (14 November 2026)
 
