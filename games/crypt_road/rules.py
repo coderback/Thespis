@@ -15,8 +15,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from games import race
 from games.crypt_road import claims, voice, words
 from games.crypt_road import content as C
+from games.race import LOST, WON
 from thespis import perception
 from thespis.affordances import decide
 from thespis.brain import Brain, UtilityBrain
@@ -29,7 +31,7 @@ from thespis.moderation import Moderator
 from thespis.play import NotAllowed, Verbs, check, count_calls, offers, open_mind
 from thespis.tick import Tick, gossip, run_tick, walk, walks
 from thespis.voice import View, reply
-from thespis.world import LOST, PLAYING, WON, World
+from thespis.world import World
 
 __all__ = ["NotAllowed", "Tick"]
 
@@ -102,8 +104,9 @@ def allowed(w: World) -> list[dict]:
     """Every verb the player could use now, in the docs/api.md shape; disabled ones carry a reason."""
     loc = w.player["loc"]
     here = [n.id for n in w.npcs_at(loc)]
-    ended = w.status != PLAYING
-    verbs = Verbs("The race is over" if ended else ("Choose: humiliate or spare" if w.pending == DUEL_WON else None))
+    ended = race.over(w)
+    choose = "Choose: humiliate or spare" if race.pending(w) == DUEL_WON else None
+    verbs = Verbs("The race is over" if ended else choose)
     add = verbs.add
 
     for n in here:
@@ -112,7 +115,7 @@ def allowed(w: World) -> list[dict]:
         add("insult", n, f"Insult {_npc_name(n)}", {}, False)
     if C.RIVAL in here:
         add("challenge", C.RIVAL, f"Challenge {_npc_name(C.RIVAL)}", {}, True)
-        duel = "The race is over" if ended else (None if w.pending == DUEL_WON else "Win a duel first")
+        duel = "The race is over" if ended else (None if race.pending(w) == DUEL_WON else "Win a duel first")
         add("humiliate", C.RIVAL, f"Humiliate {_npc_name(C.RIVAL)}", {}, True, reason=duel)
         add("spare", C.RIVAL, f"Spare {_npc_name(C.RIVAL)}", {}, True, reason=duel)
     for n in here:
@@ -241,17 +244,17 @@ def act(w: World, verb: str, target: str | None = None, claim: dict | Claim | No
     elif verb in ("move", "wait"):
         ends_phase = verb
     elif verb == "take_relic":
-        w.status, w.ended_at = WON, w.phase
+        race.end(w, WON)
         _event(w, "take_relic", "player", None, w.player["loc"])
 
     replies = voice.react(w, mind, verb, target, list(w.ledger)[start:], told, text)
     if haggle:
         replies.append(haggle)
     tick = end_phase(w, ends_phase, brain, mind) if ends_phase else None
-    if tick is not None and w.status == PLAYING:
+    if tick is not None and not race.over(w):
         replies += voice.phase_start(w, mind, tick.moves)
     events = list(w.ledger)[start:]
-    epilogue = run_epilogue(w, brain, mind) if w.status != PLAYING and w.ended_at is not None and not \
+    epilogue = run_epilogue(w, brain, mind) if race.over(w) and race.ended_at(w) is not None and not \
         w.counters.get("epilogue_done") else None
     return ActResult(events=events, tick=tick, epilogue=epilogue, replies=replies, model_calls=count_calls(w, mind))
 
@@ -337,7 +340,7 @@ def _challenge(w: World) -> bool:
         kael["grudge"] += 2
         c = Claim("beat", "player", C.RIVAL)
         witness(w, c, "player", C.RIVAL, _event(w, "beat", "player", C.RIVAL, w.player["loc"], c))
-        w.pending = DUEL_WON  # the player must humiliate or spare, which ends the phase
+        race.set_pending(w, DUEL_WON)  # the player must humiliate or spare, which ends the phase
         return True
     kael["grudge"] += 1
     c = Claim("beat", C.RIVAL, "player")
@@ -346,7 +349,7 @@ def _challenge(w: World) -> bool:
 
 
 def _settle_duel(w: World, verb: str) -> None:
-    w.pending = None
+    race.set_pending(w, None)
     kael = w.npcs[C.RIVAL].drives
     if verb == "humiliate":
         kael["grudge"] += 3
@@ -445,8 +448,8 @@ def end_phase(w: World, action: str, brain: Brain | None = None, mind: Mind | No
         chosen = choose(C.RIVAL, "tick", choices, lambda ch: voice.decision_line(w, C.RIVAL, ch, grievance, view),
                         f"You are at {C.STOP_NAMES[kael.loc]}.", ask=ask)
         if chosen == "take_relic":
-            if w.status == PLAYING:
-                w.status, w.ended_at = LOST, p
+            if not race.over(w):
+                race.end(w, LOST, p)
                 _event(w, "take_relic", C.RIVAL, None, kael.loc)
         elif chosen == "accuse:player":
             kael.flags["accused"] = True

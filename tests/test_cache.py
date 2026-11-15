@@ -4,6 +4,7 @@ import dataclasses
 
 import pytest
 
+from games import race
 from games.crypt_road import rules, voice
 from games.crypt_road.content import new_world
 from games.store import Store
@@ -72,7 +73,7 @@ def test_a_second_play_makes_no_model_calls(cache):
     assert spoken(second) == spoken(first)
     assert [d.source for d in second.decisions] == [d.source.replace("llm", "cache") for d in first.decisions]
     assert without_decisions(second) == without_decisions(first)
-    assert (second.status, second.ended_at) == ("won", 5)
+    assert (race.status(second), race.ended_at(second)) == ("won", 5)
 
 
 def test_replay_plays_the_route_from_the_cache_alone(cache):
@@ -86,7 +87,7 @@ def test_replay_plays_the_route_from_the_cache_alone(cache):
 
 def test_replay_falls_back_on_a_miss(cache):
     w, _ = play_demo(Offline(), cache=cache, replay=True)
-    assert (w.status, w.ended_at) == ("won", 5)  # the fallback route still wins
+    assert (race.status(w), race.ended_at(w)) == ("won", 5)  # the fallback route still wins
     assert all(d.source == "fallback" for d in w.decisions)
     assert any(d.reason.endswith("replay: not in the cache") for d in w.decisions)
     assert cache.cached_replies() == 0

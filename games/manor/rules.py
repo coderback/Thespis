@@ -12,9 +12,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from games import race
 from games.manor import claims, voice, words
 from games.manor import content as C
 from games.manor.voice import Speech
+from games.race import LOST, WON
 from thespis.affordances import decide
 from thespis.beliefs import Belief, credence, reconcile
 from thespis.brain import UtilityBrain
@@ -26,7 +28,7 @@ from thespis.intents import ACT, ASK, Offer, Understander, Understood, Words, de
 from thespis.ledger import Claim, Event
 from thespis.moderation import Moderator
 from thespis.play import NotAllowed, Verbs, check, count_calls, offers, open_mind
-from thespis.world import LOST, PLAYING, WON, World
+from thespis.world import World
 
 __all__ = ["NotAllowed"]
 
@@ -46,7 +48,7 @@ def allowed(w: World) -> list[dict]:
     """Every verb the player could use now; disabled ones carry a reason."""
     loc = w.player["loc"]
     here = [n.id for n in w.npcs_at(loc)]
-    verbs = Verbs("The case is closed" if w.status != PLAYING else None)
+    verbs = Verbs("The case is closed" if race.over(w) else None)
     add = verbs.add
 
     topics = [{"id": k, "label": v} for k, v in C.TOPICS.items()]
@@ -114,7 +116,7 @@ def say(w: World, to: str, text: str, gateway: ModelGateway | None = None, cache
     """The player says `text` to `to`: it is read as one of the acts open now, and that act is applied exactly as its
     button would be. Words that do none of them do nothing; a reading that isn't sure enough comes back as a question
     for the player. Reading costs up to two model calls, counted with the action's."""
-    if w.status != PLAYING:
+    if race.over(w):
         raise NotAllowed("The case is closed")
     if to not in [n.id for n in w.npcs_at(w.player["loc"])]:
         raise NotAllowed(f"{C.name(to)} isn't here to speak to")
@@ -250,7 +252,7 @@ def _accuse(w: World, mind: Mind, npc: str) -> list[dict]:
     accused = w.ledger.append(w.phase, "accuse", "player", npc, w.player["loc"])
     alibi = _held(w, C.OWNER, C.THE_ALIBI)
     solved = npc == C.MAID and w.beliefs.conf(C.OWNER, C.THE_TRUTH) >= C.BELIEVED and not alibi.active
-    w.status, w.ended_at = (WON if solved else LOST), w.phase
+    race.end(w, WON if solved else LOST)
     if solved:
         key, cites = "won", [_held(w, C.OWNER, C.THE_TRUTH).id, accused.id]  # solved means she believes it
     elif npc == C.MAID:
@@ -268,7 +270,7 @@ def _move(w: World, mind: Mind, room: str) -> list[dict]:
     w.phase += 1
     if w.phase < C.DEADLINE:
         return []
-    w.status, w.ended_at = LOST, w.phase
+    race.end(w, LOST)
     sent = w.ledger.append(w.phase, "constable", C.OWNER, None, "hall")
     w.player["outcome"] = OUTCOMES["constable"]
     if room != "hall":

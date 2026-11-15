@@ -1,5 +1,6 @@
 """The adapter's starting state must match the rules model and the design doc's cast table."""
 
+from games import race
 from games.crypt_road import content
 from tools import crypt_road_sim as sim
 
@@ -21,7 +22,7 @@ def test_new_world_matches_the_rules_model():
 
 def test_start_of_run():
     world = content.new_world(5)
-    assert (world.seed, world.phase, world.status, world.counters) == (5, 0, "playing", {"challenges": 0})
+    assert (world.seed, world.phase, race.status(world), world.counters) == (5, 0, "playing", {"challenges": 0})
     seen = {n.id: n.last_seen for n in world.npcs.values()}
     assert seen == {"kael": {"loc": "tavern", "phase": 0}, "odo": {"loc": "tavern", "phase": 0},
                     "mags": {"loc": "tavern", "phase": 0}, "brenna": None}  # Brenna is out of sight

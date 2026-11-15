@@ -17,6 +17,7 @@ import argparse
 import json
 from pathlib import Path
 
+from games import race
 from rehearsal.scenarios import MANOR_ROUTES, Stage
 from thespis.world import World
 from tools.routes import ROUTES, ApiError, play, seed_for
@@ -28,7 +29,7 @@ OUTCOME = ("outcome", "player", "npcs", "events", "decisions")  # what may not m
 
 def fingerprint(w: World) -> dict:
     return {
-        "outcome": f"{w.status}@{w.ended_at}",
+        "outcome": f"{race.status(w)}@{race.ended_at(w)}",
         "player": {k: v for k, v in w.player.items() if k != "outcome"} | {"outcome": w.player.get("outcome")},
         "npcs": {n.id: {"loc": n.loc, "drives": n.drives, "trust": n.trust_in, "frozen_until": n.frozen_until}
                  for n in w.npcs.values()},
@@ -52,7 +53,7 @@ def outcomes() -> dict[str, dict]:
     for name, steps in MANOR_ROUTES.items():
         m = Stage(None, brain="fallback").manor()
         for verb, target, topic in steps:
-            if m.w.status != "playing":
+            if race.over(m.w):
                 break
             m.act(verb, target, topic)
         out[f"manor/{name}"] = fingerprint(m.w)

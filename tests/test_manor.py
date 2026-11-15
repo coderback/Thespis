@@ -5,6 +5,7 @@ import pathlib
 
 import pytest
 
+from games import race
 from games.manor import content as C
 from games.manor import rules, views, voice
 from games.manor.content import new_world
@@ -35,7 +36,7 @@ def test_the_morning_is_in_the_ledger_before_you_arrive():
 def test_the_scripted_solve_wins():
     w = new_world()
     play(w, SOLVE)
-    assert (w.status, w.ended_at, w.player["outcome"]) == ("won", 5, rules.OUTCOMES["won"])
+    assert (race.status(w), race.ended_at(w), w.player["outcome"]) == ("won", 5, rules.OUTCOMES["won"])
     assert w.beliefs.get("vane", C.THE_ALIBI).status == "retracted"  # Pell's word beat Sable's
     assert w.npcs["vane"].trust_in["sable"] == 2 - C.CONTRADICTED
 
@@ -60,7 +61,7 @@ def test_sables_lie_is_a_validated_action_logged_false():
 def test_wrong_turns_lose(steps, why):
     w = new_world()
     play(w, steps)
-    assert (w.status, w.player["outcome"]) == ("lost", rules.OUTCOMES[why])
+    assert (race.status(w), w.player["outcome"]) == ("lost", rules.OUTCOMES[why])
 
 
 def test_questioning_needs_a_lead_and_the_rules_hold():

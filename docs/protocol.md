@@ -511,7 +511,8 @@ What the gate shows:
 
 `snapshot()` is plain JSON: the world, every belief and its evidence, the ledger, the decisions, and who witnessed
 what. Restoring it gives the same minds, which go on to play the same: a test plays a scene on from both copies and
-compares them. A snapshot of another game, or from a newer Thespis, is refused. Store it as the text you were sent:
+compares them. A snapshot of another game, or from a newer Thespis, is refused; one from an older Thespis is
+brought up to this one as it loads (its `thespis` field is the save's version). Store it as the text you were sent:
 an engine with one number type (GDScript reads every JSON number as a float) can still hand it back parsed, and it
 restores the same, but there's no reason to unpack it.
 

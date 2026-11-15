@@ -5,6 +5,7 @@ import json
 
 import pytest
 
+from games import race
 from games.crypt_road import rules
 from games.crypt_road.content import new_world
 from tests.test_voice import check_cites
@@ -60,7 +61,7 @@ def test_demo_route_with_the_model_on():
     """#17's done-when: no beat uses the fallback, every line's cites are valid, and the route plays the same."""
     model = FakeModel()
     w, results = play_demo(model)
-    assert (w.status, w.ended_at) == ("won", 5)
+    assert (race.status(w), race.ended_at(w)) == ("won", 5)
     assert w.npcs["brenna"].trust_in["player"] == -1  # the lie was still exposed in the epilogue
     replies = [r for res in results for r in res.replies]
     assert replies and all(r["source"] == "llm" for r in replies)

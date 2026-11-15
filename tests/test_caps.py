@@ -2,6 +2,7 @@
 
 import pytest
 
+from games import race
 from games.crypt_road import voice
 from games.crypt_road.app import SessionLimiter, client_ip
 from games.crypt_road.content import new_world
@@ -114,5 +115,5 @@ def test_the_client_ip_comes_from_railways_headers():
 def test_a_capped_route_plays_the_same_in_process():
     """The rules: with no budget left, every NPC falls back to the utility brain and the route still wins."""
     w, _ = play_demo(FakeModel(), budget=0)
-    assert (w.status, w.ended_at) == ("won", 5) and "model_calls" not in w.counters
+    assert (race.status(w), race.ended_at(w)) == ("won", 5) and "model_calls" not in w.counters
     assert all(d.source == "fallback" for d in w.decisions)

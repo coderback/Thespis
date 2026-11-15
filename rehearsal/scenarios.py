@@ -23,6 +23,7 @@ from pathlib import Path
 
 import yaml
 
+from games import race
 from games.crypt_road import claims as cr_claims
 from games.crypt_road import rules as cr_rules
 from games.crypt_road import views as cr_views
@@ -33,7 +34,7 @@ from games.manor.content import new_world as mn_world
 from thespis.claims import ClaimChecking
 from thespis.expression import Mind, Observer, ReplyCache
 from thespis.gateway import ModelGateway
-from thespis.world import PLAYING, World
+from thespis.world import World
 from tools.harness import fresh_questions
 from tools.manor_solve import SOLVE, WATCH
 from tools.routes import ROUTES, ApiError, play, provoke, seed_for
@@ -101,7 +102,7 @@ class CryptRoad:
         out = cr_views.act_view(result, self.w)
         if result.tick is not None:
             self.digest(phase)
-        if self.question and len(self.w.ledger) and self.w.status == PLAYING:
+        if self.question and len(self.w.ledger) and not race.over(self.w):
             question, self.question = self.question, None
             for (v, npc), option in self.allowed().items():
                 if v == "talk" and option["enabled"]:
@@ -159,8 +160,8 @@ def _route(name: str, seed: int, question: str) -> Callable[[Stage], World]:
             play(s, name)
         except ApiError:
             pass  # a route that can't go on (no purse after a lost duel) still counts what was said
-        if s.w.ended_at is not None:
-            s.digest(s.w.ended_at)  # the end card's telling
+        if race.ended_at(s.w) is not None:
+            s.digest(race.ended_at(s.w))  # the end card's telling
         return s.w
     return run
 
@@ -169,7 +170,7 @@ def _manor(steps: list) -> Callable[[Stage], World]:
     def run(stage: Stage) -> World:
         m = stage.manor()
         for verb, target, topic in steps:
-            if m.w.status != PLAYING:
+            if race.over(m.w):
                 break
             m.act(verb, target, topic)
         return m.w

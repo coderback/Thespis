@@ -6,6 +6,7 @@ import json
 import pytest
 from fastapi.testclient import TestClient
 
+from games import race
 from games.crypt_road import content as C
 from games.crypt_road import rules, views
 from games.crypt_road import words as cr_words
@@ -95,7 +96,7 @@ def test_a_manor_route_played_by_text_ends_as_its_buttons_do(name):
     w = M.new_world()
     w.brain_mode = "fallback"
     for verb, target, topic in MANOR_ROUTES[name]:
-        if w.status != "playing":
+        if race.status(w) != "playing":
             break
         try:
             if verb == "move":
@@ -107,7 +108,7 @@ def test_a_manor_route_played_by_text_ends_as_its_buttons_do(name):
                 u, _ = manor.say(w, M.OWNER, f"Please question {M.name(target)}." if verb == "request_questioning"
                                  else f"I accuse {M.name(target)}.")
                 if verb == "accuse":  # asked first, as the button asks once more; then the player says yes
-                    assert u.status == ASK and w.status == "playing"
+                    assert u.status == ASK and race.status(w) == "playing"
                     manor.act(w, **manor_views.understood_view(u, M.OWNER)["readings"][0]["act"])
         except manor.NotAllowed:
             pass
@@ -320,7 +321,7 @@ def test_the_manor_reads_questions_as_asking():
 def test_an_accusation_in_words_is_asked_first_and_ends_nothing():
     w = M.new_world()
     u, result = manor.say(w, "vane", "Sable took the ring.")
-    assert (u.status, result.events, w.status) == (ASK, [], "playing")
+    assert (u.status, result.events, race.status(w)) == (ASK, [], "playing")
     assert manor_views.understood_view(u, "vane")["readings"] == [
         {"verb": "accuse", "act": {"verb": "accuse", "target": "sable"}}]
 

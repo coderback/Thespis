@@ -14,6 +14,7 @@ import json
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 
+from games import race
 from thespis.deception import SAID
 from thespis.expression import StatePack, Utterance
 from thespis.gateway import Call, ModelGateway, ModelReply
@@ -146,7 +147,7 @@ def transcript(w: World, tellings: list[tuple[str, str]]) -> dict:
     source, every digest, and every refusal."""
     story = [[e.verb, e.actor, e.target, e.claim.to_json() if e.claim else None, e.truth] for e in w.ledger]
     return {
-        "outcome": f"{w.status}@{w.ended_at}",
+        "outcome": f"{race.status(w)}@{race.ended_at(w)}",
         "story": hashlib.sha256(json.dumps(story, sort_keys=True).encode("utf-8")).hexdigest()[:16],
         "lines": [[d.npc, d.trigger, d.chosen, d.source, d.line] for d in w.decisions if d.line],
         "tellings": [list(t) for t in tellings],

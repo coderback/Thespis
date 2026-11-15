@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import re
 
+from games import race
 from games.crypt_road import content as C
 from games.crypt_road import words
 from thespis.beliefs import Belief
@@ -134,7 +135,7 @@ def react(w: World, mind: Mind, verb: str, target: str | None, events: list[Even
         assert target is not None  # the rules found someone here to insult
         speeches.append(Speech(target, "insulted", line(target, "insulted", [last]), "The player just insulted you."))
     elif verb == "challenge":
-        won = w.pending == "duel_won"
+        won = race.pending(w) == "duel_won"
         key = "beaten" if won else "victor"
         what = "The player just beat you in a duel." if won else "You just beat the player in a duel."
         speeches.append(Speech(C.RIVAL, key, line(C.RIVAL, key, [last]), what))
