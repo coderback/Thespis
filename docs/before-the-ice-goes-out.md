@@ -87,6 +87,127 @@ threaten, confess. Meanwhile Gilchrist makes his own rounds, and the town talks 
 what he has heard that day: *"Billy Tuck says he saw a lantern by Brand's back door. Yours, perhaps?"* You answer,
 and he weighs it against what you told him before and what others have told him.
 
+## The town
+
+Coldwater Landing sits on the south bank of the Yukon where Coldwater Creek comes in from the north. The claims are
+up the creek, across the ice; all winter the ice is the road between them, and when it goes out the creek is cut
+off until the boats run. Like Dawson's, the town is one street along the bank, Front Street, with the buildings
+facing the river across it. Behind them runs a back lane of back doors and woodpiles with no lamps, and that is
+where the night of the fire happened.
+
+The plan is drawn on the design canvas ("The town plan"), with the references it's built from: Dawson's Front
+Street, the Mounted Police compound at Fort Herchmer, St Mary's mission hospital, the Dawson ice pool (recorded since
+1896) and Forty Mile.
+
+```
+  N                      spruce, the hills
+  ↑            Coldwater Creek      the claim
+                     \
+                      \  7 Věra's cabin, at the creek mouth, facing the town
+   ~~~~~~~~~~~~~~~~~~~~\~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   the bend crossing      the ice crossing     6 the tripod       the Yukon, frozen, flowing east
+   (cracks first)  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   spruce point      steamer, laid up    1 the landing: dock, clock post, pool board, Ashby's tent
+   ============================ Front Street ==================================
+     8 your cabin   2 Maggie's roadhouse   3 Brand's store  Kovács forge   5 the post   4 the mission
+                       (back room,            (burned)                      (stockade)   church, infirmary
+                        kitchen door)
+   . . . . . . . . . . . back lane . . . cordwood . . . . . . . . . . . . . . . . . .
+                                      the bench, rising to the hills
+```
+
+### The places
+
+You go to one place each morning, afternoon and evening. Walking between places in town is part of that turn;
+getting across the river can cost more (below).
+
+| # | Place | Who you'll find | What's there for the story |
+|---|---|---|---|
+| 1 | **The landing** | Billy (mornings), Ashby (all day), the pool crowd | The tripod and its clock, the ice-pool board, the laid-up steamer, Ashby's tent. Everyone at the landing sees who comes and goes over the ice |
+| 2 | **Maggie's roadhouse** | Maggie, Otto, Sándor and Ashby (evenings) | The bar, the kitchen where Billy eats, the back room where Otto was fixing a card game the night of the fire |
+| 3 | **Brand's store** | Otto, picking through the ashes (afternoons) | The ruin, the back door Billy saw the lantern by, the cordwood stack he was stealing from |
+| 4 | **The mission infirmary** | Tamás, always; Sándor (mornings) | The church and its hospital at the east end, the window looking back along the street |
+| 5 | **The Mounted Police post** | Gilchrist, when he isn't on his rounds | A small stockade compound with a flag, and his room. Every evening he asks you to sit with him here |
+| 6 | **The ice** | Ashby, the curious | The tripod up close. Where the ice talks first as the week warms |
+| 7 | **Věra's cabin** | Věra | At the creek mouth across the river, facing the town; the claim Brand would have taken is up the creek behind it. From her door she sees the landing and the lights of Front Street |
+| 8 | **Your cabin** | You; Gilchrist's men, if it comes to that | West end of the street. Where each day starts, and what he searches when he starts to believe |
+
+The Kovács forge, hard against Brand's east wall, is on the model but isn't a place you visit: Tamás is a smith by
+trade (*kovács*) who watched the store by night, and Sándor sleeps there while his father is in the infirmary. A
+forge next door is the accident the town would rather believe. The steamer isn't a place either, until the last day.
+
+The layout comes from the story as much as from the history. Brand's ruin is the middle of town, opposite the
+landing, so you pass what you did every day, and whoever lingers there is noticed (*Crime and Punishment*). To reach
+Tamás you pass the Inspector's window, so every visit to the man who can't trust his own memory is seen
+(*Othello*). Ashby lives in a tent in the open at the landing, where a town with something to hide finds its
+stranger (*The Government Inspector*). And the back lane hides you until you keep to it too often (*The Tell-Tale
+Heart*).
+
+### The night of the fire
+
+Drawn on the canvas as the same plan at one in the morning: where everyone really was, and the one piece each could
+see. Nobody saw it all; the Inspector's Notebook is him piecing it together (*In a Grove*).
+
+- **About 9 pm:** you cross the ice to Věra's. **11.30 pm:** you walk home across it with your lantern; she watches
+  it all the way to the landing.
+- **Midnight:** Maggie sells Tamás a bottle at her kitchen door; he takes it to his bed in Brand's back room.
+- **12.30 am:** Otto is dealing a fixed game in the roadhouse back room.
+- **1.00 am:** you go out your back door and along the lane to Brand's back door, where the notes are kept.
+  **1.10 am:** you come back the same way, past the back-room window.
+- **1.15 am:** Ashby, stowing food aboard the laid-up steamer for his escape, sees the glow first and shouts.
+- **1.20 am:** Sándor breaks in from the forge and drags his father out.
+
+| Who | Saw | Why they can't say so |
+|---|---|---|
+| Věra | your lantern crossing home at 11.30, and the glow later | she keeps quiet while she trusts you |
+| Billy Tuck | a lantern at Brand's back door, no face | he was stealing Brand's cordwood |
+| Otto Brand | a lantern going west past the back-room window | he was fixing a card game |
+| Maggie Doyle | Tamás drunk at midnight, with her bottle | she sold it to him |
+| Jack Ashby | the glow, first; he raised the alarm | he was stowing away on the steamer |
+| Sándor Kovács | his father, burned | nothing; he wants someone to pay |
+| Tamás Kovács | a lantern, a coat, a face in the firelight | he can't remember yet |
+
+Your story is that you were **at Věra's till late**. It's the natural lie: you were there, and across the ice is
+the one place nobody in town can see. It only holds if your sister lies for you, because she watched you leave at
+11.30, an hour and a half before the fire. Whether she will is her arc: *věra* is "faith", and she keeps quiet
+while she trusts you. Tell it to Maggie and it's all over town by morning, including, sooner or later, to Věra
+herself, and to Gilchrist, who will take his questions across the ice. The only other person who can break it is
+Otto, who saw a lantern pass his back-room window going west, and he'd have to admit to the card game first.
+
+### The ways between them
+
+| Way | Joins | Seen by | Cost |
+|---|---|---|---|
+| **Front Street** | every place in town, and the landing across it | whoever is at the landing, on the roadhouse porch, at the post window or the infirmary window | none |
+| **The back lane** | the back doors, from your cabin to the mission | only whoever is out back: Billy at the cordwood, the card players in the roadhouse back room | none |
+| **The ice crossing** | the landing and the creek | everyone at the landing and on the ice | none |
+| **The bend crossing** | the west end and the creek, behind the spruce point | nobody | the next turn as well |
+
+Being seen is the point. Whoever has a way in view when you pass now knows where you went, first-hand, and can say
+so; the walk shows them as it happens. Front Street is in view of the whole town. The back lane is in view of almost
+nobody, which is why it's where you went that night, and why the two who were out back (Billy at the cordwood, Otto
+at his crooked card game) each saw something they can't admit to having been there to see. The bend crossing is the
+only unseen way to Věra, and it costs you a turn.
+
+The ice clock closes ways too. When the crack opens at the bend, the bend crossing is gone, and the only way to Věra
+is past everyone at the landing. On the last day the ice moves, and the creek is cut off.
+
+### Where people start
+
+Thespis moves people as the days go on, so this is only where each starts their week: who they talk to, and where
+your lies meet them, comes from here.
+
+| Who | Morning | Afternoon | Evening |
+|---|---|---|---|
+| Maggie Doyle | roadhouse | roadhouse | roadhouse |
+| Billy Tuck | the landing | the store (cordwood) | roadhouse kitchen |
+| Jack Ashby | the landing | the ice | roadhouse |
+| Sándor Kovács | the infirmary | the landing | roadhouse |
+| Otto Brand | roadhouse | the store | roadhouse back room |
+| Věra Holub | her cabin | her cabin | her cabin |
+| Tamás Kovács | the infirmary | the infirmary | the infirmary |
+| Inspector Gilchrist | his rounds | his rounds | the post, with you |
+
 ## Two clocks
 
 **The ice.** The town's talk turns to the pool as the days warm: the river groans at night, a crack opens at the
