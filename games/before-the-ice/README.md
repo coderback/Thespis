@@ -11,6 +11,7 @@ believes, and the steamer at the end.
 | --- | --- |
 | `assets/town.glb`, `assets/town.json` | The town, exported from the Blender builder, and what Godot needs to stage it: each material's colours and grain, the lamps, the people, chimneys, places, routes, the camera |
 | `assets/sprites/` | The townsfolk, 32x48 (from [art/before-the-ice](../../art/before-the-ice/README.md)) |
+| `assets/fonts/` | The period faces the canvas sets the paper in, each with its licence: Old Standard TT, IM Fell English SC and Cedarville Cursive (SIL Open Font License), Special Elite (Apache 2.0), from [google/fonts](https://github.com/google/fonts). `scripts/fonts.gd` loads them |
 | `assets/portraits/` | Half-length conversation portraits: Maggie's so far. Anyone without one is shown by their figure, scaled up |
 | `scripts/main.gd` | The screen: the town rendered at 960x540 and scaled up by whole pixels, the paper on top at full size |
 | `scripts/town.gd` | Stages the model: the toon material on every surface, the desk lamp and the small lamps, sprites, smoke, the camera from the river, the outline pass |

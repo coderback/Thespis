@@ -57,22 +57,11 @@ var _dimmed := 0.0  ## how far the town is dimmed now
 var _title := ""
 var _part := ""
 
-var _serif := SystemFont.new()
-var _italic := SystemFont.new()
-var _caps := SystemFont.new()
-var _type := SystemFont.new()
-var _hand := SystemFont.new()
-
-
-func _init() -> void:
-	# stand-ins until the period faces are in the project (Old Standard TT, IM Fell English SC, Special Elite,
-	# Cedarville Cursive: all on Google Fonts under the OFL)
-	_serif.font_names = PackedStringArray(["Old Standard TT", "Georgia", "Times New Roman", "serif"])
-	_italic.font_names = _serif.font_names
-	_italic.font_italic = true
-	_caps.font_names = PackedStringArray(["IM Fell English SC", "Georgia", "Times New Roman", "serif"])
-	_type.font_names = PackedStringArray(["Special Elite", "Courier New", "monospace"])
-	_hand.font_names = PackedStringArray(["Cedarville Cursive", "Segoe Script", "Segoe Print", "cursive"])
+var _serif: Font = Fonts.serif
+var _italic: Font = Fonts.italic
+var _caps: Font = Fonts.caps
+var _type: Font = Fonts.type
+var _hand: Font = Fonts.hand
 
 
 func _ready() -> void:
