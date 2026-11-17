@@ -1,0 +1,259 @@
+"""Before the Ice Goes Out: the case plays as the design says (docs/before-the-ice-goes-out.md).
+
+The game file is games/before-the-ice/coldwater.toml and the world's side is case.json beside it, which the Godot game
+reads too. With no model the minds are deterministic, so each ending is a short scene played here: the calls the
+game makes, and what the town comes to believe and do."""
+
+import json
+from pathlib import Path
+
+import pytest
+
+from thespis.api import Game, Session
+from thespis.ledger import Claim
+
+HERE = Path(__file__).resolve().parents[1] / "games" / "before-the-ice"
+GAME = Game.load(HERE / "coldwater.toml")
+CASE = json.loads((HERE / "case.json").read_text(encoding="utf-8"))
+
+ALIBI = {"pred": "with_vera", "a": "player"}
+NO_ALIBI = {**ALIBI, "neg": True}
+LANTERN = {"pred": "lantern", "a": "someone"}
+
+
+def fired(who: str) -> dict:
+    return {"pred": "fired", "a": who, "b": "otto"}
+
+
+def lantern(who: str) -> dict:
+    return {"pred": "lantern", "a": who}
+
+
+def observe(s: Session, o: dict) -> None:
+    o = {k: v for k, v in o.items() if k != "note"}
+    s.observe(o.pop("verb"), o.pop("actor"), o.pop("target", None), **o)
+
+
+def week(face: bool = False, seed: int = 1) -> Session:
+    """The morning of day 1: the night of the fire, as each saw their piece of it."""
+    s = Session.new(GAME, seed=seed)
+    for o in CASE["night"]:
+        observe(s, o)
+    for o in CASE["face"]["observe"] if face else ():
+        observe(s, o)
+    return s
+
+
+def remember(s: Session, stage: str) -> None:
+    for o in CASE["tamas"][stage]["observe"]:
+        observe(s, o)
+
+
+def conf(s: Session, npc: str, claim: dict) -> float:
+    b = s.world.beliefs.get(npc, Claim.from_json(claim))
+    return 0.0 if b is None or b.status != "active" else round(b.conf, 2)
+
+
+def say(s: Session, to: str, claim: dict, at: str, speaker: str = "player", witnesses=()) -> None:
+    s.observe("tell", speaker, to, at=at, claim=claim, said=True, witnesses=list(witnesses))
+
+
+def evening(s: Session, teller: str = "Billy Tuck") -> str:
+    return s.decide("gilchrist", "evening", bindings={"teller": teller}).action
+
+
+def steamer(s: Session) -> str:
+    return s.decide("gilchrist", "steamer").action
+
+
+# ---------------------------------------------------------------- the file and the night
+def test_the_game_has_nine_people_and_the_case_names_only_them():
+    assert sorted(GAME.cast.data["npc"]) == sorted(CASE["everyone"])
+    assert set(CASE["flags"].values()) <= set(GAME.places)
+
+
+def test_the_night_leaves_each_witness_their_own_piece():
+    s = week()
+    assert conf(s, "vera", {"pred": "left_vera", "a": "player"}) == 1.0  # she watched his lantern cross home
+    assert conf(s, "billy", LANTERN) == conf(s, "otto", LANTERN) == conf(s, "martha", LANTERN) == 1.0  # no face
+    assert conf(s, "martha", {"pred": "sold_bottle", "a": "maggie", "b": "tamas"}) == 1.0
+    assert conf(s, "gilchrist", fired("someone")) == 1.0  # someone burned the store; nobody knows who
+    assert not any(conf(s, n, fired("player")) for n in CASE["everyone"])
+    assert conf(week(face=True), "martha", lantern("player")) == 1.0  # on some seeds she saw his face
+
+
+# ---------------------------------------------------------------- the evenings
+def test_his_question_each_evening_is_what_he_heard_that_day():
+    s = week()
+    assert evening(s) == "ask_night"
+    say(s, "maggie", ALIBI, "maggies")  # Anton's story, told to the town's quickest tongue
+    s.tick(2)
+    assert conf(s, "gilchrist", ALIBI) > 0  # over supper, from Maggie
+    assert evening(s) == "ask_alibi"
+    line = s.decide("gilchrist", "evening", bindings={"teller": "Billy Tuck"})
+    assert line.text.startswith("At your sister's till late")
+
+
+def test_the_lantern_line_names_whoever_he_has_it_from():
+    s = week()
+    say(s, "gilchrist", LANTERN, "police", speaker="billy")
+    line = s.decide("gilchrist", "evening", bindings={"teller": "Billy Tuck"})
+    assert line.action == "ask_lantern"
+    assert line.text == "Billy Tuck says a lantern went down the back lane at one that night. Yours, perhaps?"
+
+
+def test_vera_covers_for_him_while_she_trusts_him_and_tells_the_truth_when_she_doesnt():
+    s = week()
+    say(s, "gilchrist", ALIBI, "police")
+    s.update("gilchrist", loc="vera")
+    assert s.decide("vera", "questioned", to="gilchrist").action == "cover"
+    assert conf(s, "gilchrist", NO_ALIBI) == 0
+    s.update("vera", trust_in={"player": 1})  # he threatened her, or she caught him lying
+    assert s.decide("vera", "questioned", to="gilchrist").action == "truth"
+    assert conf(s, "gilchrist", NO_ALIBI) == 0.4
+    assert evening(s) == "doubt_alibi"
+    s.update("gilchrist", flags={"doubted": True})
+    say(s, "gilchrist", LANTERN, "police", speaker="billy")
+    assert evening(s) == "warn"  # her word, and a lantern in the lane: don't leave town
+
+
+def test_vera_keeps_quiet_about_him_while_she_trusts_him():
+    s = week()
+    stopped = s.trace({"pred": "left_vera", "a": "player"})["stopped"]
+    assert {"npc": "vera", "why": "keeps it quiet ([[npc.vera.keeps]] 1)"} in stopped
+    s.update("vera", trust_in={"player": 2})
+    assert s.trace({"pred": "left_vera", "a": "player"})["next"]  # now she tells Maggie
+
+
+# ---------------------------------------------------------------- Martha
+def test_martha_tells_the_inspector_only_once_he_has_earned_it():
+    s = week(face=True)
+    s.update("gilchrist", loc="maggies")
+    assert s.decide("martha", "questioned", to="gilchrist").action == "say_nothing"
+    s.update("martha", trust_in={"gilchrist": 1})
+    line = s.decide("martha", "questioned", to="gilchrist")
+    assert line.action == "statement_face" and "Anton Holub" in line.text
+    assert conf(s, "gilchrist", lantern("player")) == 0.4
+
+
+def test_martha_keeps_the_bottle_from_everyone_to_protect_maggie():
+    stopped = week().trace({"pred": "sold_bottle", "a": "maggie", "b": "tamas"})["stopped"]
+    assert {"npc": "martha", "why": "keeps it quiet ([[npc.martha.keeps]] 1)"} in stopped
+
+
+def test_martha_is_never_the_one_he_takes():
+    s = week()
+    for teller in ("otto", "sandor", "maggie"):  # the town says it was "one of the Indians"
+        say(s, "gilchrist", fired("martha"), "police", speaker=teller)
+        say(s, "gilchrist", lantern("martha"), "police", speaker=teller)
+    assert conf(s, "gilchrist", fired("martha")) > 0.4
+    assert all("martha" not in c["do"] for c in s.explain("gilchrist", "steamer"))
+    assert steamer(s) == "nobody"
+
+
+# ---------------------------------------------------------------- the endings
+def test_breakup_an_old_man_a_bottle_and_a_lamp():
+    s = week()
+    say(s, "gilchrist", {"pred": "drunk", "a": "tamas"}, "police")
+    say(s, "gilchrist", {"pred": "sold_bottle", "a": "maggie", "b": "tamas"}, "police")
+    assert steamer(s) == "breakup"
+
+
+def test_another_mans_coat():
+    s = week()
+    say(s, "gilchrist", lantern("ashby"), "police")
+    assert steamer(s) == "take:ashby"
+
+
+def test_a_hand_on_the_shoulder_her_word_and_his_sisters():
+    s = week(face=True)
+    say(s, "gilchrist", ALIBI, "police")
+    s.update("vera", trust_in={"player": 1})
+    s.update("gilchrist", loc="vera")
+    s.decide("vera", "questioned", to="gilchrist")  # the truth
+    s.update("gilchrist", loc="maggies")
+    s.update("martha", trust_in={"gilchrist": 1})
+    s.decide("martha", "questioned", to="gilchrist")  # the face in the lane
+    assert steamer(s) == "arrest"
+
+
+def test_tamas_remembers_and_the_lie_told_him_comes_back():
+    s = week()
+    s.update("player", loc="mission")
+    say(s, "tamas", lantern("ashby"), "mission")  # "it was the stranger's lantern you saw"
+    assert conf(s, "tamas", lantern("ashby")) == 0.9  # he believes the one who sits with him
+    remember(s, "lantern")
+    assert conf(s, "tamas", lantern("ashby")) == 0.9  # a lantern, no face: no rival story
+    remember(s, "face")
+    assert conf(s, "tamas", lantern("ashby")) == 0.0 and conf(s, "tamas", lantern("player")) == 1.0
+    assert s.decide("tamas", "visit").action == "cold"
+    line = s.decide("tamas", "decision", to="gilchrist")
+    assert line.action == "go_to_inspector"
+    assert conf(s, "gilchrist", fired("player")) == 0.9
+    assert steamer(s) == "arrest"
+
+
+def test_tamas_forgives_a_friend_who_never_lied_to_him():
+    s = week()
+    remember(s, "face")
+    assert s.decide("tamas", "visit").action == "remembers"
+    assert s.decide("tamas", "decision", to="gilchrist").action == "forgive"
+    assert steamer(s) == "nobody"
+
+
+def test_the_confession():
+    s = week()
+    s.observe("confess", "player", "gilchrist", at="police", claim=fired("player"), said=True)
+    s.update("gilchrist", flags={"confessed": True})
+    assert evening(s) == "hear_confession"
+    assert steamer(s) == "mercy"
+
+
+def test_vera_takes_it_on_herself():
+    s = week()
+    s.observe("confess", "player", "vera", at="vera", claim=fired("player"), said=True)
+    assert conf(s, "vera", fired("player")) == 0.9
+    s.update("vera", flags={"brother_lost": True})
+    assert s.decide("vera", "last_morning", to="gilchrist").action == "confess_for_him"
+    assert steamer(s) == "take:vera"
+
+
+# ---------------------------------------------------------------- the town
+def test_billy_paid_a_little_keeps_quiet_and_paid_too_much_wonders():
+    s = week()
+    assert s.decide("billy", "offered", bindings={"amount": 5}).action == "pocket"
+    assert s.decide("billy", "offered", bindings={"amount": 40}).action == "wonder"
+    s.update("billy", flags={"paid_off": True})
+    assert {"npc": "billy", "why": "keeps it quiet ([[npc.billy.keeps]] 2)"} in s.trace(LANTERN)["stopped"]
+
+
+def test_a_lie_told_to_sandor_becomes_a_fight():
+    s = week()
+    say(s, "sandor", fired("ashby"), "mission")
+    s.update("sandor", loc="landing")
+    s.update("ashby", loc="ice")
+    assert s.decide("sandor", "meet", bindings={"who": "ashby"}).action == "greet"  # Ashby isn't there
+    s.update("ashby", loc="landing")
+    assert s.decide("sandor", "meet", bindings={"who": "ashby"}).action == "fight:ashby"
+
+
+@pytest.mark.parametrize("text, verb", [
+    ("I set the fire", "confess"),
+    ("here's 5 dollars", "pay"),
+    ("where were you the night of the fire", "ask"),
+])
+def test_the_players_words_read_with_no_model(text, verb):
+    s = week()
+    s.update("player", loc="maggies")
+    r = s.understand(text, to="maggie")
+    assert (r.status, r.intent.verb, r.path) == ("act", verb, "bank")
+
+
+def test_the_game_ships_the_addon_as_the_sdk_has_it():
+    """games/before-the-ice/addons/thespis is a copy of sdk/godot/addons/thespis: a change to one is made to both."""
+    sdk = HERE.parents[1] / "sdk" / "godot" / "addons" / "thespis"
+    ours = HERE / "addons" / "thespis"
+    names = sorted(p.name for p in sdk.iterdir())
+    assert sorted(p.name for p in ours.iterdir()) == names
+    for name in names:
+        assert (ours / name).read_bytes().replace(b"\r\n", b"\n") == (sdk / name).read_bytes().replace(b"\r\n", b"\n"), name

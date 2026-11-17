@@ -1,0 +1,736 @@
+#:schema https://raw.githubusercontent.com/coderback/Thespis/main/docs/game.schema.json
+# Before the Ice Goes Out: Coldwater Landing, on the Yukon, the last week of April 1898. The design is
+# docs/before-the-ice-goes-out.md; this file is the minds. The Godot game owns the world: where everyone is, who
+# sees whom pass, the clock, and what an act does. It reports what happened, and asks what each person does.
+#
+# The player is Anton Holub, who set the fire. Nine people believe what they saw and what they're told:
+#   - one fire, one culprit: `fired` and the `lantern` in the lane are `one_actor`, so two names for either are rival
+#     stories, and whoever started the losing one is caught. What someone saw with their own eyes counts for more
+#     (`first_hand`);
+#   - news goes along the town's ties: Maggie tells everyone, Sándor tells Billy, Věra tells Maggie, and Martha
+#     tells only Věra. Gilchrist hears what is said where he stands, and what Maggie tells him over supper;
+#   - silence is kept: Věra while she trusts her brother, Billy while he's paid or a friend, Otto while his card
+#     game is his own business, Maggie and Martha about the bottle;
+#   - Gilchrist's evening question, his rounds and whom he takes on the steamer are choices that open as his
+#     beliefs grow.
+# Days are three phases (morning, afternoon, evening); the week is 15. A tick moves the minds on one phase.
+
+[game]
+id = "coldwater"
+name = "Before the Ice Goes Out"
+setting = """Coldwater Landing, a gold-rush town on the frozen Yukon, the last week of April 1898. Four nights ago \
+Otto Brand's store burned with the grubstake notes half the creek owed him, and Tamás Kovács, the watchman asleep in \
+the back, was burned. Inspector Gilchrist of the North-West Mounted Police has come over the ice to find out who set \
+it, and leaves on the first steamer when the ice goes out. The player is Anton Holub, a Czech miner whose widowed \
+sister Věra would have lost her claim to Brand on the first of May."""
+
+[places]
+landing = "the landing, with the ice-pool tripod and its clock"
+maggies = "Maggie's roadhouse"
+store = "the ruin of Brand's store"
+mission = "the mission infirmary"
+police = "the Mounted Police post"
+ice = "the river ice"
+vera = "Věra's cabin at the creek mouth"
+your_cabin = "Anton's cabin"
+downriver = "the new cabins downriver"
+
+[player]
+start = "your_cabin"
+
+# ---------------------------------------------------------------- the cast
+# trust_in runs -5 to 5. Walks are a place per phase (morning, afternoon, evening), round and round.
+
+[npc.gilchrist]
+name = "Inspector Gilchrist"
+aliases = ["Gilchrist", "the Inspector", "the Mountie"]
+start = "police"
+goal = "Find out who set the fire, and take that person south on the first steamer"
+persona = """Inspector Ewan Gilchrist of the North-West Mounted Police, a Scot: polite, patient, and never in a \
+hurry. He doesn't accuse; he asks, writes it down, and waits for people to talk themselves into a corner. He calls \
+Anton "Mr Holub"."""
+drives = {}
+trust_in = { maggie = 1, otto = 1, billy = 0, ashby = -1, sandor = 1, vera = 1, tamas = 2, martha = 1, player = 0 }
+# his rounds: a place a phase, the evenings at the post. The game moves him elsewhere when a round choice says so.
+walk = ["police", "maggies", "police",
+        "store", "mission", "police",
+        "landing", "maggies", "police",
+        "mission", "store", "police",
+        "landing", "maggies", "police"]
+
+[npc.gilchrist.lines]
+talk = "Mr Holub. A cold one again."
+told = "Is that so. I'll write that down, if you don't mind."
+asked = "I ask the questions here, Mr Holub. It's a habit of the trade."
+paid = "Put that away. I'll forget you offered it."
+threatened = "I'll forget you said that too. Once."
+comforted = "Kind of you."
+confessed = "Sit down, Mr Holub. Start from the beginning, and take your time."
+# the evening: his question is a choice, by what he believes tonight
+pleasantry = "Sit down, Mr Holub. The river's talking tonight; they say the pool will go to a Swede."
+ask_night = "Four nights ago Brand's store burned. Where were you that night, Mr Holub?"
+ask_lantern = "{teller} says a lantern went down the back lane at one that night. Yours, perhaps?"
+ask_alibi = "At your sister's till late, you said. I may walk across the ice tomorrow and hear it from her."
+doubt_alibi = "Your sister says you left her at half past eleven. That leaves an hour and a half, Mr Holub."
+caught_lie = "You told me a thing that wasn't so. I wrote it down, as I write everything down."
+warn = "Don't leave town, Mr Holub. Not before the ice goes."
+search = "My men will look over your cabin in the morning. You won't mind, I'm sure."
+hear_confession = "Thank you, Mr Holub. That can't have been easy."
+# his rounds
+round = "Morning. Just walking."
+see_vera = "I'll cross the ice to Mrs Holub's today."
+see_martha = "I hear someone in Maggie's kitchen saw the lane that night. I'll ask her myself."
+see_tamas = "I'll sit with the watchman a while."
+search_cabin = "Stand aside, Mr Holub. This won't take long."
+# the steamer
+take = "{who}, you'll come south with me. We'll talk on the boat."
+arrest = "Mr Holub. You'll come south with me; we'll talk on the boat."
+breakup = "It was the watchman's lamp. I'll write it so, and the town can have its ice."
+mercy = "I'll take you south, Mr Holub, and I'll tell the judge why you did it."
+nobody = "I'll go south with no one. I don't like it, but I'll go."
+
+[npc.vera]
+name = "Věra"
+aliases = ["Vera", "Mrs Holub", "your sister"]
+start = "vera"
+goal = "Keep her brother safe, and keep the claim"
+persona = """Věra Holub, Anton's older sister, widowed in the winter: from Bohemia by way of Chicago, practical, dry, \
+and loyal. She watched Anton's lantern cross the ice home at half past eleven, an hour and a half before the fire, \
+and she suspects him. She keeps quiet while she trusts him."""
+drives = {}
+trust_in = { player = 4, martha = 3, maggie = 1, gilchrist = 0, otto = -2 }
+
+[[npc.vera.keeps]]
+about = "player"
+when = [{ trust = "player", gte = 3 }]
+
+[npc.vera.lines]
+talk = "You came the long way. Sit, the kettle's on."
+told = "Is that what they're saying in town."
+asked = "Ask me straight, Anton. You always could."
+paid = "Keep your money. You'll need it."
+threatened = "Don't you speak to me like that. Not you."
+comforted = "I know. I know."
+confessed = "I knew. God help me, I knew when I saw your lantern on the ice."
+cover = "He was here till late, Inspector. We played cards and talked about the claim."
+truth = "He left at half past eleven. I watched his lantern all the way to the landing."
+nothing = "I've nothing to say, Inspector. It's cold; you'll want to get back before dark."
+confess_for_him = "It was me, Inspector. I set it. Take me and leave my brother be."
+
+[npc.tamas]
+name = "Tamás"
+aliases = ["Tamas", "the watchman", "Mr Kovács"]
+start = "mission"
+goal = "To remember the night of the fire"
+persona = """Tamás Kovács, the night watchman, a Hungarian smith: burned, feverish, and ashamed of the bottle. He \
+remembers the night a piece at a time, and he believes the one who sits with him, until his own memory says \
+otherwise."""
+drives = {}
+trust_in = { player = 2, sandor = 4, maggie = 1, gilchrist = 1, otto = 0 }
+
+[[npc.tamas.keeps]]  # ashamed of the bottle
+pred = "drunk"
+
+[[npc.tamas.keeps]]  # what he remembers of Anton is his to tell, the last day, or not
+about = "player"
+when = [{ trust = "player", gte = 2 }]
+
+[[npc.tamas.keeps]]
+pred = "sold_bottle"
+
+[npc.tamas.lines]
+talk = "You came again. Sit where I can see you."
+told = "Perhaps. It's all smoke, in here."
+asked = "I don't know. I keep trying."
+paid = "For the medicine? God bless you."
+threatened = "I'm burned, not deaf."
+comforted = "You're a good man, Anton. You're the only one who comes."
+confessed = "You. It was you in the light."
+thank = "You came again. Sit where I can see you."
+remembers = "It was you. In the light, with the lantern. Why, Anton?"
+cold = "You told me it was another man's lantern. I can see it now. Don't come here again."
+forgive = "I won't tell him. Go home, Anton. Pray for both of us."
+go_to_inspector = "Fetch the Inspector. I have something to tell him."
+
+[npc.sandor]
+name = "Sándor"
+aliases = ["Sandor", "Sandy", "the watchman's son"]
+start = "mission"
+goal = "Make someone pay for what happened to his father"
+persona = """Sándor "Sandy" Kovács, Tamás's son, born in the Pennsylvania mines: young, strong, quick to anger, and \
+loyal to whoever he trusts. He believes what he's told by people he likes, and acts on it."""
+drives = { anger = 6 }
+trust_in = { tamas = 4, maggie = 2, gilchrist = 1, player = 1, billy = 1, ashby = -2, otto = -1, martha = -1 }
+walk = ["mission", "landing", "maggies"]
+
+[npc.sandor.lines]
+talk = "Anton. Any news?"
+told = "If I find him, I'll kill him."
+asked = "I was at the forge. I dragged him out myself."
+paid = "I don't want your money. I want the man."
+threatened = "Try it."
+comforted = "Thanks. He doesn't know me some days."
+greet = "Anton. Any news?"
+fight = "{who}! You burned my father!"
+
+[npc.billy]
+name = "Billy"
+aliases = ["Billy Tuck", "the wood boy"]
+start = "landing"
+goal = "To eat until the boats come"
+persona = """Billy Tuck, a San Francisco orphan of about thirteen who cuts and steals wood for a living: quick, \
+cheeky, frightened of the police. He saw a lantern at Brand's back door while he was stealing Brand's cordwood."""
+drives = { fear = 0 }
+trust_in = { maggie = 3, sandor = 1, player = 0, gilchrist = -1, otto = -2 }
+walk = ["landing", "store", "maggies"]
+
+[npc.billy.feels]
+threatened = { fear = 4 }
+
+[npc.billy.decay]
+fear = { to = 0, half_life = 3 }
+
+[[npc.billy.keeps]]
+about = "player"
+when = [{ flag = "paid_off" }]
+
+[[npc.billy.keeps]]
+pred = "lantern"
+when = [{ any = [{ flag = "paid_off" }, { trust = "player", gte = 3 }, { drive = "fear", gte = 3 }] }]
+
+[npc.billy.lines]
+talk = "Wood, mister? Two bits an armful, dry as a bone."
+told = "No foolin'?"
+asked = "I didn't see nothin'. I was asleep."
+threatened = "All right! All right."
+comforted = "Gee. Thanks, mister."
+pocket = "I didn't see nothin', mister. Not a thing."
+wonder = "That's a lot of money for nothin', mister."
+
+[npc.maggie]
+name = "Maggie"
+aliases = ["Maggie Doyle", "Mrs Doyle"]
+start = "maggies"
+goal = "Peace in her house, and the Mountie's money"
+persona = """Maggie Doyle, keeps the roadhouse, from Cork: warm, shrewd, and the town's quickest tongue. Everything \
+told to her is known by morning. She sold Tamás the bottle the night of the fire, and she'd rather nobody said so."""
+drives = {}
+trust_in = { otto = 1, sandor = 1, billy = 1, gilchrist = 1, ashby = 0, martha = 1, vera = 2, player = 1 }
+
+[[npc.maggie.keeps]]  # she sold it: what Tamás drank, and that he was drunk, would bring the police on her
+pred = "sold_bottle"
+
+[[npc.maggie.keeps]]
+pred = "drunk"
+
+[npc.maggie.lines]
+talk = "Sit yourself down, Anton. Beans and bread, and the coffee's hot."
+told = "Well! Is that so. I never."
+asked = "I was behind my own bar all night, as I am every night."
+paid = "God love you."
+threatened = "Not under my roof, you won't."
+comforted = "Ah, go on."
+
+[npc.otto]
+name = "Otto Brand"
+aliases = ["Otto", "Brand", "Mr Brand"]
+start = "maggies"
+goal = "His gold, and a debtor to blame"
+persona = """Otto Brand, trader and lender from Hamburg: stiff, exact, and owed money by half the creek. The night of \
+the fire he was dealing a fixed card game in Maggie's back room, and saw a lantern pass the window going west."""
+drives = {}
+trust_in = { maggie = 1, gilchrist = 1, player = -1, ashby = -2, martha = -2, vera = -1 }
+walk = ["maggies", "store", "maggies"]
+
+[[npc.otto.keeps]]  # his own crooked game, always
+pred = "fixed_game"
+
+[[npc.otto.keeps]]  # and the lantern he saw from the back room, while the game is his own business
+pred = "lantern"
+when = [{ not_flag = "found_out" }]
+
+[npc.otto.lines]
+talk = "Holub. Your sister's claim is still mine, notes or no notes."
+told = "I'll believe it when the Inspector does."
+asked = "I was in my bed. Ask anyone."
+paid = "On account. I'll write it down, since my book is ash."
+threatened = "You'll answer to the Inspector for that."
+comforted = "Spare me."
+
+[npc.ashby]
+name = "Jack Ashby"
+aliases = ["Ashby", "Jack", "the stranger"]
+start = "landing"
+goal = "To leave on the first boat"
+persona = """A man who calls himself Jack Ashby, over the pass in the fall: easy-going, careful about his past, and \
+watchful. He raised the alarm the night of the fire, from the laid-up steamer where he was hiding food for his \
+escape. The name isn't his."""
+drives = {}
+trust_in = { maggie = 0, player = 0, gilchrist = -2 }
+walk = ["landing", "ice", "maggies"]
+
+[npc.ashby.lines]
+talk = "Holub. Watching the tripod? It won't move for you looking."
+told = "People say all sorts."
+asked = "I was the one who shouted fire. Ask anybody."
+paid = "Obliged."
+threatened = "Easy, friend."
+comforted = "Kind of you."
+
+[npc.martha]
+name = "Martha"
+aliases = ["Martha Matthias", "Mrs Matthias"]
+start = "downriver"
+goal = "What Brand owes her household, and the new cabin finished before the ice goes"
+persona = """Martha Matthias, a Hän woman whose people are building new cabins three miles downriver, since the town \
+was built on their fish camp. She sews gloves and moccasins, and sleeps in Maggie's kitchen when it's too late to \
+walk home. Plain-spoken and fluent in English, with her own opinions; she owes the town nothing. Brand bought her \
+household's meat on account, and says the account burned with his ledger. From the kitchen she saw Tamás buy the \
+bottle, and a man with a lantern pass in the lane at one."""
+drives = {}
+trust_in = { vera = 3, maggie = 2, player = 1, gilchrist = -1, otto = -3, sandor = 0, billy = 1 }
+walk = ["downriver", "store", "maggies"]
+
+[[npc.martha.keeps]]
+pred = "sold_bottle"
+when = [{ trust = "maggie", gte = 1 }]
+
+[npc.martha.lines]
+talk = "You're Věra's brother. She says you work hard."
+told = "That's what the town says. The town says a lot."
+asked = "Nobody's asked me anything all week."
+paid = "For gloves? Four dollars, they're good ones."
+threatened = "I've heard worse from better men."
+comforted = "Thank you."
+statement = "A man went past the window with a lantern at one o'clock, going east. Ten minutes later he came back."
+statement_face = "A man went past the window with a lantern at one o'clock. It was Anton Holub. I saw his face."
+say_nothing = "I sew, Inspector. I don't look out of windows."
+tell_lantern = "Somebody went down the lane with a lantern that night. I didn't tell the Mountie. Nobody asked."
+
+# ---------------------------------------------------------------- choices
+# The game asks at these moments, and applies what comes back under its own rules.
+
+# The evening at the post: his question tonight is the most pressing thing he believes. The game binds `teller`, the
+# name of whoever he has it from, for the lantern line.
+[[npc.gilchrist.choices.evening]]
+do = "pleasantry"
+utility = 1
+
+[[npc.gilchrist.choices.evening]]
+do = "ask_night"
+utility = 2
+when = [{ believes = { pred = "fired", a = "someone", b = "otto" } }]
+
+[[npc.gilchrist.choices.evening]]
+do = "ask_alibi"
+utility = 3
+when = [{ believes = { pred = "with_vera", a = "player" } }, { not_flag = "asked_vera" }]
+
+[[npc.gilchrist.choices.evening]]
+do = "ask_lantern"
+utility = 4
+when = [{ believes = { pred = "lantern", a = "someone" } }, { not_flag = "asked_lantern" }]
+
+[[npc.gilchrist.choices.evening]]
+do = "doubt_alibi"
+utility = 6
+when = [{ believes = { pred = "with_vera", a = "player", neg = true } }, { not_flag = "doubted" }]
+
+# What would make him sure it was Anton: his own sister saying he wasn't with her, and a lantern in the lane; his
+# lantern, seen by someone; or someone telling him so who saw it. Thespis doesn't reason for him: these are the sums.
+[[npc.gilchrist.choices.evening]]
+do = "warn"
+utility = 7
+when = [{ any = [{ all = [{ believes = { pred = "with_vera", a = "player", neg = true } },
+                          { believes = { pred = "lantern", a = "someone" } }] },
+                 { believes = { pred = "lantern", a = "player" } },
+                 { believes = { pred = "fired", a = "player", b = "otto" } }] },
+        { not_flag = "warned" }]
+
+[[npc.gilchrist.choices.evening]]
+do = "search"
+utility = 8
+when = [{ any = [{ believes = { pred = "lantern", a = "player" }, min = 0.4 },
+                 { believes = { pred = "fired", a = "player", b = "otto" }, min = 0.3 }] },
+        { not_flag = "searched" }]
+
+[[npc.gilchrist.choices.evening]]
+do = "caught_lie"
+utility = 9
+when = [{ caught = "player" }, { not_flag = "said_caught" }]
+
+[[npc.gilchrist.choices.evening]]
+do = "hear_confession"
+utility = 20
+when = [{ flag = "confessed" }]
+
+# His rounds, each morning and afternoon: where he goes, if not where his walk takes him.
+[[npc.gilchrist.choices.rounds]]
+do = "round"
+utility = 1
+
+[[npc.gilchrist.choices.rounds]]
+do = "see_tamas"
+utility = 2
+when = [{ believes = { pred = "lantern", a = "someone" } }, { not_flag = "saw_tamas" }]
+
+[[npc.gilchrist.choices.rounds]]
+do = "see_vera"
+utility = 4
+when = [{ believes = { pred = "with_vera", a = "player" } }, { not_flag = "asked_vera" }]
+
+[[npc.gilchrist.choices.rounds]]
+do = "see_martha"
+utility = 5
+when = [{ believes = { pred = "saw_lane", a = "martha" } }, { not_flag = "asked_martha" }]
+
+[[npc.gilchrist.choices.rounds]]
+do = "search_cabin"
+utility = 6
+when = [{ flag = "search_due" }]
+
+# The steamer: whom he takes south, the surest case first. Never Martha, whatever the town says. Anyone he caught
+# lying counts for more. "An old man, a bottle and a lamp" closes it as an accident.
+[[npc.gilchrist.choices.steamer]]
+do = "nobody"
+utility = 1
+
+[[npc.gilchrist.choices.steamer]]
+do = "breakup"
+utility = 3
+when = [{ any = [{ believes = { pred = "fired", a = "tamas", b = "otto" }, min = 0.4 },
+                 { all = [{ believes = { pred = "drunk", a = "tamas" }, min = 0.4 },
+                          { believes = { pred = "sold_bottle", a = "maggie", b = "tamas" }, min = 0.4 }] }] }]
+
+[[npc.gilchrist.choices.steamer]]
+do = "take:ashby"
+utility = [4, { plus = 2, if = { believes = { pred = "wanted", a = "ashby" } } },
+           { plus = 3, if = { caught = "ashby" } }]
+when = [{ any = [{ believes = { pred = "fired", a = "ashby", b = "otto" }, min = 0.4 },
+                 { believes = { pred = "lantern", a = "ashby" }, min = 0.4 }] }]
+
+[[npc.gilchrist.choices.steamer]]
+do = "take:otto"
+utility = [4, { plus = 3, if = { caught = "otto" } }]
+when = [{ any = [{ believes = { pred = "fired", a = "otto", b = "otto" }, min = 0.4 },
+                 { believes = { pred = "lantern", a = "otto" }, min = 0.4 }] }]
+
+[[npc.gilchrist.choices.steamer]]
+do = "take:billy"
+utility = [4, { plus = 3, if = { caught = "billy" } }]
+when = [{ any = [{ believes = { pred = "fired", a = "billy", b = "otto" }, min = 0.4 },
+                 { believes = { pred = "lantern", a = "billy" }, min = 0.4 }] }]
+
+[[npc.gilchrist.choices.steamer]]
+do = "take:vera"
+utility = 6
+when = [{ believes = { pred = "fired", a = "vera", b = "otto" }, min = 0.4 }]
+
+[[npc.gilchrist.choices.steamer]]
+do = "arrest"
+utility = [5, { plus = 3, if = { caught = "player" } }]
+when = [{ any = [{ believes = { pred = "fired", a = "player", b = "otto" }, min = 0.4 },
+                 { believes = { pred = "lantern", a = "player" }, min = 0.6 },
+                 { all = [{ believes = { pred = "lantern", a = "player" }, min = 0.3 },
+                          { believes = { pred = "with_vera", a = "player", neg = true } }] }] }]
+
+[[npc.gilchrist.choices.steamer]]
+do = "mercy"
+utility = 20
+when = [{ flag = "confessed" }]
+
+# Věra, when Gilchrist asks her where her brother was. Her answer is a statement to him (`to = "gilchrist"`).
+[[npc.vera.choices.questioned]]
+do = "nothing"
+utility = 1
+
+[[npc.vera.choices.questioned]]
+do = "cover"
+utility = 4
+when = [{ trust = "player", gte = 3 }]
+asserts = { pred = "with_vera", a = "player" }
+
+[[npc.vera.choices.questioned]]
+do = "truth"
+utility = 3
+when = [{ trust = "player", lte = 1 }]
+asserts = { pred = "with_vera", a = "player", neg = true }
+
+# Věra, the last morning: if she's sure he did it and he's lost, she takes it on herself.
+[[npc.vera.choices.last_morning]]
+do = "nothing"
+utility = 1
+
+[[npc.vera.choices.last_morning]]
+do = "confess_for_him"
+utility = 5
+when = [{ believes = { pred = "fired", a = "player", b = "otto" }, min = 0.8 }, { trust = "player", gte = 4 },
+        { flag = "brother_lost" }]
+asserts = { pred = "fired", a = "vera", b = "otto" }
+
+# Tamás, when Anton sits with him.
+[[npc.tamas.choices.visit]]
+do = "thank"
+utility = 1
+
+[[npc.tamas.choices.visit]]
+do = "remembers"
+utility = 4
+when = [{ believes = { pred = "fired", a = "player", b = "otto" } }]
+
+[[npc.tamas.choices.visit]]
+do = "cold"
+utility = 6
+when = [{ caught = "player" }]
+
+# Tamás, the last day: once he remembers, the decision is his.
+[[npc.tamas.choices.decision]]
+do = "thank"
+utility = 1
+
+[[npc.tamas.choices.decision]]
+do = "forgive"
+utility = 3
+when = [{ believes = { pred = "fired", a = "player", b = "otto" } }, { trust = "player", gte = 2 }]
+
+[[npc.tamas.choices.decision]]
+do = "go_to_inspector"
+utility = 4
+when = [{ believes = { pred = "fired", a = "player", b = "otto" } }, { any = [{ caught = "player" },
+        { trust = "player", lte = 1 }] }]
+asserts = { pred = "fired", a = "player", b = "otto" }
+
+# Sándor, meeting someone (the game binds `who`): he goes for whoever he believes burned his father.
+[[npc.sandor.choices.meet]]
+do = "greet"
+utility = 1
+
+[[npc.sandor.choices.meet]]
+do = "fight:{who}"
+utility = [{ drive = "anger" }]
+when = [{ with = "{who}" }, { believes = { pred = "fired", a = "{who}", b = "otto" }, min = 0.4 }]
+
+# Billy, offered money (the game binds `amount`, in dollars): a little buys his silence; too much makes him wonder.
+[[npc.billy.choices.offered]]
+do = "pocket"
+utility = 3
+
+[[npc.billy.choices.offered]]
+do = "wonder"
+utility = [{ bound = "amount", weight = 0.2 }]
+
+# Martha, when Gilchrist comes to the kitchen. She speaks to him only if he has earned it; the face only on the
+# seeds where she saw it.
+[[npc.martha.choices.questioned]]
+do = "say_nothing"
+utility = 1
+
+[[npc.martha.choices.questioned]]
+do = "statement"
+utility = 3
+when = [{ trust = "gilchrist", gte = 1 }, { believes = { pred = "lantern", a = "someone" } }]
+asserts = { pred = "lantern", a = "someone" }
+
+[[npc.martha.choices.questioned]]
+do = "statement_face"
+utility = 4
+when = [{ trust = "gilchrist", gte = 1 }, { believes = { pred = "lantern", a = "player" } }]
+asserts = { pred = "lantern", a = "player" }
+
+# Martha, when Anton sits in the kitchen: she says what she saw, to someone who asks kindly.
+[[npc.martha.choices.meet]]
+do = "talk"
+utility = 1
+
+[[npc.martha.choices.meet]]
+do = "tell_lantern"
+utility = 3
+when = [{ trust = "player", gte = 2 }, { believes = { pred = "lantern", a = "someone" } }]
+asserts = { pred = "lantern", a = "someone" }
+
+# ---------------------------------------------------------------- the grapevine
+# Who tells whom. Maggie is the town's crossroads; Martha's only tie is Věra, so what she says goes no further unless
+# Věra carries it; Gilchrist sups at Maggie's, and keeps what he hears.
+[[tie]]
+between = ["maggie", "otto"]
+kind = "trade"
+
+[[tie]]
+between = ["maggie", "sandor"]
+kind = "friend"
+
+[[tie]]
+between = ["maggie", "billy"]
+kind = "friend"
+
+[[tie]]
+between = ["maggie", "ashby"]
+kind = "lodger"
+
+[[tie]]
+between = ["maggie", "gilchrist"]
+kind = "lodger"
+
+[[tie]]
+between = ["maggie", "vera"]
+kind = "trade"
+
+[[tie]]
+between = ["sandor", "tamas"]
+kind = "kin"
+
+[[tie]]
+between = ["sandor", "billy"]
+kind = "friend"
+
+[[tie]]
+between = ["martha", "vera"]
+kind = "friend"
+
+[[npc.gilchrist.keeps]]
+pred = "fired"
+
+[[npc.gilchrist.keeps]]
+pred = "lantern"
+
+[[npc.gilchrist.keeps]]
+pred = "with_vera"
+
+[[npc.gilchrist.keeps]]
+pred = "saw_lane"
+
+[gossip]
+about = "everyone"
+priority = { fired = 6, lantern = 5, with_vera = 4, saw_lane = 3, drunk = 3, sold_bottle = 3, fixed_game = 3, wanted = 2, went = 1 }
+threshold = 0.4
+along = { kin = 1.0, friend = 0.9, lodger = 0.8, trade = 0.7 }
+in_person = 0.7
+corroborate = true
+
+[claims]
+one_actor = ["fired", "lantern"]
+caught = 2
+first_hand = 3
+
+# ---------------------------------------------------------------- the player's words
+# What Anton may do by typing it. The game offers the ones open now, with the people there.
+[intents.tell]
+means = "tells the one they speak to, as fact, that the claim is true (or, with neg, that it isn't)"
+reads = "Tell {to} that {claim}"
+args = { to = "npc", claim = { type = "claim", preds = ["fired", "with_vera", "lantern", "drunk", "sold_bottle", "fixed_game", "wanted"] } }
+examples = ["{claim}, I'd swear to it", "{claim}"]
+
+[intents.ask]
+means = "asks the one they speak to what they saw or know about the night of the fire"
+reads = "Ask {to} about the night of the fire"
+args = { to = "npc" }
+asks = true
+consequential = false
+examples = ["what did you see that night", "where were you the night of the fire", "what happened that night"]
+
+[intents.pay]
+means = "gives the one they speak to money, or firmly offers it: for wood, gloves, medicine or their silence"
+reads = "Give {to} {amount} dollars"
+args = { to = "npc", amount = { type = "amount", min = 1, max = 50 } }
+examples = ["here's {amount} dollars", "take these {amount} dollars and keep your mouth shut"]
+
+[intents.threaten]
+means = "threatens the one they speak to with harm, to their face, to frighten them"
+reads = "Threaten {to}"
+args = { to = "npc" }
+examples = ["keep your mouth shut or you'll regret it", "say a word and I'll break your neck"]
+
+[intents.comfort]
+means = "comforts or reassures the one they speak to, kindly"
+reads = "Comfort {to}"
+args = { to = "npc" }
+consequential = false
+examples = ["it'll be all right", "I'm sorry for what happened to you", "you're not alone in this"]
+
+[intents.confess]
+means = "admits to the one they speak to that they themselves set the fire at Brand's store"
+reads = "Confess to {to} that you set the fire"
+args = { to = "npc" }
+examples = ["I set the fire", "it was me, I burned Brand's store", "I did it, I set the fire"]
+
+[intents.talk]
+reads = "Talk to {to}"
+args = { to = "npc" }
+
+# ---------------------------------------------------------------- words
+[words.claims]
+fired = "{a} started the fire in {b}'s store"
+lantern = "{a} carried a lantern down the back lane to Brand's store at one in the morning, the night of the fire"
+with_vera = "{a} was at Věra's cabin across the ice until after the fire started"
+saw_lane = "{a} saw someone in the back lane the night of the fire"
+left_vera = "{a} left Věra's cabin at half past eleven, the night of the fire"
+sold_bottle = "{a} sold {b} a bottle of whisky at midnight, the night of the fire"
+drunk = "{a} was drunk on watch the night of the fire"
+fixed_game = "{a} was dealing a crooked card game in Maggie's back room the night of the fire"
+wanted = "{a} is wanted in Seattle under another name"
+went = "{a} went to {place}"
+paid = "{a} paid {b}"
+threatened = "{a} threatened {b}"
+comforted = "{a} comforted {b}"
+
+[words.events]
+fire = "{a} set the fire in Brand's store."
+carry = "{a} carried a lantern down the back lane."
+leave = "{a} left {where} with a lantern."
+sell = "{a} sold {t} a bottle at {where}."
+deal = "{a} dealt a crooked game at {where}."
+drink = "{a} drank on watch."
+walk = "{a} went from {where} to {to}."
+move = "{a} went from {where} to {to}."
+tell = "{a} told {t} that {claim}."
+gossip = "{a} told {t} that {claim}."
+pay = "{a} gave {t} {amount} dollars."
+threaten = "{a} threatened {t}."
+comfort = "{a} comforted {t}."
+confess = "{a} confessed to {t} that {claim}."
+remember = "{a} remembered more of the night of the fire."
+flee = "{a} came over the pass under a name that isn't his."
+watch = "{a} looked out of the kitchen window into the lane."
+
+[actions]
+pleasantry = "pass the time with {who} and listen"
+ask_night = "ask {who} where they were the night of the fire"
+ask_lantern = "ask {who} whether the lantern in the back lane was theirs"
+ask_alibi = "tell {who} he'll check their story with their sister"
+doubt_alibi = "tell {who} their sister's story doesn't match theirs"
+caught_lie = "tell {who} he caught them in a lie"
+warn = "tell {who} not to leave town"
+search = "tell {who} his men will search their cabin"
+hear_confession = "hear {who} confess"
+take = "arrest {who} and take them south on the steamer"
+arrest = "arrest Anton Holub, in front of the town, and take him south on the steamer"
+breakup = "close the case as an accident with the watchman's lamp"
+mercy = "take {who} south, and speak for them to the judge"
+nobody = "leave on the steamer with nobody"
+cover = "tell the Inspector her brother was with her till late"
+truth = "tell the Inspector her brother left at half past eleven"
+confess_for_him = "confess to the fire herself, to save her brother"
+remembers = "tell {who} that he remembers them in the firelight"
+cold = "send {who} away for lying to him"
+forgive = "forgive {who} and keep it from the Inspector"
+go_to_inspector = "ask for the Inspector, to tell him who set the fire"
+fight = "go for {who} with his fists"
+pocket = "take the money and keep quiet"
+wonder = "wonder why he's being paid so much"
+statement = "tell the Inspector about the lantern in the lane"
+statement_face = "tell the Inspector whose face she saw in the lane"
+say_nothing = "say nothing to the Inspector"
+tell_lantern = "tell {who} about the lantern she saw in the lane"
+
+[situations]
+evening = "The evening at the Mounted Police post. Gilchrist has asked Anton to sit with him by the stove."
+rounds = "Gilchrist on his rounds of the town."
+steamer = "The ice has gone out. The first steamer is at the landing, and Gilchrist is boarding it."
+questioned = "Inspector Gilchrist has come to ask what they know about the night of the fire."
+visit = "Anton sits with Tamás in the mission infirmary."
+
+[narrator]
+name = "The Inspector's Notebook"
+persona = """Inspector Gilchrist's own notebook: dry, exact, in the first person, written up each night. It records \
+who told him what and when, and names prejudice where the town shows it."""
+structured = true

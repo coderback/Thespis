@@ -29,6 +29,8 @@ var flags: Dictionary = {}  ## key -> Control
 var prompt: PanelContainer
 var prompt_line: Label
 var prompt_hint: Label
+var day_line: Label
+var phase_line: Label
 
 var _serif := SystemFont.new()
 var _italic := SystemFont.new()
@@ -85,8 +87,10 @@ func _cartouche() -> void:
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", int(4 * K))
 	v.add_child(_label("Coldwater Landing", _caps, 32, INK))
-	v.add_child(_label("Yukon District · Wednesday, April 27, 1898", _italic, 14, BROWN))
-	v.add_child(_label("DAY 2 · EVENING", _serif, 14, Color("#8a4f10")))
+	day_line = _label("Yukon District · Tuesday, April 26, 1898", _italic, 14, BROWN)
+	v.add_child(day_line)
+	phase_line = _label("DAY 1 · MORNING", _serif, 14, Color("#8a4f10"))
+	v.add_child(phase_line)
 	p.add_child(v)
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(p)
@@ -114,6 +118,24 @@ func _prompt() -> void:
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(p)
 	prompt = p
+
+
+## The day on the cartouche.
+func set_clock(day_name: String, date: String, day: int, part: String) -> void:
+	day_line.text = "Yukon District · %s, %s" % [day_name, date]
+	phase_line.text = "DAY %d · %s" % [day, part]
+
+
+## Who is at a flag's place now.
+func set_who(key: String, who: String) -> void:
+	if not flags.has(key):
+		return
+	var b: Button = flags[key]
+	var f: Dictionary = b.get_meta("flag")
+	f.who = who
+	b.tooltip_text = "Go to %s. Here: %s" % [f.name, who]
+	var words: VBoxContainer = b.get_child(0).get_child(0).get_child(0)
+	(words.get_child(1) as Label).text = who
 
 
 func say(line: String, hint := "") -> void:
@@ -169,7 +191,7 @@ func _flag(f: Dictionary) -> void:
 	headrow.add_child(head)
 	col.add_child(headrow)
 	b.add_child(col)
-	b.set_meta("flag", f)
+	b.set_meta("flag", f.duplicate())  # its own copy: who is there changes
 	if not you:
 		b.pressed.connect(func() -> void: chosen.emit(f.key))
 	add_child(b)
