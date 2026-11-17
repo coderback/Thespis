@@ -1,0 +1,1298 @@
+{
+ "camera": {
+  "pos": [
+   12.0,
+   38.0,
+   -50.0
+  ],
+  "target": [
+   0.5,
+   -1.0,
+   -0.2
+  ],
+  "ortho": 46.0,
+  "size": [
+   960,
+   540
+  ]
+ },
+ "lamp": {
+  "pos": [
+   -24.0,
+   34.0,
+   -18.0
+  ],
+  "target": [
+   0,
+   -1,
+   0
+  ],
+  "color": "#ffd8ad",
+  "energy": 52000.0
+ },
+ "moon": {
+  "color": "#8aa6cf",
+  "energy": 1.600000023841858,
+  "rotation": [
+   0.9599310755729675,
+   0.0,
+   -0.5235987901687622
+  ]
+ },
+ "world": "#13203a",
+ "bands": [
+  [
+   0.0,
+   "#2c3658"
+  ],
+  [
+   0.05,
+   "#55638a"
+  ],
+  [
+   0.22,
+   "#a9a9b8"
+  ],
+  [
+   0.6,
+   "#f2e2c8"
+  ],
+  [
+   1.6,
+   "#fff4e0"
+  ]
+ ],
+ "band_scale": 0.45,
+ "materials": {
+  "snow": {
+   "kind": "snow",
+   "color": "#eef3f9"
+  },
+  "log0": {
+   "kind": "noise",
+   "stops": [
+    [
+     0,
+     "#2a1f17"
+    ],
+    [
+     0.45,
+     "#56412e"
+    ],
+    [
+     0.7,
+     "#76644f"
+    ],
+    [
+     1,
+     "#9a8b77"
+    ]
+   ],
+   "map": [
+    9,
+    9,
+    0.5
+   ],
+   "noise": 3.5
+  },
+  "log1": {
+   "kind": "noise",
+   "stops": [
+    [
+     0,
+     "#2e2219"
+    ],
+    [
+     0.5,
+     "#5e4733"
+    ],
+    [
+     0.75,
+     "#806b54"
+    ],
+    [
+     1,
+     "#a39380"
+    ]
+   ],
+   "map": [
+    9,
+    9,
+    0.5
+   ],
+   "noise": 3.5
+  },
+  "log2": {
+   "kind": "noise",
+   "stops": [
+    [
+     0,
+     "#261c15"
+    ],
+    [
+     0.4,
+     "#4e3b2a"
+    ],
+    [
+     0.7,
+     "#6d5a46"
+    ],
+    [
+     1,
+     "#8c7c68"
+    ]
+   ],
+   "map": [
+    9,
+    9,
+    0.5
+   ],
+   "noise": 3.5
+  },
+  "chink": {
+   "kind": "plain",
+   "color": "#3b342b",
+   "emit": null,
+   "strength": 0.0
+  },
+  "plankZ": {
+   "kind": "noise",
+   "stops": [
+    [
+     0,
+     "#2c2016"
+    ],
+    [
+     0.5,
+     "#5a4433"
+    ],
+    [
+     1,
+     "#7d6550"
+    ]
+   ],
+   "map": [
+    14,
+    14,
+    0.6
+   ],
+   "noise": 4.0
+  },
+  "plankY": {
+   "kind": "noise",
+   "stops": [
+    [
+     0,
+     "#2c2016"
+    ],
+    [
+     0.5,
+     "#5a4433"
+    ],
+    [
+     1,
+     "#7d6550"
+    ]
+   ],
+   "map": [
+    14,
+    0.6,
+    14
+   ],
+   "noise": 4.0
+  },
+  "paint": {
+   "kind": "noise",
+   "stops": [
+    [
+     0,
+     "#3e3024"
+    ],
+    [
+     0.36,
+     "#4a3a2c"
+    ],
+    [
+     0.42,
+     "#b39a74"
+    ],
+    [
+     1,
+     "#cfbf9c"
+    ]
+   ],
+   "map": [
+    6,
+    6,
+    0.8
+   ],
+   "noise": 2.5
+  },
+  "trim": {
+   "kind": "noise",
+   "stops": [
+    [
+     0,
+     "#1e231d"
+    ],
+    [
+     0.6,
+     "#2b3329"
+    ],
+    [
+     1,
+     "#3d463a"
+    ]
+   ],
+   "map": [
+    10,
+    10,
+    1
+   ],
+   "noise": 4.0
+  },
+  "cream": {
+   "kind": "plain",
+   "color": "#e6d8b8",
+   "emit": null,
+   "strength": 0.0
+  },
+  "metal": {
+   "kind": "plain",
+   "color": "#1c1a19",
+   "emit": null,
+   "strength": 0.0
+  },
+  "glass": {
+   "kind": "plain",
+   "color": "#2a1a0a",
+   "emit": "#ffb35a",
+   "strength": 9
+  },
+  "ice": {
+   "kind": "noise",
+   "stops": [
+    [
+     0,
+     "#6e95b8"
+    ],
+    [
+     0.5,
+     "#8fb1cf"
+    ],
+    [
+     1,
+     "#c2d6e8"
+    ]
+   ],
+   "map": [
+    2,
+    2,
+    2
+   ],
+   "noise": 3
+  },
+  "strata": {
+   "kind": "strata",
+   "h": 4.6,
+   "stops": [
+    [
+     0,
+     "#3a3028"
+    ],
+    [
+     0.2,
+     "#5d6f84"
+    ],
+    [
+     0.34,
+     "#8a9bb0"
+    ],
+    [
+     0.38,
+     "#5a4430"
+    ],
+    [
+     0.6,
+     "#7a6248"
+    ],
+    [
+     0.7,
+     "#a08a6a"
+    ],
+    [
+     0.74,
+     "#6a5038"
+    ],
+    [
+     0.86,
+     "#4a3626"
+    ],
+    [
+     0.9,
+     "#e4ebf2"
+    ],
+    [
+     1,
+     "#f2f6fa"
+    ]
+   ]
+  },
+  "walnut": {
+   "kind": "noise",
+   "stops": [
+    [
+     0,
+     "#1c120b"
+    ],
+    [
+     0.5,
+     "#2c1b10"
+    ],
+    [
+     1,
+     "#3c2616"
+    ]
+   ],
+   "map": [
+    0.08,
+    2.5,
+    1
+   ],
+   "noise": 6
+  },
+  "spruce": {
+   "kind": "noise",
+   "stops": [
+    [
+     0,
+     "#0f1d16"
+    ],
+    [
+     0.5,
+     "#1d3328"
+    ],
+    [
+     1,
+     "#2c4a3a"
+    ]
+   ],
+   "map": [
+    4,
+    4,
+    4
+   ],
+   "noise": 6
+  },
+  "icicle": {
+   "kind": "plain",
+   "color": "#dbe8f5",
+   "emit": null,
+   "strength": 0.0
+  },
+  "whiteboard": {
+   "kind": "noise",
+   "stops": [
+    [
+     0,
+     "#a8adb0"
+    ],
+    [
+     0.5,
+     "#cfd3d2"
+    ],
+    [
+     1,
+     "#e4e6e3"
+    ]
+   ],
+   "map": [
+    10,
+    10,
+    0.6
+   ],
+   "noise": 3
+  },
+  "darkglass": {
+   "kind": "plain",
+   "color": "#141418",
+   "emit": null,
+   "strength": 0.0
+  },
+  "icecut": {
+   "kind": "plain",
+   "color": "#cfe0ee",
+   "emit": null,
+   "strength": 0.0
+  },
+  "water": {
+   "kind": "plain",
+   "color": "#24405e",
+   "emit": null,
+   "strength": 0.0
+  },
+  "trodden": {
+   "kind": "plain",
+   "color": "#b9c4d3",
+   "emit": null,
+   "strength": 0.0
+  },
+  "earthbank": {
+   "kind": "plain",
+   "color": "#4a3a2c",
+   "emit": null,
+   "strength": 0.0
+  },
+  "crackline": {
+   "kind": "plain",
+   "color": "#24364a",
+   "emit": null,
+   "strength": 0.0
+  },
+  "doorwaydark": {
+   "kind": "plain",
+   "color": "#120c08",
+   "emit": null,
+   "strength": 0.0
+  },
+  "fire_b8321a": {
+   "kind": "plain",
+   "color": "#000000",
+   "emit": "#b8321a",
+   "strength": 1.0
+  },
+  "fire_ff6a1a": {
+   "kind": "plain",
+   "color": "#000000",
+   "emit": "#ff6a1a",
+   "strength": 1.0
+  },
+  "fire_ff6a1a.001": {
+   "kind": "plain",
+   "color": "#000000",
+   "emit": "#ff6a1a",
+   "strength": 1.0
+  },
+  "fire_ffc84a": {
+   "kind": "plain",
+   "color": "#000000",
+   "emit": "#ffc84a",
+   "strength": 1.0
+  },
+  "stone": {
+   "kind": "plain",
+   "color": "#6b6660",
+   "emit": null,
+   "strength": 0.0
+  },
+  "char": {
+   "kind": "plain",
+   "color": "#151312",
+   "emit": null,
+   "strength": 0.0
+  },
+  "soot": {
+   "kind": "plain",
+   "color": "#2b2a2a",
+   "emit": null,
+   "strength": 0.0
+  },
+  "charred": {
+   "kind": "plain",
+   "color": "#2a221c",
+   "emit": null,
+   "strength": 0.0
+  },
+  "castiron": {
+   "kind": "plain",
+   "color": "#26262a",
+   "emit": null,
+   "strength": 0.0
+  },
+  "safegreen": {
+   "kind": "plain",
+   "color": "#2f3a33",
+   "emit": null,
+   "strength": 0.0
+  },
+  "safeinside": {
+   "kind": "plain",
+   "color": "#0d0d0e",
+   "emit": null,
+   "strength": 0.0
+  },
+  "flagred": {
+   "kind": "plain",
+   "color": "#b3262b",
+   "emit": null,
+   "strength": 0.0
+  },
+  "belfrywhite": {
+   "kind": "plain",
+   "color": "#e8e6df",
+   "emit": null,
+   "strength": 0.0
+  },
+  "spiretin": {
+   "kind": "plain",
+   "color": "#4a4e55",
+   "emit": null,
+   "strength": 0.0
+  },
+  "pennant": {
+   "kind": "plain",
+   "color": "#1b2a4a",
+   "emit": null,
+   "strength": 0.0
+  },
+  "canvas": {
+   "kind": "plain",
+   "color": "#cfc3a6",
+   "emit": null,
+   "strength": 0.0
+  },
+  "line": {
+   "kind": "plain",
+   "color": "#1a1714",
+   "emit": null,
+   "strength": 0.0
+  },
+  "hull": {
+   "kind": "plain",
+   "color": "#3b2b22",
+   "emit": null,
+   "strength": 0.0
+  },
+  "steamerwhite": {
+   "kind": "plain",
+   "color": "#e2dccf",
+   "emit": null,
+   "strength": 0.0
+  },
+  "wheel": {
+   "kind": "plain",
+   "color": "#6a2a1e",
+   "emit": null,
+   "strength": 0.0
+  },
+  "barrel": {
+   "kind": "plain",
+   "color": "#4a3322",
+   "emit": null,
+   "strength": 0.0
+  },
+  "rock": {
+   "kind": "plain",
+   "color": "#6d7178",
+   "emit": null,
+   "strength": 0.0
+  },
+  "quenchwater": {
+   "kind": "plain",
+   "color": "#1d2a38",
+   "emit": null,
+   "strength": 0.0
+  },
+  "coal": {
+   "kind": "plain",
+   "color": "#121214",
+   "emit": null,
+   "strength": 0.0
+  },
+  "gravel": {
+   "kind": "plain",
+   "color": "#8a8076",
+   "emit": null,
+   "strength": 0.0
+  },
+  "shaft": {
+   "kind": "plain",
+   "color": "#141110",
+   "emit": null,
+   "strength": 0.0
+  },
+  "rope": {
+   "kind": "plain",
+   "color": "#8a7a5c",
+   "emit": null,
+   "strength": 0.0
+  }
+ },
+ "lights": [
+  {
+   "pos": [
+    -11.55,
+    1.125,
+    1.55
+   ],
+   "color": "#ffa64d",
+   "watts": 18.0,
+   "radius": 0.25
+  },
+  {
+   "pos": [
+    7.65,
+    1.125,
+    2.9
+   ],
+   "color": "#ffa64d",
+   "watts": 18.0,
+   "radius": 0.25
+  },
+  {
+   "pos": [
+    4.45,
+    1.125,
+    1.4
+   ],
+   "color": "#ffa64d",
+   "watts": 18.0,
+   "radius": 0.25
+  },
+  {
+   "pos": [
+    -4.25,
+    1.275,
+    2.6
+   ],
+   "color": "#ffa64d",
+   "watts": 18.0,
+   "radius": 0.25
+  },
+  {
+   "pos": [
+    -7.7,
+    1.4,
+    4.7
+   ],
+   "color": "#ffa64d",
+   "watts": 22.0,
+   "radius": 0.30000001192092896
+  },
+  {
+   "pos": [
+    -5.5,
+    1.4,
+    4.7
+   ],
+   "color": "#ffa64d",
+   "watts": 22.0,
+   "radius": 0.30000001192092896
+  },
+  {
+   "pos": [
+    -5.85,
+    1.9,
+    4.5
+   ],
+   "color": "#ffa64d",
+   "watts": 30.0,
+   "radius": 0.11999999731779099
+  },
+  {
+   "pos": [
+    8.45,
+    1.125,
+    3.95
+   ],
+   "color": "#ffa64d",
+   "watts": 18.0,
+   "radius": 0.25
+  },
+  {
+   "pos": [
+    10.25,
+    1.125,
+    3.95
+   ],
+   "color": "#ffa64d",
+   "watts": 18.0,
+   "radius": 0.25
+  },
+  {
+   "pos": [
+    14.85,
+    2.0,
+    2.3
+   ],
+   "color": "#ffa64d",
+   "watts": 18.0,
+   "radius": 0.25
+  },
+  {
+   "pos": [
+    12.175,
+    1.175,
+    3.6
+   ],
+   "color": "#ffa64d",
+   "watts": 18.0,
+   "radius": 0.25
+  },
+  {
+   "pos": [
+    12.975,
+    1.175,
+    3.6
+   ],
+   "color": "#ffa64d",
+   "watts": 18.0,
+   "radius": 0.25
+  },
+  {
+   "pos": [
+    13.725,
+    1.175,
+    3.6
+   ],
+   "color": "#ffa64d",
+   "watts": 18.0,
+   "radius": 0.25
+  },
+  {
+   "pos": [
+    14.6,
+    1.1,
+    3.55
+   ],
+   "color": "#ffa64d",
+   "watts": 18.0,
+   "radius": 0.25
+  },
+  {
+   "pos": [
+    16.2,
+    1.1,
+    3.55
+   ],
+   "color": "#ffa64d",
+   "watts": 18.0,
+   "radius": 0.25
+  },
+  {
+   "pos": [
+    -2.45,
+    1.125,
+    -8.9
+   ],
+   "color": "#ffa64d",
+   "watts": 18.0,
+   "radius": 0.25
+  },
+  {
+   "pos": [
+    -12.0,
+    1.6,
+    0.15
+   ],
+   "color": "#ffa64d",
+   "watts": 40.0,
+   "radius": 0.11999999731779099
+  },
+  {
+   "pos": [
+    -8.6,
+    1.6,
+    0.15
+   ],
+   "color": "#ffa64d",
+   "watts": 40.0,
+   "radius": 0.11999999731779099
+  },
+  {
+   "pos": [
+    -3.3,
+    1.6,
+    0.15
+   ],
+   "color": "#ffa64d",
+   "watts": 40.0,
+   "radius": 0.11999999731779099
+  },
+  {
+   "pos": [
+    3.9,
+    1.6,
+    0.15
+   ],
+   "color": "#ffa64d",
+   "watts": 40.0,
+   "radius": 0.11999999731779099
+  },
+  {
+   "pos": [
+    7.0,
+    1.6,
+    0.15
+   ],
+   "color": "#ffa64d",
+   "watts": 40.0,
+   "radius": 0.11999999731779099
+  },
+  {
+   "pos": [
+    12.0,
+    1.6,
+    0.15
+   ],
+   "color": "#ffa64d",
+   "watts": 40.0,
+   "radius": 0.11999999731779099
+  },
+  {
+   "pos": [
+    2.8,
+    0.8,
+    0.7
+   ],
+   "color": "#ff7a2a",
+   "watts": 60.0,
+   "radius": 0.30000001192092896
+  },
+  {
+   "pos": [
+    3.95,
+    0.75,
+    0.7
+   ],
+   "color": "#ff8a3a",
+   "watts": 110.0,
+   "radius": 0.3499999940395355
+  },
+  {
+   "pos": [
+    -2.4,
+    0.9,
+    -0.65
+   ],
+   "color": "#ffa64d",
+   "watts": 35.0,
+   "radius": 0.10000000149011612
+  }
+ ],
+ "chimneys": [
+  [
+   -13.884,
+   3.643,
+   1.65
+  ],
+  [
+   -11.04,
+   3.375,
+   1.6
+  ],
+  [
+   5.46,
+   3.375,
+   1.6
+  ],
+  [
+   -7.5,
+   4.414,
+   3.072
+  ],
+  [
+   9.15,
+   3.577,
+   3.296
+  ],
+  [
+   14.75,
+   3.61,
+   2.44
+  ],
+  [
+   -3.66,
+   3.375,
+   -7.65
+  ]
+ ],
+ "glows": [
+  {
+   "pos": [
+    2.8,
+    0.15,
+    0.6
+   ],
+   "radii": [
+    0.62,
+    0.34
+   ],
+   "color": "#7a4022"
+  },
+  {
+   "pos": [
+    2.75,
+    0.152,
+    0.7
+   ],
+   "radii": [
+    0.36,
+    0.2
+   ],
+   "color": "#a8582a"
+  },
+  {
+   "pos": [
+    4.25,
+    0.09,
+    1.5
+   ],
+   "radii": [
+    0.42,
+    0.85
+   ],
+   "color": "#e7a978"
+  },
+  {
+   "pos": [
+    4.2,
+    0.092,
+    1.25
+   ],
+   "radii": [
+    0.3,
+    0.5
+   ],
+   "color": "#f6c590"
+  }
+ ],
+ "people": {
+  "anton": {
+   "pos": [
+    -2.9,
+    0.03,
+    -0.35
+   ],
+   "height": 2.6
+  },
+  "maggie": {
+   "pos": [
+    -6.1,
+    0.15,
+    0.7
+   ],
+   "height": 2.6
+  },
+  "sandor": {
+   "pos": [
+    -4.6,
+    0.03,
+    -0.3
+   ],
+   "height": 2.6
+  },
+  "gilchrist": {
+   "pos": [
+    9.6,
+    0.03,
+    0.45
+   ],
+   "height": 2.6
+  },
+  "billy": {
+   "pos": [
+    0.0,
+    0.03,
+    -1.8
+   ],
+   "height": 2.08
+  },
+  "ashby": {
+   "pos": [
+    5.5,
+    0.06,
+    -3.9
+   ],
+   "height": 2.6
+  },
+  "vera": {
+   "pos": [
+    -2.55,
+    0.03,
+    -7.15
+   ],
+   "height": 2.6
+  }
+ },
+ "places": {
+  "maggies": [
+   -6.6,
+   4.665,
+   1.0
+  ],
+  "store": [
+   0.0,
+   1.3,
+   2.2
+  ],
+  "landing": [
+   1.0,
+   0.3,
+   -2.9
+  ],
+  "ice": [
+   4.6,
+   2.3,
+   -4.4
+  ],
+  "vera": [
+   -4.1,
+   2.9,
+   -8.2
+  ],
+  "police": [
+   9.6,
+   1.2,
+   1.2
+  ],
+  "infirmary": [
+   15.4,
+   2.7,
+   2.0
+  ],
+  "church": [
+   13.0,
+   4.6,
+   1.3
+  ],
+  "your_cabin": [
+   -13.4,
+   2.8,
+   2.3
+  ],
+  "dest": [
+   -3.5,
+   0.08,
+   -6.85
+  ]
+ },
+ "heads": {
+  "anton": [
+   -3.2265,
+   1.9316,
+   1.0638
+  ],
+  "maggie": [
+   -6.4265,
+   2.0516,
+   2.1138
+  ],
+  "sandor": [
+   -4.9265,
+   1.9316,
+   1.1138
+  ],
+  "gilchrist": [
+   9.2735,
+   1.9316,
+   1.8638
+  ],
+  "billy": [
+   -0.2612,
+   1.5513,
+   -0.6689
+  ],
+  "ashby": [
+   5.1735,
+   1.9616,
+   -2.4862
+  ],
+  "vera": [
+   -2.8765,
+   1.9316,
+   -5.7362
+  ]
+ },
+ "routes": {
+  "taken": [
+   [
+    -13.4,
+    0.16,
+    0.9
+   ],
+   [
+    -13.4,
+    0.07,
+    -0.3
+   ],
+   [
+    -8,
+    0.07,
+    -0.4
+   ],
+   [
+    -2,
+    0.07,
+    -0.4
+   ],
+   [
+    0.7,
+    0.07,
+    -0.6
+   ],
+   [
+    1.0,
+    0.2,
+    -1.8
+   ],
+   [
+    1.0,
+    0.2,
+    -3.4
+   ],
+   [
+    0.2,
+    0.08,
+    -4.4
+   ],
+   [
+    -1.0,
+    0.08,
+    -5.4
+   ],
+   [
+    -2.0,
+    0.08,
+    -6.3
+   ],
+   [
+    -2.8,
+    0.07,
+    -6.8
+   ],
+   [
+    -3.5,
+    0.07,
+    -6.85
+   ]
+  ],
+  "backway": [
+   [
+    -13.4,
+    0.16,
+    0.9
+   ],
+   [
+    -13.6,
+    0.07,
+    -0.3
+   ],
+   [
+    -15.4,
+    0.07,
+    -0.4
+   ],
+   [
+    -16.2,
+    0.07,
+    -1.6
+   ],
+   [
+    -16.3,
+    0.08,
+    -3.5
+   ],
+   [
+    -16.2,
+    0.08,
+    -5.6
+   ],
+   [
+    -15.6,
+    0.07,
+    -7.3
+   ],
+   [
+    -12,
+    0.07,
+    -7.7
+   ],
+   [
+    -8,
+    0.07,
+    -7.5
+   ],
+   [
+    -5.6,
+    0.07,
+    -7.1
+   ],
+   [
+    -4.7,
+    0.07,
+    -6.95
+   ]
+  ]
+ },
+ "screen": {
+  "maggies": [
+   825,
+   188
+  ],
+  "store": [
+   639,
+   268
+  ],
+  "landing": [
+   643,
+   378
+  ],
+  "ice": [
+   555,
+   372
+  ],
+  "vera": [
+   815,
+   388
+  ],
+  "police": [
+   385,
+   323
+  ],
+  "infirmary": [
+   222,
+   299
+  ],
+  "church": [
+   292,
+   259
+  ],
+  "your_cabin": [
+   1001,
+   182
+  ],
+  "dest": [
+   790,
+   430
+  ],
+  "head_anton": [
+   733,
+   260
+  ],
+  "head_maggie": [
+   813,
+   228
+  ],
+  "head_sandor": [
+   779,
+   253
+  ],
+  "head_gilchrist": [
+   389,
+   295
+  ],
+  "head_billy": [
+   664,
+   308
+  ],
+  "head_ashby": [
+   528,
+   350
+  ],
+  "head_vera": [
+   766,
+   373
+  ]
+ }
+}

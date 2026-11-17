@@ -14,6 +14,10 @@ def lin(h):
 
 
 # ---------------------------------------------------------------- materials
+# What each material is, recorded as it's made, so the Godot game can rebuild it in its own shader
+MATSPEC = {}
+
+
 def new_mat(name):
     m = bpy.data.materials.new(name)
     try:
@@ -59,6 +63,7 @@ def textured(name, stops, scale=(1, 1, 1), noise=4.0, detail=8.0, rough=0.85, bu
     r = ramp(nt, stops)
     nt.links.new(t.outputs["Fac"], r.inputs["Fac"])
     nt.links.new(r.outputs["Color"], b.inputs["Base Color"])
+    MATSPEC[m.name] = {"kind": "noise", "stops": stops, "map": list(scale), "noise": noise}
     bp = nt.nodes.new("ShaderNodeBump")
     bp.inputs["Strength"].default_value = bump
     nt.links.new(t.outputs["Fac"], bp.inputs["Height"])
@@ -76,11 +81,13 @@ def plain(name, hexc, rough=0.8, metal=0.0, emit=None, strength=0.0):
     if emit:
         b.inputs["Emission Color"].default_value = (*lin(emit), 1)
         b.inputs["Emission Strength"].default_value = strength
+    MATSPEC[m.name] = {"kind": "plain", "color": hexc, "emit": emit, "strength": strength}
     return m
 
 
 def snow_mat():
     m, nt, b = new_mat("snow")
+    MATSPEC[m.name] = {"kind": "snow", "color": "#eef3f9"}
     b.inputs["Base Color"].default_value = (*lin("#eef3f9"), 1)
     b.inputs["Roughness"].default_value = 0.55
     b.inputs["Subsurface Weight"].default_value = 0.35
@@ -98,6 +105,7 @@ def snow_mat():
 
 def strata_mat():
     m, nt, b = new_mat("strata")
+    MATSPEC[m.name] = {"kind": "strata", "h": STRATA_H, "stops": [(0, "#3a3028"), (0.2, "#5d6f84"), (0.34, "#8a9bb0"), (0.38, "#5a4430"), (0.6, "#7a6248"), (0.7, "#a08a6a"), (0.74, "#6a5038"), (0.86, "#4a3626"), (0.9, "#e4ebf2"), (1, "#f2f6fa")]}
     tc = nt.nodes.new("ShaderNodeTexCoord")
     sep = nt.nodes.new("ShaderNodeSeparateXYZ")
     nt.links.new(tc.outputs["Object"], sep.inputs["Vector"])
