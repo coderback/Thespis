@@ -32,17 +32,9 @@ var prompt_hint: Label
 var day_line: Label
 var phase_line: Label
 
-var _serif := SystemFont.new()
-var _italic := SystemFont.new()
-var _caps := SystemFont.new()
-
-
-func _init() -> void:
-	# stand-ins until the period faces are in the project (IM Fell English SC, Old Standard TT)
-	_serif.font_names = PackedStringArray(["Old Standard TT", "Georgia", "Times New Roman", "serif"])
-	_italic.font_names = _serif.font_names
-	_italic.font_italic = true
-	_caps.font_names = PackedStringArray(["IM Fell English SC", "Georgia", "Times New Roman", "serif"])
+var _serif: Font = Fonts.serif
+var _italic: Font = Fonts.italic
+var _caps: Font = Fonts.caps
 
 
 func _ready() -> void:
