@@ -10,6 +10,7 @@ var view: SubViewport
 var town: Town
 var walk: Walk
 var paper: Paper
+var picture: TextureRect
 var case: Case
 var talk: Talk
 var _thespis := false  ## the case is playing through Thespis
@@ -37,13 +38,16 @@ func _ready() -> void:
 	town = Town.new()
 	view.add_child(town)
 
-	var picture := TextureRect.new()
+	picture = TextureRect.new()
 	picture.texture = view.get_texture()
 	picture.set_anchors_preset(Control.PRESET_FULL_RECT)
 	picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	picture.stretch_mode = TextureRect.STRETCH_SCALE
 	picture.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	picture.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var dim := ShaderMaterial.new()  # dims and zooms the town behind a conversation
+	dim.shader = load("res://shaders/dim.gdshader")
+	picture.material = dim
 	add_child(picture)
 
 	walk = Walk.new()
@@ -71,12 +75,11 @@ func _ready() -> void:
 	add_child(case)
 	talk = Talk.new()
 	talk.case = case
-	talk.visible = false
+	talk.picture = picture
 	add_child(talk)
-	talk.position = Vector2(1920 - 430 * Talk.K - 60, 140)
 	talk.finished.connect(_day_goes_on)
 	case.spoke.connect(talk.hear)
-	case.news.connect(func(t: String): talk.write("[i]%s[/i]" % t))
+	case.news.connect(func(t: String): paper.say(t, ""))
 	case.clock.connect(_clock)
 	case.people_moved.connect(_who)
 	case.ended.connect(_ended)
@@ -86,15 +89,19 @@ func _ready() -> void:
 	if not r.ok:
 		push_warning("No Thespis: %s" % r.reason)
 		paper.say("The town is quiet: no Thespis.", r.reason.left(80))
-	if args.has("talk"):  # `-- --talk=maggies --shot=<file.png>`: at a place, talking, for a picture
+	if args.has("talk"):  # `-- --talk=maggies [--answer=2] [--evening=1] --shot=<file.png>`: talking, for a picture
 		var key: String = args.talk
 		town.people.anton.position = town.place(key)
 		_arrived(key)
 		await get_tree().create_timer(1.0).timeout
-		await case.talk(talk.to)
-		var u := await Thespis.understand("I was at my sister's till late", talk.to, {"offered": case.offered()})
-		if u.ok and u.value.intent != null and u.value.status == "act":
-			await case.carry_out(u.value.intent)
+		if args.has("answer"):  # `--answer=2`: press that answer, as the player would
+			talk._answer(int(args.answer) - 1)
+			await get_tree().create_timer(1.5).timeout
+		if args.has("evening"):  # `--evening=1`: leave, and leave again, to the evening at the post
+			for i in 3:
+				talk.close()
+				await _day_goes_on()
+			await get_tree().create_timer(1.0).timeout
 		if args.has("shot"):
 			_shot(args.shot)
 
@@ -114,7 +121,16 @@ func _arrived(place: String) -> void:
 	paper.flags.you.visible = true
 	if _thespis and case.playing:
 		await case.go(case.data.flags.get(place, place))
-		talk.show_place(f.name)
+		_sit(place, f.name, "Leave %s" % f.name)
+
+
+## Sit down to talk at a place: the town zooms in on it and dims, and the paper on the desk gives way to the
+## conversation.
+func _sit(place: String, title: String, leave: String, first := "") -> void:
+	var m := picture.material as ShaderMaterial
+	m.set_shader_parameter("center", town.to_screen(town.place(place)) / Vector2(PIXELS))
+	paper.visible = false
+	talk.open(title, case.data.phases[case.part()], leave, first)
 
 
 ## Anton is done here. In the evening he goes on to sit with Gilchrist at the post; then the night passes.
@@ -122,11 +138,10 @@ func _day_goes_on() -> void:
 	if not case.playing:
 		return
 	var evening := case.part() == 2 and not case.sat_with_him
-	talk.visible = false
+	paper.visible = true
 	await case.end_phase()
-	if evening and case.playing:
-		paper.say("The post, with Inspector Gilchrist.", "he asked you to sit with him")
-		talk.show_place("The Mounted Police post", "Good night")
+	if evening and case.playing:  # he asked Anton to sit with him, and his question is on the sheet
+		_sit("police", "The Mounted Police post", "Good night", "gilchrist")
 
 
 func _clock(day: int, part: int) -> void:
@@ -144,14 +159,12 @@ func _who() -> void:
 
 
 func _ended(title: String, line: ThespisLine) -> void:
-	paper.say(title, "the ice has gone out")
-	talk.show_place(title, "The End")
+	_sit("landing", title, "The End", "gilchrist")
 	if line != null:
 		talk.hear(line)
 	var nb := await case.notebook()
 	if nb.ok and nb.value != null:
-		talk.write("[b]The Inspector's Notebook[/b]
-%s" % nb.value.words(""))
+		talk.notebook(nb.value.words(""))
 
 
 func _unhandled_input(event: InputEvent) -> void:

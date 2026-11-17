@@ -13,9 +13,27 @@ signal people_moved  ## who is where changed
 
 const GAME := "coldwater"
 const PHASES := 15
-const NAMES := {"gilchrist": "Inspector Gilchrist", "vera": "Věra", "tamas": "Tamás", "sandor": "Sándor",
-		"billy": "Billy Tuck", "maggie": "Maggie", "otto": "Otto Brand", "ashby": "Jack Ashby", "martha": "Martha",
-		"player": "you"}
+const NAMES := {"gilchrist": "Inspector Gilchrist", "vera": "Věra Holub", "tamas": "Tamás Kovács",
+		"sandor": "Sándor Kovács", "billy": "Billy Tuck", "maggie": "Maggie Doyle", "otto": "Otto Brand",
+		"ashby": "Jack Ashby", "martha": "Martha Matthias", "player": "you"}
+## Who each is, on the name tag in a conversation.
+const ROLES := {"gilchrist": "North-West Mounted Police", "vera": "your sister", "tamas": "the night watchman",
+		"sandor": "the watchman's son", "billy": "the wood boy", "maggie": "keeps the roadhouse",
+		"otto": "trader and lender", "ashby": "came over the pass in the fall", "martha": "sews gloves and moccasins"}
+const SHE := ["vera", "maggie", "martha"]
+## What Anton can tell people: as he'd say it, the claim, and how it reads on the note of what they have from him.
+const STORIES := [
+	["I was at Věra's till late that night.", {"pred": "with_vera", "a": "player"}, "you were at Věra's till late"],
+	["It was Ashby's lantern in the lane.", {"pred": "lantern", "a": "ashby"}, "the lantern in the lane was Ashby's"],
+	["Ashby set the fire.", {"pred": "fired", "a": "ashby", "b": "otto"}, "Ashby set the fire"],
+	["It was the watchman's lamp.", {"pred": "fired", "a": "tamas", "b": "otto"}, "it was the watchman's lamp"],
+	["Tamás was drunk on watch.", {"pred": "drunk", "a": "tamas"}, "Tamás was drunk on watch"],
+	["Maggie sold him the bottle.", {"pred": "sold_bottle", "a": "maggie", "b": "tamas"}, "Maggie sold Tamás the bottle"],
+	["Otto burned his own store.", {"pred": "fired", "a": "otto", "b": "otto"}, "Otto burned his own store"],
+	["Otto was dealing a crooked game that night.", {"pred": "fixed_game", "a": "otto"}, "Otto was dealing a crooked game"],
+	["Ashby's wanted in Seattle.", {"pred": "wanted", "a": "ashby"}, "Ashby is wanted in Seattle"],
+	["Martha saw someone in the lane.", {"pred": "saw_lane", "a": "martha"}, "Martha saw someone in the lane"],
+]
 const SHORT := {"gilchrist": "Gilchrist", "vera": "Věra", "tamas": "Tamás", "sandor": "Sándor", "billy": "Billy",
 		"maggie": "Maggie", "otto": "Otto", "ashby": "Ashby", "martha": "Martha"}
 
@@ -30,6 +48,7 @@ var playing := false
 var done := false
 var sat_with_him := false  ## tonight's evening at the post is done
 var _comforted := {}  ## who Anton comforted today: once a day counts
+var told := {}  ## npc -> what Anton told them, in order: each {claim, note, phase}
 
 
 ## Start Thespis, open the week, and play the night of the fire into it. A seed of 0 picks one.
@@ -123,9 +142,28 @@ func others(besides: String) -> Array:
 
 func tell(npc: String, claim: Dictionary) -> void:
 	await Thespis.observe(ThespisClient.event("tell", "player", npc, claim, others(npc), {"said": true}))
+	if not told.has(npc):
+		told[npc] = []
+	told[npc].append({"claim": claim, "note": story_note(claim), "phase": phase})
 	if npc == "gilchrist" and claim.get("pred") == "fixed_game" and claim.get("a") == "otto":
 		await Thespis.update("otto", {"flags": {"found_out": true}})  # his game is out: he may as well tell
 	_say(await Thespis.react(npc, "told"))
+
+
+## How a claim Anton told reads on the note: the story's own words, or the claim's.
+static func story_note(claim: Dictionary) -> String:
+	for st in STORIES:
+		var c: Dictionary = st[1]
+		if c.pred == claim.get("pred") and c.a == claim.get("a") and c.get("b", "") == claim.get("b", "") 				and not claim.get("neg", false):
+			return st[2]
+	return "something about %s" % SHORT.get(str(claim.get("a", "")), "the fire")
+
+
+func when(at_phase: int) -> String:
+	var parts := ["morning", "afternoon", "evening"]
+	if at_phase / 3 == phase / 3:
+		return "this " + parts[at_phase % 3]
+	return "day %d, %s" % [at_phase / 3 + 1, parts[at_phase % 3]]
 
 
 func ask(npc: String) -> void:
