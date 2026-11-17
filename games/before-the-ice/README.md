@@ -11,16 +11,18 @@ believes, and the steamer at the end.
 | --- | --- |
 | `assets/town.glb`, `assets/town.json` | The town, exported from the Blender builder, and what Godot needs to stage it: each material's colours and grain, the lamps, the people, chimneys, places, routes, the camera |
 | `assets/sprites/` | The townsfolk, 32x48 (from [art/before-the-ice](../../art/before-the-ice/README.md)) |
+| `assets/portraits/` | Half-length conversation portraits: Maggie's so far. Anyone without one is shown by their figure, scaled up |
 | `scripts/main.gd` | The screen: the town rendered at 960x540 and scaled up by whole pixels, the paper on top at full size |
 | `scripts/town.gd` | Stages the model: the toon material on every surface, the desk lamp and the small lamps, sprites, smoke, the camera from the river, the outline pass |
 | `scripts/paper.gd` | The cartouche, the prompt, and a flag pinned to each place |
 | `scripts/walk.gd` | Pick a flag and Anton walks there: red behind him, dashed ahead, click to skip |
 | `shaders/toon.gdshader` | The Blender look, live: the desk lamp's light cut into bands (cold blue to warm), falling off with distance and at the edge of its cone; each surface's colour a noise ramp in its own space, as the Blender materials are |
 | `shaders/outline.gdshader` | One-pixel ink lines on silhouettes and creases, as Freestyle draws them |
+| `shaders/dim.gdshader` | The town behind a conversation: zoomed in on the place, darkened, washed out and softly blurred |
 | `coldwater.toml` | The minds: the nine people, what each keeps quiet, the town's ties, Gilchrist's evening questions, rounds and steamer, the player's words. `thespis check coldwater.toml` checks it |
 | `case.json` | The world's side, which the game and `tests/test_coldwater.py` both play: the week, the night of the fire as the observations the minds start from, how Tamás remembers, who sees each way |
 | `scripts/case.gd` | The rules: the clock, who is where, what Anton's acts do and who sees them, Gilchrist's rounds and evenings, Tamás's memory, the steamer and the Notebook |
-| `scripts/talk.gd` | The talk panel: whom Anton speaks to, what they say, his own words (read by `understand`) and the acts as buttons |
+| `scripts/talk.gd` | A conversation, as the canvas's ConversationDesk draws it: the town zoomed and dimmed behind, the place card, a half-length portrait with a pinned name tag, what they say on a sheet, numbered answers that say what they may cost (keys 1 to 4), a ruled line for Anton's own words (read by `understand`), the note of what they have from him with the red string of who they told, and the way out. Four answers a visit |
 | `addons/thespis/` | The Godot addon, a copy of [sdk/godot/addons/thespis](../../sdk/godot/addons/thespis) (a test keeps the two the same) |
 | `tools/week.tscn` | Plays a whole week headless through a sidecar and checks it holds (CI runs it) |
 | `tools/shot.py` | Saves what the game draws, to compare with the Blender renders |
@@ -34,6 +36,7 @@ godot --path games/before-the-ice                       # a new week; -- --seed=
 godot --headless --path games/before-the-ice res://tools/week.tscn -- --seed=7   # a whole week, checked
 python games/before-the-ice/tools/shot.py --godot <Godot 4.7 console build>                       # shots/town.png
 python games/before-the-ice/tools/shot.py --godot <...> --out shots/walk.png --walk=dest --at=0.5  # mid-walk
+godot --path games/before-the-ice -- --seed=7 --talk=maggies --answer=2 --shot=talk.png          # a conversation
 ```
 
 Thespis runs as a sidecar the addon starts: the packaged runtime as `thespis/` beside the game's executable, else
