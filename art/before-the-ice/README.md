@@ -34,6 +34,10 @@ KIT=kit MODE=town SPRITES=<path to sprites> blender -b --factory-startup --pytho
 python blender/kit_sheet.py kit town-960.png kit/cards
 ```
 
+**For the game.** With `EXPORT=<dir>` the script writes the town as `town.glb` and, in `town.json`, what the Godot
+game needs to stage it (each material's colours and grain, the lamps, people, chimneys, places, routes, the camera)
+instead of rendering. The game is in [`games/before-the-ice`](../../games/before-the-ice/README.md).
+
 - `coldwater_lib.py`: materials, primitives and the log-cabin builder the town uses (logs, gables, snow on the roof,
   icicles, doors and lit windows, an open forge door with the fire in it, woodpiles).
 - `build_test.py`: the first test, Maggie's roadhouse and one cabin, rendered in Cycles. Run with `STYLE=toon` or

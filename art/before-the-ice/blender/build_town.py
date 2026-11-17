@@ -17,6 +17,7 @@ OUT, ANCH = argv[0], argv[1]
 BLEND = argv[2] if len(argv) > 2 else None
 MODE = os.environ.get("MODE", "town")
 SPRITES = os.environ["SPRITES"]
+EXPORT = os.environ.get("EXPORT")  # a folder: write town.glb and town.json for the Godot game, then stop
 WALK = MODE == "walk"
 
 random.seed(1898)
@@ -604,7 +605,7 @@ def toonify(m):
     nt.links.new(em.outputs[0], out.inputs["Surface"])
 
 
-for m in list(bpy.data.materials):
+for m in [] if EXPORT else list(bpy.data.materials):  # Godot shades the exported town itself
     if m.name.startswith("glass"):
         m.node_tree.nodes["Principled BSDF"].inputs["Emission Strength"].default_value = 3.0
     elif m.name.startswith("fire_"):
@@ -633,6 +634,7 @@ def unlit(name, hexc, alpha=1.0):
         nt.links.new(mx.outputs[0], nt.nodes.get("Material Output").inputs["Surface"])
     else:
         nt.links.new(em.outputs[0], nt.nodes.get("Material Output").inputs["Surface"])
+    L.MATSPEC[m.name] = {"kind": "unlit", "color": hexc, "alpha": alpha}
     return m
 
 
@@ -655,8 +657,10 @@ for (x, y, z) in SMOKE_POS:
 
 # the forge's firelight: the cel bands keep only brightness, so the fire's colour is laid down as warm pools,
 # the way pixel scenes draw lamplight; an inner and an outer ring on the boardwalk and over the yard
+GLOWS = []
 for (x, y, z, rx, ry, col) in [(2.8, FRONT + 0.4, 0.15, 0.62, 0.34, "#7a4022"), (2.75, FRONT + 0.3, 0.152, 0.36, 0.2, "#a8582a"),
                                (4.25, FRONT - 0.5, 0.09, 0.42, 0.85, "#e7a978"), (4.2, FRONT - 0.25, 0.092, 0.3, 0.5, "#f6c590")]:
+    GLOWS.append({"pos": [x, y, z], "radii": [rx, ry], "color": col})
     o = cyl("fireglow", 1.0, 0.004, (x, y, z), (0, 0, 0.2), unlit("fireglow_" + col[1:], col), verts=10)
     o.scale = (rx, ry, 1)
     for c in o.users_collection:
@@ -677,10 +681,12 @@ FWD = (target - co.location).normalized()
 
 # ---------------------------------------------------------------- the townsfolk
 HEAD = {}
+PEOPLE = {}
 PERSON_H = 2.6
 
 
 def sprite(name, x, y, z=0.03, k=1.0):
+    PEOPLE[name] = {"pos": [x, y, z], "height": PERSON_H * k}
     img = bpy.data.images.load(os.path.join(SPRITES, name + ".png"))
     m = bpy.data.materials.new("sprite_" + name)
     try:
@@ -876,14 +882,72 @@ def scr(v):
     return [round(cc.x * 1280), round((1 - cc.y) * 720)]
 
 
-A = {
-    "maggies": scr((RX, FRONT, FH + 0.3)), "store": scr((SX0, SY0, 1.3)), "landing": scr((DX0, S_BANK + 0.6, 0.3)), "ice": scr(TT),
-    "vera": scr((VX, VY, 2.9)), "police": scr((PX, FRONT - 0.2, 1.2)), "infirmary": scr((IX, IY, 2.7)), "church": scr((CHX, FRONT - 0.3, 4.6)),
-    "your_cabin": scr((-13.4, FRONT - 1.3, 2.8)), "dest": scr((VX + 0.6, N_BANK + 0.25, 0.08)),
+PLACES = {
+    "maggies": (RX, FRONT, FH + 0.3), "store": (SX0, SY0, 1.3), "landing": (DX0, S_BANK + 0.6, 0.3), "ice": tuple(TT),
+    "vera": (VX, VY, 2.9), "police": (PX, FRONT - 0.2, 1.2), "infirmary": (IX, IY, 2.7), "church": (CHX, FRONT - 0.3, 4.6),
+    "your_cabin": (-13.4, FRONT - 1.3, 2.8), "dest": (VX + 0.6, N_BANK + 0.25, 0.08),
 }
+A = {k_: scr(v) for k_, v in PLACES.items()}
 for k_, v in HEAD.items():
     A["head_" + k_] = scr(v)
 json.dump(A, open(ANCH, "w"), indent=0)
+
+# ---------------------------------------------------------------- export: the town as glTF plus what Godot needs to stage it
+
+
+def godot_xyz(v):
+    """Blender is Z-up with Y north; Godot is Y-up with -Z north (what the glTF exporter does to the meshes)."""
+    return [round(v[0], 4), round(v[2], 4), round(-v[1], 4)]
+
+
+def hexs(c):
+    return "#%02x%02x%02x" % tuple(round(max(0.0, min(1.0, x)) ** (1 / 2.2) * 255) for x in c[:3])
+
+
+if EXPORT:
+    os.makedirs(EXPORT, exist_ok=True)
+    skip = {"thread"}
+    keep = []
+    bpy.ops.object.select_all(action="DESELECT")
+    for o in list(S.objects):
+        if o.type in ("CURVE", "FONT") and o.name not in skip and SPR not in o.users_collection:
+            bpy.context.view_layer.objects.active = o
+            o.select_set(True)
+            bpy.ops.object.convert(target="MESH")
+            o.select_set(False)
+    for o in S.objects:
+        if SPR in o.users_collection or o.name.split(".")[0] in skip or o.name.startswith("spruce_proto"):
+            continue
+        if o.type in ("MESH", "EMPTY"):
+            o.select_set(True)
+            keep.append(o)
+    bpy.ops.export_scene.gltf(filepath=os.path.join(EXPORT, "town.glb"), export_format="GLB", use_selection=True,
+                              export_apply=True, export_lights=False, export_cameras=False, export_yup=True)
+    used = {s.material.name for o in keep if o.type == "MESH" for s in o.material_slots if s.material}
+    lights = [{"pos": godot_xyz(o.location), "color": hexs(o.data.color), "watts": o.data.energy,
+               "radius": o.data.shadow_soft_size}
+              for o in S.objects if o.type == "LIGHT" and o.data.type == "POINT"]
+    data = {
+        "camera": {"pos": godot_xyz(co.location), "target": godot_xyz(target), "ortho": cam.ortho_scale,
+                   "size": [RES, RES * 9 // 16]},
+        "lamp": {"pos": godot_xyz(lo.location), "target": [0, -1, 0], "color": hexs(lamp.color), "energy": lamp.energy},
+        "moon": {"color": hexs(moon.color), "energy": moon.energy, "rotation": list(mo.rotation_euler)},
+        "world": "#13203a",
+        "bands": BANDS, "band_scale": BAND_SCALE,
+        "materials": {k_: v for k_, v in L.MATSPEC.items() if k_ in used},
+        "lights": lights,
+        "chimneys": [godot_xyz(c) for c in SMOKE_POS],
+        "glows": [{"pos": godot_xyz(g["pos"]), "radii": g["radii"], "color": g["color"]} for g in GLOWS],
+        "people": {k_: {"pos": godot_xyz(v["pos"]), "height": v["height"]} for k_, v in PEOPLE.items()},
+        "places": {k_: godot_xyz(v) for k_, v in PLACES.items()},
+        "heads": {k_: godot_xyz(v) for k_, v in HEAD.items()},
+        "routes": {"taken": [godot_xyz((x, y, ground_z(x, y))) for x, y in TAKEN],
+                   "backway": [godot_xyz((x, y, ground_z(x, y))) for x, y in BACKWAY]},
+        "screen": A,
+    }
+    json.dump(data, open(os.path.join(EXPORT, "town.json"), "w", encoding="utf-8"), indent=1, ensure_ascii=False)
+    print("exported", len(keep), "objects,", len(used), "materials")
+    sys.exit(0)
 
 # ---------------------------------------------------------------- kit mode: every piece rendered on its own, close up
 KIT = [

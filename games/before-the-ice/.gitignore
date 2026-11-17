@@ -1,0 +1,4 @@
+# Godot's import cache and editor state, rebuilt on open
+.godot/
+# screenshots from tools/shot
+shots/

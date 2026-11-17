@@ -162,6 +162,11 @@ jobs:
           echo "GODOT=$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" >> "$GITHUB_ENV"
       - name: The example plays through a sidecar and a server, unchanged
         run: python sdk/godot/test/run.py
+      - name: Before the Ice Goes Out loads headless, with no script errors
+        run: |
+          "$GODOT" --headless --path games/before-the-ice --import
+          "$GODOT" --headless --path games/before-the-ice --quit-after 30 2>&1 | tee "$RUNNER_TEMP/ice.log"
+          ! grep -E "SCRIPT ERROR|Parse Error|Failed to load" "$RUNNER_TEMP/ice.log"
 
   # The Unity package's core and example under .NET, against a sidecar and a hosted-mode server (sdk/unity). The
   # scene itself plays in the Unity editor, which needs a licence: run sdk/unity/test/run.py --unity locally.
