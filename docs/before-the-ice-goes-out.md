@@ -43,7 +43,7 @@ These works are public domain; we take their shapes and their weather, not their
 
 ## The cast
 
-They came from everywhere, and their names say where.
+They came from everywhere, and their names say where. All but one: Martha Paul's people were here first.
 
 | Who | What they want | What they hide about that night |
 |---|---|---|
@@ -55,6 +55,7 @@ They came from everywhere, and their names say where.
 | **Maggie Doyle**, keeps the roadhouse, from Cork | Peace, and the Mountie's money | She sold Tamás the bottle. Everything told to her is known by morning |
 | **Otto Brand**, trader and lender, from Hamburg | His gold, and a debtor to blame | He wasn't at the store. He was at a card game he was fixing |
 | **Jack Ashby**, came over the pass in the fall | To leave on the first boat | A name that isn't his, and a warrant in Seattle under the one that is. The perfect stranger to blame |
+| **Martha Paul**, Hän, whose people are building new cabins three miles downriver | What Brand owes her household, and the cabin finished before the ice goes | Nothing she means to hide. From Maggie's kitchen she saw Tamás buy the bottle, and a man with a lantern pass in the lane. Nobody has asked her, and the town won't carry her word |
 
 ## The names
 
@@ -73,8 +74,47 @@ players who look them up find a second layer.
 - **Otto Brand:** *ōt*, "wealth", and *Brand*, German for "fire". A fortune that burned.
 - **Maggie Doyle:** the magpie is named for *Mag*, Margaret; it chatters and hoards bright things.
 - **Billy Tuck:** what's tucked away is hidden, as what he saw is.
+- **Martha Paul:** the name she was given at baptism at the Forty Mile mission, as the Hän of 1898 were. Martha in
+  the gospel is the one who works while the others talk. Her own name isn't in any record the town keeps, and the
+  game doesn't invent one.
 - **Jack Ashby:** an alias, an ordinary English surname with *ash* in it: the stranger the town would like to bury in
   the ashes. His real name is in the Inspector's Notebook.
+
+## The people downriver
+
+The Hän lived on this river long before the rush. They were researched for this game in
+[before-the-ice-han-1898.md](before-the-ice-han-1898.md), from the Tr'ondëk Hwëch'in's own published history where
+possible. Coldwater is fictional, but it follows what happened at Dawson:
+
+- **Their fish camp was at the creek mouth**, where Věra's cabin and the claims are now. When the rush came they
+  sold the miners their houses, believing the land wasn't part of the sale; the miners believed it was. The salmon
+  traps were torn out. Over the winter the people agreed with the mission and the government to move three miles
+  downriver, and this spring they are building cabins there. Their camp is off the model: Martha comes to town, and
+  her home isn't a set to tour.
+- **April isn't salmon season.** It's the end of the late-winter hunt, grayling and the first ducks, mending canoes
+  and nets, tanning, and sewing. Moccasins have gone from 75 cents to seven dollars a pair this winter.
+- **Martha's household fed the town.** Her brother's party brought in moose and caribou when the town was hungry,
+  and Brand bought the meat on account, written in his ledger. The ledger burned with the notes, and Brand now says
+  the account went with it. The fire that freed half the creek from its debts wiped out the one debt owed to her.
+  (The account is the game's invention; the meat sales and the prices are on record.)
+- **She was in Maggie's kitchen that night**, where she sleeps when it's too late to walk the river trail home and
+  Maggie pays for gloves in board. At midnight she saw Maggie sell Tamás the bottle. At one she saw a man with a
+  lantern go east along the lane past the window, and come back ten minutes later; on some seeds, his face.
+
+So she can save you or hang you. What she saw of the bottle is the safest story in town, and it's true. What she saw
+in the lane is the one sighting that could break your alibi without Věra. But her word travels badly: she has few
+ties in town, so what she says stops at their edge unless someone she trusts carries it: Věra, who buys from her. Telling the police about the bottle brings them down on Maggie, who feeds her, and the police are the
+ones who staked her people's land. Gilchrist, unlike the town, will take her statement and weigh it, if he hears
+there's one to take. That makes her a choice for the player: you can make sure nobody hears her, and know what you
+did.
+
+She is never the one Gilchrist takes. The town may say it was "one of the Indians", and the Notebook names that for
+the prejudice it is; no record ties any Dawson fire to the Hän, and the game doesn't add one.
+
+**What the game doesn't use:** Hän words (the language is critically endangered and its teaching materials aren't
+licensed for this), songs, the dancing stick, potlatch or other ceremony, the Moosehide Gathering (which began in
+1993), or any real person. Chief Isaac stays offstage. Martha speaks plain, fluent English with her own opinions,
+never the newspapers' pidgin. A Hän reader, paid and credited, reads her before the game is released.
 
 ## How a day plays
 
@@ -86,6 +126,13 @@ threaten, confess. Meanwhile Gilchrist makes his own rounds, and the town talks 
 **Every evening Gilchrist asks you to sit with him.** These conversations are the set pieces. His questions come from
 what he has heard that day: *"Billy Tuck says he saw a lantern by Brand's back door. Yours, perhaps?"* You answer,
 and he weighs it against what you told him before and what others have told him.
+
+**The evenings work without a model.** Each of his questions is a written line, chosen by what he believes that day
+and filled in with who told him and what they saw, so the line above comes from Billy's sighting, not from a
+writer guessing it. Your answers go through `understand` as anywhere else: typed words are read against the game's
+own phrases, and the suggested acts are always there. A model, when there is one, gives him his own voice on top of
+the same question, but it never decides what he asks or what he concludes; those come from the engine either way,
+so the case runs by the same rules with or without one.
 
 ## The town
 
@@ -124,7 +171,7 @@ getting across the river can cost more (below).
 | # | Place | Who you'll find | What's there for the story |
 |---|---|---|---|
 | 1 | **The landing** | Billy (mornings), Ashby (all day), the pool crowd | The tripod and its clock, the ice-pool board, the laid-up steamer, Ashby's tent. Everyone at the landing sees who comes and goes over the ice |
-| 2 | **Maggie's roadhouse** | Maggie, Otto, Sándor and Ashby (evenings) | The bar, the kitchen where Billy eats, the back room where Otto was fixing a card game the night of the fire |
+| 2 | **Maggie's roadhouse** | Maggie, Otto, Sándor and Ashby (evenings); Martha in the kitchen (evenings) | The bar, the kitchen where Billy eats, the back room where Otto was fixing a card game the night of the fire |
 | 3 | **Brand's store** | Otto, picking through the ashes (afternoons) | The ruin, the back door Billy saw the lantern by, the cordwood stack he was stealing from |
 | 4 | **The mission infirmary** | Tamás, always; Sándor (mornings) | The church and its hospital at the east end, the window looking back along the street |
 | 5 | **The Mounted Police post** | Gilchrist, when he isn't on his rounds | A small stockade compound with a flag, and his room. Every evening he asks you to sit with him here |
@@ -151,9 +198,10 @@ see. Nobody saw it all; the Inspector's Notebook is him piecing it together (*In
 - **About 9 pm:** you cross the ice to Věra's. **11.30 pm:** you walk home across it with your lantern; she watches
   it all the way to the landing.
 - **Midnight:** Maggie sells Tamás a bottle at her kitchen door; he takes it to his bed in Brand's back room.
+  Martha, sewing by the stove, sees it.
 - **12.30 am:** Otto is dealing a fixed game in the roadhouse back room.
-- **1.00 am:** you go out your back door and along the lane to Brand's back door, where the notes are kept.
-  **1.10 am:** you come back the same way, past the back-room window.
+- **1.00 am:** you go out your back door and along the lane, past Maggie's kitchen window, to Brand's back door,
+  where the notes are kept. **1.10 am:** you come back the same way, past the back-room window.
 - **1.15 am:** Ashby, stowing food aboard the laid-up steamer for his escape, sees the glow first and shouts.
 - **1.20 am:** Sándor breaks in from the forge and drags his father out.
 
@@ -166,20 +214,22 @@ see. Nobody saw it all; the Inspector's Notebook is him piecing it together (*In
 | Jack Ashby | the glow, first; he raised the alarm | he was stowing away on the steamer |
 | Sándor Kovács | his father, burned | nothing; he wants someone to pay |
 | Tamás Kovács | a lantern, a coat, a face in the firelight | he can't remember yet |
+| Martha Paul | Tamás buying the bottle; a man with a lantern in the lane at one, and back at ten past | nobody asks her, and the town won't carry her word |
 
 Your story is that you were **at Věra's till late**. It's the natural lie: you were there, and across the ice is
 the one place nobody in town can see. It only holds if your sister lies for you, because she watched you leave at
 11.30, an hour and a half before the fire. Whether she will is her arc: *věra* is "faith", and she keeps quiet
 while she trusts you. Tell it to Maggie and it's all over town by morning, including, sooner or later, to Věra
-herself, and to Gilchrist, who will take his questions across the ice. The only other person who can break it is
-Otto, who saw a lantern pass his back-room window going west, and he'd have to admit to the card game first.
+herself, and to Gilchrist, who will take his questions across the ice. Two others can break it. Otto saw
+a lantern pass his back-room window going west, and he'd have to admit to the card game first. Martha saw it pass
+Maggie's kitchen window, and the town would have to listen to her first.
 
 ### The ways between them
 
 | Way | Joins | Seen by | Cost |
 |---|---|---|---|
 | **Front Street** | every place in town, and the landing across it | whoever is at the landing, on the roadhouse porch, at the post window or the infirmary window | none |
-| **The back lane** | the back doors, from your cabin to the mission | only whoever is out back: Billy at the cordwood, the card players in the roadhouse back room | none |
+| **The back lane** | the back doors, from your cabin to the mission | only whoever is out back: Billy at the cordwood, the card players in the roadhouse back room, Martha at the kitchen window | none |
 | **The ice crossing** | the landing and the creek | everyone at the landing and on the ice | none |
 | **The bend crossing** | the west end and the creek, behind the spruce point | nobody | the next turn as well |
 
@@ -206,6 +256,7 @@ your lies meet them, comes from here.
 | Otto Brand | roadhouse | the store | roadhouse back room |
 | Věra Holub | her cabin | her cabin | her cabin |
 | Tamás Kovács | the infirmary | the infirmary | the infirmary |
+| Martha Paul | downriver, at the new cabins | the store, after Otto for her account | roadhouse kitchen |
 | Inspector Gilchrist | his rounds | his rounds | the post, with you |
 
 ## Two clocks
@@ -254,7 +305,7 @@ reason they play again.
 
 The seed changes who saw what, who is tied to whom, how fast Tamás remembers, and which of the town's secrets is
 true. The lie that worked last time is the one that hangs you this time. A run takes about 40 minutes, every ending
-can be reached, and none comes from a trigger: it comes from what eight people came to believe.
+can be reached, and none comes from a trigger: it comes from what nine people came to believe.
 
 ## Built on Thespis
 
@@ -265,13 +316,14 @@ can be reached, and none comes from a trigger: it comes from what eight people c
 | Tamás remembering | What he saw, observed each day at a rising `conf`; first-hand beats what he's told once it's strong enough |
 | Rumour through Maggie, the grudge through Sándor | Gossip along ties, its threshold, `trace` |
 | Billy's and Věra's silence | `[[npc.x.keeps]]` with `when` (paid, or trust at least n) |
+| Martha's word, which the town won't carry | Few ties, so gossip from her stops at the threshold; she keeps it from the police until trust is high enough |
 | "It was the watchman's lamp" | A denial of the arson claim, believed if trusted people say it |
 | A bribe that's too generous | A `{ bound = "amount" }` utility term |
 | Gilchrist's searches, warnings and arrest | Choices that open as his beliefs grow, scored by utility |
 | What you type | `understand`: acts or talk; with a model the town speaks in its own voice, offline it uses the game's lines |
 | The Inspector's Notebook | `overview`, `explain`, `trace` |
 
-**Scope:** one `game.toml`, eight NPCs, six places, 15 phases. In Godot: the town as a miniature, a talk panel
+**Scope:** one `game.toml`, nine NPCs, six places, 15 phases. In Godot: the town as a miniature, a talk panel
 with typed input and suggested acts, the evening set piece, the tripod and its clock, the casebook, the ending and
 the Notebook.
 
@@ -300,6 +352,5 @@ conversation, the casebook, the ending.
 
 ## To decide before building
 
-- Whether the evening conversations must work without a model, as written lines.
-- The Hän people lived on this river long before the rush. If they appear, they need to be written with care and
-  with their own lives, never as scenery or as the stranger to blame; leaving them out entirely is also a choice.
+- Martha Paul's name is a working name: check it against the 1898–1901 records so it isn't a real person's, and
+  settle it with the Hän reader.
