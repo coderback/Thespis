@@ -1,0 +1,269 @@
+{
+  "about": "The case, as data the game plays by: the week, the night of the fire as the observations the minds start from, how Tamás remembers, and who sees each way. coldwater.toml is the minds; this is the world's side. tests/test_coldwater.py plays the same file.",
+  "days": [
+    {
+      "name": "Tuesday",
+      "date": "April 26, 1898"
+    },
+    {
+      "name": "Wednesday",
+      "date": "April 27, 1898"
+    },
+    {
+      "name": "Thursday",
+      "date": "April 28, 1898"
+    },
+    {
+      "name": "Friday",
+      "date": "April 29, 1898"
+    },
+    {
+      "name": "Saturday",
+      "date": "April 30, 1898"
+    }
+  ],
+  "phases": [
+    "MORNING",
+    "AFTERNOON",
+    "EVENING"
+  ],
+  "flags": {
+    "landing": "landing",
+    "maggies": "maggies",
+    "store": "store",
+    "church": "mission",
+    "police": "police",
+    "ice": "ice",
+    "dest": "vera",
+    "your_cabin": "your_cabin"
+  },
+  "everyone": [
+    "gilchrist",
+    "vera",
+    "tamas",
+    "sandor",
+    "billy",
+    "maggie",
+    "otto",
+    "ashby",
+    "martha"
+  ],
+  "night": [
+    {
+      "note": "11.30 pm: Anton leaves Věra's; she watches his lantern cross the ice",
+      "verb": "leave",
+      "actor": "player",
+      "at": "vera",
+      "claim": {
+        "pred": "left_vera",
+        "a": "player"
+      },
+      "witnesses": [
+        "vera"
+      ]
+    },
+    {
+      "note": "midnight: Maggie sells Tamás the bottle; Martha, sewing by the stove, sees it",
+      "verb": "sell",
+      "actor": "maggie",
+      "target": "tamas",
+      "at": "maggies",
+      "claim": {
+        "pred": "sold_bottle",
+        "a": "maggie",
+        "b": "tamas"
+      },
+      "witnesses": [
+        "martha"
+      ]
+    },
+    {
+      "note": "Tamás drinks it on watch",
+      "verb": "drink",
+      "actor": "tamas",
+      "at": "store",
+      "claim": {
+        "pred": "drunk",
+        "a": "tamas"
+      },
+      "witnesses": [
+        "maggie",
+        "martha"
+      ]
+    },
+    {
+      "note": "12.30 am: Otto deals a fixed game in the back room",
+      "verb": "deal",
+      "actor": "otto",
+      "at": "maggies",
+      "claim": {
+        "pred": "fixed_game",
+        "a": "otto"
+      }
+    },
+    {
+      "note": "1.00 am: a lantern down the lane, past Maggie's kitchen window, to Brand's back door and back; no face",
+      "verb": "carry",
+      "actor": "player",
+      "at": "store",
+      "claim": {
+        "pred": "lantern",
+        "a": "someone"
+      },
+      "witnesses": [
+        "billy",
+        "otto",
+        "martha"
+      ]
+    },
+    {
+      "note": "Martha saw someone in the lane: she knows she did",
+      "verb": "watch",
+      "actor": "martha",
+      "at": "maggies",
+      "claim": {
+        "pred": "saw_lane",
+        "a": "martha"
+      }
+    },
+    {
+      "note": "the fire itself: nobody saw who, and nobody took part but Anton",
+      "verb": "fire",
+      "actor": "player",
+      "at": "store",
+      "claim": {
+        "pred": "fired",
+        "a": "player",
+        "b": "otto"
+      }
+    },
+    {
+      "note": "1.15 am: Ashby sees the glow and shouts; by morning the whole town knows someone burned Brand's store",
+      "verb": "fire",
+      "actor": "someone",
+      "target": "otto",
+      "at": "store",
+      "claim": {
+        "pred": "fired",
+        "a": "someone",
+        "b": "otto"
+      },
+      "witnesses": [
+        "gilchrist",
+        "vera",
+        "tamas",
+        "sandor",
+        "billy",
+        "maggie",
+        "ashby",
+        "martha"
+      ]
+    },
+    {
+      "note": "the warrant in Seattle: only Ashby knows, but it's true",
+      "verb": "flee",
+      "actor": "ashby",
+      "at": "landing",
+      "claim": {
+        "pred": "wanted",
+        "a": "ashby"
+      }
+    }
+  ],
+  "face": {
+    "note": "On some seeds Martha saw the face in the lane",
+    "chance": 0.34,
+    "observe": [
+      {
+        "verb": "carry",
+        "actor": "player",
+        "at": "store",
+        "claim": {
+          "pred": "lantern",
+          "a": "player"
+        },
+        "witnesses": [
+          "martha"
+        ]
+      }
+    ]
+  },
+  "tamas": {
+    "note": "He remembers a piece at a time, each a thing he sees again: a lantern on day 2, then the face behind it on a seeded day (0: never, on a bad week). What he sees himself beats anything he's told: if Anton told him the lantern was another man's, Anton is caught.",
+    "lantern": {
+      "day": 2,
+      "observe": [
+        {
+          "verb": "remember",
+          "actor": "tamas",
+          "at": "mission",
+          "claim": {
+            "pred": "lantern",
+            "a": "someone"
+          }
+        }
+      ]
+    },
+    "face": {
+      "days": [
+        3,
+        4,
+        4,
+        5,
+        5,
+        0
+      ],
+      "observe": [
+        {
+          "verb": "remember",
+          "actor": "tamas",
+          "at": "mission",
+          "claim": {
+            "pred": "lantern",
+            "a": "player"
+          }
+        },
+        {
+          "verb": "remember",
+          "actor": "tamas",
+          "at": "mission",
+          "claim": {
+            "pred": "fired",
+            "a": "player",
+            "b": "otto"
+          }
+        }
+      ]
+    }
+  },
+  "ways": {
+    "note": "Who sees Anton pass: whoever stands at a place in view of the way he takes. The bend crossing is seen by nobody and costs the next phase too.",
+    "front": {
+      "seen_from": [
+        "landing",
+        "maggies",
+        "police",
+        "mission"
+      ],
+      "cost": 0
+    },
+    "lane": {
+      "seen_from": [
+        "store"
+      ],
+      "kitchen": true,
+      "cost": 0
+    },
+    "ice": {
+      "seen_from": [
+        "landing",
+        "ice"
+      ],
+      "cost": 0
+    },
+    "bend": {
+      "seen_from": [],
+      "cost": 1
+    }
+  }
+}

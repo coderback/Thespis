@@ -43,7 +43,7 @@ These works are public domain; we take their shapes and their weather, not their
 
 ## The cast
 
-They came from everywhere, and their names say where. All but one: Martha Paul's people were here first.
+They came from everywhere, and their names say where. All but one: Martha Matthias's people were here first.
 
 | Who | What they want | What they hide about that night |
 |---|---|---|
@@ -55,7 +55,7 @@ They came from everywhere, and their names say where. All but one: Martha Paul's
 | **Maggie Doyle**, keeps the roadhouse, from Cork | Peace, and the Mountie's money | She sold Tamás the bottle. Everything told to her is known by morning |
 | **Otto Brand**, trader and lender, from Hamburg | His gold, and a debtor to blame | He wasn't at the store. He was at a card game he was fixing |
 | **Jack Ashby**, came over the pass in the fall | To leave on the first boat | A name that isn't his, and a warrant in Seattle under the one that is. The perfect stranger to blame |
-| **Martha Paul**, Hän, whose people are building new cabins three miles downriver | What Brand owes her household, and the cabin finished before the ice goes | Nothing she means to hide. From Maggie's kitchen she saw Tamás buy the bottle, and a man with a lantern pass in the lane. Nobody has asked her, and the town won't carry her word |
+| **Martha Matthias**, Hän, whose people are building new cabins three miles downriver | What Brand owes her household, and the cabin finished before the ice goes | Nothing she means to hide. From Maggie's kitchen she saw Tamás buy the bottle, and a man with a lantern pass in the lane. Nobody has asked her, and the town won't carry her word |
 
 ## The names
 
@@ -74,8 +74,11 @@ players who look them up find a second layer.
 - **Otto Brand:** *ōt*, "wealth", and *Brand*, German for "fire". A fortune that burned.
 - **Maggie Doyle:** the magpie is named for *Mag*, Margaret; it chatters and hoards bright things.
 - **Billy Tuck:** what's tucked away is hidden, as what he saw is.
-- **Martha Paul:** the name she was given at baptism at the Forty Mile mission, as the Hän of 1898 were. Martha in
-  the gospel is the one who works while the others talk. Her own name isn't in any record the town keeps, and the
+- **Martha Matthias:** the name she was given at baptism at the Forty Mile mission, as the Hän of 1898 were: the
+  missions often made a father's Christian name the family's surname. Martha in the gospel is the one who works
+  while the others talk, and the one who goes out and says the plain truth; the name means "the lady", in a town
+  that treats her as a servant. Matthias was the apostle chosen by lot to take the betrayer's place, in a town run
+  by a lottery that wants someone to take the culprit's. Her own name isn't in any record the town keeps, and the
   game doesn't invent one.
 - **Jack Ashby:** an alias, an ordinary English surname with *ash* in it: the stranger the town would like to bury in
   the ashes. His real name is in the Inspector's Notebook.
@@ -214,7 +217,7 @@ see. Nobody saw it all; the Inspector's Notebook is him piecing it together (*In
 | Jack Ashby | the glow, first; he raised the alarm | he was stowing away on the steamer |
 | Sándor Kovács | his father, burned | nothing; he wants someone to pay |
 | Tamás Kovács | a lantern, a coat, a face in the firelight | he can't remember yet |
-| Martha Paul | Tamás buying the bottle; a man with a lantern in the lane at one, and back at ten past | nobody asks her, and the town won't carry her word |
+| Martha Matthias | Tamás buying the bottle; a man with a lantern in the lane at one, and back at ten past | nobody asks her, and the town won't carry her word |
 
 Your story is that you were **at Věra's till late**. It's the natural lie: you were there, and across the ice is
 the one place nobody in town can see. It only holds if your sister lies for you, because she watched you leave at
@@ -256,7 +259,7 @@ your lies meet them, comes from here.
 | Otto Brand | roadhouse | the store | roadhouse back room |
 | Věra Holub | her cabin | her cabin | her cabin |
 | Tamás Kovács | the infirmary | the infirmary | the infirmary |
-| Martha Paul | downriver, at the new cabins | the store, after Otto for her account | roadhouse kitchen |
+| Martha Matthias | downriver, at the new cabins | the store, after Otto for her account | roadhouse kitchen |
 | Inspector Gilchrist | his rounds | his rounds | the post, with you |
 
 ## Two clocks
@@ -312,18 +315,18 @@ can be reached, and none comes from a trigger: it comes from what nine people ca
 | In the game | In Thespis 0.6.0 |
 |---|---|
 | "Someone set the fire" until a name sticks | `someone` as the culprit; a name learned later counts as no rival story |
-| Rival stories of the night; your lie caught | `[claims] one_actor`, `first_hand`, the `caught` event, trust |
-| Tamás remembering | What he saw, observed each day at a rising `conf`; first-hand beats what he's told once it's strong enough |
+| Rival stories of the night; your lie caught | `[claims] one_actor` for the fire and the lantern in the lane, `first_hand`, the `caught` event, trust |
+| Tamás remembering | What he saw, seen again a piece at a time: a lantern on day 2, the face on a seeded day (or never). His own eyes beat anything he was told, so a lie told to him is caught |
 | Rumour through Maggie, the grudge through Sándor | Gossip along ties, its threshold, `trace` |
 | Billy's and Věra's silence | `[[npc.x.keeps]]` with `when` (paid, or trust at least n) |
 | Martha's word, which the town won't carry | Few ties, so gossip from her stops at the threshold; she keeps it from the police until trust is high enough |
 | "It was the watchman's lamp" | A denial of the arson claim, believed if trusted people say it |
 | A bribe that's too generous | A `{ bound = "amount" }` utility term |
-| Gilchrist's searches, warnings and arrest | Choices that open as his beliefs grow, scored by utility |
+| Gilchrist's searches, warnings and arrest | Choices that open as his beliefs grow, scored by utility. Thespis doesn't reason for him, so the sums are written into the choices: his warning opens on a broken alibi and a lantern in the lane, the steamer takes whoever the surest case names |
 | What you type | `understand`: acts or talk; with a model the town speaks in its own voice, offline it uses the game's lines |
 | The Inspector's Notebook | `overview`, `explain`, `trace` |
 
-**Scope:** one `game.toml`, nine NPCs, six places, 15 phases. In Godot: the town as a miniature, a talk panel
+**Scope:** one game file ([`coldwater.toml`](../games/before-the-ice/coldwater.toml)) and the case it starts from ([`case.json`](../games/before-the-ice/case.json)), nine NPCs, eight places, 15 phases. In Godot: the town as a miniature, a talk panel
 with typed input and suggested acts, the evening set piece, the tripod and its clock, the casebook, the ending and
 the Notebook.
 
@@ -352,5 +355,7 @@ conversation, the casebook, the ending.
 
 ## To decide before building
 
-- Martha Paul's name is a working name: check it against the 1898–1901 records so it isn't a real person's, and
-  settle it with the Hän reader.
+- Martha's name. Her working name was Martha Paul, but *Paul* is the surname of a living Hän family at Eagle, one
+  of the river's Hän communities, so she is Martha Matthias. A web search (November 2026) found no Hän or Yukon
+  family of that name; the registers that would settle it (the Anglican Diocese of Yukon's, the 1901 census for
+  Moosehide) aren't online, so the Hän reader, or the Tr'ondëk Hwëch'in Heritage department, checks it.

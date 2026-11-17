@@ -167,6 +167,14 @@ jobs:
           "$GODOT" --headless --path games/before-the-ice --import
           "$GODOT" --headless --path games/before-the-ice --quit-after 30 2>&1 | tee "$RUNNER_TEMP/ice.log"
           ! grep -E "SCRIPT ERROR|Parse Error|Failed to load" "$RUNNER_TEMP/ice.log"
+      - name: Before the Ice Goes Out plays a whole week through a sidecar
+        env:
+          THESPIS_SIDECAR: '["python", "-m", "thespis"]'
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          "$GODOT" --headless --path games/before-the-ice res://tools/week.tscn -- --seed=7 2>&1 | tee "$RUNNER_TEMP/week.log"
+          grep -q "the week held" "$RUNNER_TEMP/week.log"
+          ! grep -E "SCRIPT ERROR|Parse Error|Failed to load" "$RUNNER_TEMP/week.log"
 
   # The Unity package's core and example under .NET, against a sidecar and a hosted-mode server (sdk/unity). The
   # scene itself plays in the Unity editor, which needs a licence: run sdk/unity/test/run.py --unity locally.
