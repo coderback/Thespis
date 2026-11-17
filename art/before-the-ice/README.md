@@ -5,25 +5,42 @@ drafts and stand-ins, not final art. Nothing here is imported by Thespis or its 
 
 ## The town in Blender (`blender/`)
 
-`build_town.py` builds the whole of Coldwater Landing on its plinth (log cabins, the roadhouse's false front, the
-burned store, the steamer frozen in, the landing and tripod, the boardwalk, the spruce, the townsfolk) and renders it
-pixel style: EEVEE at 960x540, light in bands (warm lamplight, cold blue shadow), 1-pixel ink outlines. It also
-writes the screen positions of places and people, which the screen drafts use to pin flags onto the model.
+`build_town.py` builds Coldwater Landing to the town plan in [the design](../../docs/before-the-ice-goes-out.md) and
+looks at it from the river: the ice with the tripod and the steamer laid up in front, the landing, Front Street with
+every building facing the river (your cabin, Maggie's roadhouse, Brand's burned store, the forge, the Mounted Police
+post, the mission), spruce on the bench behind, and Věra's cabin and claim across the ice at the creek mouth. It renders
+pixel style: EEVEE at 960x540, light in bands (warm lamplight, cold blue shadow), 1-pixel ink outlines, the townsfolk as
+camera-facing sprites. It also writes the screen positions of places and people, which the screens use to pin flags.
 
 ```
-MODE=town  SPRITES=<path to sprites> blender -b --factory-startup --python blender/build_town.py -- town.png town-anchors.json [town.blend]
-MODE=walk  SPRITES=<path to sprites> blender -b --factory-startup --python blender/build_town.py -- walk.png walk-anchors.json
+MODE=town SPRITES=<path to sprites> blender -b --factory-startup --python blender/build_town.py -- town.png town-anchors.json [town.blend]
+MODE=walk SPRITES=<path to sprites> blender -b --factory-startup --python blender/build_town.py -- walk.png walk-anchors.json
+python blender/pixelate.py town.png town-960.png town-1080.png
 ```
 
 `MODE=walk` moves Anton onto the ice and draws his route: solid behind him, dashed ahead, the back way faint.
-Optional settings: `RES` (render width, default 960), `ORTHO` (camera width in scene units, default 50),
-`LAMP` (desk lamp watts), `BAND_SCALE` (where the light bands fall). Scale the 960x540 image up by whole pixels.
+Optional settings: `RES` (render width, default 960), `ORTHO` (camera width in scene units, default 46), `CAMX`
+(camera position along the river), `LAMP` (desk lamp watts), `BAND_SCALE` (where the light bands fall).
+`pixelate.py` takes the render down to 128 colours and doubles it by whole pixels for a 1920x1080 screen.
 
-- `coldwater_lib.py`: materials, primitives and the log-cabin builder the town uses.
+**Piece by piece.** With `KIT=<dir>` the script renders each part of the town on its own instead (your cabin, the
+roadhouse, the store, the forge, the post, the mission, the landing, the steamer, the tripod, the spruce point, Věra's
+claim, the bench, the street, the people), close up at 640x480 from the same angle, and writes where each sits in
+the game view. `KITONLY=forge,store` renders just those. `kit_sheet.py` pairs each close-up with the same piece cut
+from the game render, so detail can be checked at both sizes:
+
+```
+KIT=kit MODE=town SPRITES=<path to sprites> blender -b --factory-startup --python blender/build_town.py -- unused.png unused.json
+python blender/kit_sheet.py kit town-960.png kit/cards
+```
+
+- `coldwater_lib.py`: materials, primitives and the log-cabin builder the town uses (logs, gables, snow on the roof,
+  icicles, doors and lit windows, an open forge door with the fire in it, woodpiles).
 - `build_test.py`: the first test, Maggie's roadhouse and one cabin, rendered in Cycles. Run with `STYLE=toon` or
   `STYLE=pixel` and `--python stylize.py` after it for the cel-shaded and pixel versions.
 
-Made with Blender 5.2. Building the town takes about three minutes; the render itself, seconds.
+Made with Blender 5.2. Building the town takes about six minutes, most of it the spruce and the logs; each render,
+seconds.
 
 ## Sprites and portraits
 

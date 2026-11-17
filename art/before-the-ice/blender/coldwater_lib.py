@@ -143,7 +143,7 @@ TRIM = textured("trim", [(0, "#1e231d"), (0.6, "#2b3329"), (1, "#3d463a")], scal
 CREAM = plain("cream", "#e6d8b8", 0.6)
 METAL = plain("metal", "#1c1a19", 0.45, 0.7)
 GLASS = plain("glass", "#2a1a0a", 0.2, 0, emit="#ffb35a", strength=9)
-ICE = textured("ice", [(0, "#8fb0cc"), (0.5, "#b4cadd"), (1, "#e6eef6")], scale=(2, 2, 2), noise=3, rough=0.12, bump=0.08)
+ICE = textured("ice", [(0, "#6e95b8"), (0.5, "#8fb1cf"), (1, "#c2d6e8")], scale=(2, 2, 2), noise=3, rough=0.12, bump=0.08)
 STRATA = strata_mat()
 DESK = textured("walnut", [(0, "#1c120b"), (0.5, "#2c1b10"), (1, "#3c2616")], scale=(0.08, 2.5, 1), noise=6, detail=12, rough=0.3, bump=0.02)
 SPRUCE = textured("spruce", [(0, "#0f1d16"), (0.5, "#1d3328"), (1, "#2c4a3a")], scale=(4, 4, 4), noise=6, rough=0.95, bump=0.6)
@@ -206,9 +206,9 @@ def point(name, loc, watts, color="#ffa64d", radius=0.1):
 def ALONG_X(spin=0.0):
     return (0, math.pi / 2, spin)
 
+
 def ALONG_Y(spin=0.0):
     return (math.pi / 2, 0, spin)
-
 
 
 def cut(segs, a, b):
@@ -287,7 +287,7 @@ def cabin(name, cx, cy, w, d, h, openings=(), rh_ratio=0.3, front_logs=True, pip
 
     # roof: boards, a thick rounded layer of snow, a snow lip at the eave, icicles
     a = math.atan2(rh, d / 2)
-    ov, gov = 0.38, 0.42
+    ov, gov = 0.24, 0.27
     for s in (-1, 1):
         run = d / 2 + ov
         L = run / math.cos(a)
@@ -298,24 +298,24 @@ def cabin(name, cx, cy, w, d, h, openings=(), rh_ratio=0.3, front_logs=True, pip
         th = -s * a
         nrm = Vector((0, -math.sin(th), math.cos(th)))
         box(name + "_roof", (w + 2 * gov, L, 0.06), mid, PLANK_Y, rot=(th, 0, 0), bevel=0.01)
-        box(name + "_roofsnow", (w + 2 * gov + 0.08, L + 0.06, 0.26), mid + nrm * 0.16, SNOW, rot=(th, 0, 0), bevel=0.11, segs=5)
-        lip = eave + nrm * 0.1 + Vector((0, s * 0.03, -0.02))
-        o = cyl(name + "_lip", 0.13, w + 2 * gov + 0.02, lip, ALONG_X(), SNOW, verts=20)
+        box(name + "_roofsnow", (w + 2 * gov + 0.05, L + 0.04, 0.15), mid + nrm * 0.1, SNOW, rot=(th, 0, 0), bevel=0.055, segs=4)
+        lip = eave + nrm * 0.07 + Vector((0, s * 0.02, -0.01))
+        o = cyl(name + "_lip", 0.085, w + 2 * gov + 0.02, lip, ALONG_X(), SNOW, verts=20)
         rb = o.modifiers.new("round", "BEVEL")
-        rb.width = 0.1
-        rb.segments = 5
+        rb.width = 0.06
+        rb.segments = 4
         rb.limit_method = "ANGLE"
         if s == -1:
             x = -w / 2 - gov + 0.05
             while x < w / 2 + gov - 0.05:
                 ln = random.uniform(0.08, 0.42) if random.random() < 0.7 else random.uniform(0.02, 0.1)
-                cyl(name + "_icicle", 0.03, ln, (cx + x, lip.y + 0.03, lip.z - 0.1 - ln / 2), (math.pi, 0, 0), plain("icicle", "#dbe8f5", 0.05) if False else ICICLE, verts=6, r2=0.0)
+                cyl(name + "_icicle", 0.03, ln, (cx + x, lip.y + 0.02, lip.z - 0.06 - ln / 2), (math.pi, 0, 0), plain("icicle", "#dbe8f5", 0.05) if False else ICICLE, verts=6, r2=0.0)
                 x += random.uniform(0.09, 0.2)
-    sph = cyl(name + "_ridgesnow", 0.17, w + 2 * gov - 0.02, (cx, cy, h + rh + 0.3), ALONG_X(), SNOW, verts=20)
+    sph = cyl(name + "_ridgesnow", 0.11, w + 2 * gov - 0.02, (cx, cy, h + rh + 0.21), ALONG_X(), SNOW, verts=20)
     sph.scale = (1, 1, 0.6)
     rb = sph.modifiers.new("round", "BEVEL")
-    rb.width = 0.12
-    rb.segments = 5
+    rb.width = 0.07
+    rb.segments = 4
     rb.limit_method = "ANGLE"
 
     # openings: frames through the log wall, plank doors, lit windows with mullions and snow on the sill
@@ -325,7 +325,21 @@ def cabin(name, cx, cy, w, d, h, openings=(), rh_ratio=0.3, front_logs=True, pip
         for side in (u0 - 0.04, u1 + 0.04):
             box(name + "_frame", wall_size(wall, 0.08, depth, ht + 0.08), wall_pos(wall, side, z0 + ht / 2, 0), PLANK_Z, bevel=0.01)
         box(name + "_lintel", wall_size(wall, wd + 0.2, depth, 0.1), wall_pos(wall, uc, z1 + 0.05, 0), PLANK_Z, bevel=0.01)
-        if kind == "door":
+        if kind == "firedoor":
+            # the door stands open, swung back on its hinges at u1; the fire shows in the dark of the doorway
+            box(name + "_doorway", wall_size(wall, wd, 0.02, ht), wall_pos(wall, uc, z0 + ht / 2, -0.05), plain("doorwaydark", "#120c08", 1.0))
+            # the hearth, stepped like a pixel flame: embers, flame, a hot core (emissive, kept out of the cel bands)
+            for (su, sz, zc, dep, col) in [(0.72, 0.12, 0.13, -0.04, "#b8321a"), (0.46, 0.26, 0.3, -0.035, "#ff6a1a"),
+                                           (0.22, 0.1, 0.47, -0.035, "#ff6a1a"), (0.22, 0.15, 0.27, -0.03, "#ffc84a")]:
+                box(name + "_fire", wall_size(wall, wd * su, 0.02, ht * sz), wall_pos(wall, uc - wd * 0.08, z0 + ht * zc, dep),
+                    plain("fire_" + col[1:], "#000000", 1.0, emit=col, strength=1.0))
+            if wall == "front":
+                leaf = ((0.05, wd, ht), (cx + u1 + 0.03, cy - d / 2 - wd / 2, z0 + ht / 2))
+            else:
+                leaf = ((wd, 0.05, ht), (cx + w / 2 + wd / 2, cy + u1 + 0.03, z0 + ht / 2))
+            box(name + "_door", leaf[0], leaf[1], PLANK_Z, bevel=0.006)
+            box(name + "_step", wall_size(wall, wd + 0.5, 0.45, 0.12), wall_pos(wall, uc, 0.06, 0.32), PLANK_Y, bevel=0.01)
+        elif kind == "door":
             n = 4
             for i in range(n):
                 box(name + "_door", wall_size(wall, wd / n - 0.012, 0.05, ht - 0.02), wall_pos(wall, u0 + (i + 0.5) * wd / n, z0 + ht / 2, 0.02), PLANK_Z, bevel=0.006)
@@ -357,12 +371,19 @@ def cabin(name, cx, cy, w, d, h, openings=(), rh_ratio=0.3, front_logs=True, pip
         sphere(name + "_drift", loc, sc, SNOW)
     for sx in (-1, 1):
         sphere(name + "_cornerdrift", (cx + sx * (w / 2 + 0.2), cy - d / 2 - 0.2, 0), (0.45, 0.4, 0.3), SNOW)
-    if woodpile:
+    if woodpile == "side":
+        # stacked against the long wall at -Y, toward the back (-X): for gable-front cabins, beside the house, not before the door
+        bx, by = cx - w / 2 + 0.25, cy - d / 2 - 0.42
+        for row in range(4):
+            for i in range(6 - row):
+                cyl(name + "_wood", 0.075, 0.55, (bx + i * 0.16 + row * 0.08, by, 0.08 + row * 0.135), ALONG_Y(random.uniform(0, 6)), random.choice(LOGS), verts=9)
+        sphere(name + "_woodsnow", (bx + 0.4, by, 0.6), (0.3, 0.27, 0.055), SNOW)
+    elif woodpile:
         bx, by = cx + w / 2 + 0.6, cy - d / 2 + 0.35
         for row in range(4):
             for i in range(6 - row):
                 cyl(name + "_wood", 0.075, 0.55, (bx, by + i * 0.16 + row * 0.08, 0.08 + row * 0.135), ALONG_X(random.uniform(0, 6)), random.choice(LOGS), verts=9)
-        sphere(name + "_woodsnow", (bx, by + 0.4, 0.6), (0.34, 0.5, 0.1), SNOW)
+        sphere(name + "_woodsnow", (bx, by + 0.4, 0.6), (0.27, 0.3, 0.055), SNOW)
     return h, rh
 
 
