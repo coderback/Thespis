@@ -111,6 +111,28 @@ def test_his_question_each_evening_is_what_he_heard_that_day():
     assert line.text.startswith("At your sister's till late")
 
 
+def test_he_asks_where_anton_was_once():
+    s = week()
+    assert evening(s) == "ask_night"
+    s.update("gilchrist", flags={"asked_night": True})
+    assert evening(s) != "ask_night"  # he has his answer, or the lack of one
+
+
+def test_with_nothing_pressing_he_passes_the_evening_a_different_way_each_night():
+    s = week()
+    s.update("gilchrist", flags={"asked_night": True})
+    said = []
+    for _ in range(3):
+        action = evening(s)
+        said.append(action)
+        s.update("gilchrist", flags={f"said_{action}": True})
+    assert said == ["remark_ice", "remark_home", "pleasantry"]  # each once, then the river
+    s.update("gilchrist", flags={"saw_tamas": True, "last_evening": True})
+    assert evening(s) == "last_evening"  # the last evening: anything to tell him?
+    s.update("gilchrist", flags={"said_last_evening": True})
+    assert evening(s) == "remark_watchman"  # where his case stands
+
+
 def test_the_lantern_line_names_whoever_he_has_it_from():
     s = week()
     say(s, "gilchrist", LANTERN, "police", speaker="billy")

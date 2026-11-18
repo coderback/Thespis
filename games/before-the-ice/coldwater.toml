@@ -77,6 +77,14 @@ comforted = "Kind of you."
 confessed = "Sit down, Mr Holub. Start from the beginning, and take your time."
 # the evening: his question is a choice, by what he believes tonight
 pleasantry = "Sit down, Mr Holub. The river's talking tonight; they say the pool will go to a Swede."
+# when nothing more pressing is open: each said once, some of them where his case stands
+remark_ice = "The ice is going grey at the edges. Another few days, the old hands say."
+remark_home = "My mother writes from Dundee that the gorse is out. And here's me, waiting on a river."
+remark_lane = "Somebody walked that back lane at one in the morning, Mr Holub. I'll know who before the ice goes."
+remark_watchman = "I sat with the watchman today. He's a hard man to listen to, and a harder one to doubt."
+remark_martha = "Mrs Matthias has a good eye. Nobody in this town thought to ask her."
+remark_search = "My men were careful with your things. I hope you found them as you left them."
+last_evening = "The ice goes tomorrow, and I go with it. Is there anything you'd like to tell me before I do?"
 ask_night = "Four nights ago Brand's store burned. Where were you that night, Mr Holub?"
 ask_lantern = "{teller} says a lantern went down the back lane at one that night. Yours, perhaps?"
 ask_alibi = "At your sister's till late, you said. I may walk across the ice tomorrow and hear it from her."
@@ -343,10 +351,47 @@ tell_lantern = "Somebody went down the lane with a lantern that night. I didn't 
 do = "pleasantry"
 utility = 1
 
+# When nothing more pressing is open, a remark, each once (the game sets said_<it>): small talk, or a word on where his
+# case stands, so that Anton can feel it close without a meter. The last evening, he asks if there's anything more.
 [[npc.gilchrist.choices.evening]]
+do = "remark_home"
+utility = 1.5
+when = [{ not_flag = "said_remark_home" }]
+
+[[npc.gilchrist.choices.evening]]
+do = "remark_ice"
+utility = 1.6
+when = [{ not_flag = "said_remark_ice" }]
+
+[[npc.gilchrist.choices.evening]]
+do = "remark_watchman"
+utility = 1.7
+when = [{ flag = "saw_tamas" }, { not_flag = "said_remark_watchman" }]
+
+[[npc.gilchrist.choices.evening]]
+do = "remark_lane"
+utility = 1.8
+when = [{ believes = { pred = "lantern", a = "someone" } }, { flag = "asked_lantern" }, { not_flag = "said_remark_lane" }]
+
+[[npc.gilchrist.choices.evening]]
+do = "remark_martha"
+utility = 1.9
+when = [{ flag = "asked_martha" }, { not_flag = "said_remark_martha" }]
+
+[[npc.gilchrist.choices.evening]]
+do = "remark_search"
+utility = 2.5
+when = [{ flag = "searched" }, { not_flag = "search_due" }, { not_flag = "said_remark_search" }]
+
+[[npc.gilchrist.choices.evening]]
+do = "last_evening"
+utility = 3.5
+when = [{ flag = "last_evening" }, { not_flag = "said_last_evening" }]
+
+[[npc.gilchrist.choices.evening]]  # once: after it, he knows the answer he got
 do = "ask_night"
 utility = 2
-when = [{ believes = { pred = "fired", a = "someone", b = "otto" } }]
+when = [{ believes = { pred = "fired", a = "someone", b = "otto" } }, { not_flag = "asked_night" }]
 
 [[npc.gilchrist.choices.evening]]
 do = "ask_alibi"

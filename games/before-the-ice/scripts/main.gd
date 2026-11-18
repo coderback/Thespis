@@ -179,11 +179,8 @@ func _ended(title: String, line: ThespisLine) -> void:
 	_sit("landing", title, "The End", "gilchrist")
 	if line != null:
 		talk.hear(line)
-	var nb := await case.notebook()
-	var told := ""
-	if nb.ok and nb.value != null:
-		told = nb.value.words("")
-		talk.notebook(told)
+	var told := await case.notebook()
+	talk.notebook(told)
 	_save_journal(told, true)
 
 

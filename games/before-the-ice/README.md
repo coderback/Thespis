@@ -28,6 +28,7 @@ believes, and the steamer at the end.
 | `addons/thespis/` | The Godot addon, a copy of [sdk/godot/addons/thespis](../../sdk/godot/addons/thespis) (a test keeps the two the same) |
 | `tools/week.tscn` | Plays a whole week headless through a sidecar and checks it holds, that the weeks seeds 1 to 500 make keep the rules, and that the week's record is kept and written (CI runs it) |
 | `tools/sweep.tscn` | The seed sweep: plays whole weeks headless, ten fixed ways of playing (lie low, an alibi, blame Ashby, the true thing, the watchman's lamp, blame Otto, blame Billy, pay Billy, lose Věra, confess) over many seeds, and counts how each ended, by way of playing and by each thing the seed drew, whether the seed moves each way's ending, and how far Gilchrist's case against Anton got (what he believed, whether he warned and searched, whether he went to ask Otto and Billy). Does every ending stay reachable; does one way always win? About six seconds a week |
+| `tools/tour.tscn` | A playthrough of the real screens: loads the game and plays a week the way a player would (flags, walks, answers, typed words, leaving, the evenings at the post, the ending and the Notebook), saving a screenshot and the screen's text at each step. Needs a window. Run it before a playtest, or after changing a screen |
 | `tools/shot.py` | Saves what the game draws, to compare with the Blender renders |
 
 ## Run it
@@ -37,6 +38,7 @@ Open the folder in Godot 4.7 and press Play, or:
 ```
 godot --path games/before-the-ice                       # a new week; -- --seed=7 for a given one; --log=<dir> or none for its record
 godot --headless --path games/before-the-ice res://tools/week.tscn -- --seed=7   # a whole week, checked
+godot --path games/before-the-ice res://tools/tour.tscn -- --seed=19 --out=<dir>        # the screens, played through
 godot --headless --path games/before-the-ice res://tools/sweep.tscn -- --seeds=24 [--only=alibi,confess] [--out=sweep.json]
 python games/before-the-ice/tools/shot.py --godot <Godot 4.7 console build>                       # shots/town.png
 python games/before-the-ice/tools/shot.py --godot <...> --out shots/walk.png --walk=dest --at=0.5  # mid-walk
