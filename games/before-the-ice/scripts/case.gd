@@ -44,6 +44,7 @@ var here := "your_cabin"  ## where Anton is
 var where := {}  ## npc -> place, from the session
 var trust := {}  ## npc -> {who: trust}, from the session
 var face_day := 0  ## the day Tamás sees the face again; 0, never
+var face_seen := false  ## Martha saw his face in the lane (on some seeds)
 var playing := false
 var done := false
 var sat_with_him := false  ## tonight's evening at the post is done
@@ -64,7 +65,8 @@ func begin(seed_wanted := 0) -> ThespisResult:
 		await _observe(o)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_value
-	if rng.randf() < float(data.face.chance):
+	face_seen = rng.randf() < float(data.face.chance)
+	if face_seen:
 		for o in data.face.observe:
 			await _observe(o)
 	var days: Array = data.tamas.face.days
