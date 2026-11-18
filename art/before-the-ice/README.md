@@ -50,8 +50,11 @@ seconds.
 
 - `sprites/`: the seven townsfolk, 32x48 each, drawn in `prototype/desk-render.html` (open it with
   `?mode=town&dump&sprites` to print them as PNG data). They stand in the Blender town as camera-facing cut-outs.
-- `portraits/maggie.py`: Maggie Doyle's half-length conversation portrait, 64x80 with an ink outline and a paper-white
-  cut-out edge, drawn pixel by pixel: `python portraits/maggie.py maggie.png 5`.
+- `portraits/`: half-length conversation portraits, 64x80 with an ink outline and a paper-white cut-out edge, each
+  drawn pixel by pixel by its own script: `python portraits/<who>.py <who>.png 5`. Maggie Doyle with a mug of coffee;
+  Tamás Kovács in the infirmary blanket, his head bandaged and the back of his hand burned; Otto Brand with a scorched
+  ledger; Martha Matthias sewing a hide glove. `kit.py` is what the later three share. Copy the PNGs to
+  `games/before-the-ice/assets/portraits/`.
 
 ## The earlier prototype (`prototype/`)
 

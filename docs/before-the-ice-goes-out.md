@@ -117,7 +117,7 @@ the prejudice it is; no record ties any Dawson fire to the Hän, and the game do
 **What the game doesn't use:** Hän words (the language is critically endangered and its teaching materials aren't
 licensed for this), songs, the dancing stick, potlatch or other ceremony, the Moosehide Gathering (which began in
 1993), or any real person. Chief Isaac stays offstage. Martha speaks plain, fluent English with her own opinions,
-never the newspapers' pidgin. A Hän reader, paid and credited, reads her before the game is released.
+never the newspapers' pidgin. A Hän reader, paid and credited, reads her and sees her portrait before the game is released.
 
 ## How a day plays
 
