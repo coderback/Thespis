@@ -211,8 +211,8 @@ see. Nobody saw it all; the Inspector's Notebook is him piecing it together (*In
 | Who | Saw | Why they can't say so |
 |---|---|---|
 | Věra | your lantern crossing home at 11.30, and the glow later | she keeps quiet while she trusts you |
-| Billy Tuck | a lantern at Brand's back door, no face | he was stealing Brand's cordwood |
-| Otto Brand | a lantern going west past the back-room window | he was fixing a card game |
+| Billy Tuck | a lantern at Brand's back door, no face | he was stealing Brand's cordwood; to the police he was asleep |
+| Otto Brand | a lantern going west past the back-room window | he was fixing a card game; to the police he was in his bed |
 | Maggie Doyle | Tamás drunk at midnight, with her bottle | she sold it to him |
 | Jack Ashby | the glow, first; he raised the alarm | he was stowing away on the steamer |
 | Sándor Kovács | his father, burned | nothing; he wants someone to pay |
@@ -291,6 +291,10 @@ relieved.
   you less. That includes Věra, and with her trust goes her silence.
 - **Witnesses are people, not clues.** Billy can be paid, befriended or frightened; each has a cost. Paying him
   too much makes him wonder why.
+- **Everyone else has something to hide.** Otto says he was in his bed; he was dealing in Maggie's back room, and
+  Maggie and Martha know it. Billy says he was asleep; he was at Brand's back door with the cordwood, and someone
+  may have seen him. Point a story at either and Gilchrist goes to ask where he was at one. Once he hears the truth
+  after the lie, any story pointing that way will do to take him.
 - **The true thing is the best weapon.** Tamás *was* drunk. Maggie *did* sell him the bottle. "An old man, a bottle
   and a lamp" is the safest story in town, and it's mostly true.
 - **Saying too much gives you away.** Deny the fire before anyone has asked and Gilchrist writes it down.
@@ -330,10 +334,14 @@ true. The lie that worked last time is the one that hangs you this time. Each se
   back over the ice. She keeps it while she trusts him; if he loses her, it goes into town. If he's lost and she
   loves him enough, she takes it on herself.
 - **Whom Martha talks to**: Věra, and on some weeks Maggie too, across the kitchen, so what she saw goes round.
+- **Who saw Billy at the back door**: Otto from the back-room window (his wood, again), Martha from the kitchen, or
+  nobody.
+- **Whether Maggie keeps her back room quiet.** Usually she says who was there. On some weeks she takes a cut of
+  Otto's game, and keeps it to herself.
 
 The seed draws again until the week keeps the rules. Every week gives the town someone else to suspect: a story,
-or Tamás's wrong face on a day that comes. Gilchrist never knows anything nobody told him. A run takes about 40 minutes, every ending
-can be reached, and none comes from a trigger: it comes from what nine people came to believe.
+or Tamás's wrong face on a day that comes. Gilchrist never knows anything nobody told him. A run takes about 40
+minutes, every ending can be reached, and none comes from a trigger: it comes from what nine people came to believe.
 
 ## Built on Thespis
 

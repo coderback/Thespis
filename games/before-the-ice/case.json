@@ -102,6 +102,18 @@
       }
     },
     {
+      "note": "12.50 am: Billy at Brand's back door, taking cordwood; who saw him is the seed's (week: woodpile)",
+      "id": "woodpile",
+      "verb": "steal",
+      "actor": "billy",
+      "at": "store",
+      "claim": {
+        "pred": "woodpile",
+        "a": "billy"
+      },
+      "witnesses": []
+    },
+    {
       "note": "1.00 am: a lantern down the lane, past Maggie's kitchen window, to Brand's back door and back; no face. Martha sees it from the kitchen; who else did is the seed's (week: lantern)",
       "verb": "carry",
       "actor": "player",
@@ -114,6 +126,20 @@
         "martha"
       ],
       "id": "lantern"
+    },
+    {
+      "note": "1.00 am: Otto still at cards in Maggie's back room; Maggie and Martha know he's there",
+      "verb": "deal",
+      "actor": "otto",
+      "at": "maggies",
+      "claim": {
+        "pred": "back_room",
+        "a": "otto"
+      },
+      "witnesses": [
+        "maggie",
+        "martha"
+      ]
     },
     {
       "note": "Martha saw someone in the lane: she knows she did",
@@ -479,6 +505,58 @@
               "maggie": {
                 "trust_in": {
                   "martha": 2
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "woodpile",
+        "note": "Who saw Billy at Brand's back door with the cordwood",
+        "options": [
+          {
+            "name": "Otto",
+            "weight": 2,
+            "note": "from the back-room window: his wood, again",
+            "see": {
+              "woodpile": [
+                "otto"
+              ]
+            }
+          },
+          {
+            "name": "Martha",
+            "weight": 1,
+            "note": "from the kitchen",
+            "see": {
+              "woodpile": [
+                "martha"
+              ]
+            }
+          },
+          {
+            "name": "nobody",
+            "weight": 1
+          }
+        ]
+      },
+      {
+        "name": "back room",
+        "note": "Whether Maggie keeps quiet about who was in her back room",
+        "options": [
+          {
+            "name": "she says so",
+            "weight": 2
+          },
+          {
+            "name": "she takes a cut",
+            "weight": 1,
+            "note": "of Otto's game: she keeps it to herself",
+            "update": {
+              "maggie": {
+                "flags": {
+                  "takes_a_cut": true
                 }
               }
             }
