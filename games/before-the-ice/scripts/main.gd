@@ -15,6 +15,8 @@ var picture: TextureRect
 var case: Case
 var talk: Talk
 var _thespis := false  ## the case is playing through Thespis
+var _log_dir := Journal.DIR  ## where the week's record goes (`-- --log=<dir>`; `--log=none` for none)
+var _journal_saved := false
 
 
 func _ready() -> void:
@@ -84,6 +86,8 @@ func _ready() -> void:
 	case.clock.connect(_clock)
 	case.people_moved.connect(_who)
 	case.ended.connect(_ended)
+	case.keep_journal = not (args.has("shot") or args.get("log", "") == "none")  # a playtest's record of the week
+	_log_dir = str(args.get("log", Journal.DIR))
 	paper.say("Starting Thespis...", "the town's minds")
 	var r := await case.begin(int(args.get("seed", "0")))
 	_thespis = r.ok
@@ -176,8 +180,25 @@ func _ended(title: String, line: ThespisLine) -> void:
 	if line != null:
 		talk.hear(line)
 	var nb := await case.notebook()
+	var told := ""
 	if nb.ok and nb.value != null:
-		talk.notebook(nb.value.words(""))
+		told = nb.value.words("")
+		talk.notebook(told)
+	_save_journal(told, true)
+
+
+## Write the playtest's record of the week, once: at the steamer, or when the window closes on a week not done.
+func _save_journal(notebook: String, ended: bool) -> void:
+	if case == null or not case.keep_journal or _journal_saved or case.journal.is_empty():
+		return
+	_journal_saved = true
+	var path := Journal.save(case, notebook, ended, _log_dir)
+	print("The week's record: %s" % (path if not path.is_empty() else "couldn't be written to " + _log_dir))
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		_save_journal("", false)
 
 
 func _unhandled_input(event: InputEvent) -> void:

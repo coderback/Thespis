@@ -58,6 +58,11 @@ var sat_with_him := false  ## tonight's evening at the post is done
 var _comforted := {}  ## who Anton comforted today: once a day counts
 var _sat_with_tamas := false  ## Anton was at the infirmary today
 var told := {}  ## npc -> what Anton told them, in order: each {claim, note, phase}
+var keep_journal := false  ## record the week for a playtest (Journal writes it out)
+var journal: Array = []  ## what happened, in order: each {phase, day, part, kind, ...}
+## What the journal notes of Gilchrist each morning: his beliefs about these.
+const NOTED := ["fired", "lantern", "with_vera", "left_vera", "saw_lane", "drunk", "sold_bottle", "in_bed", "back_room",
+		"asleep", "woodpile", "wanted"]
 
 
 ## Start Thespis, open the week, and play the night of the fire into it. A seed of 0 picks one.
@@ -97,9 +102,10 @@ func begin(seed_wanted := 0) -> ThespisResult:
 	face_seen = week.get("face", "") == "seen"
 	await refresh()
 	playing = true
+	await _morning()
 	clock.emit(day(), part())
 	for t in heard:
-		news.emit(t)
+		_news(t)
 	return r
 
 
@@ -201,6 +207,7 @@ func go(to: String, way := "") -> void:
 	var saw := onlookers(way, here, to)
 	await Thespis.observe(ThespisClient.event("walk", "player", to, {"pred": "went", "a": "player", "place": to},
 			saw, {"at": here}))
+	_note("walk", {"to": to, "way": way, "seen_by": saw})
 	here = to
 	if to == "mission":
 		_sat_with_tamas = true
@@ -221,6 +228,7 @@ func tell(npc: String, claim: Dictionary) -> void:
 	if not told.has(npc):
 		told[npc] = []
 	told[npc].append({"claim": claim, "note": story_note(claim), "phase": phase})
+	_note("tell", {"to": npc, "what": story_note(claim), "claim": claim})
 	if npc == "gilchrist" and claim.get("pred") == "fixed_game" and claim.get("a") == "otto":
 		await Thespis.update("otto", {"flags": {"found_out": true}})  # his game is out: he may as well tell
 	_say(await Thespis.react(npc, "told"))
@@ -243,6 +251,7 @@ func when(at_phase: int) -> String:
 
 
 func ask(npc: String) -> void:
+	_note("ask", {"to": npc})
 	match npc:
 		"tamas":
 			_say(await Thespis.decide("tamas", "visit"))
@@ -255,6 +264,7 @@ func ask(npc: String) -> void:
 
 
 func pay(npc: String, amount: int) -> void:
+	_note("pay", {"to": npc, "amount": amount})
 	await Thespis.observe(ThespisClient.event("pay", "player", npc, ThespisClient.claim("paid", "player", npc),
 			others(npc), {"amount": amount}))
 	if npc == "billy":
@@ -266,6 +276,7 @@ func pay(npc: String, amount: int) -> void:
 
 
 func threaten(npc: String) -> void:
+	_note("threaten", {"to": npc})
 	await Thespis.observe(ThespisClient.event("threaten", "player", npc,
 			ThespisClient.claim("threatened", "player", npc), others(npc)))
 	await _trust(npc, -2)
@@ -273,6 +284,7 @@ func threaten(npc: String) -> void:
 
 
 func comfort(npc: String) -> void:
+	_note("comfort", {"to": npc})
 	await Thespis.observe(ThespisClient.event("comfort", "player", npc,
 			ThespisClient.claim("comforted", "player", npc), others(npc)))
 	if not _comforted.has(npc):
@@ -282,6 +294,7 @@ func comfort(npc: String) -> void:
 
 
 func confess(npc: String) -> void:
+	_note("confess", {"to": npc})
 	await Thespis.observe(ThespisClient.event("confess", "player", npc,
 			ThespisClient.claim("fired", "player", "otto"), others(npc), {"said": true}))
 	if npc == "gilchrist":
@@ -290,6 +303,7 @@ func confess(npc: String) -> void:
 
 
 func talk(npc: String) -> void:
+	_note("talk", {"to": npc})
 	_say(await Thespis.react(npc, "talk"))
 
 
@@ -350,6 +364,7 @@ func advance() -> void:
 	if part() == 0:
 		await _waited()
 		await _remember()
+		await _morning()
 	if part() < 2:
 		await rounds()
 	clock.emit(day(), part())
@@ -392,28 +407,30 @@ func rounds() -> void:
 	var r := await Thespis.decide("gilchrist", "rounds")
 	if not r.ok:
 		return
+	if str(r.value.action) != "round":
+		_note("round", {"action": str(r.value.action)})
 	match str(r.value.action):
 		"see_vera":
 			await _visit("vera", {"asked_vera": true})
 			_overheard(await Thespis.decide("vera", "questioned", {"to": "gilchrist"}))
-			news.emit("Gilchrist crossed the ice to Věra's.")
+			_news("Gilchrist crossed the ice to Věra's.")
 		"see_martha":
 			var place: String = where.get("martha", "maggies")
 			await _visit(place, {"asked_martha": true})
 			await _trust("martha", 2, "gilchrist")  # the first in town to ask her properly
 			_overheard(await Thespis.decide("martha", "questioned", {"to": "gilchrist"}))
-			news.emit("Gilchrist went looking for Martha.")
+			_news("Gilchrist went looking for Martha.")
 		"see_tamas":
 			await _visit("mission", {"saw_tamas": true})
-			news.emit("Gilchrist is sitting with Tamás at the mission.")
+			_news("Gilchrist is sitting with Tamás at the mission.")
 		"see_otto", "see_billy":  # where were you at one? They lie.
 			var who := str(r.value.action).trim_prefix("see_")
 			await _visit(where.get(who, "maggies"), {"asked_" + who: true})
 			_overheard(await Thespis.decide(who, "questioned", {"to": "gilchrist"}))
-			news.emit("Gilchrist went looking for %s." % SHORT[who])
+			_news("Gilchrist went looking for %s." % SHORT[who])
 		"search_cabin":
 			await _visit("your_cabin", {"search_due": false})
-			news.emit("Gilchrist's men are going through your cabin.")
+			_news("Gilchrist's men are going through your cabin.")
 	await refresh()
 
 
@@ -454,6 +471,7 @@ func steamer() -> void:
 	if g.ok and g.value.npc.get("flags", {}).get("warned", false) and g.value.npc.get("flags", {}).get("searched", false):
 		await Thespis.update("vera", {"flags": {"brother_lost": true}})
 	_overheard(await Thespis.decide("vera", "last_morning", {"to": "gilchrist"}))
+	await _morning("steamer")
 	here = "landing"
 	var r := await Thespis.decide("gilchrist", "steamer")
 	if not r.ok:
@@ -471,6 +489,7 @@ func steamer() -> void:
 		title = "The Confession"
 	elif act.begins_with("take:"):
 		title = "Another Man's Coat"
+	_note("ending", {"title": title, "action": act})
 	ended.emit(title, r.value)
 
 
@@ -493,15 +512,68 @@ func _observe(o: Dictionary) -> ThespisResult:
 ## A line Anton hears: shown if he's there.
 func _say(r: ThespisResult) -> ThespisResult:
 	if r.ok and r.value != null and not r.value.is_silent():
+		_note_line(r.value, true)
 		spoke.emit(r.value)
 	return r
 
 
 ## A line said where Anton isn't: it happens, and he doesn't hear it.
 func _overheard(r: ThespisResult) -> ThespisResult:
+	if r.ok and r.value != null and not r.value.is_silent():
+		_note_line(r.value, where.get(r.value.npc, "") == here)
 	if r.ok and where.get(r.value.npc, "") == here:
 		spoke.emit(r.value)
 	return r
+
+
+# ------------------------------------------------------------------------------------------------ the journal
+# A playtest's record of the week (keep_journal): what Anton did, what he heard, what was said where he wasn't, the
+# news, and each morning what Gilchrist believed and whom the town still trusted. Journal writes it out.
+
+func _note(kind: String, more := {}) -> void:
+	if keep_journal:
+		var e := {"phase": phase, "day": day(), "part": part(), "kind": kind}
+		e.merge(more)
+		journal.append(e)
+
+
+func _note_line(l: ThespisLine, heard: bool) -> void:
+	_note("line", {"npc": l.npc, "action": str(l.action), "words": l.words(""), "heard": heard})
+
+
+func _news(text: String) -> void:
+	_note("news", {"text": text})
+	news.emit(text)
+
+
+## The morning's state: Gilchrist's beliefs about the case, what he has done, and each person's trust in Anton.
+func _morning(kind := "morning") -> void:
+	if not keep_journal:
+		return
+	var g := await Thespis.inspect("gilchrist")
+	var knew := {}
+	var did: Array = []
+	if g.ok:
+		for b in g.value.beliefs:
+			var c: Dictionary = b.claim
+			if b.status == "active" and str(c.pred) in NOTED:
+				knew[claim_text(c)] = snappedf(float(b.opinion.b), 0.01)
+		for f in g.value.npc.get("flags", {}):
+			if g.value.npc.flags[f] and not str(f).ends_with("_due"):
+				did.append(f)
+	var trusts := {}
+	for n in trust:
+		if trust[n].has("player"):
+			trusts[n] = int(trust[n].player)
+	_note(kind, {"gilchrist": knew, "done": did, "trust": trusts})
+
+
+## A claim, short: pred(who), "not " first for a denial; the fire's object (always Brand's store) left out.
+static func claim_text(c: Dictionary) -> String:
+	var who := str(c.a)
+	if c.has("b") and not str(c.b).is_empty() and str(c.pred) != "fired":
+		who = "%s, %s" % [c.a, c.b]
+	return "%s%s(%s)" % ["not " if c.get("neg", false) else "", c.pred, who]
 
 
 ## Move `npc`'s trust in `who` (Anton, unless said) by `by`, within -5 to 5.

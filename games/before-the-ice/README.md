@@ -23,9 +23,10 @@ believes, and the steamer at the end.
 | `coldwater.toml` | The minds: the nine people, what each keeps quiet, the town's ties, Gilchrist's evening questions, rounds and steamer, the player's words. `thespis check coldwater.toml` checks it |
 | `case.json` | The world's side, which the game and `tests/test_coldwater.py` both play: the days, the night of the fire as the observations the minds start from, how Tamás remembers, who sees each way, and what the seed varies (`week`: draws with weighted options, and the rules every week keeps) |
 | `scripts/case.gd` | The rules: the clock, who is where, what Anton's acts do and who sees them, Gilchrist's rounds and evenings, Tamás's memory, the steamer and the Notebook |
+| `scripts/journal.gd` | A playtest's record of the week, written when the ice goes out (or the window closes): what the seed drew; each phase, what Anton did and heard and what was said where he wasn't; each morning, what Gilchrist believed and whom the town still trusted; the ending and the Notebook. JSON and a Markdown page, in `user://playtest` ([the playtest kit](../../docs/before-the-ice-playtest.md)) |
 | `scripts/talk.gd` | A conversation, as the canvas's ConversationDesk draws it: the town zoomed and dimmed behind, the place card, a half-length portrait with a pinned name tag, what they say on a sheet, numbered answers that say what they may cost (keys 1 to 4), a ruled line for Anton's own words (read by `understand`), the note of what they have from him with the red string of who they told, and the way out. Four answers a visit |
 | `addons/thespis/` | The Godot addon, a copy of [sdk/godot/addons/thespis](../../sdk/godot/addons/thespis) (a test keeps the two the same) |
-| `tools/week.tscn` | Plays a whole week headless through a sidecar and checks it holds, and that the weeks seeds 1 to 500 make keep the rules (CI runs it) |
+| `tools/week.tscn` | Plays a whole week headless through a sidecar and checks it holds, that the weeks seeds 1 to 500 make keep the rules, and that the week's record is kept and written (CI runs it) |
 | `tools/sweep.tscn` | The seed sweep: plays whole weeks headless, ten fixed ways of playing (lie low, an alibi, blame Ashby, the true thing, the watchman's lamp, blame Otto, blame Billy, pay Billy, lose Věra, confess) over many seeds, and counts how each ended, by way of playing and by each thing the seed drew, whether the seed moves each way's ending, and how far Gilchrist's case against Anton got (what he believed, whether he warned and searched, whether he went to ask Otto and Billy). Does every ending stay reachable; does one way always win? About six seconds a week |
 | `tools/shot.py` | Saves what the game draws, to compare with the Blender renders |
 
@@ -34,7 +35,7 @@ believes, and the steamer at the end.
 Open the folder in Godot 4.7 and press Play, or:
 
 ```
-godot --path games/before-the-ice                       # a new week; -- --seed=7 for a given one
+godot --path games/before-the-ice                       # a new week; -- --seed=7 for a given one; --log=<dir> or none for its record
 godot --headless --path games/before-the-ice res://tools/week.tscn -- --seed=7   # a whole week, checked
 godot --headless --path games/before-the-ice res://tools/sweep.tscn -- --seeds=24 [--only=alibi,confess] [--out=sweep.json]
 python games/before-the-ice/tools/shot.py --godot <Godot 4.7 console build>                       # shots/town.png

@@ -343,6 +343,9 @@ The seed draws again until the week keeps the rules. Every week gives the town s
 or Tamás's wrong face on a day that comes. Gilchrist never knows anything nobody told him. A run takes about 40
 minutes, every ending can be reached, and none comes from a trigger: it comes from what nine people came to believe.
 
+Whether that holds for players is the playtest's question: [the playtest kit](before-the-ice-playtest.md) has the
+seeds, the session and the questions, and every week writes a record to set beside the player's own account.
+
 ## Built on Thespis
 
 | In the game | In Thespis 0.6.0 |
