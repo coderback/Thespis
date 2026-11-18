@@ -33,6 +33,8 @@ from games.crypt_road.content import DEMO_SEED  # noqa: E402
 from tools import warm_cache  # noqa: E402
 from tools.routes import EXPECTED, ROUTES, Session, admin_headers, outcome, play, seed_for  # noqa: E402
 
+# What the model probe says: the date and the second in it make every run's words new, so the reply can't come from the
+# model cache (which keeps replies across days, and keys them on the player's exact words).
 PROBE = "Smoke test at {when}: what's the news on the road?"
 
 
@@ -95,6 +97,8 @@ def check_model(client, when: str) -> tuple[bool, str]:
         return True, "skipped: the host has REPLAY=1"
     if d["source"] == "llm":
         return True, f"answered by {calls[-1]['provider'].rsplit('/', 1)[-1] if calls else 'the model'} in {took:.1f} s"
+    if d["source"] == "cache":
+        return False, f"answered from the model cache ({d['reason']}): the probe's words weren't new"
     return False, f"fell back ({d['reason']}); calls: {[c['error'] for c in calls] or 'none'}"
 
 
@@ -149,7 +153,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=(__doc__ or "").split("\n")[0])
     parser.add_argument("host")
     args = parser.parse_args(argv)
-    when = datetime.now(UTC).strftime("%H:%M UTC")
+    when = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
     with httpx.Client(base_url=args.host, timeout=60, headers=admin_headers()) as client:
         results = run(client, when)
     print(f"Smoke test of {args.host} at {when}")
