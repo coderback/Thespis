@@ -49,6 +49,7 @@ var playing := false
 var done := false
 var sat_with_him := false  ## tonight's evening at the post is done
 var _comforted := {}  ## who Anton comforted today: once a day counts
+var _sat_with_tamas := false  ## Anton was at the infirmary today
 var told := {}  ## npc -> what Anton told them, in order: each {claim, note, phase}
 
 
@@ -130,6 +131,8 @@ func go(to: String, way := "") -> void:
 	await Thespis.observe(ThespisClient.event("walk", "player", to, {"pred": "went", "a": "player", "place": to},
 			saw, {"at": here}))
 	here = to
+	if to == "mission":
+		_sat_with_tamas = true
 	await Thespis.update("player", {"loc": to})
 	if int(data.ways.get(way, {}).get("cost", 0)) > 0 and part() < 2:
 		await advance()
@@ -274,6 +277,7 @@ func advance() -> void:
 		await steamer()
 		return
 	if part() == 0:
+		await _waited()
 		await _remember()
 	if part() < 2:
 		await rounds()
@@ -290,8 +294,8 @@ func evening() -> ThespisResult:
 	var r := _say(await Thespis.decide("gilchrist", "evening",
 			{"bindings": {"teller": await _teller()}}))
 	if r.ok:
-		var flag: String = {"ask_lantern": "asked_lantern", "doubt_alibi": "doubted", "warn": "warned",
-				"caught_lie": "said_caught", "search": "searched"}.get(str(r.value.action), "")
+		var flag: String = {"ask_night": "asked_night", "ask_lantern": "asked_lantern", "doubt_alibi": "doubted",
+				"warn": "warned", "caught_lie": "said_caught", "search": "searched"}.get(str(r.value.action), "")
 		if not flag.is_empty():
 			var flags := {flag: true}
 			if flag == "searched":
@@ -340,6 +344,18 @@ func rounds() -> void:
 func _visit(place: String, flags: Dictionary) -> void:
 	await Thespis.update("gilchrist", {"loc": place, "flags": flags})
 	where["gilchrist"] = place
+
+
+## Tamás trusts the one who sits with him: a day without Anton costs a little of that, and a day with him wins it
+## back, up to what it was. Below 2 he stops keeping what he remembers of Anton to himself (it goes to Sándor), and
+## the last day it may go to the Inspector.
+func _waited() -> void:
+	if day() >= 2:
+		if not _sat_with_tamas:
+			await _trust("tamas", -1)
+		elif int(trust.get("tamas", {}).get("player", 0)) < 2:
+			await _trust("tamas", 1)
+	_sat_with_tamas = here == "mission"
 
 
 ## Tamás's memory comes back a piece a morning: a lantern on the day the case says, the face on the seed's day.

@@ -26,7 +26,7 @@ believes, and the steamer at the end.
 | `scripts/talk.gd` | A conversation, as the canvas's ConversationDesk draws it: the town zoomed and dimmed behind, the place card, a half-length portrait with a pinned name tag, what they say on a sheet, numbered answers that say what they may cost (keys 1 to 4), a ruled line for Anton's own words (read by `understand`), the note of what they have from him with the red string of who they told, and the way out. Four answers a visit |
 | `addons/thespis/` | The Godot addon, a copy of [sdk/godot/addons/thespis](../../sdk/godot/addons/thespis) (a test keeps the two the same) |
 | `tools/week.tscn` | Plays a whole week headless through a sidecar and checks it holds (CI runs it) |
-| `tools/sweep.tscn` | The seed sweep: plays whole weeks headless, eight fixed ways of playing (lie low, an alibi, blame Ashby, the true thing, the watchman's lamp, pay Billy, lose Věra, confess) over many seeds, and counts how each ended, by way of playing and by the world each seed made. Does every ending stay reachable; does one way always win? About six seconds a week |
+| `tools/sweep.tscn` | The seed sweep: plays whole weeks headless, eight fixed ways of playing (lie low, an alibi, blame Ashby, the true thing, the watchman's lamp, pay Billy, lose Věra, confess) over many seeds, and counts how each ended, by way of playing and by the world each seed made, and how far Gilchrist's case against Anton got (what he believed, whether he warned and searched). Does every ending stay reachable; does one way always win? About six seconds a week |
 | `tools/shot.py` | Saves what the game draws, to compare with the Blender renders |
 
 ## Run it
