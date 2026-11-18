@@ -62,10 +62,10 @@ ends at the post with Gilchrist's question, and after the fifth the ice goes out
 ## Changing the town
 
 The model is built in Blender by [`art/before-the-ice/blender/build_town.py`](../../art/before-the-ice/blender/build_town.py).
-After changing it, export again and copy both files here:
+After changing it, export again and copy both files here (Blender reads `SPRITES` from its own folder, so give it in full):
 
 ```
-EXPORT=<dir> MODE=town SPRITES=art/before-the-ice/sprites blender -b --factory-startup --python art/before-the-ice/blender/build_town.py -- unused.png unused.json
+EXPORT=<dir> MODE=town SPRITES=<absolute path to art/before-the-ice/sprites> blender -b --factory-startup --python art/before-the-ice/blender/build_town.py -- unused.png unused.json
 ```
 
 The Blender render is the reference for the look; the Godot picture should match it band for band. Two things are
