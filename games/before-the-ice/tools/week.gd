@@ -74,13 +74,13 @@ func _ready() -> void:
 	check(case.done, "the ice went out after %d phases" % case.phase)
 
 	var nb := await case.notebook()
-	check(nb.ok and nb.value != null and not nb.value.words("").is_empty(), "the Notebook tells the week")
+	check(nb.contains(" · ") and (nb.contains("south") or nb.contains("lamp")), "the Notebook tells his case:\n%s" % nb)
 
 	# The playtest's record: every morning and the steamer, what Anton did, and the ending; written out as a page.
 	var kinds: Array = case.journal.map(func(e): return e.kind)
 	check(kinds.count("morning") == 5 and kinds.count("steamer") == 1 and "ending" in kinds and "tell" in kinds
 			and "line" in kinds, "the journal kept the week (%d entries)" % case.journal.size())
-	var md := Journal.save(case, nb.value.words("") if nb.ok and nb.value != null else "", true, "user://playtest-check")
+	var md := Journal.save(case, nb, true, "user://playtest-check")
 	var page := FileAccess.get_file_as_string(md) if not md.is_empty() else ""
 	check(page.contains("**Ending:**") and page.contains("## Day 5, morning") and page.contains("Gilchrist believes")
 			and FileAccess.file_exists(md.get_basename() + ".json"), "the week's record was written: %s" % md)
