@@ -27,5 +27,7 @@ Two games built on the core, playable online. Their own APIs are theirs, not The
 
 | Doc | What it is |
 | --- | --- |
+| [minds-that-reason.md](minds-that-reason.md) | A proposal for NPCs that reason: inference with variables, personality in how they conclude, competing explanations and curiosity, beliefs about beliefs, lasting intentions, and showing the thinking, across genres; for review, not built |
+| [characters-with-a-self.md](characters-with-a-self.md) | A proposal for NPCs with a self: traits that weight shared actions, wants and values, feelings with causes, relationships with more than one side, stress and breaking points, a voice that holds, and arcs; the companion to minds-that-reason.md; for review, not built |
 | [redefining-the-npc.md](redefining-the-npc.md) | Research on stateful, autonomous NPCs: the landscape, memory, planning, personality, player studies, and the architecture Thespis follows |
 | [cast-review.md](cast-review.md) | Thespis Cast's architecture reviewed after the hackathon (6 October 2026), and the road to production it set out: the claim check, Rehearsal as a release gate |
