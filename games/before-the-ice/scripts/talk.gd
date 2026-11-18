@@ -35,6 +35,7 @@ var case: Case
 var picture: TextureRect  ## the town, dimmed behind the conversation (shaders/dim.gdshader)
 var to := ""  ## whom Anton speaks to
 var spent := 0  ## answers given this visit
+var _gloves := false  ## Anton has bought a pair from Martha this visit
 
 var _place: Label
 var _when: Label
@@ -371,6 +372,7 @@ func open(title: String, part_name: String, leave_label: String, first := "") ->
 	_title = title
 	_part = part_name
 	spent = 0
+	_gloves = false
 	_place.text = title
 	_when.text = "DAY %d · %s" % [case.day(), part_name]
 	_leave.text = leave_label
@@ -509,7 +511,7 @@ func _refresh_note() -> void:
 
 
 ## The answers here: ask, the stories not yet told this person, and what suits them (money for Billy, gloves from
-## Martha, comfort for the rest). Each says what it may cost.
+## Martha once a visit, comfort for the rest). Each says what it may cost.
 func _refresh_answers() -> void:
 	_choices = []
 	if not to.is_empty():
@@ -534,13 +536,19 @@ func _refresh_answers() -> void:
 		if to == "billy":
 			_choices.append({"say": "Here's five dollars. You didn't see anything.", "hint": "buys his silence?",
 					"warn": true, "act": func() -> void: await case.pay(to, 5)})
-		elif to == "martha":
+		elif to == "martha" and not _gloves:  # one pair a visit; after it, what suits anyone
 			_choices.append({"say": "I'll take a pair of gloves.", "hint": "eight dollars", "warn": false,
-					"act": func() -> void: await case.pay(to, 8)})  # moosehide gloves, that winter
+					"act": _buy_gloves})
 		else:
 			_choices.append({"say": "I'm sorry for all of it.", "hint": "comforts", "warn": false,
 					"act": func() -> void: await case.comfort(to)})
 	_draw_answers()
+
+
+## A pair of Martha's gloves: eight dollars, moosehide gloves that winter. One pair a visit.
+func _buy_gloves() -> void:
+	_gloves = true
+	await case.pay(to, 8)
 
 
 func _draw_answers() -> void:
