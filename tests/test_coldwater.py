@@ -284,7 +284,8 @@ def test_vera_takes_it_on_herself():
 # ---------------------------------------------------------------- the week the seed makes
 def test_every_draw_names_its_options_and_the_rules_name_real_ones():
     assert USUAL == {"lantern": "Billy and Otto", "face": "not seen", "memory": "day 4", "whose face": "Anton's",
-                     "talk": "nothing yet", "sister": "he left at half past eleven", "kitchen": "Věra"}
+                     "talk": "nothing yet", "sister": "he left at half past eleven", "kitchen": "Věra",
+                     "woodpile": "Otto", "back room": "she says so"}
     for opts in WEEK.values():
         assert all(o["weight"] > 0 for o in opts.values())
     rules = CASE["week"]["rules"]
@@ -340,13 +341,80 @@ def test_on_some_weeks_martha_talks_to_maggie_too():
     assert conf(s, "maggie", lantern("player")) < 0.4  # word of mouth, too faint for her to pass on
 
 
+# ---------------------------------------------------------------- Otto's and Billy's lies
+OTTO = fired("otto")
+BILLY = lantern("billy")
+
+
+def round_to(s: Session, who: str) -> str:
+    """Gilchrist's round: whom he goes to ask; there, what they tell him."""
+    action = s.decide("gilchrist", "rounds").action
+    if action == f"see_{who}":
+        s.update("gilchrist", loc=s.world.npcs[who].loc, flags={f"asked_{who}": True})
+        return s.decide(who, "questioned", to="gilchrist").action
+    return action
+
+
+def test_a_story_about_otto_sends_him_to_ask_where_otto_was_and_otto_lies():
+    s = week()
+    assert s.decide("gilchrist", "rounds").action != "see_otto"
+    s.observe("tell", "someone", "gilchrist", at="police", claim=OTTO, said=True, conf=0.2)  # faint hearsay
+    assert round_to(s, "otto") == "in_bed"
+    assert conf(s, "gilchrist", {"pred": "in_bed", "a": "otto"}) > 0
+    assert not s.world.ledger.happened(Claim.from_json({"pred": "in_bed", "a": "otto"}))
+
+
+def test_otto_caught_out_of_his_bed_is_taken_on_a_story():
+    s = week()
+    s.observe("tell", "someone", "gilchrist", at="police", claim=OTTO, said=True, conf=0.2)
+    assert steamer(s) == "nobody"  # a story alone
+    assert round_to(s, "otto") == "in_bed"
+    assert steamer(s) == "nobody"  # and his word
+    say(s, "gilchrist", {"pred": "back_room", "a": "otto"}, "police", speaker="maggie")  # her house: he was there
+    assert steamer(s) == "take:otto"
+
+
+def test_maggie_says_who_was_in_her_back_room_unless_she_takes_a_cut():
+    back = {"pred": "back_room", "a": "otto"}
+    assert conf(week(), "maggie", back) == 1.0
+    assert not any(x.get("npc") == "maggie" for x in week().trace(back)["stopped"] if "keeps" in x.get("why", ""))
+    s = week(back_room="she takes a cut")
+    assert {"npc": "maggie", "why": "keeps it quiet ([[npc.maggie.keeps]] 3)"} in s.trace(back)["stopped"]
+
+
+def test_otto_found_out_owns_up_to_the_back_room():
+    s = week()
+    s.update("otto", flags={"found_out": True})
+    s.update("gilchrist", flags={"asked_otto": False})
+    s.observe("tell", "player", "gilchrist", at="police", claim=OTTO, said=True)
+    assert round_to(s, "otto") == "back_room"
+
+
+def test_billy_asleep_who_was_seen_at_the_back_door_is_taken_on_a_story():
+    for seen_by, taken in (("Otto", True), ("Martha", True), ("nobody", False)):
+        s = week(woodpile=seen_by)
+        s.observe("tell", "someone", "gilchrist", at="police", claim=BILLY, said=True, conf=0.2)
+        assert round_to(s, "billy") == "asleep"
+        for n in ("otto", "martha"):
+            if conf(s, n, {"pred": "woodpile", "a": "billy"}) == 1.0:  # whoever saw him tells the Inspector
+                say(s, "gilchrist", {"pred": "woodpile", "a": "billy"}, "police", speaker=n)
+        assert (steamer(s) == "take:billy") == taken, seen_by
+
+
+def test_billy_keeps_what_he_was_doing_at_the_back_door():
+    s = week()
+    assert conf(s, "billy", {"pred": "woodpile", "a": "billy"}) == 1.0
+    assert {"npc": "billy", "why": "keeps it quiet ([[npc.billy.keeps]] 2)"} in \
+        s.trace({"pred": "woodpile", "a": "billy"})["stopped"]
+
+
 # ---------------------------------------------------------------- the town
 def test_billy_paid_a_little_keeps_quiet_and_paid_too_much_wonders():
     s = week()
     assert s.decide("billy", "offered", bindings={"amount": 5}).action == "pocket"
     assert s.decide("billy", "offered", bindings={"amount": 40}).action == "wonder"
     s.update("billy", flags={"paid_off": True})
-    assert {"npc": "billy", "why": "keeps it quiet ([[npc.billy.keeps]] 2)"} in s.trace(LANTERN)["stopped"]
+    assert {"npc": "billy", "why": "keeps it quiet ([[npc.billy.keeps]] 3)"} in s.trace(LANTERN)["stopped"]
 
 
 def test_a_lie_told_to_sandor_becomes_a_fight():

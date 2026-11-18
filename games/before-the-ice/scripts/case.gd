@@ -33,6 +33,11 @@ const STORIES := [
 	["Otto was dealing a crooked game that night.", {"pred": "fixed_game", "a": "otto"}, "Otto was dealing a crooked game"],
 	["Ashby's wanted in Seattle.", {"pred": "wanted", "a": "ashby"}, "Ashby is wanted in Seattle"],
 	["Martha saw someone in the lane.", {"pred": "saw_lane", "a": "martha"}, "Martha saw someone in the lane"],
+	["It was the wood boy's lantern.", {"pred": "lantern", "a": "billy"}, "the lantern in the lane was Billy's"],
+	["Billy was at Brand's back door that night.", {"pred": "woodpile", "a": "billy"},
+			"Billy was at Brand's back door that night"],
+	["Otto was in Maggie's back room at one.", {"pred": "back_room", "a": "otto"},
+			"Otto was in Maggie's back room at one"],
 ]
 const SHORT := {"gilchrist": "Gilchrist", "vera": "Věra", "tamas": "Tamás", "sandor": "Sándor", "billy": "Billy",
 		"maggie": "Maggie", "otto": "Otto", "ashby": "Ashby", "martha": "Martha"}
@@ -401,6 +406,11 @@ func rounds() -> void:
 		"see_tamas":
 			await _visit("mission", {"saw_tamas": true})
 			news.emit("Gilchrist is sitting with Tamás at the mission.")
+		"see_otto", "see_billy":  # where were you at one? They lie.
+			var who := str(r.value.action).trim_prefix("see_")
+			await _visit(where.get(who, "maggies"), {"asked_" + who: true})
+			_overheard(await Thespis.decide(who, "questioned", {"to": "gilchrist"}))
+			news.emit("Gilchrist went looking for %s." % SHORT[who])
 		"search_cabin":
 			await _visit("your_cabin", {"search_due": false})
 			news.emit("Gilchrist's men are going through your cabin.")

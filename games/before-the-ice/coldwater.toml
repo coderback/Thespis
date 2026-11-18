@@ -17,8 +17,11 @@
 #     ice to the sister. Tamás's trust in Anton fades on days he doesn't sit with him (the game does that), and then
 #     what Tamás remembers goes to Sándor, and perhaps to the Inspector.
 #   - the seed draws the week (case.json): who saw the lantern, whether Martha saw the face, when Tamás sees a face
-#     again and whose (on some weeks, in the fever, Ashby's), what the town said the morning after, what Věra saw, and
-#     whether Martha talks to Maggie.
+#     again and whose (on some weeks, in the fever, Ashby's), what the town said the morning after, what Věra saw,
+#     whether Martha talks to Maggie, who saw Billy at Brand's back door, and whether Maggie keeps her back room quiet;
+#   - Otto and Billy lie about where they were at one: Otto says his bed (he was dealing in Maggie's back room), Billy
+#     says asleep (he was taking Brand's cordwood at the back door). Gilchrist asks them once a story points their
+#     way, and a lie he hears the truth of rules them in.
 # Days are three phases (morning, afternoon, evening); the week is 15. A tick moves the minds on one phase.
 
 [game]
@@ -87,6 +90,8 @@ round = "Morning. Just walking."
 see_vera = "I'll cross the ice to Mrs Holub's today."
 see_martha = "I hear someone in Maggie's kitchen saw the lane that night. I'll ask her myself."
 see_tamas = "I'll sit with the watchman a while."
+see_otto = "I'll have a word with Mr Brand about where he was that night."
+see_billy = "I'll find the wood boy. Somebody says he was about that night."
 search_cabin = "Stand aside, Mr Holub. This won't take long."
 # the steamer
 take = "{who}, you'll come south with me. We'll talk on the boat."
@@ -202,6 +207,9 @@ fear = { to = 0, half_life = 3 }
 about = "player"
 when = [{ flag = "paid_off" }]
 
+[[npc.billy.keeps]]  # what he was doing at the back door: not to anyone
+pred = "woodpile"
+
 [[npc.billy.keeps]]
 pred = "lantern"
 when = [{ any = [{ flag = "paid_off" }, { trust = "player", gte = 3 }, { drive = "fear", gte = 3 }] }]
@@ -214,6 +222,7 @@ threatened = "All right! All right."
 comforted = "Gee. Thanks, mister."
 pocket = "I didn't see nothin', mister. Not a thing."
 wonder = "That's a lot of money for nothin', mister."
+asleep = "I was asleep, mister. In Maggie's woodshed, all night. Honest."
 
 [npc.maggie]
 name = "Maggie"
@@ -230,6 +239,10 @@ pred = "sold_bottle"
 
 [[npc.maggie.keeps]]
 pred = "drunk"
+
+[[npc.maggie.keeps]]  # who was in her back room, on the weeks she takes a cut of the game
+pred = "back_room"
+when = [{ flag = "takes_a_cut" }]
 
 [npc.maggie.lines]
 talk = "Sit yourself down, Anton. Beans and bread, and the coffee's hot."
@@ -257,6 +270,10 @@ pred = "fixed_game"
 pred = "lantern"
 when = [{ not_flag = "found_out" }]
 
+[[npc.otto.keeps]]  # and that he was in the back room at all
+pred = "back_room"
+when = [{ not_flag = "found_out" }]
+
 [npc.otto.lines]
 talk = "Holub. Your sister's claim is still mine, notes or no notes."
 told = "I'll believe it when the Inspector does."
@@ -264,6 +281,8 @@ asked = "I was in my bed. Ask anyone."
 paid = "On account. I'll write it down, since my book is ash."
 threatened = "You'll answer to the Inspector for that."
 comforted = "Spare me."
+in_bed = "I was in my bed by midnight, Inspector, as a man of business is. Ask anyone."
+back_room = "Very well. I was in Maggie's back room, at cards, till the shouting. Write that down if you must."
 
 [npc.ashby]
 name = "Jack Ashby"
@@ -398,13 +417,27 @@ do = "see_martha"
 utility = 5
 when = [{ believes = { pred = "saw_lane", a = "martha" } }, { not_flag = "asked_martha" }]
 
+# Anyone a story points at, he asks where they were at one. Asked, Otto and Billy lie (they answer below).
+[[npc.gilchrist.choices.rounds]]
+do = "see_otto"
+utility = 3
+when = [{ any = [{ believes = { pred = "fired", a = "otto", b = "otto" } }, { believes = { pred = "lantern", a = "otto" } }] },
+        { not_flag = "asked_otto" }]
+
+[[npc.gilchrist.choices.rounds]]
+do = "see_billy"
+utility = 3
+when = [{ any = [{ believes = { pred = "fired", a = "billy", b = "otto" } }, { believes = { pred = "lantern", a = "billy" } }] },
+        { not_flag = "asked_billy" }]
+
 [[npc.gilchrist.choices.rounds]]
 do = "search_cabin"
 utility = 6
 when = [{ flag = "search_due" }]
 
 # The steamer: whom he takes south, the surest case first. Never Martha, whatever the town says. Anyone he caught
-# lying counts for more. "An old man, a bottle and a lamp" closes it as an accident.
+# lying counts for more, and so does a man who lied to him about where he was at one: with that, any story pointing
+# his way will do. "An old man, a bottle and a lamp" closes it as an accident.
 [[npc.gilchrist.choices.steamer]]
 do = "nobody"
 utility = 1
@@ -425,15 +458,25 @@ when = [{ any = [{ believes = { pred = "fired", a = "ashby", b = "otto" }, min =
 
 [[npc.gilchrist.choices.steamer]]
 do = "take:otto"
-utility = [4, { plus = 3, if = { caught = "otto" } }]
+utility = [4, { plus = 3, if = { caught = "otto" } },
+           { plus = 2, if = { all = [{ believes = { pred = "in_bed", a = "otto" } },
+                                     { believes = { pred = "back_room", a = "otto" } }] } }]
 when = [{ any = [{ believes = { pred = "fired", a = "otto", b = "otto" }, min = 0.4 },
-                 { believes = { pred = "lantern", a = "otto" }, min = 0.4 }] }]
+                 { believes = { pred = "lantern", a = "otto" }, min = 0.4 },
+                 { all = [{ believes = { pred = "in_bed", a = "otto" } }, { believes = { pred = "back_room", a = "otto" } },
+                          { any = [{ believes = { pred = "fired", a = "otto", b = "otto" } },
+                                   { believes = { pred = "lantern", a = "otto" } }] }] }] }]
 
 [[npc.gilchrist.choices.steamer]]
 do = "take:billy"
-utility = [4, { plus = 3, if = { caught = "billy" } }]
+utility = [4, { plus = 3, if = { caught = "billy" } },
+           { plus = 2, if = { all = [{ believes = { pred = "asleep", a = "billy" } },
+                                     { believes = { pred = "woodpile", a = "billy" } }] } }]
 when = [{ any = [{ believes = { pred = "fired", a = "billy", b = "otto" }, min = 0.4 },
-                 { believes = { pred = "lantern", a = "billy" }, min = 0.4 }] }]
+                 { believes = { pred = "lantern", a = "billy" }, min = 0.4 },
+                 { all = [{ believes = { pred = "asleep", a = "billy" } }, { believes = { pred = "woodpile", a = "billy" } },
+                          { any = [{ believes = { pred = "fired", a = "billy", b = "otto" } },
+                                   { believes = { pred = "lantern", a = "billy" } }] }] }] }]
 
 [[npc.gilchrist.choices.steamer]]
 do = "take:vera"
@@ -484,6 +527,24 @@ utility = 5
 when = [{ believes = { pred = "fired", a = "player", b = "otto" }, min = 0.8 }, { trust = "player", gte = 4 },
         { flag = "brother_lost" }]
 asserts = { pred = "fired", a = "vera", b = "otto" }
+
+# Otto, when Gilchrist asks where he was at one: his bed, while his game is his own business.
+[[npc.otto.choices.questioned]]
+do = "in_bed"
+utility = 3
+asserts = { pred = "in_bed", a = "otto" }
+
+[[npc.otto.choices.questioned]]
+do = "back_room"
+utility = 5
+when = [{ flag = "found_out" }]
+asserts = { pred = "back_room", a = "otto" }
+
+# Billy, asked by a policeman: asleep, always.
+[[npc.billy.choices.questioned]]
+do = "asleep"
+utility = 3
+asserts = { pred = "asleep", a = "billy" }
 
 # Tamás, when Anton sits with him.
 [[npc.tamas.choices.visit]]
@@ -629,7 +690,7 @@ pred = "saw_lane"
 
 [gossip]
 about = "everyone"
-priority = { fired = 6, lantern = 5, with_vera = 4, saw_lane = 3, drunk = 3, sold_bottle = 3, fixed_game = 3, wanted = 2, went = 1 }
+priority = { fired = 6, lantern = 5, with_vera = 4, saw_lane = 3, drunk = 3, sold_bottle = 3, fixed_game = 3, back_room = 2, woodpile = 2, wanted = 2, in_bed = 1, asleep = 1, went = 1 }
 threshold = 0.4
 along = { kin = 1.0, friend = 0.9, lodger = 0.8, trade = 0.7 }
 in_person = 0.7
@@ -645,7 +706,7 @@ first_hand = 3
 [intents.tell]
 means = "tells the one they speak to, as fact, that the claim is true (or, with neg, that it isn't)"
 reads = "Tell {to} that {claim}"
-args = { to = "npc", claim = { type = "claim", preds = ["fired", "with_vera", "lantern", "drunk", "sold_bottle", "fixed_game", "wanted"] } }
+args = { to = "npc", claim = { type = "claim", preds = ["fired", "with_vera", "lantern", "drunk", "sold_bottle", "fixed_game", "wanted", "back_room", "woodpile"] } }
 examples = ["{claim}, I'd swear to it", "{claim}"]
 
 [intents.ask]
@@ -696,6 +757,10 @@ sold_bottle = "{a} sold {b} a bottle of whisky at midnight, the night of the fir
 drunk = "{a} was drunk on watch the night of the fire"
 fixed_game = "{a} was dealing a crooked card game in Maggie's back room the night of the fire"
 wanted = "{a} is wanted in Seattle under another name"
+back_room = "{a} was in Maggie's back room at one in the morning, the night of the fire"
+woodpile = "{a} was at Brand's back door taking cordwood at one in the morning, the night of the fire"
+in_bed = "{a} was in bed by midnight, the night of the fire"
+asleep = "{a} was asleep at one in the morning, the night of the fire"
 went = "{a} went to {place}"
 paid = "{a} paid {b}"
 threatened = "{a} threatened {b}"

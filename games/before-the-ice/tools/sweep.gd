@@ -17,6 +17,10 @@ const ASHBY_FIRE := {"pred": "fired", "a": "ashby", "b": "otto"}
 const DRUNK := {"pred": "drunk", "a": "tamas"}
 const BOTTLE := {"pred": "sold_bottle", "a": "maggie", "b": "tamas"}
 const LAMP := {"pred": "fired", "a": "tamas", "b": "otto"}
+const OTTO_FIRE := {"pred": "fired", "a": "otto", "b": "otto"}
+const OTTO_BACK := {"pred": "back_room", "a": "otto"}
+const BILLY_LANTERN := {"pred": "lantern", "a": "billy"}
+const BILLY_DOOR := {"pred": "woodpile", "a": "billy"}
 
 ## The ways of playing. Each phase is "day.part" (part 0 morning, 1 afternoon, 2 evening), or "*.part" for that part
 ## of every day not given; its value is [place, acts], each act [verb, person, what]. A phase not given: he stays put.
@@ -44,6 +48,20 @@ const PLANS := {
 		"1.2": ["police", [["tell", "gilchrist", LAMP], ["tell", "gilchrist", DRUNK]]],
 		"*.2": ["vera", [["comfort", "vera", null]]],
 	},
+	"blame Otto": {
+		"1.0": ["maggies", [["tell", "maggie", OTTO_FIRE]]],
+		"1.2": ["police", [["tell", "gilchrist", OTTO_FIRE]]],
+		"2.2": ["police", [["tell", "gilchrist", OTTO_BACK]]],
+		"*.0": ["mission", [["ask", "tamas", null]]],
+		"*.2": ["vera", [["comfort", "vera", null]]],
+	},
+	"blame Billy": {
+		"1.0": ["maggies", [["tell", "maggie", BILLY_LANTERN]]],
+		"1.2": ["police", [["tell", "gilchrist", BILLY_LANTERN]]],
+		"2.2": ["police", [["tell", "gilchrist", BILLY_DOOR]]],
+		"*.0": ["mission", [["ask", "tamas", null]]],
+		"*.2": ["vera", [["comfort", "vera", null]]],
+	},
 	"pay Billy": {
 		"1.0": ["maggies", [["tell", "maggie", ALIBI]]],
 		"1.1": ["store", [["pay", "billy", 5]]],
@@ -63,7 +81,7 @@ const PLANS := {
 const WATCHED := ["fired", "lantern", "with_vera", "left_vera", "saw_lane"]
 ## The steps of his case against Anton, counted in the report: beliefs he held, and things he'd done.
 const STEPS := ["lantern(someone)", "lantern(player)", "fired(player)", "not with_vera(player)", "left_vera(player)",
-		"saw_lane(martha)", "asked_vera", "asked_martha", "warned", "searched"]
+		"saw_lane(martha)", "asked_vera", "asked_martha", "warned", "searched", "asked_otto", "asked_billy"]
 
 var case: Case
 var ending := ""
@@ -147,7 +165,8 @@ func _week(plan: String, s: int) -> Dictionary:
 ## A week, short: each draw's option, the usual ones left out.
 static func _drawn(w: Dictionary) -> String:
 	var usual := {"lantern": "Billy and Otto", "face": "not seen", "whose face": "Anton's", "talk": "nothing yet",
-			"sister": "he left at half past eleven", "kitchen": "Věra"}
+			"sister": "he left at half past eleven", "kitchen": "Věra", "woodpile": "Otto",
+			"back room": "she says so"}
 	var parts: Array = []
 	for d in w:
 		if usual.get(d, "") != w[d]:
