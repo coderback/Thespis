@@ -55,8 +55,12 @@ seconds.
 - `portraits/`: half-length conversation portraits, 64x80 with an ink outline and a paper-white cut-out edge, each
   drawn pixel by pixel by its own script: `python portraits/<who>.py <who>.png 5`. Maggie Doyle with a mug of coffee;
   Tamás Kovács in the infirmary blanket, his head bandaged and the back of his hand burned; Otto Brand with a scorched
-  ledger; Martha Matthias sewing a hide glove. `kit.py` is what the later three share. Copy the PNGs to
-  `games/before-the-ice/assets/portraits/`.
+  ledger; Martha Matthias sewing a hide glove. `kit.py` is what the later three share.
+- `portraits/ai/`: the portraits the game uses now, all nine, made with an image model from the prompts in
+  [`portraits/ai/PROMPTS.md`](portraits/ai/PROMPTS.md) (the record for store disclosure), kept here restored to their
+  own 74x99 grid. `python portraits/from_ai.py <model's image> games/before-the-ice/assets/portraits/<who>.png
+  portraits/ai/<who>.png` restores one, cuts it out and frames it x4 for the conversation screen. The hand-drawn
+  portraits above stay as the fallback.
 
 ## The earlier prototype (`prototype/`)
 
