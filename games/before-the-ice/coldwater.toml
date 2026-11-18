@@ -12,7 +12,10 @@
 #   - silence is kept: Věra while she trusts her brother, Billy while he's paid or a friend, Otto while his card
 #     game is his own business, Maggie and Martha about the bottle;
 #   - Gilchrist's evening question, his rounds and whom he takes on the steamer are choices that open as his
-#     beliefs grow.
+#     beliefs grow. The case grows without Anton: asked where he was at one (`asked_night`), no account counts like a
+#     broken alibi, and so does Věra saying he left her at half past eleven; once he's asked, Gilchrist crosses the
+#     ice to the sister. Tamás's trust in Anton fades on days he doesn't sit with him (the game does that), and then
+#     what Tamás remembers goes to Sándor, and perhaps to the Inspector.
 # Days are three phases (morning, afternoon, evening); the week is 15. A tick moves the minds on one phase.
 
 [game]
@@ -336,12 +339,16 @@ do = "doubt_alibi"
 utility = 6
 when = [{ believes = { pred = "with_vera", a = "player", neg = true } }, { not_flag = "doubted" }]
 
-# What would make him sure it was Anton: his own sister saying he wasn't with her, and a lantern in the lane; his
-# lantern, seen by someone; or someone telling him so who saw it. Thespis doesn't reason for him: these are the sums.
+# What would make him sure it was Anton: no account of where he was at one, and a lantern in the lane (his sister
+# saying he wasn't with her; that he left her at half past eleven; or, asked, he never said); his lantern, seen by
+# someone; or someone telling him so who saw it. Thespis doesn't reason for him: these are the sums.
 [[npc.gilchrist.choices.evening]]
 do = "warn"
 utility = 7
-when = [{ any = [{ all = [{ believes = { pred = "with_vera", a = "player", neg = true } },
+when = [{ any = [{ all = [{ any = [{ believes = { pred = "with_vera", a = "player", neg = true } },
+                                   { believes = { pred = "left_vera", a = "player" } },
+                                   { all = [{ flag = "asked_night" },
+                                            { not = { believes = { pred = "with_vera", a = "player" } } }] }] },
                           { believes = { pred = "lantern", a = "someone" } }] },
                  { believes = { pred = "lantern", a = "player" } },
                  { believes = { pred = "fired", a = "player", b = "otto" } }] },
@@ -364,7 +371,8 @@ do = "hear_confession"
 utility = 20
 when = [{ flag = "confessed" }]
 
-# His rounds, each morning and afternoon: where he goes, if not where his walk takes him.
+# His rounds, each morning and afternoon: where he goes, if not where his walk takes him. Once he's asked Anton where
+# he was, he crosses the ice to the sister, said or not: the family first.
 [[npc.gilchrist.choices.rounds]]
 do = "round"
 utility = 1
@@ -377,7 +385,8 @@ when = [{ believes = { pred = "lantern", a = "someone" } }, { not_flag = "saw_ta
 [[npc.gilchrist.choices.rounds]]
 do = "see_vera"
 utility = 4
-when = [{ believes = { pred = "with_vera", a = "player" } }, { not_flag = "asked_vera" }]
+when = [{ any = [{ believes = { pred = "with_vera", a = "player" } }, { flag = "asked_night" }] },
+        { not_flag = "asked_vera" }]
 
 [[npc.gilchrist.choices.rounds]]
 do = "see_martha"
@@ -432,7 +441,10 @@ utility = [5, { plus = 3, if = { caught = "player" } }]
 when = [{ any = [{ believes = { pred = "fired", a = "player", b = "otto" }, min = 0.4 },
                  { believes = { pred = "lantern", a = "player" }, min = 0.6 },
                  { all = [{ believes = { pred = "lantern", a = "player" }, min = 0.3 },
-                          { believes = { pred = "with_vera", a = "player", neg = true } }] }] }]
+                          { any = [{ believes = { pred = "with_vera", a = "player", neg = true } },
+                                   { believes = { pred = "left_vera", a = "player" } },
+                                   { all = [{ flag = "asked_night" },
+                                            { not = { believes = { pred = "with_vera", a = "player" } } }] }] }] }] }]
 
 [[npc.gilchrist.choices.steamer]]
 do = "mercy"
@@ -453,7 +465,7 @@ asserts = { pred = "with_vera", a = "player" }
 [[npc.vera.choices.questioned]]
 do = "truth"
 utility = 3
-when = [{ trust = "player", lte = 1 }]
+when = [{ trust = "player", lte = 2 }]
 asserts = { pred = "with_vera", a = "player", neg = true }
 
 # Věra, the last morning: if she's sure he did it and he's lost, she takes it on herself.

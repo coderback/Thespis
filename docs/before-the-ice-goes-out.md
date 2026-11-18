@@ -271,7 +271,9 @@ bend. When the tripod moves, the steamer comes and Gilchrist boards it with what
 with him, and you can *help* him remember: tell him it was a stranger's lantern he saw. Early on he'll believe you,
 because you're the one who visits. As his own memory hardens, what he saw counts for more than what he's told, and
 if your story loses, he knows you lied to him. He can be the friend who forgives you or the witness who hangs you.
-On a bad week, if nobody fetches the medicine, the fever takes him first, and you'll have to live with feeling
+He trusts the one who sits with him: a day you don't come costs a little of that, and a day you do wins it back.
+Let it run low and what he remembers of you goes to Sándor, and on the last day perhaps to the Inspector. On a bad
+week, if nobody fetches the medicine, the fever takes him first, and you'll have to live with feeling
 relieved.
 
 ## What makes it fun
@@ -279,6 +281,10 @@ relieved.
 - **You can feel his suspicion without a meter.** As he comes to believe it was you, his choices change: he takes
   his questions to Věra, has your cabin searched, tells you not to leave town. Each step is a warning you can read
   and answer.
+- **Lying low isn't safe.** The case grows without you. The first evening he asks where you were at one; say
+  nothing and that counts as no account, which with a lantern in the lane is enough to warn you. He crosses the ice
+  to ask your sister either way, and what she says depends on how far she trusts you. Leave Tamás alone and what he
+  remembers finds its own way out. Hiding is a choice with a price, like any other.
 - **Lies have a life of their own.** A story told to Maggie is all over town by morning. Told to Sándor, it becomes a
   fight at the landing. It can also come back to you by a route you didn't foresee.
 - **Getting caught is a turn of the plot, not the end.** If a truer story beats yours, whoever heard your lie trusts

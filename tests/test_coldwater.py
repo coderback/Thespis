@@ -125,6 +125,52 @@ def test_vera_keeps_quiet_about_him_while_she_trusts_him():
     assert s.trace({"pred": "left_vera", "a": "player"})["next"]  # now she tells Maggie
 
 
+# ---------------------------------------------------------------- the case grows without Anton
+def test_no_account_and_a_lantern_draws_the_warning():
+    s = week()
+    s.update("gilchrist", flags={"asked_night": True})  # he asked where Anton was, and Anton never said
+    say(s, "gilchrist", LANTERN, "police", speaker="billy")
+    assert evening(s) == "warn"
+
+
+def test_an_account_given_is_not_no_account():
+    s = week()
+    s.update("gilchrist", flags={"asked_night": True})
+    say(s, "gilchrist", ALIBI, "police")
+    say(s, "gilchrist", LANTERN, "police", speaker="billy")
+    assert evening(s) != "warn"
+
+
+def test_out_of_his_sisters_at_half_past_eleven_and_a_lantern_draws_the_warning():
+    s = week()
+    say(s, "gilchrist", {"pred": "left_vera", "a": "player"}, "police", speaker="maggie")  # Věra's word, by Maggie
+    say(s, "gilchrist", LANTERN, "police", speaker="billy")
+    assert evening(s) == "warn"
+
+
+def test_once_he_has_asked_he_crosses_to_the_sister():
+    s = week()
+    assert s.decide("gilchrist", "rounds").action != "see_vera"
+    s.update("gilchrist", flags={"asked_night": True})
+    assert s.decide("gilchrist", "rounds").action == "see_vera"
+
+
+def test_vera_shaken_tells_the_truth():
+    s = week()
+    s.update("gilchrist", loc="vera")
+    s.update("vera", trust_in={"player": 2})  # threatened once
+    assert s.decide("vera", "questioned", to="gilchrist").action == "truth"
+
+
+def test_a_face_in_the_lane_and_no_account_is_enough_to_take_him():
+    s = week(face=True)
+    s.update("gilchrist", flags={"asked_night": True})
+    s.update("gilchrist", loc="maggies")
+    s.update("martha", trust_in={"gilchrist": 1})
+    s.decide("martha", "questioned", to="gilchrist")  # the face, at Martha's word: 0.4
+    assert steamer(s) == "arrest"
+
+
 # ---------------------------------------------------------------- Martha
 def test_martha_tells_the_inspector_only_once_he_has_earned_it():
     s = week(face=True)

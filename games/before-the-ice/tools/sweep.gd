@@ -58,6 +58,12 @@ const PLANS := {
 	},
 }
 
+## What Gilchrist believed at the end, reported for these: his case, as the evidence stood.
+const WATCHED := ["fired", "lantern", "with_vera", "left_vera", "saw_lane"]
+## The steps of his case against Anton, counted in the report: beliefs he held, and things he'd done.
+const STEPS := ["lantern(someone)", "lantern(player)", "fired(player)", "not with_vera(player)", "left_vera(player)",
+		"saw_lane(martha)", "asked_vera", "asked_martha", "warned", "searched"]
+
 var case: Case
 var ending := ""
 var title := ""
@@ -98,7 +104,7 @@ func _week(plan: String, s: int) -> Dictionary:
 	title = ""
 	case.ended.connect(_ended)
 	var run := {"seed": s, "plan": plan, "ok": false, "reason": "", "ending": "", "title": "", "missed": [],
-			"face_seen": false, "face_day": 0}
+			"face_seen": false, "face_day": 0, "knew": {}, "did": []}
 	var r := await case.begin(s)
 	if not r.ok:
 		run.reason = r.reason
@@ -124,9 +130,27 @@ func _week(plan: String, s: int) -> Dictionary:
 	run.reason = "" if run.ok else "the week didn't reach the steamer"
 	run.ending = ending
 	run.title = title
+	var g := await Thespis.inspect("gilchrist")  # what he went south believing, and what he'd done
+	if g.ok:
+		for b in g.value.beliefs:
+			var c: Dictionary = b.claim
+			if b.status == "active" and str(c.pred) in WATCHED:
+				run.knew[_claim(c)] = snappedf(float(b.opinion.b), 0.01)
+		for f in g.value.npc.get("flags", {}):
+			if g.value.npc.flags[f]:
+				run.did.append(f)
 	await Thespis.close()
 	case.queue_free()
 	return run
+
+
+## A claim as the report writes it: pred(who), "not " first for a denial; the fire's object (always Brand's store)
+## left out.
+static func _claim(c: Dictionary) -> String:
+	var who := str(c.a)
+	if c.has("b") and str(c.pred) != "fired":
+		who = "%s, %s" % [c.a, c.b]
+	return "%s%s(%s)" % ["not " if c.get("neg", false) else "", c.pred, who]
 
 
 func _ended(t: String, l: ThespisLine) -> void:
@@ -164,6 +188,13 @@ func _report(runs: Array, plans: Array) -> void:
 		var row: Array = []
 		for e in endings:
 			row.append("%-10d" % runs.filter(func(r): return r.plan == plan and r.ending == e).size())
+		print("  %-20s %s" % [plan, "  ".join(row)])
+	print("\nHow far his case against Anton got (weeks, of each way of playing):")
+	print("  %-20s %s" % ["", "  ".join(STEPS.map(func(st): return st.left(12).rpad(12)))])
+	for plan in plans:
+		var row: Array = []
+		for st in STEPS:
+			row.append(str(runs.filter(func(r): return r.plan == plan and (r.knew.has(st) or st in r.did)).size()).rpad(12))
 		print("  %-20s %s" % [plan, "  ".join(row)])
 	print("\nBy the world the seed made (face seen by Martha / the day Tamás remembers):")
 	var worlds := {}
