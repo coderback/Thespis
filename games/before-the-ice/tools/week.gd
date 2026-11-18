@@ -26,6 +26,7 @@ func _ready() -> void:
 	add_child(case)
 	case.spoke.connect(func(l: ThespisLine): heard.append("%s: %s" % [l.npc, l.words("...")]))
 	case.ended.connect(func(title: String, l: ThespisLine): print("  ending: %s. %s" % [title, l.words("") if l else ""]))
+	case.keep_journal = true
 	var r := await case.begin(int(args.get("seed", "7")))
 	check(r.ok, "Thespis started and the week opened (%s)" % ("seed %d" % case.seed_value if r.ok else r.reason))
 	if not r.ok:
@@ -74,6 +75,15 @@ func _ready() -> void:
 
 	var nb := await case.notebook()
 	check(nb.ok and nb.value != null and not nb.value.words("").is_empty(), "the Notebook tells the week")
+
+	# The playtest's record: every morning and the steamer, what Anton did, and the ending; written out as a page.
+	var kinds: Array = case.journal.map(func(e): return e.kind)
+	check(kinds.count("morning") == 5 and kinds.count("steamer") == 1 and "ending" in kinds and "tell" in kinds
+			and "line" in kinds, "the journal kept the week (%d entries)" % case.journal.size())
+	var md := Journal.save(case, nb.value.words("") if nb.ok and nb.value != null else "", true, "user://playtest-check")
+	var page := FileAccess.get_file_as_string(md) if not md.is_empty() else ""
+	check(page.contains("**Ending:**") and page.contains("## Day 5, morning") and page.contains("Gilchrist believes")
+			and FileAccess.file_exists(md.get_basename() + ".json"), "the week's record was written: %s" % md)
 	_quit()
 
 
