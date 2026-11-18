@@ -5,9 +5,10 @@
 ##         [--only=alibi,confess] [--out=<file.json>]
 ##
 ## Each way of playing is a plan: where Anton goes in a phase and what he does there. An act needs its person to be
-## there; one who isn't is counted as missed, not done. The world each seed makes is reported beside the ending:
-## whether Martha saw his face, and the day Tamás remembers it (0, never). Thespis runs as a sidecar, started once
-## ($THESPIS_SIDECAR, as for tools/week.gd); every week is a fresh session.
+## there; one who isn't is counted as missed, not done. The week each seed makes (case.json's week: who saw the
+## lantern, whose face Tamás sees and when, what the town says...) is reported beside the ending, and the endings by
+## each draw. Thespis runs as a sidecar, started once ($THESPIS_SIDECAR, as for tools/week.gd); every week is a fresh
+## session.
 extends Node
 
 const ALIBI := {"pred": "with_vera", "a": "player"}
@@ -83,8 +84,8 @@ func _ready() -> void:
 		for plan in plans:
 			var run := await _week(plan, s)
 			runs.append(run)
-			print("  seed %3d  %-20s %-22s face %-5s Tamás day %d%s" % [s, plan, run.ending, run.face_seen,
-					run.face_day, ("  (missed: %s)" % ", ".join(run.missed)) if run.missed.size() > 0 else ""])
+			print("  seed %3d  %-20s %-12s %s%s" % [s, plan, run.ending, _drawn(run.week),
+					("  (missed: %s)" % ", ".join(run.missed)) if run.missed.size() > 0 else ""])
 			if not run.ok:
 				print("    stopped: %s" % run.reason)
 	_report(runs, plans)
@@ -104,14 +105,13 @@ func _week(plan: String, s: int) -> Dictionary:
 	title = ""
 	case.ended.connect(_ended)
 	var run := {"seed": s, "plan": plan, "ok": false, "reason": "", "ending": "", "title": "", "missed": [],
-			"face_seen": false, "face_day": 0, "knew": {}, "did": []}
+			"week": {}, "knew": {}, "did": []}
 	var r := await case.begin(s)
 	if not r.ok:
 		run.reason = r.reason
 		case.queue_free()
 		return run
-	run.face_seen = case.face_seen
-	run.face_day = case.face_day
+	run.week = case.week
 	var steps: Dictionary = PLANS.get(plan, {})
 	var done_at := -1
 	while case.playing:
@@ -142,6 +142,17 @@ func _week(plan: String, s: int) -> Dictionary:
 	await Thespis.close()
 	case.queue_free()
 	return run
+
+
+## A week, short: each draw's option, the usual ones left out.
+static func _drawn(w: Dictionary) -> String:
+	var usual := {"lantern": "Billy and Otto", "face": "not seen", "whose face": "Anton's", "talk": "nothing yet",
+			"sister": "he left at half past eleven", "kitchen": "Věra"}
+	var parts: Array = []
+	for d in w:
+		if usual.get(d, "") != w[d]:
+			parts.append("%s: %s" % [d, w[d]])
+	return "; ".join(parts)
 
 
 ## A claim as the report writes it: pred(who), "not " first for a denial; the fire's object (always Brand's store)
@@ -196,18 +207,29 @@ func _report(runs: Array, plans: Array) -> void:
 		for st in STEPS:
 			row.append(str(runs.filter(func(r): return r.plan == plan and (r.knew.has(st) or st in r.did)).size()).rpad(12))
 		print("  %-20s %s" % [plan, "  ".join(row)])
-	print("\nBy the world the seed made (face seen by Martha / the day Tamás remembers):")
-	var worlds := {}
+	print("\nDoes the seed move the ending? (for each way of playing: how many endings, and the commonest's share)")
+	for plan in plans:
+		var mine: Array = runs.filter(func(r): return r.plan == plan)
+		var counts := {}
+		for r in mine:
+			counts[r.ending] = counts.get(r.ending, 0) + 1
+		var top: int = counts.values().max() if counts.size() > 0 else 0
+		print("  %-20s %d endings, the commonest %d of %d" % [plan, counts.size(), top, mine.size()])
+	print("\nBy what the seed drew (every way of playing together):")
+	var draws := {}
 	for r in runs:
-		var w := "face %s, Tamás day %d" % ["seen" if r.face_seen else "not seen", r.face_day]
-		if not worlds.has(w):
-			worlds[w] = {}
-		worlds[w][r.ending] = worlds[w].get(r.ending, 0) + 1
-	for w in worlds:
+		for d in r.week:
+			var key := "%s: %s" % [d, r.week[d]]
+			if not draws.has(key):
+				draws[key] = {}
+			draws[key][r.ending] = draws[key].get(r.ending, 0) + 1
+	var keys: Array = draws.keys()
+	keys.sort()
+	for k in keys:
 		var parts: Array = []
-		for e in worlds[w]:
-			parts.append("%s %d" % [e, worlds[w][e]])
-		print("  %-30s %s" % [w, ", ".join(parts)])
+		for e in draws[k]:
+			parts.append("%s %d" % [e, draws[k][e]])
+		print("  %-40s %s" % [k, ", ".join(parts)])
 	var never: Array = ["nobody", "breakup", "take:ashby", "take:otto", "take:billy", "take:vera", "arrest", "mercy"].filter(
 			func(e): return e not in endings)
 	print("\nNever reached: %s" % (", ".join(never) if never.size() > 0 else "none"))

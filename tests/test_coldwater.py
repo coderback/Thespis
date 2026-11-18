@@ -15,6 +15,10 @@ from thespis.ledger import Claim
 HERE = Path(__file__).resolve().parents[1] / "games" / "before-the-ice"
 GAME = Game.load(HERE / "coldwater.toml")
 CASE = json.loads((HERE / "case.json").read_text(encoding="utf-8"))
+## What a seed can make of the week: draw -> option name -> the option (case.json's week; case.gd rolls it).
+WEEK = {d["name"]: {o["name"]: o for o in d["options"]} for d in CASE["week"]["draws"]}
+## The week most seeds come near: the heaviest option of each draw, Martha not seeing the face.
+USUAL = {d: max(opts.values(), key=lambda o: o["weight"])["name"] for d, opts in WEEK.items()}
 
 ALIBI = {"pred": "with_vera", "a": "player"}
 NO_ALIBI = {**ALIBI, "neg": True}
@@ -30,22 +34,35 @@ def lantern(who: str) -> dict:
 
 
 def observe(s: Session, o: dict) -> None:
-    o = {k: v for k, v in o.items() if k != "note"}
+    o = {k: v for k, v in o.items() if k not in ("note", "id")}
     s.observe(o.pop("verb"), o.pop("actor"), o.pop("target", None), **o)
 
 
-def week(face: bool = False, seed: int = 1) -> Session:
-    """The morning of day 1: the night of the fire, as each saw their piece of it."""
+def week(face: bool = False, seed: int = 1, **drawn: str) -> Session:
+    """The morning of day 1: the night of the fire, as each saw their piece of it, in a week a seed might make: the
+    usual one, but for the draws given (by name, a space as _), as case.gd plays it."""
+    picks = {**USUAL, "face": "seen" if face else "not seen", **{k.replace("_", " "): v for k, v in drawn.items()}}
+    options = [WEEK[d][picks[d]] for d in WEEK]
+    see: dict[str, list] = {}
+    for o in options:
+        for event, who in o.get("see", {}).items():
+            see.setdefault(event, []).extend(who)
     s = Session.new(GAME, seed=seed)
     for o in CASE["night"]:
-        observe(s, o)
-    for o in CASE["face"]["observe"] if face else ():
-        observe(s, o)
+        observe(s, {**o, "witnesses": o.get("witnesses", []) + see.get(o.get("id", ""), [])})
+    for o in options:
+        for x in o.get("observe", ()):
+            observe(s, x)
+        for a, b, kind in o.get("tie", ()):
+            s.tie(a, b, kind)
+        for npc, change in o.get("update", {}).items():
+            s.update(npc, **change)
     return s
 
 
 def remember(s: Session, stage: str) -> None:
-    for o in CASE["tamas"][stage]["observe"]:
+    """Tamás sees a piece of the night again: the lantern, or a face (whose: an option of the week's draw)."""
+    for o in CASE["tamas"]["lantern"]["observe"] if stage == "lantern" else WEEK["whose face"][stage]["remember"]:
         observe(s, o)
 
 
@@ -230,7 +247,7 @@ def test_tamas_remembers_and_the_lie_told_him_comes_back():
     assert conf(s, "tamas", lantern("ashby")) == 0.9  # he believes the one who sits with him
     remember(s, "lantern")
     assert conf(s, "tamas", lantern("ashby")) == 0.9  # a lantern, no face: no rival story
-    remember(s, "face")
+    remember(s, "Anton's")
     assert conf(s, "tamas", lantern("ashby")) == 0.0 and conf(s, "tamas", lantern("player")) == 1.0
     assert s.decide("tamas", "visit").action == "cold"
     line = s.decide("tamas", "decision", to="gilchrist")
@@ -241,7 +258,7 @@ def test_tamas_remembers_and_the_lie_told_him_comes_back():
 
 def test_tamas_forgives_a_friend_who_never_lied_to_him():
     s = week()
-    remember(s, "face")
+    remember(s, "Anton's")
     assert s.decide("tamas", "visit").action == "remembers"
     assert s.decide("tamas", "decision", to="gilchrist").action == "forgive"
     assert steamer(s) == "nobody"
@@ -262,6 +279,65 @@ def test_vera_takes_it_on_herself():
     s.update("vera", flags={"brother_lost": True})
     assert s.decide("vera", "last_morning", to="gilchrist").action == "confess_for_him"
     assert steamer(s) == "take:vera"
+
+
+# ---------------------------------------------------------------- the week the seed makes
+def test_every_draw_names_its_options_and_the_rules_name_real_ones():
+    assert USUAL == {"lantern": "Billy and Otto", "face": "not seen", "memory": "day 4", "whose face": "Anton's",
+                     "talk": "nothing yet", "sister": "he left at half past eleven", "kitchen": "Věra"}
+    for opts in WEEK.values():
+        assert all(o["weight"] > 0 for o in opts.values())
+    rules = CASE["week"]["rules"]
+    for cond in rules["one_of"] + rules["never"]:
+        for d, want in cond.items():
+            assert want.removeprefix("!") in WEEK[d], (d, want)
+
+
+def test_someone_besides_martha_always_saw_the_lantern():
+    for name in WEEK["lantern"]:
+        s = week(lantern=name)
+        saw = [n for n in ("billy", "otto") if conf(s, n, LANTERN) == 1.0]
+        assert saw and conf(s, "martha", LANTERN) == 1.0, name
+
+
+def test_the_fever_can_give_him_the_wrong_face():
+    s = week(whose_face="Ashby's")
+    remember(s, "lantern")
+    remember(s, "Ashby's")
+    assert conf(s, "tamas", fired("ashby")) == 1.0  # he's sure: he saw it
+    assert not s.world.ledger.happened(Claim.from_json(fired("ashby")))  # and it never happened
+    assert s.decide("tamas", "visit").action == "remembers_ashby"  # Anton can hear it, sitting with him
+    assert s.decide("tamas", "decision", to="gilchrist").action == "accuse_ashby"
+    assert conf(s, "gilchrist", fired("ashby")) == 0.9
+    assert steamer(s) == "take:ashby"
+
+
+def test_what_the_town_says_is_a_story_someone_tells_not_a_sighting():
+    for name, o in WEEK["talk"].items():
+        s = week(talk=name)
+        for x in o.get("observe", ()):
+            assert x["said"] and x["actor"] == "someone"
+            assert conf(s, x["target"], x["claim"]) == 0.6, name
+            assert not s.world.ledger.happened(Claim.from_json(x["claim"])), name
+        assert bool(o.get("news")) == bool(o.get("observe")), name  # Anton hears what the town is saying
+
+
+def test_a_sister_who_saw_his_lantern_come_back_keeps_it_while_she_trusts_him():
+    s = week(sister="his lantern came back")
+    assert conf(s, "vera", fired("player")) == 1.0
+    assert {"npc": "vera", "why": "keeps it quiet ([[npc.vera.keeps]] 1)"} in s.trace(fired("player"))["stopped"]
+    s.update("vera", flags={"brother_lost": True})  # warned and searched: she gives herself up for him
+    assert s.decide("vera", "last_morning", to="gilchrist").action == "confess_for_him"
+    assert steamer(s) == "take:vera"
+
+
+def test_on_some_weeks_martha_talks_to_maggie_too():
+    s = week(face=True, kitchen="Věra and Maggie")
+    s.tick(2)
+    assert conf(s, "maggie", lantern("player")) >= 0.4  # enough for her to pass on
+    s = week(face=True)
+    s.tick(2)
+    assert conf(s, "maggie", lantern("player")) < 0.4  # word of mouth, too faint for her to pass on
 
 
 # ---------------------------------------------------------------- the town

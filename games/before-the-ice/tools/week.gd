@@ -32,6 +32,10 @@ func _ready() -> void:
 		_quit()
 		return
 	check(case.where.get("vera") == "vera" and case.where.get("tamas") == "mission", "everyone starts where the case says")
+	var spec: Dictionary = case.data.week
+	var fair := range(1, 501).all(func(n): return Case.keeps(spec.rules, Case.roll(spec, n)))
+	check(fair and Case.roll(spec, 7) == Case.roll(spec, 7), "every week seeds 1 to 500 make keeps the rules, and a seed makes the same week")
+	print("  the week: %s" % case.week)
 
 	# Day 1, morning: the roadhouse. Anton gives Maggie his story, and types something to her.
 	await case.go("maggies")

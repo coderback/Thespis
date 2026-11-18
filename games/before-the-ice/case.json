@@ -102,7 +102,7 @@
       }
     },
     {
-      "note": "1.00 am: a lantern down the lane, past Maggie's kitchen window, to Brand's back door and back; no face",
+      "note": "1.00 am: a lantern down the lane, past Maggie's kitchen window, to Brand's back door and back; no face. Martha sees it from the kitchen; who else did is the seed's (week: lantern)",
       "verb": "carry",
       "actor": "player",
       "at": "store",
@@ -111,10 +111,9 @@
         "a": "someone"
       },
       "witnesses": [
-        "billy",
-        "otto",
         "martha"
-      ]
+      ],
+      "id": "lantern"
     },
     {
       "note": "Martha saw someone in the lane: she knows she did",
@@ -170,26 +169,8 @@
       }
     }
   ],
-  "face": {
-    "note": "On some seeds Martha saw the face in the lane",
-    "chance": 0.34,
-    "observe": [
-      {
-        "verb": "carry",
-        "actor": "player",
-        "at": "store",
-        "claim": {
-          "pred": "lantern",
-          "a": "player"
-        },
-        "witnesses": [
-          "martha"
-        ]
-      }
-    ]
-  },
   "tamas": {
-    "note": "He remembers a piece at a time, each a thing he sees again: a lantern on day 2, then the face behind it on a seeded day (0: never, on a bad week). What he sees himself beats anything he's told: if Anton told him the lantern was another man's, Anton is caught.",
+    "note": "He remembers a piece at a time, each a thing he sees again: a lantern on day 2, then a face behind it on the seed's day (week: memory), Anton's or, in the fever, another man's (week: whose face). What he sees himself beats anything he's told: if Anton told him the lantern was another man's, and the face he sees is Anton's, Anton is caught.",
     "lantern": {
       "day": 2,
       "observe": [
@@ -203,35 +184,323 @@
           }
         }
       ]
-    },
-    "face": {
-      "days": [
-        3,
-        4,
-        4,
-        5,
-        5,
-        0
-      ],
-      "observe": [
-        {
-          "verb": "remember",
-          "actor": "tamas",
-          "at": "mission",
-          "claim": {
-            "pred": "lantern",
-            "a": "player"
+    }
+  },
+  "week": {
+    "note": "What the seed changes. For each draw, one option, by weight; the seed draws again until the week keeps the rules. An option may add witnesses to an event of the night (see, by its id), play observations into the morning of day 1 (observe), tie two people (tie), change someone (update: npc -> what to change), set the day Tamás's face comes back (day) and what he sees then (remember), and tell Anton what he hears that first morning (news). A story the town tells is a statement from someone, believed as far as its conf: never a sighting, and false in the ledger.",
+    "draws": [
+      {
+        "name": "lantern",
+        "note": "Who saw the lantern in the lane, besides Martha at the kitchen window",
+        "options": [
+          {
+            "name": "Billy and Otto",
+            "weight": 3,
+            "see": {
+              "lantern": [
+                "billy",
+                "otto"
+              ]
+            }
+          },
+          {
+            "name": "Billy",
+            "weight": 2,
+            "note": "Otto never looked up from his cards",
+            "see": {
+              "lantern": [
+                "billy"
+              ]
+            }
+          },
+          {
+            "name": "Otto",
+            "weight": 1,
+            "note": "Billy had run off with the wood before it passed",
+            "see": {
+              "lantern": [
+                "otto"
+              ]
+            }
           }
+        ]
+      },
+      {
+        "name": "face",
+        "note": "Whether Martha saw the face behind the lantern",
+        "options": [
+          {
+            "name": "not seen",
+            "weight": 2
+          },
+          {
+            "name": "seen",
+            "weight": 1,
+            "observe": [
+              {
+                "verb": "carry",
+                "actor": "player",
+                "at": "store",
+                "claim": {
+                  "pred": "lantern",
+                  "a": "player"
+                },
+                "witnesses": [
+                  "martha"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "memory",
+        "note": "The day Tamás sees the face again: never, on a bad week",
+        "options": [
+          {
+            "name": "day 3",
+            "weight": 1,
+            "day": 3
+          },
+          {
+            "name": "day 4",
+            "weight": 2,
+            "day": 4
+          },
+          {
+            "name": "day 5",
+            "weight": 2,
+            "day": 5
+          },
+          {
+            "name": "never",
+            "weight": 1,
+            "day": 0
+          }
+        ]
+      },
+      {
+        "name": "whose face",
+        "note": "What he sees: Anton's face, or, in the fever, the face of the man who shouted fire and pulled at the door beside him",
+        "options": [
+          {
+            "name": "Anton's",
+            "weight": 4,
+            "remember": [
+              {
+                "verb": "remember",
+                "actor": "tamas",
+                "at": "mission",
+                "claim": {
+                  "pred": "lantern",
+                  "a": "player"
+                }
+              },
+              {
+                "verb": "remember",
+                "actor": "tamas",
+                "at": "mission",
+                "claim": {
+                  "pred": "fired",
+                  "a": "player",
+                  "b": "otto"
+                }
+              }
+            ]
+          },
+          {
+            "name": "Ashby's",
+            "weight": 1,
+            "remember": [
+              {
+                "verb": "remember",
+                "actor": "tamas",
+                "at": "mission",
+                "claim": {
+                  "pred": "lantern",
+                  "a": "ashby"
+                },
+                "true": false
+              },
+              {
+                "verb": "remember",
+                "actor": "tamas",
+                "at": "mission",
+                "claim": {
+                  "pred": "fired",
+                  "a": "ashby",
+                  "b": "otto"
+                },
+                "true": false
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "talk",
+        "note": "What the town said the morning after, and who had it first: a story, not a sighting",
+        "options": [
+          {
+            "name": "nothing yet",
+            "weight": 2
+          },
+          {
+            "name": "the stranger",
+            "weight": 1,
+            "news": "At Maggie's they're saying it was the stranger, Ashby.",
+            "observe": [
+              {
+                "verb": "tell",
+                "actor": "someone",
+                "target": "maggie",
+                "at": "maggies",
+                "claim": {
+                  "pred": "fired",
+                  "a": "ashby",
+                  "b": "otto"
+                },
+                "said": true,
+                "conf": 0.6
+              }
+            ]
+          },
+          {
+            "name": "the lamp",
+            "weight": 1,
+            "news": "Brand is telling anyone who'll listen it was his watchman's lamp.",
+            "observe": [
+              {
+                "verb": "tell",
+                "actor": "someone",
+                "target": "otto",
+                "at": "maggies",
+                "claim": {
+                  "pred": "fired",
+                  "a": "tamas",
+                  "b": "otto"
+                },
+                "said": true,
+                "conf": 0.6
+              }
+            ]
+          },
+          {
+            "name": "Brand himself",
+            "weight": 1,
+            "news": "Downriver they're saying Brand burned his own book, to be rid of what he owed.",
+            "observe": [
+              {
+                "verb": "tell",
+                "actor": "someone",
+                "target": "martha",
+                "at": "downriver",
+                "claim": {
+                  "pred": "fired",
+                  "a": "otto",
+                  "b": "otto"
+                },
+                "said": true,
+                "conf": 0.6
+              }
+            ]
+          },
+          {
+            "name": "the wood boy",
+            "weight": 1,
+            "news": "Maggie has heard the wood boy was at Brand's back door that night.",
+            "observe": [
+              {
+                "verb": "tell",
+                "actor": "someone",
+                "target": "maggie",
+                "at": "maggies",
+                "claim": {
+                  "pred": "lantern",
+                  "a": "billy"
+                },
+                "said": true,
+                "conf": 0.6
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "sister",
+        "note": "What Věra saw that night",
+        "options": [
+          {
+            "name": "he left at half past eleven",
+            "weight": 3
+          },
+          {
+            "name": "his lantern came back",
+            "weight": 1,
+            "note": "Up with the glow at a quarter past one, she saw his lantern come back over the ice",
+            "observe": [
+              {
+                "verb": "return",
+                "actor": "player",
+                "at": "ice",
+                "claim": {
+                  "pred": "fired",
+                  "a": "player",
+                  "b": "otto"
+                },
+                "witnesses": [
+                  "vera"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "kitchen",
+        "note": "Whom Martha talks to: Věra, and on some weeks Maggie too",
+        "options": [
+          {
+            "name": "Věra",
+            "weight": 2
+          },
+          {
+            "name": "Věra and Maggie",
+            "weight": 1,
+            "tie": [
+              [
+                "martha",
+                "maggie",
+                "friend"
+              ]
+            ],
+            "note": "They sit up together in the kitchen: Maggie trusts her, and what Martha saw goes round the town",
+            "update": {
+              "maggie": {
+                "trust_in": {
+                  "martha": 2
+                }
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "rules": {
+      "note": "What every week must be. one_of: at least one holds, so the town always has someone else to suspect. never: no week is all of one. A value with ! first is any option but that one.",
+      "one_of": [
+        {
+          "talk": "!nothing yet"
         },
         {
-          "verb": "remember",
-          "actor": "tamas",
-          "at": "mission",
-          "claim": {
-            "pred": "fired",
-            "a": "player",
-            "b": "otto"
-          }
+          "whose face": "Ashby's",
+          "memory": "!never"
+        }
+      ],
+      "never": [
+        {
+          "whose face": "Ashby's",
+          "memory": "never"
         }
       ]
     }
