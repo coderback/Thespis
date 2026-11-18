@@ -89,11 +89,16 @@ func _ready() -> void:
 	if not r.ok:
 		push_warning("No Thespis: %s" % r.reason)
 		paper.say("The town is quiet: no Thespis.", r.reason.left(80))
-	if args.has("talk"):  # `-- --talk=maggies [--answer=2] [--evening=1] --shot=<file.png>`: talking, for a picture
-		var key: String = args.talk
+	if args.has("talk"):  # `-- --talk=maggies [--part=1] [--to=otto] [--answer=2] [--evening=1] --shot=<file.png>`
+		var key: String = args.talk  # talking, for a picture
+		for i in int(args.get("part", "0")):  # `--part=1`: let the morning pass first (2: the afternoon too)
+			await case.end_phase()
 		town.people.anton.position = town.place(key)
 		_arrived(key)
 		await get_tree().create_timer(1.0).timeout
+		if args.has("to"):  # `--to=martha`: speak to someone else who's there
+			talk._speak_to(args.to)
+			await get_tree().create_timer(1.0).timeout
 		if args.has("answer"):  # `--answer=2`: press that answer, as the player would
 			talk._answer(int(args.answer) - 1)
 			await get_tree().create_timer(1.5).timeout

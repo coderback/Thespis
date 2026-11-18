@@ -24,7 +24,12 @@ const BLUE_INK := Color("#1b2a4a")
 const PALE := Color("#c9bba0")
 const TILT := [-0.8, 0.5, -0.4, 0.7]
 const ANSWERS := 4  ## answers a visit: each spends a little of the day
-const PORTRAITS := {"maggie": "res://assets/portraits/maggie.png"}
+const PORTRAITS := {
+	"maggie": "res://assets/portraits/maggie.png",
+	"tamas": "res://assets/portraits/tamas.png",
+	"otto": "res://assets/portraits/otto.png",
+	"martha": "res://assets/portraits/martha.png",
+}
 
 var case: Case
 var picture: TextureRect  ## the town, dimmed behind the conversation (shaders/dim.gdshader)
