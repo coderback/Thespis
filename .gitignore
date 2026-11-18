@@ -41,3 +41,6 @@ client/.vite/
 # OS
 .DS_Store
 Thumbs.db
+
+# the Before the Ice web build, put here by the Dockerfile (or by hand to try it)
+games/ice/web/

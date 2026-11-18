@@ -20,3 +20,6 @@ client/dist
 docs
 tests
 backups
+games/ice/web
+games/before-the-ice/build
+games/before-the-ice/.godot

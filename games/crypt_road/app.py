@@ -36,6 +36,7 @@ from games.hosting import (
 )
 from games.hosting import budget as _budget
 from games.hosting import env_int as _env_int
+from games.ice import api as ice
 from games.manor import api as manor
 from games.manor.content import load_cast as manor_cast
 from games.store import SessionNotFound, Store
@@ -313,6 +314,9 @@ def post_persona(body: PersonaBody, request: Request, x_session: str | None = He
 
 # The second game on the same core (#35), text-only, at /manor.
 app.include_router(manor.router)
+
+# Before the Ice Goes Out in the browser, for playtests: /ice/, its Thespis at /thespis, its records at /ice/record.
+ice.install(app)
 
 # Mounted last so API routes win. Present once the client has been built (client/dist/index.html).
 if (CLIENT_DIST / "index.html").exists():

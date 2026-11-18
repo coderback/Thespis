@@ -34,6 +34,17 @@ uniform float cone_cos = 0.857;         // cos of half the 62 degree cone
 uniform float cone_blend = 0.6;         // Blender's spot blend: the soft part of the cone
 
 varying vec3 obj;
+
+// The browser's renderer (Compatibility) hands these generated gradients back as stored, in sRGB, where Forward+
+// hands them back linear: the same colour either way.
+vec3 lin(vec3 c) {
+#if CURRENT_RENDERER == RENDERER_COMPATIBILITY
+	return mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)), step(0.04045, c));
+#else
+	return c;
+#endif
+}
+
 varying vec3 world;
 varying float shake;
 
@@ -91,10 +102,10 @@ void fragment() {
 	shake = (1.0 + grain * (n - 0.5) * 2.0) * d * d * cone;
 	if (kind == EMISSIVE) {
 		ALBEDO = vec3(0.0);
-		EMISSION = emission * emission_strength;
+		EMISSION = lin(emission) * emission_strength;
 	} else {
 		ALBEDO = c;
-		EMISSION = emission * emission_strength;
+		EMISSION = lin(emission) * emission_strength;
 	}
 }
 
@@ -104,11 +115,14 @@ void light() {
 	if (LIGHT_IS_DIRECTIONAL) {
 		// the desk lamp: the whole ramp, shadow colour included, comes from it
 		float f = e * lamp_k * shake;
-		DIFFUSE_LIGHT += texture(bands, vec2(clamp(f / band_top, 0.0, 0.999), 0.5)).rgb;
+		DIFFUSE_LIGHT += lin(texture(bands, vec2(clamp(f / band_top, 0.0, 0.999), 0.5)).rgb);
 	} else {
 		// window spill, lanterns, the forge: a warm band, stepped
 		float f = e * omni_k * dot(LIGHT_COLOR, vec3(0.333));
+#if CURRENT_RENDERER == RENDERER_COMPATIBILITY
+		f /= PI;  // its local lights arrive a factor of pi stronger than Forward+'s
+#endif
 		float b = f > 0.6 ? 0.55 : (f > 0.2 ? 0.3 : (f > 0.05 ? 0.12 : 0.0));
-		DIFFUSE_LIGHT += b * omni_warm;
+		DIFFUSE_LIGHT += b * lin(omni_warm);
 	}
 }

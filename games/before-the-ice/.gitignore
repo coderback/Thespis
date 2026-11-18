@@ -2,3 +2,5 @@
 .godot/
 # screenshots from tools/shot
 shots/
+# the web export (export_presets.cfg); the Dockerfile builds it for the server
+build/
