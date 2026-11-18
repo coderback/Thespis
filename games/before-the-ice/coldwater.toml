@@ -19,6 +19,10 @@
 #   - the seed draws the week (case.json): who saw the lantern, whether Martha saw the face, when Tamás sees a face
 #     again and whose (on some weeks, in the fever, Ashby's), what the town said the morning after, what Věra saw,
 #     whether Martha talks to Maggie, who saw Billy at Brand's back door, and whether Maggie keeps her back room quiet;
+#   - a pressure director (case.json): each morning the game measures the pressure on Anton against a target that rises
+#     by day, and below it brings out one incident latent in the night (Otto's crooked game found out, Billy caught at
+#     the cordwood, Martha overheard); well above it, early, relief (Ashby's stores found, the watchman's bottle).
+#     Gilchrist won't search before day 3;
 #   - Otto and Billy lie about where they were at one: Otto says his bed (he was dealing in Maggie's back room), Billy
 #     says asleep (he was taking Brand's cordwood at the back door). Gilchrist asks them once a story points their
 #     way, and a lie he hears the truth of rules them in.
@@ -423,12 +427,13 @@ when = [{ any = [{ all = [{ any = [{ believes = { pred = "with_vera", a = "playe
                  { believes = { pred = "fired", a = "player", b = "otto" } }] },
         { not_flag = "warned" }]
 
+# No search before day 3 (the game sets day<n> each morning): the case has to grow before it bites.
 [[npc.gilchrist.choices.evening]]
 do = "search"
 utility = 8
 when = [{ any = [{ believes = { pred = "lantern", a = "player" }, min = 0.4 },
                  { believes = { pred = "fired", a = "player", b = "otto" }, min = 0.3 }] },
-        { not_flag = "searched" }]
+        { flag = "day3" }, { not_flag = "searched" }]
 
 [[npc.gilchrist.choices.evening]]
 do = "caught_lie"
@@ -735,7 +740,7 @@ pred = "saw_lane"
 
 [gossip]
 about = "everyone"
-priority = { fired = 6, lantern = 5, with_vera = 4, saw_lane = 3, drunk = 3, sold_bottle = 3, fixed_game = 3, back_room = 2, woodpile = 2, wanted = 2, in_bed = 1, asleep = 1, went = 1 }
+priority = { fired = 6, lantern = 5, stowed = 3, caught_stealing = 2, with_vera = 4, saw_lane = 3, drunk = 3, sold_bottle = 3, fixed_game = 3, back_room = 2, woodpile = 2, wanted = 2, in_bed = 1, asleep = 1, went = 1 }
 threshold = 0.4
 along = { kin = 1.0, friend = 0.9, lodger = 0.8, trade = 0.7 }
 in_person = 0.7
@@ -805,6 +810,8 @@ wanted = "{a} is wanted in Seattle under another name"
 back_room = "{a} was in Maggie's back room at one in the morning, the night of the fire"
 woodpile = "{a} was at Brand's back door taking cordwood at one in the morning, the night of the fire"
 in_bed = "{a} was in bed by midnight, the night of the fire"
+stowed = "{a} stowed food aboard the laid-up steamer, ready to run"
+caught_stealing = "{a} was caught taking Brand's cordwood"
 asleep = "{a} was asleep at one in the morning, the night of the fire"
 went = "{a} went to {place}"
 paid = "{a} paid {b}"

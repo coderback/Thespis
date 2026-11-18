@@ -58,6 +58,8 @@ var sat_with_him := false  ## tonight's evening at the post is done
 var _comforted := {}  ## who Anton comforted today: once a day counts
 var _sat_with_tamas := false  ## Anton was at the infirmary today
 var ending_action := ""  ## what Gilchrist did at the steamer: nobody, arrest, take:<who>, ...
+var pressures := {}  ## day -> the pressure on Anton that morning, 0 to 1 (the director's measure)
+var incidents: Array = []  ## the incidents the director brought out, in order: each {day, name, kind}
 var told := {}  ## npc -> what Anton told them, in order: each {claim, note, phase}
 var keep_journal := false  ## record the week for a playtest (Journal writes it out)
 var journal: Array = []  ## what happened, in order: each {phase, day, part, kind, ...}
@@ -367,8 +369,10 @@ func advance() -> void:
 		await steamer()
 		return
 	if part() == 0:
+		await Thespis.update("gilchrist", {"flags": {"day%d" % day(): true}})
 		await _waited()
 		await _remember()
+		await _direct()
 		await _morning()
 	if part() < 2:
 		await rounds()
@@ -459,6 +463,136 @@ func _waited() -> void:
 		elif int(trust.get("tamas", {}).get("player", 0)) < 2:
 			await _trust("tamas", 1)
 	_sat_with_tamas = here == "mission"
+
+
+# ------------------------------------------------------------------------------------------------ the director
+
+## The pressure on Anton now, 0 to 1, by case.json's director: how far Gilchrist suspects him, whether his account
+## has broken, and how many in town hold a true and damaging belief about him.
+func pressure() -> float:
+	var spec: Dictionary = data.director
+	var w: Dictionary = spec.weights
+	var g := await Thespis.inspect("gilchrist")
+	var suspects := 0.0
+	var alibi := 0.0
+	if g.ok:
+		var asked: bool = g.value.npc.get("flags", {}).get("asked_night", false)
+		var vouched := false
+		for b in g.value.beliefs:
+			var c: Dictionary = b.claim
+			if b.status != "active" or str(c.a) != "player":
+				continue
+			var conf := float(b.opinion.b)
+			if c.pred in ["lantern", "fired"]:
+				suspects = maxf(suspects, conf)
+			elif c.pred == "left_vera" or (c.pred == "with_vera" and c.get("neg", false)):
+				alibi = 1.0
+			elif c.pred == "with_vera":
+				vouched = true
+		if alibi == 0.0 and asked and not vouched:
+			alibi = 0.5  # asked, and never given an account
+	var holders := {}
+	for claim in [{"pred": "lantern", "a": "player"}, {"pred": "fired", "a": "player", "b": "otto"},
+			{"pred": "left_vera", "a": "player"}, {"pred": "with_vera", "a": "player", "neg": true}]:
+		var t := await Thespis.trace(claim)
+		if t.ok:
+			for h in t.value.holders:
+				if h.npc != "gilchrist" and h.status == "active" and float(h.conf) >= 0.4:
+					holders[h.npc] = true
+	var town := minf(1.0, float(holders.size()) / float(spec.town_full))
+	return float(w.gilchrist) * suspects + float(w.alibi) * alibi + float(w.town) * town
+
+
+## The morning's direction: below the day's target, bring out an incident latent in the night; well above it early,
+## one that gives relief; on a day that's never quiet, one either way. One a morning, each once.
+func _direct() -> void:
+	var spec: Dictionary = data.director
+	var key := str(day())
+	if not spec.targets.has(key):
+		return
+	var now := await pressure()
+	pressures[day()] = snappedf(now, 0.01)
+	var target := float(spec.targets[key])
+	var kind := ""
+	if now < target:
+		kind = "press"
+	elif now > target + float(spec.relief_over) and day() <= 3:
+		kind = "relieve"
+	elif _quiet_day(spec):
+		kind = "relieve" if now >= target else "press"
+	_note("director", {"pressure": pressures[day()], "target": target, "wants": kind})
+	if kind.is_empty() or not spec.get("active", true):
+		return
+	var done: Array = incidents.map(func(i): return i.name)
+	var kinds := [kind]
+	if _quiet_day(spec):  # something happens: the other kind if none of this is left, then a beat
+		kinds = [kind, "relieve" if kind == "press" else "press", "beat"]
+	var open: Array = []
+	for k in kinds:
+		for inc in spec.incidents:
+			if inc.kind == k and inc.name not in done and await _requires(inc.get("requires", [])):
+				open.append(inc)
+		if not open.is_empty():
+			kind = k
+			break
+	if open.is_empty():
+		return
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_value * 31 + day()
+	var inc: Dictionary = open[rng.randi() % open.size()]
+	for o in inc.get("observe", []):
+		await _observe(o)
+	if inc.get("remember_now", false):  # the fever breaks: what he'd have seen later, he sees now
+		face_day = day()
+		for o in _memory:
+			await _observe(o)
+	for npc in inc.get("update", {}):
+		await Thespis.update(npc, inc.update[npc])
+	incidents.append({"day": day(), "name": inc.name, "kind": kind})
+	_note("incident", {"name": inc.name, "kind": kind})
+	if inc.has("news"):
+		_news(inc.news)
+
+
+## Today is one the director never leaves quiet. (JSON's numbers are floats: compare as whole days.)
+func _quiet_day(spec: Dictionary) -> bool:
+	return spec.never_quiet.any(func(d): return int(d) == day())
+
+
+## Whether every requirement of an incident holds now: a draw of the week, a flag set or not, a belief not held.
+func _requires(reqs: Array) -> bool:
+	for r in reqs:
+		if r.has("week"):
+			var drawn := {}
+			for d in data.week.draws:
+				for o in d.options:
+					if o.name == week.get(d.name, ""):
+						drawn[d.name] = o
+			if not Case._is(r.week, drawn):
+				return false
+		elif r.has("flag") or r.has("not_flag"):
+			var who: Array = r.get("flag", r.get("not_flag"))
+			var i := await Thespis.inspect(str(who[0]))
+			var set_: bool = i.ok and bool(i.value.npc.get("flags", {}).get(str(who[1]), false))
+			if set_ != r.has("flag"):
+				return false
+		elif r.has("memory_ahead"):  # Tamás's face is still to come
+			if not (face_day > day()):
+				return false
+		elif r.has("not_believes"):
+			var i := await Thespis.inspect(str(r.not_believes[0]))
+			if i.ok:
+				for b in i.value.beliefs:
+					if b.status == "active" and _same(b.claim, r.not_believes[1]):
+						return false
+	return true
+
+
+static func _same(a: Dictionary, b: Dictionary) -> bool:
+	for k in ["pred", "a"]:
+		if str(a.get(k, "")) != str(b.get(k, "")):
+			return false
+	return str(a.get("b", "")) == str(b.get("b", "")) and bool(a.get("neg", false)) == bool(b.get("neg", false))
 
 
 ## Tamás's memory comes back a piece a morning: a lantern on the day the case says, a face on the seed's day.

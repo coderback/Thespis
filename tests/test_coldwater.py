@@ -363,6 +363,63 @@ def test_on_some_weeks_martha_talks_to_maggie_too():
     assert conf(s, "maggie", lantern("player")) < 0.4  # word of mouth, too faint for her to pass on
 
 
+# ---------------------------------------------------------------- the pressure director
+DIRECTOR = CASE["director"]
+
+
+def week_for(incident: dict) -> dict:
+    """Draws that meet an incident's requirements on the week, the usual ones otherwise."""
+    drawn = {}
+    for r in incident.get("requires", []):
+        for d, want in r.get("week", {}).items():
+            fits = (lambda o, w=want: o != w[1:]) if want.startswith("!") else (lambda o, w=want: o == w)
+            drawn[d.replace(" ", "_")] = next(o for o in WEEK[d] if fits(o))
+    return drawn
+
+
+def test_the_directors_data_names_real_draws_people_and_claims():
+    people = set(CASE["everyone"]) | {"player", "someone"}
+    words = GAME.cast.data["words"]["claims"]
+    assert set(DIRECTOR["targets"]) == {"2", "3", "4", "5"}
+    assert list(DIRECTOR["targets"].values()) == sorted(DIRECTOR["targets"].values())  # it rises
+    for inc in DIRECTOR["incidents"]:
+        assert inc["kind"] in ("press", "relieve", "beat") and inc["news"]
+        for r in inc.get("requires", []):
+            for d, want in r.get("week", {}).items():
+                assert want.removeprefix("!") in WEEK[d], (inc["name"], d)
+        for o in inc.get("observe", []):
+            assert {o["actor"], o.get("target", "someone"), *o.get("witnesses", [])} <= people, inc["name"]
+            assert o["claim"]["pred"] in words, inc["name"]
+
+
+def test_an_incident_only_brings_out_what_is_so():
+    for inc in DIRECTOR["incidents"]:
+        s = week(**week_for(inc))
+        for o in inc.get("observe", []):
+            if o.get("said") and o["actor"] != "someone":  # a person telling: only the truth
+                assert s.world.ledger.happened(Claim.from_json(o["claim"])), (inc["name"], o["claim"])
+
+
+def test_no_search_before_day_three():
+    s = week(face=True)
+    say(s, "gilchrist", lantern("player"), "police", speaker="maggie")
+    say(s, "gilchrist", lantern("player"), "police", speaker="otto")
+    s.update("gilchrist", flags={"asked_night": True, "warned": True, "day2": True})
+    assert evening(s) != "search"
+    s.update("gilchrist", flags={"day3": True})
+    assert evening(s) == "search"
+
+
+def test_billy_caught_at_the_cordwood_tells_maggie_what_he_saw():
+    inc = next(i for i in DIRECTOR["incidents"] if i["name"] == "Billy caught at the cordwood")
+    s = week(**week_for(inc))
+    assert conf(s, "maggie", LANTERN) == 0.0
+    for o in inc.get("observe", []):
+        observe(s, o)
+    assert conf(s, "maggie", LANTERN) > 0  # the hub has it now
+    assert conf(s, "maggie", {"pred": "woodpile", "a": "billy"}) > 0
+
+
 # ---------------------------------------------------------------- Otto's and Billy's lies
 OTTO = fired("otto")
 BILLY = lantern("billy")

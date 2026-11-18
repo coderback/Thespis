@@ -72,6 +72,9 @@ func _ready() -> void:
 			await case.ask("tamas")
 		await case.end_phase()
 	check(case.done, "the ice went out after %d phases" % case.phase)
+	check(case.pressures.keys() == [2, 3, 4, 5] and case.pressures.values().all(func(p): return p >= 0.0 and p <= 1.0),
+			"the director measured each morning: %s; brought out: %s" % [case.pressures,
+			", ".join(case.incidents.map(func(i): return "day %d %s" % [i.day, i.name]))])
 
 	var nb := await case.notebook()
 	check(nb.contains(" · ") and (nb.contains("south") or nb.contains("lamp")), "the Notebook tells his case:\n%s" % nb)

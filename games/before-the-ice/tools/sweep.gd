@@ -123,7 +123,7 @@ func _week(plan: String, s: int) -> Dictionary:
 	title = ""
 	case.ended.connect(_ended)
 	var run := {"seed": s, "plan": plan, "ok": false, "reason": "", "ending": "", "title": "", "missed": [],
-			"week": {}, "knew": {}, "did": []}
+			"week": {}, "knew": {}, "did": [], "pressure": {}, "incidents": []}
 	var r := await case.begin(s)
 	if not r.ok:
 		run.reason = r.reason
@@ -144,6 +144,8 @@ func _week(plan: String, s: int) -> Dictionary:
 					else:
 						run.missed.append("%s %s, day %d" % [act[0], act[1], case.day()])
 		await case.end_phase()
+	run.pressure = case.pressures
+	run.incidents = case.incidents.map(func(i): return "day %d: %s" % [i.day, i.name])
 	run.ok = case.done and not ending.is_empty()
 	run.reason = "" if run.ok else "the week didn't reach the steamer"
 	run.ending = ending
@@ -160,6 +162,38 @@ func _week(plan: String, s: int) -> Dictionary:
 	await Thespis.close()
 	case.queue_free()
 	return run
+
+
+## The director: the pressure each morning by way of playing (the mean over seeds, against the target), and what it
+## brought out, with how those weeks ended.
+func _director(runs: Array, plans: Array) -> void:
+	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://case.json"))
+	var targets: Dictionary = data.director.targets
+	print("\nThe pressure on Anton each morning (mean over seeds; the target in brackets):")
+	print("  %-20s %s" % ["", "  ".join([2, 3, 4, 5].map(func(d): return ("day %d (%s)" % [d, targets[str(d)]]).rpad(14)))])
+	for plan in plans:
+		var mine: Array = runs.filter(func(r): return r.plan == plan)
+		var row: Array = []
+		for d in [2, 3, 4, 5]:
+			var total := 0.0
+			for r in mine:
+				total += float(r.pressure.get(d, 0.0))
+			row.append(("%.2f" % (total / maxf(1.0, mine.size()))).rpad(14))
+		print("  %-20s %s" % [plan, "  ".join(row)])
+	print("\nWhat the director brought out (weeks), and how those weeks ended:")
+	var seen := {}
+	for r in runs:
+		for i in r.incidents:
+			var name: String = i.get_slice(": ", 1)
+			if not seen.has(name):
+				seen[name] = {}
+			seen[name][r.ending] = seen[name].get(r.ending, 0) + 1
+	for name in seen:
+		var parts: Array = []
+		for e in seen[name]:
+			parts.append("%s %d" % [e, seen[name][e]])
+		print("  %-30s %s" % [name, ", ".join(parts)])
+	print("  %-30s %d weeks" % ["(nothing brought out)", runs.filter(func(r): return r.incidents.is_empty()).size()])
 
 
 ## A week, short: each draw's option, the usual ones left out.
@@ -226,6 +260,7 @@ func _report(runs: Array, plans: Array) -> void:
 		for st in STEPS:
 			row.append(str(runs.filter(func(r): return r.plan == plan and (r.knew.has(st) or st in r.did)).size()).rpad(12))
 		print("  %-20s %s" % [plan, "  ".join(row)])
+	_director(runs, plans)
 	print("\nDoes the seed move the ending? (for each way of playing: how many endings, and the commonest's share)")
 	for plan in plans:
 		var mine: Array = runs.filter(func(r): return r.plan == plan)
