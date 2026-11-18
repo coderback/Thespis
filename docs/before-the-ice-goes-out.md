@@ -283,7 +283,8 @@ waiting comes out: a miner catches Otto dealing crooked cards and, cornered, Ott
 catches Billy at his cordwood again and the boy blurts what he saw, unless you've paid him; on the weeks Martha saw
 your face, she's overheard saying so; the fever breaks early and Tamás remembers. Run far ahead of it on the first
 days and the town looks elsewhere for a while: food stowed aboard the laid-up steamer turns eyes to Ashby; an empty
-bottle in the ruin turns them to the watchman. The fourth morning is never quiet. And Gilchrist won't search a
+bottle in the ruin turns them to the watchman. The fourth morning is never quiet: if nothing of the kind the week needs is left, the world goes on (the tripod
+moves in the night), rather than handing a week that's behind somewhere else to look. And Gilchrist won't search a
 cabin before the third day: the case has to grow before it bites. Every incident only brings out what someone truly
 saw, or something true that happens that day. The numbers are in [`case.json`](../games/before-the-ice/case.json)'s
 `director`, to be tuned in playtests.

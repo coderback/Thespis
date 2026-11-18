@@ -525,8 +525,8 @@ func _direct() -> void:
 		return
 	var done: Array = incidents.map(func(i): return i.name)
 	var kinds := [kind]
-	if _quiet_day(spec):  # something happens: the other kind if none of this is left, then a beat
-		kinds = [kind, "relieve" if kind == "press" else "press", "beat"]
+	if _quiet_day(spec):  # something happens: a beat if none of this kind is left, and only last the other kind
+		kinds = [kind, "beat", "relieve" if kind == "press" else "press"]
 	var open: Array = []
 	for k in kinds:
 		for inc in spec.incidents:
