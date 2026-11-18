@@ -299,7 +299,7 @@ when = [{ trust = "maggie", gte = 1 }]
 talk = "You're Věra's brother. She says you work hard."
 told = "That's what the town says. The town says a lot."
 asked = "Nobody's asked me anything all week."
-paid = "For gloves? Four dollars, they're good ones."
+paid = "For gloves? Eight dollars, they're good ones."
 threatened = "I've heard worse from better men."
 comforted = "Thank you."
 statement = "A man went past the window with a lantern at one o'clock, going east. Ten minutes later he came back."

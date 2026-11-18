@@ -535,8 +535,8 @@ func _refresh_answers() -> void:
 			_choices.append({"say": "Here's five dollars. You didn't see anything.", "hint": "buys his silence?",
 					"warn": true, "act": func() -> void: await case.pay(to, 5)})
 		elif to == "martha":
-			_choices.append({"say": "I'll take a pair of gloves.", "hint": "four dollars", "warn": false,
-					"act": func() -> void: await case.pay(to, 4)})
+			_choices.append({"say": "I'll take a pair of gloves.", "hint": "eight dollars", "warn": false,
+					"act": func() -> void: await case.pay(to, 8)})  # moosehide gloves, that winter
 		else:
 			_choices.append({"say": "I'm sorry for all of it.", "hint": "comforts", "warn": false,
 					"act": func() -> void: await case.comfort(to)})
