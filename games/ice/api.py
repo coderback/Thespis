@@ -124,7 +124,7 @@ class _Front:
         await self.app(scope, receive, send)
 
 
-def _thespis() -> object:
+def _thespis() -> _Front:
     from thespis.gateway import NoModel
     from thespis.host import SIDECAR, Host
     from thespis.server import create_app
