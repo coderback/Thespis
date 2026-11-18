@@ -313,7 +313,26 @@ reason they play again.
 ## Why they play again
 
 The seed changes who saw what, who is tied to whom, how fast Tamás remembers, and which of the town's secrets is
-true. The lie that worked last time is the one that hangs you this time. A run takes about 40 minutes, every ending
+true. The lie that worked last time is the one that hangs you this time. Each seed draws a week from
+[`case.json`](../games/before-the-ice/case.json)'s `week`:
+
+- **Who saw the lantern** besides Martha: Billy and Otto, or only one of them (Otto never looked up from his cards;
+  Billy ran with the wood).
+- **Whether Martha saw the face**, about one week in three.
+- **When Tamás sees a face again**, day 3, 4 or 5, or never; and **whose**. Usually Anton's. Sometimes, in the fever,
+  it's Ashby's, the man who shouted fire and pulled at the door beside him. He is sure, and he's wrong. Sitting with
+  him, Anton hears it; on the last day Tamás sends for the Inspector.
+- **What the town said the morning after**: nothing yet, or a story someone had first. At Maggie's it was the
+  stranger; Brand blames his watchman's lamp; downriver they say Brand burned his own book, to be rid of what he
+  owed; Maggie heard the wood boy was at the back door. Anton hears it that first morning. It is a story, not a
+  sighting, and it travels like any other.
+- **What Věra saw.** Usually that he left at half past eleven. Sometimes, up with the glow, she saw his lantern come
+  back over the ice. She keeps it while she trusts him; if he loses her, it goes into town. If he's lost and she
+  loves him enough, she takes it on herself.
+- **Whom Martha talks to**: Věra, and on some weeks Maggie too, across the kitchen, so what she saw goes round.
+
+The seed draws again until the week keeps the rules. Every week gives the town someone else to suspect: a story,
+or Tamás's wrong face on a day that comes. Gilchrist never knows anything nobody told him. A run takes about 40 minutes, every ending
 can be reached, and none comes from a trigger: it comes from what nine people came to believe.
 
 ## Built on Thespis
@@ -322,7 +341,8 @@ can be reached, and none comes from a trigger: it comes from what nine people ca
 |---|---|
 | "Someone set the fire" until a name sticks | `someone` as the culprit; a name learned later counts as no rival story |
 | Rival stories of the night; your lie caught | `[claims] one_actor` for the fire and the lantern in the lane, `first_hand`, the `caught` event, trust |
-| Tamás remembering | What he saw, seen again a piece at a time: a lantern on day 2, the face on a seeded day (or never). His own eyes beat anything he was told, so a lie told to him is caught |
+| Tamás remembering | What he saw, seen again a piece at a time: a lantern on day 2, a face on a seeded day (or never), Anton's or, on some seeds, Ashby's, a deed the ledger knows never happened. His own eyes beat anything he was told, so a lie told to him is caught |
+| What the town says the morning after | A statement from `someone`, believed as far as its `conf`, then gossip like anything else |
 | Rumour through Maggie, the grudge through Sándor | Gossip along ties, its threshold, `trace` |
 | Billy's and Věra's silence | `[[npc.x.keeps]]` with `when` (paid, or trust at least n) |
 | Martha's word, which the town won't carry | Few ties, so gossip from her stops at the threshold; she keeps it from the police until trust is high enough |

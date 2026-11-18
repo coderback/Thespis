@@ -16,6 +16,9 @@
 #     broken alibi, and so does Věra saying he left her at half past eleven; once he's asked, Gilchrist crosses the
 #     ice to the sister. Tamás's trust in Anton fades on days he doesn't sit with him (the game does that), and then
 #     what Tamás remembers goes to Sándor, and perhaps to the Inspector.
+#   - the seed draws the week (case.json): who saw the lantern, whether Martha saw the face, when Tamás sees a face
+#     again and whose (on some weeks, in the fever, Ashby's), what the town said the morning after, what Věra saw, and
+#     whether Martha talks to Maggie.
 # Days are three phases (morning, afternoon, evening); the week is 15. A tick moves the minds on one phase.
 
 [game]
@@ -151,9 +154,11 @@ comforted = "You're a good man, Anton. You're the only one who comes."
 confessed = "You. It was you in the light."
 thank = "You came again. Sit where I can see you."
 remembers = "It was you. In the light, with the lantern. Why, Anton?"
+remembers_ashby = "The stranger. Ashby. I saw his face in the light, with the lantern. I'm sure of it now."
 cold = "You told me it was another man's lantern. I can see it now. Don't come here again."
 forgive = "I won't tell him. Go home, Anton. Pray for both of us."
 go_to_inspector = "Fetch the Inspector. I have something to tell him."
+accuse_ashby = "Fetch the Inspector. It was the stranger, Ashby; I saw him."
 
 [npc.sandor]
 name = "Sándor"
@@ -490,6 +495,11 @@ do = "remembers"
 utility = 4
 when = [{ believes = { pred = "fired", a = "player", b = "otto" } }]
 
+[[npc.tamas.choices.visit]]  # on some seeds the face that comes back in the fever is the wrong man's
+do = "remembers_ashby"
+utility = 4
+when = [{ believes = { pred = "fired", a = "ashby", b = "otto" } }]
+
 [[npc.tamas.choices.visit]]
 do = "cold"
 utility = 6
@@ -511,6 +521,12 @@ utility = 4
 when = [{ believes = { pred = "fired", a = "player", b = "otto" } }, { any = [{ caught = "player" },
         { trust = "player", lte = 1 }] }]
 asserts = { pred = "fired", a = "player", b = "otto" }
+
+[[npc.tamas.choices.decision]]  # the wrong man's face: nothing to forgive, so he tells
+do = "accuse_ashby"
+utility = 4
+when = [{ believes = { pred = "fired", a = "ashby", b = "otto" } }]
+asserts = { pred = "fired", a = "ashby", b = "otto" }
 
 # Sándor, meeting someone (the game binds `who`): he goes for whoever he believes burned his father.
 [[npc.sandor.choices.meet]]

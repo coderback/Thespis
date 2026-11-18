@@ -43,8 +43,10 @@ var phase := 0  ## 0 to 14: the session's phase, three a day
 var here := "your_cabin"  ## where Anton is
 var where := {}  ## npc -> place, from the session
 var trust := {}  ## npc -> {who: trust}, from the session
-var face_day := 0  ## the day Tamás sees the face again; 0, never
+var week := {}  ## what this seed made of the week: each draw in case.json's week, by name -> the option's name
+var face_day := 0  ## the day Tamás sees a face again; 0, never
 var face_seen := false  ## Martha saw his face in the lane (on some seeds)
+var _memory: Array = []  ## what Tamás sees that day: Anton's face, or another man's
 var playing := false
 var done := false
 var sat_with_him := false  ## tonight's evening at the post is done
@@ -62,20 +64,84 @@ func begin(seed_wanted := 0) -> ThespisResult:
 		r = await Thespis.open(GAME, seed_value)
 	if not r.ok:
 		return r
+	var drawn := roll(data.week, seed_value)
+	var see := {}
+	for d in drawn:
+		week[d] = str(drawn[d].name)
+		for id in drawn[d].get("see", {}):
+			see[id] = see.get(id, []) + drawn[d].see[id]
 	for o in data.night:
-		await _observe(o)
-	var rng := RandomNumberGenerator.new()
-	rng.seed = seed_value
-	face_seen = rng.randf() < float(data.face.chance)
-	if face_seen:
-		for o in data.face.observe:
+		var o2: Dictionary = o.duplicate()
+		o2.witnesses = o.get("witnesses", []) + see.get(o.get("id", ""), [])
+		await _observe(o2)
+	var heard: Array = []
+	for d in drawn:
+		var opt: Dictionary = drawn[d]
+		for o in opt.get("observe", []):
 			await _observe(o)
-	var days: Array = data.tamas.face.days
-	face_day = int(days[rng.randi() % days.size()])
+		for t in opt.get("tie", []):
+			await Thespis.tie(t[0], t[1], t[2])
+		for npc in opt.get("update", {}):
+			await Thespis.update(npc, opt.update[npc])
+		if opt.has("day"):
+			face_day = int(opt.day)
+		if opt.has("remember"):
+			_memory = opt.remember
+		if opt.has("news"):
+			heard.append(opt.news)
+	face_seen = week.get("face", "") == "seen"
 	await refresh()
 	playing = true
 	clock.emit(day(), part())
+	for t in heard:
+		news.emit(t)
 	return r
+
+
+## The week a seed makes: for each draw, one option by weight, drawn again (the next numbers on) until the week keeps
+## the rules. draw name -> the option. The same seed makes the same week.
+static func roll(spec: Dictionary, s: int) -> Dictionary:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = s
+	var drawn := {}
+	for i in 100:
+		drawn = {}
+		for d in spec.draws:
+			drawn[d.name] = _pick(rng, d.options)
+		if keeps(spec.get("rules", {}), drawn):
+			break
+	return drawn
+
+
+static func _pick(rng: RandomNumberGenerator, options: Array) -> Dictionary:
+	var total := 0.0
+	for o in options:
+		total += float(o.weight)
+	var x := rng.randf() * total
+	for o in options:
+		x -= float(o.weight)
+		if x < 0.0:
+			return o
+	return options[-1]
+
+
+## Whether a drawn week keeps the rules: at least one of `one_of`, and none of `never`.
+static func keeps(rules: Dictionary, drawn: Dictionary) -> bool:
+	for n in rules.get("never", []):
+		if _is(n, drawn):
+			return false
+	var one_of: Array = rules.get("one_of", [])
+	return one_of.is_empty() or one_of.any(func(c): return _is(c, drawn))
+
+
+## Whether every draw a condition names came out as it says ("!x": anything but x).
+static func _is(cond: Dictionary, drawn: Dictionary) -> bool:
+	for d in cond:
+		var want := str(cond[d])
+		var got := str(drawn.get(d, {}).get("name", ""))
+		if (got == want.substr(1)) if want.begins_with("!") else (got != want):
+			return false
+	return true
 
 
 func day() -> int:
@@ -358,13 +424,13 @@ func _waited() -> void:
 	_sat_with_tamas = here == "mission"
 
 
-## Tamás's memory comes back a piece a morning: a lantern on the day the case says, the face on the seed's day.
+## Tamás's memory comes back a piece a morning: a lantern on the day the case says, a face on the seed's day.
 func _remember() -> void:
 	if day() == int(data.tamas.lantern.day):
 		for o in data.tamas.lantern.observe:
 			await _observe(o)
 	if day() == face_day:
-		for o in data.tamas.face.observe:
+		for o in _memory:
 			await _observe(o)
 
 
@@ -407,8 +473,9 @@ func notebook() -> ThespisResult:
 
 func _observe(o: Dictionary) -> ThespisResult:
 	var more := {}
-	if o.has("at"):
-		more["at"] = o.at
+	for k in ["at", "said", "conf", "true"]:
+		if o.has(k):
+			more[k] = o[k]
 	return await Thespis.observe(ThespisClient.event(o.verb, o.actor, o.get("target", ""), o.get("claim", {}),
 			o.get("witnesses", []), more))
 
