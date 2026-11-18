@@ -33,7 +33,10 @@ enabled=PackedStringArray("res://addons/thespis/plugin.cfg")
 
 [rendering]
 
+limits/opengl/max_lights_per_object=32
+
 renderer/rendering_method="forward_plus"
+renderer/rendering_method.web="gl_compatibility"
 textures/canvas_textures/default_texture_filter=0
 anti_aliasing/quality/msaa_3d=0
 lights_and_shadows/directional_shadow/size=8192

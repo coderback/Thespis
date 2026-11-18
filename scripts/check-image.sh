@@ -30,7 +30,9 @@ healthy
 uid=$(docker exec "$name" cat /proc/1/status | awk '/^Uid:/ {print $2}')
 [ "$uid" = 10001 ] || { echo "the app runs as uid $uid, not 10001"; exit 1; }
 docker logs "$name" 2>&1 | grep -q '"message": "boot #1' || { docker logs "$name"; echo "no JSON boot line"; exit 1; }
+curl -fsS "http://127.0.0.1:$port/ice/" | grep -q "<canvas" || { echo "the Before the Ice web build isn't served at /ice/"; exit 1; }
+curl -fsS "http://127.0.0.1:$port/thespis/v1/health" | grep -q '"ok":true' || { echo "no Thespis at /thespis"; exit 1; }
 docker restart "$name" >/dev/null
 healthy
 docker logs "$name" 2>&1 | grep -q 'boot #2' || { docker logs "$name"; echo "the database didn't survive a restart"; exit 1; }
-echo "image ok: the app runs as uid 10001, logs JSON, and its volume persists"
+echo "image ok: the app runs as uid 10001, logs JSON, its volume persists, and it serves Before the Ice"

@@ -405,6 +405,7 @@ thespis/            the core, which knows no game: the ledger, beliefs, percepti
 docker/             the hosted server's image (serve.Dockerfile); the root Dockerfile is the demo's
 games/crypt_road/   the demo game as a Thespis adapter: its cast and words (cast.toml), rules, views, web app
 games/manor/        a second adapter: the manor mystery, served at /manor (its client is client/manor/)
+games/ice/          Before the Ice Goes Out (games/before-the-ice/) in the browser for playtests, at /ice/
 client/             the browser client for both games: The Crypt Road (index.html) and the manor (manor/)
 docs/               getting started, the reference (protocol.md, openapi-v1.json), serve.md, models.md; the demo
                     games' design and API; research

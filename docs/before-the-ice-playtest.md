@@ -4,7 +4,7 @@ The seed sweep can count endings, but it can't say what a week feels like. A pla
 
 1. **Does the town closing in read without a meter?** Do players feel watched, and can they say by whom and why?
 2. **Do the odds feel fair?** When Gilchrist comes for them, or takes someone else, does it feel earned or arbitrary?
-   Lying low ends in arrest on about 14 seeds in 24; is that tense or punishing?
+   Lying low ends in arrest on about 15 seeds in 24; is that tense or punishing?
 3. **Do players tell their week as a story?** The research's honest measure is the retelling: ask players to tell
    their week in their own words, and compare that with what actually happened.
 
@@ -12,14 +12,30 @@ Each session takes about an hour: 40 minutes playing, 15 talking, a few minutes 
 
 ## What you need
 
-- The game, from this repo: `godot --path games/before-the-ice -- --seed=<N>`. Thespis starts as a sidecar, as for
-  `tools/week.tscn` (`$THESPIS_SIDECAR`; see the game's README).
+- The game, either way:
+  - **In a browser**, for a friend anywhere: <https://thespis-production.up.railway.app/ice/?seed=19>, with the seed
+    in the link. Nothing to install. Watch them on a video call with their screen shared. Tell them to keep the
+    game's tab in front: a browser pauses a tab it isn't showing.
+  - **From this repo**: `godot --path games/before-the-ice -- --seed=<N>`. Thespis starts as a sidecar, as for
+    `tools/week.tscn` (`$THESPIS_SIDECAR`; see the game's README).
 - **No model, for now.** Offline, the town speaks its written lines and the minds are deterministic, so two players
   on one seed meet the same town. With a model the lines vary, which tests something else.
 - This page, and a copy of the notes sheet below for each session.
 
-When the ice goes out, the game writes **the week's record**: a page to read, and the same as JSON. If the player
-stops early and closes the window, it writes what there was. The path is printed, and on Windows it is:
+When the ice goes out, the game writes **the week's record**: a page to read, and the same as JSON.
+
+**In a browser** the record goes to the server instead, sent again each phase, so a closed tab still leaves the week
+up to its last phase. List them and fetch one with the admin token (`ADMIN_TOKEN`, in `.env`):
+
+```
+curl -H "Authorization: Bearer $ADMIN_TOKEN" https://thespis-production.up.railway.app/ice/records
+curl -H "Authorization: Bearer $ADMIN_TOKEN" https://thespis-production.up.railway.app/ice/records/<name>.md
+```
+
+A name is `<date>_<time>-seed<N>-<four digits>`; the time is the player's own clock.
+
+**From the repo**, if the player stops early and closes the window, it writes what there was. The path is printed,
+and on Windows it is:
 
 ```
 %APPDATA%\Godot\app_userdata\Before the Ice Goes Out\playtest\<date>_<time>-seed<N>.md   (and .json)
@@ -32,21 +48,22 @@ stops early and closes the window, it writes what there was. The path is printed
 - the news;
 - each morning: what Gilchrist believed and how sure, what he had done (asked, warned, searched), and each person's
   trust in Anton;
+- each morning, the pressure on Anton against the day's target, and what the director brought out, if anything;
 - the ending, and the Inspector's Notebook.
 
 ## The seeds
 
 Give every player **seed 19 first**, so the sessions can be compared, and then, if they play again, one of the
-others. Don't tell players what their week holds. The endings are from the sweep (#169) and show how open each
-week is.
+others. Don't tell players what their week holds. The endings are from the sweep with the pressure director (#175)
+and show how open each week is.
 
 | Seed | The week (for you, not the player) | Lie low | Alibi, sit with Tamás, keep Věra |
 | --- | --- | --- | --- |
 | **19** | A plain week. Brand blames his watchman's lamp; Tamás sees Anton's face on day 5. Every way of playing ends differently | arrest | nobody |
-| 12 | Tamás remembers early (day 3). Downriver they say Brand burned his own book; only Otto saw the lantern | arrest | Otto taken |
-| 21 | Maggie has heard the wood boy was at the back door, and she talks with Martha. Most ways of playing end with Billy taken: a boy goes south for Anton | Billy taken | Billy taken |
+| 12 | Tamás remembers early (day 3). Downriver they say Brand burned his own book; only Otto saw the lantern. Nearly every way of playing ends in arrest | arrest | arrest |
+| 21 | Maggie has heard the wood boy was at the back door, and Věra and Maggie talk. A careful week ends with Billy taken: a boy goes south for Anton | arrest | Billy taken |
 | 2 | The fever week: Tamás sees Ashby's face on day 4, and is sure. Ashby goes south whatever Anton does, unless he confesses. Does the player notice, and how do they feel about it? | Ashby taken | Ashby taken |
-| 7 | Věra saw his lantern come back, and Martha saw his face. Unless Anton turns the case another way, Věra gives herself up for him | Věra taken | Věra taken |
+| 7 | Věra saw his lantern come back, and Martha saw his face. Lying low, Věra gives herself up for him; a careful week sends Ashby south instead | Věra taken | Ashby taken |
 | 3 | The hard week: Martha saw his face, and she talks with Maggie. The town knows by the third day | arrest | nobody |
 
 Spare: **seed 20**, a quiet week. Tamás never remembers, and lying low is safe; useful against a player who found

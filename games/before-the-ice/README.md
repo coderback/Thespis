@@ -55,6 +55,22 @@ THESPIS_SIDECAR='["<python>", "-m", "thespis"]' PYTHONPATH=<repo> godot --path g
 With no model the town speaks the game file's own lines and plays the same; `thespis/sidecar/model` in Project
 Settings gives it a local one. Without Thespis at all the town still draws and Anton still walks.
 
+### In a browser
+
+The demo server plays it in a browser, for playtests: <https://thespis-production.up.railway.app/ice/?seed=19> (the
+link's `seed` picks the week). The Dockerfile exports the game with `export_presets.cfg`'s "Web" preset, and
+`games/ice/api.py` serves the build at `/ice/`, the Thespis it talks to at `/thespis` (this game loaded, no model,
+nobody may put another game on it), and takes the week's record at `/ice/record`, sent each phase and at the steamer.
+The admin token lists and fetches the records (`GET /ice/records`, `GET /ice/records/<name>.md`).
+
+A browser draws with Godot's Compatibility renderer (`rendering_method.web` in `project.godot`), not Forward+. The
+shaders keep the town's look on both: the outlines work out a surface's facing from the depth around it where there's
+no normal buffer, and the toon shader corrects the light bands, lamp colour and windows, which Compatibility hands it
+unconverted, and its lamps, which arrive pi times stronger. `--rendering-method gl_compatibility` shows it on the
+desktop. To try the web build locally: export it (`godot --headless --path games/before-the-ice --export-release Web
+build/web/index.html`, with the 4.7.2 web templates installed), copy `build/web` to `games/ice/web`, and run
+`uvicorn games.crypt_road.app:app`; then open `http://127.0.0.1:8000/ice/?seed=19`.
+
 ## How a week plays
 
 Each day has a morning, an afternoon and an evening. Pick a flag and Anton walks there: whoever has that way in

@@ -2,7 +2,8 @@
 ## The case (case.gd) plays the week through Thespis; the talk panel is where Anton speaks.
 ## Run with `-- --shot=<file.png>` to save the picture after it settles and quit (tools/shot.py does this; a shot
 ## doesn't start Thespis, unless it's `--phases=<n>`, the town that many phases into the week, or `--talk`).
-## `-- --seed=<n>` plays a given week.
+## `-- --seed=<n>` plays a given week. In a browser (the web build, served at /ice/) the link says it instead:
+## /ice/?seed=19; Thespis is the server the page came from, and the week's record is sent there as it goes.
 extends Control
 
 const PIXELS := Vector2i(960, 540)
@@ -17,6 +18,8 @@ var talk: Talk
 var _thespis := false  ## the case is playing through Thespis
 var _log_dir := Journal.DIR  ## where the week's record goes (`-- --log=<dir>`; `--log=none` for none)
 var _journal_saved := false
+var _web := OS.has_feature("web")
+var _web_name := ""  ## in a browser, the name the week's record is sent under, the same each time
 
 
 func _ready() -> void:
@@ -67,6 +70,8 @@ func _ready() -> void:
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--") and "=" in a:
 			args[a.get_slice("=", 0).trim_prefix("--")] = a.get_slice("=", 1)
+	if _web:
+		_from_page(args)
 	if args.has("walk"):
 		_go(args.walk)
 		walk.travelled = walk.curve.get_baked_length() * float(args.get("at", "0.5"))
@@ -165,6 +170,7 @@ func _clock(day: int, part: int) -> void:
 	var part_name: String = case.data.phases[part]
 	paper.set_clock(d.name, d.date, day, part_name)
 	paper.say("%s. Where will you go?" % part_name.capitalize(), "choose a flag on the model")
+	_send_record("", false)  # in a browser, the week so far: a closed tab can't send it
 
 
 ## Who is at each flag's place, as the town moves: on the flags, and the figures walking there.
@@ -189,8 +195,38 @@ func _save_journal(notebook: String, ended: bool) -> void:
 	if case == null or not case.keep_journal or _journal_saved or case.journal.is_empty():
 		return
 	_journal_saved = true
+	if _web:
+		_send_record(notebook, ended)
+		return
 	var path := Journal.save(case, notebook, ended, _log_dir)
 	print("The week's record: %s" % (path if not path.is_empty() else "couldn't be written to " + _log_dir))
+
+
+## In a browser: the seed from the page's link (?seed=19), and Thespis at the server the page came from.
+func _from_page(args: Dictionary) -> void:
+	var query := str(JavaScriptBridge.eval("location.search", true)).trim_prefix("?")
+	for pair in query.split("&", false):
+		if pair.get_slice("=", 0) == "seed" and pair.get_slice("=", 1).is_valid_int():
+			args["seed"] = pair.get_slice("=", 1)
+	Thespis.url = str(JavaScriptBridge.eval("location.origin", true)) + "/thespis"
+
+
+## In a browser: the week's record to the server it came from, under one name for the week, replacing the last send.
+func _send_record(notebook: String, ended: bool) -> void:
+	if not _web or case == null or not case.keep_journal or case.journal.is_empty():
+		return
+	if _web_name.is_empty():
+		_web_name = "%s-seed%d-%04d" % [Journal.stamp(), case.seed_value, randi() % 10000]
+	var r := Journal.record(case, notebook, ended)
+	var http := HTTPRequest.new()
+	add_child(http)
+	http.request_completed.connect(func(_res, code, _h, _b):
+		if code != 200:
+			push_warning("the week's record wasn't taken (%d)" % code)
+		http.queue_free())
+	var origin := str(JavaScriptBridge.eval("location.origin", true))
+	http.request(origin + "/ice/record", ["Content-Type: application/json"], HTTPClient.METHOD_POST,
+			JSON.stringify({"name": _web_name, "md": r.md, "json": r.json}))
 
 
 func _notification(what: int) -> void:

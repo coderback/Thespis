@@ -15,21 +15,31 @@ const PLACES := {"landing": "the landing", "maggies": "Maggie's", "store": "Bran
 ## `notebook` is the Inspector's Notebook, if it was told; `ended` false for a week the player left early.
 static func save(case: Case, notebook := "", ended := true, dir := DIR) -> String:
 	DirAccess.make_dir_recursive_absolute(dir)
-	var stamp := Time.get_datetime_string_from_system().replace(":", "-").replace("T", "_")
-	var base := "%s/%s-seed%d" % [dir, stamp, case.seed_value]
-	var record := {"seed": case.seed_value, "week": case.week, "ended": ended, "phases_played": case.phase,
-			"notebook": notebook, "journal": case.journal}
+	var base := "%s/%s-seed%d" % [dir, stamp(), case.seed_value]
+	var r := record(case, notebook, ended)
 	var j := FileAccess.open(base + ".json", FileAccess.WRITE)
 	if j == null:
 		return ""
-	j.store_string(JSON.stringify(record, "  "))
+	j.store_string(r.json)
 	j.close()
 	var m := FileAccess.open(base + ".md", FileAccess.WRITE)
 	if m == null:
 		return ""
-	m.store_string(page(case.seed_value, case.week, case.journal, notebook, ended))
+	m.store_string(r.md)
 	m.close()
 	return ProjectSettings.globalize_path(base + ".md")
+
+
+## The record as it stands, as text: {"json": ..., "md": ...}. The web build sends this (main.gd) instead of saving.
+static func record(case: Case, notebook := "", ended := true) -> Dictionary:
+	var all := {"seed": case.seed_value, "week": case.week, "ended": ended, "phases_played": case.phase,
+			"notebook": notebook, "journal": case.journal}
+	return {"json": JSON.stringify(all, "  "), "md": page(case.seed_value, case.week, case.journal, notebook, ended)}
+
+
+## Now, for a record's name: 2026-11-18_20-21-19.
+static func stamp() -> String:
+	return Time.get_datetime_string_from_system().replace(":", "-").replace("T", "_")
 
 
 ## The week as a page: what the seed drew, then each phase (what Anton did and heard, what was said where he wasn't,
