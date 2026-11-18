@@ -291,3 +291,115 @@ func route_to(key: String, from: Vector3) -> PackedVector3Array:
 			pts.append(Vector3(x, 0.07, STREET))
 			pts.append(Vector3(x, 0.16, BOARDWALK))
 	return pts
+
+
+# ------------------------------------------------------------------------------------------------ the town moves
+## Where the townsfolk stand at each place, in the open street or out on the ice: by a wall the eaves hide a
+## figure's head from the camera, and east of Maggie's the laid-up steamer hides the front of the street. Whoever is already at a place keeps their spot; a newcomer takes the first free
+## one. A place with no spots (downriver, where Martha's people are building) is off the model.
+const SPOTS := {
+	"maggies": [Vector3(-6.1, 0.03, -0.25), Vector3(-7.9, 0.03, -0.3), Vector3(-7.0, 0.03, -1.1),
+			Vector3(-8.8, 0.03, -1.1), Vector3(-9.6, 0.03, -0.3), Vector3(-4.6, 0.03, -0.3), Vector3(-10.4, 0.03, -1.1)],
+	"store": [Vector3(1.1, 0.03, 0.4), Vector3(0.2, 0.03, -0.6), Vector3(1.9, 0.03, -0.6), Vector3(-0.6, 0.03, 0.4)],
+	"landing": [Vector3(0.0, 0.03, -1.8), Vector3(2.0, 0.03, -1.8), Vector3(-1.0, 0.03, -1.2)],
+	"ice": [Vector3(5.5, 0.06, -3.9), Vector3(4.3, 0.08, -4.1), Vector3(6.7, 0.06, -3.7)],
+	"police": [Vector3(9.6, 0.03, 0.45), Vector3(8.4, 0.03, -0.3), Vector3(10.8, 0.03, -0.3)],
+	"mission": [Vector3(15.1, 0.03, -0.3), Vector3(13.9, 0.03, -0.3), Vector3(14.5, 0.03, -1.1)],
+	"vera": [Vector3(-2.55, 0.03, -7.15), Vector3(-1.6, 0.03, -6.6), Vector3(-1.5, 0.03, -7.5)],
+	"your_cabin": [Vector3(-13.4, 0.03, -0.3), Vector3(-12.2, 0.03, -0.3)],
+}
+const STREET_Z := -0.4  ## Godot z of the middle of Front Street
+const BANK_Z := -2.0  ## past this, the ice and the far side of it
+const PACE := 0.22  ## seconds a metre, as Anton walks
+const LONGEST := 4.0  ## seconds: a long way is walked faster
+
+var _standing := {}  ## who -> [place, spot]
+var _walks := {}  ## who -> Tween
+
+
+## Put the townsfolk where the case says they are (`where`: who -> place). The first time they're simply there;
+## after that each one who moved walks to the new place along the street, and over the landing to the ice.
+func stand(where: Dictionary) -> void:
+	var first := _standing.is_empty()
+	var taken := {}
+	for who in _standing:  # those who stay where they were keep their spots
+		if where.get(who, "") == _standing[who][0]:
+			taken["%s/%d" % _standing[who]] = true
+	for who in where:
+		if who not in people or who == "anton":
+			continue
+		var at: String = where[who]
+		if _standing.has(who) and _standing[who][0] == at:
+			continue
+		var spots: Array = SPOTS.get(at, [])
+		var i := 0
+		while taken.has("%s/%d" % [at, i]):
+			i += 1
+		taken["%s/%d" % [at, i]] = true
+		_standing[who] = [at, i]
+		var s: Sprite3D = people[who]
+		if spots.is_empty():
+			_fade(who, false, first)
+			continue
+		var to: Vector3 = spots[i] if i < spots.size() else spots[-1] + Vector3(0.9 * (i - spots.size() + 1), 0, 0)
+		if first or not s.visible:
+			s.position = to
+			_fade(who, true, first)
+		else:
+			_walk(who, to)
+
+
+func _walk(who: String, to: Vector3) -> void:
+	var s: Sprite3D = people[who]
+	if _walks.has(who):  # still walking, or still coming into sight: carry on from here, in full view
+		_walks[who].kill()
+	s.modulate.a = 1.0
+	var curve := Curve3D.new()
+	curve.bake_interval = 0.05
+	var pts := _way(s.position, to)
+	for i in pts.size():
+		var t := (pts[min(i + 1, pts.size() - 1)] - pts[max(i - 1, 0)]) / 6.0
+		curve.add_point(pts[i], -t, t)
+	var length := curve.get_baked_length()
+	var tw := create_tween()
+	tw.tween_method(func(d: float): s.position = curve.sample_baked(d), 0.0, length, min(length * PACE, LONGEST))
+	_walks[who] = tw
+
+
+## The way between two spots on the ground: out to the street and along it, and down the landing to the ice.
+func _way(a: Vector3, b: Vector3) -> PackedVector3Array:
+	var pts := PackedVector3Array([a])
+	var a_ice := a.z < BANK_Z
+	var b_ice := b.z < BANK_Z
+	if not a_ice:
+		pts.append(Vector3(a.x, 0.07, STREET_Z))
+	if a_ice != b_ice:  # by the landing, down to the ice or up from it
+		var down := [Vector3(1.0, 0.07, STREET_Z), Vector3(1.0, 0.2, -1.6), Vector3(1.0, 0.2, -2.9)]
+		if a_ice:
+			down.reverse()
+		for p in down:
+			pts.append(p)
+	if not b_ice:
+		pts.append(Vector3(b.x, 0.07, STREET_Z))
+	pts.append(b)
+	return pts
+
+
+## Come into sight or go out of it: off the model, or back from there.
+func _fade(who: String, show: bool, at_once: bool) -> void:
+	var s: Sprite3D = people[who]
+	if _walks.has(who):
+		_walks[who].kill()
+		_walks.erase(who)
+	if at_once:
+		s.visible = show
+		s.modulate.a = 1.0
+		return
+	if show:
+		s.modulate.a = 0.0
+		s.visible = true
+	var tw := create_tween()
+	tw.tween_property(s, "modulate:a", 1.0 if show else 0.0, 0.6)
+	if not show:
+		tw.tween_callback(func(): s.visible = false)
+	_walks[who] = tw

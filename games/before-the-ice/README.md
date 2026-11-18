@@ -14,7 +14,7 @@ believes, and the steamer at the end.
 | `assets/fonts/` | The period faces the canvas sets the paper in, each with its licence: Old Standard TT, IM Fell English SC and Cedarville Cursive (SIL Open Font License), Special Elite (Apache 2.0), from [google/fonts](https://github.com/google/fonts). `scripts/fonts.gd` loads them |
 | `assets/portraits/` | Half-length conversation portraits: Maggie, Tamás, Otto and Martha so far. Anyone without one is shown by their figure, scaled up |
 | `scripts/main.gd` | The screen: the town rendered at 960x540 and scaled up by whole pixels, the paper on top at full size |
-| `scripts/town.gd` | Stages the model: the toon material on every surface, the desk lamp and the small lamps, sprites, smoke, the camera from the river, the outline pass |
+| `scripts/town.gd` | Stages the model: the toon material on every surface, the desk lamp and the small lamps, sprites, smoke, the camera from the river, the outline pass. The townsfolk stand where the session says they are, on spots out in the open at each place; when the town moves, each one who moved walks to the new place along the street (and down the landing to the ice), and anyone going downriver fades from the model |
 | `scripts/paper.gd` | The cartouche, the prompt, and a flag pinned to each place |
 | `scripts/walk.gd` | Pick a flag and Anton walks there: red behind him, dashed ahead, click to skip |
 | `shaders/toon.gdshader` | The Blender look, live: the desk lamp's light cut into bands (cold blue to warm), falling off with distance and at the edge of its cone; each surface's colour a noise ramp in its own space, as the Blender materials are |

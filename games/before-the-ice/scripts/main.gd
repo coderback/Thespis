@@ -1,7 +1,8 @@
 ## The game's screen: the town rendered small (960x540) and scaled up by whole pixels, the paper on top at full size.
 ## The case (case.gd) plays the week through Thespis; the talk panel is where Anton speaks.
 ## Run with `-- --shot=<file.png>` to save the picture after it settles and quit (tools/shot.py does this; a shot
-## doesn't start Thespis). `-- --seed=<n>` plays a given week.
+## doesn't start Thespis, unless it's `--phases=<n>`, the town that many phases into the week, or `--talk`).
+## `-- --seed=<n>` plays a given week.
 extends Control
 
 const PIXELS := Vector2i(960, 540)
@@ -67,7 +68,7 @@ func _ready() -> void:
 	if args.has("walk"):
 		_go(args.walk)
 		walk.travelled = walk.curve.get_baked_length() * float(args.get("at", "0.5"))
-	if args.has("shot") and not args.has("talk"):
+	if args.has("shot") and not (args.has("talk") or args.has("phases")):
 		_shot(args.shot)
 		return
 
@@ -89,6 +90,12 @@ func _ready() -> void:
 	if not r.ok:
 		push_warning("No Thespis: %s" % r.reason)
 		paper.say("The town is quiet: no Thespis.", r.reason.left(80))
+	if args.has("phases") and not args.has("talk"):  # `-- --phases=4 --shot=<file.png>`: the town, a few phases on
+		for i in int(args.phases):
+			await case.advance()
+		await get_tree().create_timer(Town.LONGEST + 1.0).timeout
+		if args.has("shot"):
+			_shot(args.shot)
 	if args.has("talk"):  # `-- --talk=maggies [--part=1] [--to=otto] [--answer=2] [--evening=1] --shot=<file.png>`
 		var key: String = args.talk  # talking, for a picture
 		for i in int(args.get("part", "0")):  # `--part=1`: let the morning pass first (2: the afternoon too)
@@ -156,8 +163,9 @@ func _clock(day: int, part: int) -> void:
 	paper.say("%s. Where will you go?" % part_name.capitalize(), "choose a flag on the model")
 
 
-## Who is at each flag's place, as the town moves.
+## Who is at each flag's place, as the town moves: on the flags, and the figures walking there.
 func _who() -> void:
+	town.stand(case.where)
 	for key in case.data.flags:
 		var people: Array = case.at(case.data.flags[key]).map(func(n): return Case.SHORT[n])
 		paper.set_who(key, ", ".join(people) if people.size() > 0 else "nobody")
