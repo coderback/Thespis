@@ -70,39 +70,60 @@ def draw(p: dict) -> Image.Image:
     g = p.get
     hem = 40 if g("long") else 36
     if not g("skirt"):
-        px(12, 37, 3, 7, p["legs"]); px(17, 37, 3, 7, p["legs"]); px(12, 37, 1, 7, Lt(p["legs"])); px(19, 37, 1, 7, Dk(p["legs"]))
+        px(12, 37, 3, 7, p["legs"])
+        px(17, 37, 3, 7, p["legs"])
+        px(12, 37, 1, 7, Lt(p["legs"]))
+        px(19, 37, 1, 7, Dk(p["legs"]))
         if g("stripe"):
-            px(12, 37, 1, 5, p["stripe"]); px(19, 37, 1, 5, p["stripe"])
+            px(12, 37, 1, 5, p["stripe"])
+            px(19, 37, 1, 5, p["stripe"])
         bt = 40 if g("tallBoots") else 43
         bc = g("bootC") or BOOT
-        px(11, bt, 4, 46 - bt, bc); px(17, bt, 4, 46 - bt, bc); px(11, 45, 4, 1, "#140e0b"); px(17, 45, 4, 1, "#140e0b")
+        px(11, bt, 4, 46 - bt, bc)
+        px(17, bt, 4, 46 - bt, bc)
+        px(11, 45, 4, 1, "#140e0b")
+        px(17, 45, 4, 1, "#140e0b")
         px(11, bt, 1, 46 - bt - 1, Lt(bc))
     if g("skirt"):
         for y in range(33, 45):
             wd = (y - 33) // 3 + 1
             x0, x1 = 10 - wd, 21 + wd
-            px(x0, y, x1 - x0 + 1, 1, p["skirtC"]); px(x0, y, 2, 1, Lt(p["skirtC"])); px(x1 - 1, y, 2, 1, Dk(p["skirtC"]))
+            px(x0, y, x1 - x0 + 1, 1, p["skirtC"])
+            px(x0, y, 2, 1, Lt(p["skirtC"]))
+            px(x1 - 1, y, 2, 1, Dk(p["skirtC"]))
             if y % 4 == 1:
                 px(x0 + 4, y, 1, 1, Dk(p["skirtC"]))
             if g("dots") and y % 3 == 0:  # a print in the cloth
                 for x in range(x0 + 2 + y % 2, x1 - 1, 3):
                     px(x, y, 1, 1, p["dots"])
-        px(12, 45, 3, 1, BOOT); px(17, 45, 3, 1, BOOT)
+        px(12, 45, 3, 1, BOOT)
+        px(17, 45, 3, 1, BOOT)
     for y in range(19, (33 if g("skirt") else hem) + 1):
         wd = max(0, (y - 30) // 3)
         x0, x1 = 10 - wd, 21 + wd
-        px(x0, y, x1 - x0 + 1, 1, p["coat"]); px(x0, y, 2, 1, Lt(p["coat"])); px(x1 - 1, y, 2, 1, Dk(p["coat"]))
-    clear(10, 19); clear(21, 19)
+        px(x0, y, x1 - x0 + 1, 1, p["coat"])
+        px(x0, y, 2, 1, Lt(p["coat"]))
+        px(x1 - 1, y, 2, 1, Dk(p["coat"]))
+    clear(10, 19)
+    clear(21, 19)
     if g("long"):
         px(15, 31, 1, hem - 30, Dk(p["coat"]))
     if g("shirt"):
-        px(14, 19, 4, 6, p["shirt"]); px(15, 19, 2, 5, "#1a1a1a")
+        px(14, 19, 4, 6, p["shirt"])
+        px(15, 19, 2, 5, "#1a1a1a")
     if g("vest"):  # the coat open on a waistcoat, a watch chain across it, a white collar and dark tie
-        px(13, 19, 6, 12, p["vest"]); px(16, 19, 3, 12, Dk(p["vest"])); px(14, 19, 4, 1, "#e8e0d0"); px(15, 19, 2, 3, "#1e1a1c")
-        px(13, 26, 2, 1, p["chain"]); px(15, 27, 2, 1, p["chain"]); px(17, 26, 1, 1, p["chain"])
+        px(13, 19, 6, 12, p["vest"])
+        px(16, 19, 3, 12, Dk(p["vest"]))
+        px(14, 19, 4, 1, "#e8e0d0")
+        px(15, 19, 2, 3, "#1e1a1c")
+        px(13, 26, 2, 1, p["chain"])
+        px(15, 27, 2, 1, p["chain"])
+        px(17, 26, 1, 1, p["chain"])
     if g("blanket"):  # a blanket held round the shoulders, its stripe down the front, the nightshirt between
-        px(14, 19, 4, 13, "#ddd2bc"); px(17, 19, 1, 13, "#b8ac94")
-        px(13, 19, 1, 14, p["blanket"]); px(18, 19, 1, 14, p["blanket"])
+        px(14, 19, 4, 13, "#ddd2bc")
+        px(17, 19, 1, 13, "#b8ac94")
+        px(13, 19, 1, 14, p["blanket"])
+        px(18, 19, 1, 14, p["blanket"])
     if g("apron"):
         for y in range(25, 43):
             px(13 - (1 if y > 33 else 0), y, 6 + (2 if y > 33 else 0), 1, shade(p["apron"], 0.85) if y == 25 else p["apron"])
@@ -111,7 +132,8 @@ def draw(p: dict) -> Image.Image:
             for x in range(11 + y % 2, 21, 3):
                 px(x, y, 1, 1, p["dots"])
     if g("belt"):
-        px(10, 30, 12, 1, "#3a2616"); px(15, 30, 2, 1, p["belt"])
+        px(10, 30, 12, 1, "#3a2616")
+        px(15, 30, 2, 1, p["belt"])
         for i in range(9):
             px(11 + i, 20 + i, 1, 1, "#3a2616")
     if g("buttons"):
@@ -126,52 +148,115 @@ def draw(p: dict) -> Image.Image:
             wd = 12 - (y - 19) * 2
             if wd > 0:
                 px(16 - wd // 2, y, wd, 1, Lt(p["shawl"]) if y == 19 else p["shawl"])
-    px(8, 21, 2, 12, Lt(p["coat"])); px(22, 21, 2, 12, Dk(p["coat"])); px(8, 20, 2, 1, p["coat"]); px(22, 20, 2, 1, Dk(p["coat"]))
-    px(8, 33, 2, 2, g("mitt") or "#5a3b26"); px(22, 33, 2, 2, g("mitt") or "#5a3b26")
+    px(8, 21, 2, 12, Lt(p["coat"]))
+    px(22, 21, 2, 12, Dk(p["coat"]))
+    px(8, 20, 2, 1, p["coat"])
+    px(22, 20, 2, 1, Dk(p["coat"]))
+    px(8, 33, 2, 2, g("mitt") or "#5a3b26")
+    px(22, 33, 2, 2, g("mitt") or "#5a3b26")
     if g("lantern"):
-        px(23, 35, 1, 1, "#2a1d16"); px(21, 36, 5, 1, "#2a1d16"); px(21, 37, 5, 4, "#3a2a1a"); px(22, 37, 3, 3, "#ffc95a")
-        px(23, 38, 1, 1, "#fff3c4"); px(21, 41, 5, 1, "#2a1d16")
+        px(23, 35, 1, 1, "#2a1d16")
+        px(21, 36, 5, 1, "#2a1d16")
+        px(21, 37, 5, 4, "#3a2a1a")
+        px(22, 37, 3, 3, "#ffc95a")
+        px(23, 38, 1, 1, "#fff3c4")
+        px(21, 41, 5, 1, "#2a1d16")
     if g("ledger"):  # a ledger under his arm, its top corner burned
-        px(22, 29, 4, 6, p["ledger"]); px(22, 29, 1, 6, "#d6c4a0"); px(24, 29, 2, 2, "#1e1614"); px(22, 33, 2, 2, g("mitt") or "#5a3b26")
+        px(22, 29, 4, 6, p["ledger"])
+        px(22, 29, 1, 6, "#d6c4a0")
+        px(24, 29, 2, 2, "#1e1614")
+        px(22, 33, 2, 2, g("mitt") or "#5a3b26")
     if g("glove"):  # the hide glove she's sewing, held up in front of her
-        px(13, 27, 6, 4, p["glove"]); px(13, 26, 2, 1, p["glove"]); px(16, 26, 1, 1, p["glove"]); px(18, 26, 1, 1, p["glove"])
-        px(13, 30, 6, 1, Dk(p["glove"])); px(12, 28, 1, 3, p["skin"]); px(19, 28, 1, 2, p["skin"])
+        px(13, 27, 6, 4, p["glove"])
+        px(13, 26, 2, 1, p["glove"])
+        px(16, 26, 1, 1, p["glove"])
+        px(18, 26, 1, 1, p["glove"])
+        px(13, 30, 6, 1, Dk(p["glove"]))
+        px(12, 28, 1, 3, p["skin"])
+        px(19, 28, 1, 2, p["skin"])
     px(12, 17, 8, 2, g("scarf") or Dk(p["coat"]))
     if g("scarf"):
         px(17, 19, 2, 6, p["scarf"])
-    px(12, 8, 8, 10, p["skin"]); clear(12, 8); clear(19, 8); clear(12, 17); clear(19, 17)
-    px(19, 9, 1, 8, Dk(p["skin"])); px(13, 16, 6, 1, shade(p["skin"], 0.88)); px(11, 12, 1, 2, p["skin"]); px(20, 12, 1, 2, Dk(p["skin"]))
-    px(14, 12, 1, 2, "#1d1410"); px(17, 12, 1, 2, "#1d1410"); px(16, 14, 1, 1, Dk(p["skin"])); px(13, 14, 1, 1, "#d58f7c"); px(18, 14, 1, 1, "#c98272")
+    px(12, 8, 8, 10, p["skin"])
+    clear(12, 8)
+    clear(19, 8)
+    clear(12, 17)
+    clear(19, 17)
+    px(19, 9, 1, 8, Dk(p["skin"]))
+    px(13, 16, 6, 1, shade(p["skin"], 0.88))
+    px(11, 12, 1, 2, p["skin"])
+    px(20, 12, 1, 2, Dk(p["skin"]))
+    px(14, 12, 1, 2, "#1d1410")
+    px(17, 12, 1, 2, "#1d1410")
+    px(16, 14, 1, 1, Dk(p["skin"]))
+    px(13, 14, 1, 1, "#d58f7c")
+    px(18, 14, 1, 1, "#c98272")
     px(15, 16, 2, 1, shade(p["skin"], 0.62))
     if g("beard"):
-        px(13, 15, 6, 3, p["beard"]); px(14, 18, 4, 1, p["beard"]); px(15, 16, 2, 1, Dk(p["beard"]))
+        px(13, 15, 6, 3, p["beard"])
+        px(14, 18, 4, 1, p["beard"])
+        px(15, 16, 2, 1, Dk(p["beard"]))
     if g("whiskers"):
-        px(12, 12, 1, 4, p["whiskers"]); px(19, 12, 1, 4, Dk(p["whiskers"]))
+        px(12, 12, 1, 4, p["whiskers"])
+        px(19, 12, 1, 4, Dk(p["whiskers"]))
     if g("moustache"):
-        px(14, 15, 4, 1, p["moustache"]); px(13, 16, 1, 1, p["moustache"]); px(18, 16, 1, 1, p["moustache"])
+        px(14, 15, 4, 1, p["moustache"])
+        px(13, 16, 1, 1, p["moustache"])
+        px(18, 16, 1, 1, p["moustache"])
     hc = g("hatC")
     hat = g("hat")
     if hat == "fur":
-        px(11, 4, 10, 6, hc); px(11, 4, 2, 6, Lt(hc)); px(10, 8, 2, 6, hc); px(20, 8, 2, 6, Dk(hc)); px(15, 6, 2, 2, "#c9a14a")
+        px(11, 4, 10, 6, hc)
+        px(11, 4, 2, 6, Lt(hc))
+        px(10, 8, 2, 6, hc)
+        px(20, 8, 2, 6, Dk(hc))
+        px(15, 6, 2, 2, "#c9a14a")
     if hat == "earflap":
-        px(11, 5, 10, 5, hc); px(11, 5, 2, 5, Lt(hc)); px(11, 9, 10, 1, Lt(hc)); px(11, 10, 2, 6, hc); px(19, 10, 2, 6, Dk(hc))
+        px(11, 5, 10, 5, hc)
+        px(11, 5, 2, 5, Lt(hc))
+        px(11, 9, 10, 1, Lt(hc))
+        px(11, 10, 2, 6, hc)
+        px(19, 10, 2, 6, Dk(hc))
     if hat == "cap":
-        px(12, 5, 8, 4, hc); px(12, 5, 2, 3, Lt(hc)); px(11, 8, 11, 1, Dk(hc)); px(12, 9, 1, 3, g("hair") or "#3a2a1e")
+        px(12, 5, 8, 4, hc)
+        px(12, 5, 2, 3, Lt(hc))
+        px(11, 8, 11, 1, Dk(hc))
+        px(12, 9, 1, 3, g("hair") or "#3a2a1e")
     if hat == "brim":
-        px(13, 3, 6, 5, hc); px(13, 3, 1, 5, Lt(hc)); px(13, 7, 6, 1, "#5a2020"); px(9, 8, 14, 1, hc); px(13, 9, 6, 1, Dk(p["skin"]))
+        px(13, 3, 6, 5, hc)
+        px(13, 3, 1, 5, Lt(hc))
+        px(13, 7, 6, 1, "#5a2020")
+        px(9, 8, 14, 1, hc)
+        px(13, 9, 6, 1, Dk(p["skin"]))
     if hat == "bun":
-        px(12, 6, 8, 4, hc); px(12, 6, 2, 2, Lt(hc)); px(12, 9, 1, 5, hc); px(19, 9, 1, 5, Dk(hc)); px(14, 3, 4, 3, hc); px(16, 6, 1, 2, Dk(hc))
+        px(12, 6, 8, 4, hc)
+        px(12, 6, 2, 2, Lt(hc))
+        px(12, 9, 1, 5, hc)
+        px(19, 9, 1, 5, Dk(hc))
+        px(14, 3, 4, 3, hc)
+        px(16, 6, 1, 2, Dk(hc))
     if hat == "scarf":
-        px(11, 6, 10, 5, hc); px(11, 10, 2, 7, hc); px(19, 10, 2, 7, Dk(hc)); px(15, 18, 2, 2, hc)
+        px(11, 6, 10, 5, hc)
+        px(11, 10, 2, 7, hc)
+        px(19, 10, 2, 7, Dk(hc))
+        px(15, 18, 2, 2, hc)
         for (x, y) in [(13, 7), (17, 8), (12, 11), (19, 12)]:
             px(x, y, 1, 1, g("hatDots") or Lt(hc))
     if hat == "bowler":  # a round crown and a narrow brim
-        px(12, 4, 8, 4, hc); px(13, 3, 6, 1, hc); px(12, 4, 2, 3, Lt(hc)); px(10, 7, 12, 1, hc); px(10, 7, 2, 1, Lt(hc))
+        px(12, 4, 8, 4, hc)
+        px(13, 3, 6, 1, hc)
+        px(12, 4, 2, 3, Lt(hc))
+        px(10, 7, 12, 1, hc)
+        px(10, 7, 2, 1, Lt(hc))
         px(12, 8, 8, 1, Dk(p["skin"]))
     if hat == "bandage":  # bare-headed, grey at the sides, a linen bandage round the head
-        px(12, 6, 8, 3, p["skin"]); px(12, 6, 2, 2, Lt(p["skin"]))
-        px(11, 8, 2, 5, p["hair"]); px(19, 8, 2, 5, Dk(p["hair"]))
-        px(11, 8, 10, 2, hc); px(19, 8, 2, 2, Dk(hc)); px(20, 10, 2, 2, hc)
+        px(12, 6, 8, 3, p["skin"])
+        px(12, 6, 2, 2, Lt(p["skin"]))
+        px(11, 8, 2, 5, p["hair"])
+        px(19, 8, 2, 5, Dk(p["hair"]))
+        px(11, 8, 10, 2, hc)
+        px(19, 8, 2, 2, Dk(hc))
+        px(20, 10, 2, 2, hc)
     # the ink outline round everything drawn
     a = im.load()
     filled = [[a[x, y][3] > 0 for y in range(H)] for x in range(W)]
