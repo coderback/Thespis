@@ -48,8 +48,10 @@ seconds.
 
 ## Sprites and portraits
 
-- `sprites/`: the seven townsfolk, 32x48 each, drawn in `prototype/desk-render.html` (open it with
-  `?mode=town&dump&sprites` to print them as PNG data). They stand in the Blender town as camera-facing cut-outs.
+- `sprites/`: the ten townsfolk, 32x48 each, drawn by `sprites/people.py` from a few traits apiece (coat, hat,
+  skin...): `python sprites/people.py sprites [who ...]`. It's a port of the prototype's `drawPerson` and draws the
+  first seven exactly as the prototype did; Tamás, Otto and Martha were added after, in their portraits' colours.
+  They stand in the Blender town as camera-facing cut-outs. Copy them to `games/before-the-ice/assets/sprites/`.
 - `portraits/`: half-length conversation portraits, 64x80 with an ink outline and a paper-white cut-out edge, each
   drawn pixel by pixel by its own script: `python portraits/<who>.py <who>.png 5`. Maggie Doyle with a mug of coffee;
   Tamás Kovács in the infirmary blanket, his head bandaged and the back of his hand burned; Otto Brand with a scorched
@@ -58,5 +60,5 @@ seconds.
 
 ## The earlier prototype (`prototype/`)
 
-`desk-render.html` is the three.js version of the town that came before Blender. It still draws the sprites, and
+`desk-render.html` is the three.js version of the town that came before Blender. It draws the first seven sprites, and
 `?dump` prints screen positions.

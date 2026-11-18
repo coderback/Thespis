@@ -735,12 +735,15 @@ def sprite(name, x, y, z=0.03, k=1.0):
 
 ANTON = (-0.6, 5.0) if WALK else (-2.9, 0.35)
 sprite("anton", *ANTON, z=0.06 if WALK else 0.03)
-sprite("maggie", RX + 0.5, FRONT + 0.3, z=0.15)
+sprite("maggie", RX + 0.5, FRONT + 1.25)  # out in the street: by the wall, the eaves hide her from the camera
 sprite("sandor", -4.6, 0.3)
 sprite("gilchrist", PX, FRONT + 0.55)
 sprite("billy", 0.0, 1.8, k=0.8)
 sprite("ashby", 5.5, 3.9, z=0.06)
 sprite("vera", VX + 1.55, N_BANK + 0.55)
+sprite("tamas", IX - 0.3, FRONT + 1.3)  # outside the infirmary, in his blanket
+sprite("otto", SX0 + 1.1, FRONT + 0.6)  # by the ruin of his store
+sprite("martha", RX - 1.3, FRONT + 1.3)  # at the roadhouse, along from Maggie
 point("antonlantern", (ANTON[0] + 0.5, ANTON[1] + 0.3, 0.9), 60 if WALK else 35, radius=0.1)
 
 # ---------------------------------------------------------------- red: the thread in town, the route on the walk
