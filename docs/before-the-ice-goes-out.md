@@ -276,6 +276,18 @@ Let it run low and what he remembers of you goes to Sándor, and on the last day
 week, if nobody fetches the medicine, the fever takes him first, and you'll have to live with feeling
 relieved.
 
+**The pressure.** A third clock you don't see: each morning the game measures how close the town has come to you
+(how far Gilchrist suspects you, whether your account has broken, how many people hold something true and damaging
+about you) and sets it against a target that rises through the week. Fall behind it and something the night left
+waiting comes out: a miner catches Otto dealing crooked cards and, cornered, Otto admits the lantern he saw; Brand
+catches Billy at his cordwood again and the boy blurts what he saw, unless you've paid him; on the weeks Martha saw
+your face, she's overheard saying so; the fever breaks early and Tamás remembers. Run far ahead of it on the first
+days and the town looks elsewhere for a while: food stowed aboard the laid-up steamer turns eyes to Ashby; an empty
+bottle in the ruin turns them to the watchman. The fourth morning is never quiet. And Gilchrist won't search a
+cabin before the third day: the case has to grow before it bites. Every incident only brings out what someone truly
+saw, or something true that happens that day. The numbers are in [`case.json`](../games/before-the-ice/case.json)'s
+`director`, to be tuned in playtests.
+
 ## What makes it fun
 
 - **You can feel his suspicion without a meter.** As he comes to believe it was you, his choices change: he takes

@@ -583,6 +583,286 @@
       ]
     }
   },
+  "director": {
+    "note": "The pressure director. Each morning from day 2 the game measures the pressure on Anton, 0 to 1: how far Gilchrist suspects him (his surest belief that the lantern or the fire was Anton's), whether Anton's account has broken (his sister says otherwise, or he never gave one), and how many in town hold a true and damaging belief about him. Below the day's target, it promotes one incident latent in the night (press); well above it on days 2 and 3, one that gives relief (relieve); on a day in never_quiet it promotes one either way, trying the other kind if none of the first is left, and last a beat: the world going on, news and no evidence. One incident a morning, each once, chosen among those whose requires hold, in an order the seed shuffles. An incident only brings out what someone truly saw, or something true that happens that day: never a sighting nobody made. With active false it only measures (for a baseline sweep). An incident may also need Tamás's face to be still to come (memory_ahead), and may bring it forward (remember_now): the fever breaks early.",
+    "active": true,
+    "weights": {
+      "gilchrist": 0.5,
+      "alibi": 0.25,
+      "town": 0.25
+    },
+    "town_full": 5,
+    "targets": {
+      "2": 0.15,
+      "3": 0.25,
+      "4": 0.35,
+      "5": 0.45
+    },
+    "relief_over": 0.3,
+    "never_quiet": [
+      4
+    ],
+    "incidents": [
+      {
+        "name": "Otto's game found out",
+        "kind": "press",
+        "requires": [
+          {
+            "week": {
+              "lantern": "!Billy"
+            }
+          },
+          {
+            "not_flag": [
+              "otto",
+              "found_out"
+            ]
+          }
+        ],
+        "news": "Last night at Maggie's a miner caught Otto Brand dealing from the bottom of the deck. Cornered, Brand says he saw a lantern go past the back-room window at one, the night of the fire.",
+        "observe": [
+          {
+            "verb": "deal",
+            "actor": "otto",
+            "at": "maggies",
+            "claim": {
+              "pred": "fixed_game",
+              "a": "otto"
+            },
+            "witnesses": [
+              "maggie",
+              "ashby",
+              "sandor"
+            ]
+          },
+          {
+            "verb": "tell",
+            "actor": "otto",
+            "target": "maggie",
+            "at": "maggies",
+            "claim": {
+              "pred": "lantern",
+              "a": "someone"
+            },
+            "said": true,
+            "witnesses": [
+              "ashby",
+              "sandor"
+            ]
+          }
+        ],
+        "update": {
+          "otto": {
+            "flags": {
+              "found_out": true
+            }
+          }
+        }
+      },
+      {
+        "name": "Billy caught at the cordwood",
+        "kind": "press",
+        "requires": [
+          {
+            "week": {
+              "lantern": "!Otto"
+            }
+          },
+          {
+            "not_flag": [
+              "billy",
+              "paid_off"
+            ]
+          }
+        ],
+        "news": "Otto Brand caught the wood boy at his cordwood again and marched him into Maggie's by the ear. Frightened, Billy blurted out what he saw at the back door the night of the fire.",
+        "observe": [
+          {
+            "verb": "catch",
+            "actor": "otto",
+            "at": "store",
+            "claim": {
+              "pred": "caught_stealing",
+              "a": "billy"
+            },
+            "witnesses": [
+              "maggie"
+            ],
+            "target": "billy"
+          },
+          {
+            "verb": "tell",
+            "actor": "billy",
+            "target": "maggie",
+            "at": "maggies",
+            "claim": {
+              "pred": "lantern",
+              "a": "someone"
+            },
+            "said": true,
+            "witnesses": [
+              "otto"
+            ]
+          },
+          {
+            "verb": "tell",
+            "actor": "billy",
+            "target": "maggie",
+            "at": "maggies",
+            "claim": {
+              "pred": "woodpile",
+              "a": "billy"
+            },
+            "said": true,
+            "witnesses": [
+              "otto"
+            ]
+          }
+        ],
+        "update": {
+          "billy": {
+            "drives": {
+              "fear": 5
+            }
+          }
+        }
+      },
+      {
+        "name": "the fever breaks",
+        "kind": "press",
+        "requires": [
+          {
+            "week": {
+              "whose face": "Anton's"
+            }
+          },
+          {
+            "memory_ahead": true
+          }
+        ],
+        "news": "The fever broke in the night at the mission. Tamás is clear-eyed this morning, and asking for his son.",
+        "remember_now": true
+      },
+      {
+        "name": "Martha overheard",
+        "kind": "press",
+        "requires": [
+          {
+            "week": {
+              "face": "seen"
+            }
+          },
+          {
+            "not_believes": [
+              "gilchrist",
+              {
+                "pred": "lantern",
+                "a": "player"
+              }
+            ]
+          }
+        ],
+        "news": "In Maggie's kitchen last night, Martha was heard to say she knew whose lantern went down the lane.",
+        "observe": [
+          {
+            "verb": "tell",
+            "actor": "martha",
+            "target": "maggie",
+            "at": "maggies",
+            "claim": {
+              "pred": "lantern",
+              "a": "player"
+            },
+            "said": true,
+            "witnesses": [
+              "billy"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Ashby's stores found",
+        "kind": "relieve",
+        "requires": [
+          {
+            "not_believes": [
+              "gilchrist",
+              {
+                "pred": "fired",
+                "a": "ashby",
+                "b": "otto"
+              }
+            ]
+          }
+        ],
+        "news": "Billy found salt pork and biscuit stowed aboard the laid-up steamer. Ashby's, people say: a man ready to run.",
+        "observe": [
+          {
+            "verb": "stow",
+            "actor": "ashby",
+            "at": "landing",
+            "claim": {
+              "pred": "stowed",
+              "a": "ashby"
+            },
+            "witnesses": [
+              "billy",
+              "sandor"
+            ]
+          },
+          {
+            "verb": "tell",
+            "actor": "someone",
+            "target": "sandor",
+            "at": "landing",
+            "claim": {
+              "pred": "fired",
+              "a": "ashby",
+              "b": "otto"
+            },
+            "said": true,
+            "conf": 0.5
+          }
+        ]
+      },
+      {
+        "name": "the watchman's bottle",
+        "kind": "relieve",
+        "requires": [
+          {
+            "not_believes": [
+              "gilchrist",
+              {
+                "pred": "drunk",
+                "a": "tamas"
+              }
+            ]
+          }
+        ],
+        "news": "Picking through the ruin, Otto Brand turned up an empty whisky bottle where the watchman sat.",
+        "observe": [
+          {
+            "verb": "find",
+            "actor": "otto",
+            "at": "store",
+            "claim": {
+              "pred": "drunk",
+              "a": "tamas"
+            },
+            "witnesses": [
+              "billy",
+              "martha"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "the tripod moves",
+        "kind": "beat",
+        "news": "In the night the tripod on the ice moved two feet towards the landing. The old hands say it could go any day now, and the steamer with it."
+      }
+    ]
+  },
   "ways": {
     "note": "Who sees Anton pass: whoever stands at a place in view of the way he takes. The bend crossing is seen by nobody and costs the next phase too.",
     "front": {

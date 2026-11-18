@@ -106,4 +106,9 @@ static func _line(e: Dictionary) -> String:
 					", ".join(e.done) if e.done.size() > 0 else "done nothing yet", ", ".join(trusts)]
 		"ending":
 			return "- **%s.** Gilchrist: %s" % [e.title, e.action]
+		"director":
+			return "- *(the pressure on you: %.2f, the day's target %.2f%s)*" % [e.pressure, e.target,
+					(", so the director looks for something to " + e.wants) if not str(e.wants).is_empty() else ""]
+		"incident":
+			return "- *(the director brought out: %s)*" % e.name
 	return ""
