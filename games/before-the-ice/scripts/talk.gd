@@ -25,9 +25,14 @@ const PALE := Color("#c9bba0")
 const TILT := [-0.8, 0.5, -0.4, 0.7]
 const ANSWERS := 4  ## answers a visit: each spends a little of the day
 const PORTRAITS := {
-	"maggie": "res://assets/portraits/maggie.png",
+	"gilchrist": "res://assets/portraits/gilchrist.png",
+	"vera": "res://assets/portraits/vera.png",
 	"tamas": "res://assets/portraits/tamas.png",
+	"sandor": "res://assets/portraits/sandor.png",
+	"billy": "res://assets/portraits/billy.png",
+	"maggie": "res://assets/portraits/maggie.png",
 	"otto": "res://assets/portraits/otto.png",
+	"ashby": "res://assets/portraits/ashby.png",
 	"martha": "res://assets/portraits/martha.png",
 }
 
@@ -36,6 +41,7 @@ var picture: TextureRect  ## the town, dimmed behind the conversation (shaders/d
 var to := ""  ## whom Anton speaks to
 var spent := 0  ## answers given this visit
 var _gloves := false  ## Anton has bought a pair from Martha this visit
+var _paid_billy := false  ## Anton has paid Billy for his silence this visit
 
 var _place: Label
 var _when: Label
@@ -57,6 +63,8 @@ var _note: RichTextLabel
 var _string: StringGraph
 var _leave: Button
 var _budget: Label
+var _book: PanelContainer  ## the Inspector's Notebook, at the end
+var _book_text: Label
 var _choices: Array = []  ## the answers shown: each {say, hint, warn, act}
 var _busy := false
 var _dimmed := 0.0  ## how far the town is dimmed now
@@ -373,8 +381,14 @@ func open(title: String, part_name: String, leave_label: String, first := "") ->
 	_part = part_name
 	spent = 0
 	_gloves = false
+	_paid_billy = false
 	_place.text = title
-	_when.text = "DAY %d · %s" % [case.day(), part_name]
+	if case.done:  # the steamer, the morning the ice goes out
+		_when.text = "%s · THE STEAMER" % str(case.data.days[-1].name).to_upper()
+	else:
+		_when.text = "DAY %d · %s" % [case.day(), part_name]
+	if _book != null:
+		_book.visible = false
 	_leave.text = leave_label
 	if first.is_empty():  # with someone first, what they just said stays on the sheet
 		_speech.text = ""
@@ -466,16 +480,28 @@ func hear(line: ThespisLine) -> void:
 		line.settled.connect(better, CONNECT_ONE_SHOT)
 
 
-## The end: the Inspector's Notebook on the pinned note, and nothing left to answer.
+## The end: the Inspector's Notebook on a sheet where the answers were, and nothing left to answer. The pinned note
+## stays: what he has from Anton.
 func notebook(text: String) -> void:
 	_column.visible = false
 	_also.visible = false
 	_budget.text = ""
-	_note_title.text = "The Inspector's Notebook"
-	_note.clear()
-	_note.append_text(text)
-	_string.chain = []
-	_string.visible = false
+	if _book == null:
+		_book = PanelContainer.new()
+		_book.add_theme_stylebox_override("panel", _paper(SHEET, Vector4(18, 24, 20, 24), 22))
+		_book.custom_minimum_size = Vector2(500, 0) * K
+		_book.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var v := VBoxContainer.new()
+		v.add_theme_constant_override("separation", int(8 * K))
+		v.add_child(_label("The Inspector's Notebook", _caps, 17, BROWN))
+		_book_text = _label("", _hand, 14, BLUE_INK, true)
+		_book_text.add_theme_constant_override("line_spacing", int(-3 * K))
+		_book_text.custom_minimum_size = Vector2(452, 0) * K
+		v.add_child(_book_text)
+		_book.add_child(v)
+		_put(_book, Vector2(470, 206), -0.5)
+	_book_text.text = text
+	_book.visible = true
 
 
 ## Something Anton learns happened, said over the sheet.
@@ -533,9 +559,9 @@ func _refresh_answers() -> void:
 			_choices.append({"say": st[0], "hint": gossip, "warn": true,
 					"act": func() -> void: await case.tell(to, claim)})
 			n += 1
-		if to == "billy":
+		if to == "billy" and not _paid_billy:  # once a visit, as the gloves; after it, what suits anyone
 			_choices.append({"say": "Here's five dollars. You didn't see anything.", "hint": "buys his silence?",
-					"warn": true, "act": func() -> void: await case.pay(to, 5)})
+					"warn": true, "act": _pay_billy})
 		elif to == "martha" and not _gloves:  # one pair a visit; after it, what suits anyone
 			_choices.append({"say": "I'll take a pair of gloves.", "hint": "eight dollars", "warn": false,
 					"act": _buy_gloves})
@@ -543,6 +569,12 @@ func _refresh_answers() -> void:
 			_choices.append({"say": "I'm sorry for all of it.", "hint": "comforts", "warn": false,
 					"act": func() -> void: await case.comfort(to)})
 	_draw_answers()
+
+
+## Five dollars for Billy's silence. Once a visit: a second five in one breath looks like what it is.
+func _pay_billy() -> void:
+	_paid_billy = true
+	await case.pay(to, 5)
 
 
 ## A pair of Martha's gloves: eight dollars, moosehide gloves that winter. One pair a visit.

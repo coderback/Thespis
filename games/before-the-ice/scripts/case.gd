@@ -57,6 +57,7 @@ var done := false
 var sat_with_him := false  ## tonight's evening at the post is done
 var _comforted := {}  ## who Anton comforted today: once a day counts
 var _sat_with_tamas := false  ## Anton was at the infirmary today
+var ending_action := ""  ## what Gilchrist did at the steamer: nobody, arrest, take:<who>, ...
 var told := {}  ## npc -> what Anton told them, in order: each {claim, note, phase}
 var keep_journal := false  ## record the week for a playtest (Journal writes it out)
 var journal: Array = []  ## what happened, in order: each {phase, day, part, kind, ...}
@@ -257,8 +258,12 @@ func ask(npc: String) -> void:
 			_say(await Thespis.decide("tamas", "visit"))
 		"martha":
 			_say(await Thespis.decide("martha", "meet", {"to": "player"}))
-		"sandor":
-			_say(await Thespis.decide("sandor", "meet", {"bindings": {"who": "player"}}))
+		"sandor":  # he goes for Anton if he believes it; otherwise he answers the question
+			var r := await Thespis.decide("sandor", "meet", {"bindings": {"who": "player"}})
+			if r.ok and str(r.value.action) == "greet":
+				_say(await Thespis.react("sandor", "asked"))
+			else:
+				_say(r)
 		_:
 			_say(await Thespis.react(npc, "asked"))
 
@@ -376,12 +381,17 @@ func evening() -> ThespisResult:
 	here = "police"
 	await Thespis.update("player", {"loc": "police"})
 	await Thespis.update("gilchrist", {"loc": "police"})
+	if day() == 5:
+		await Thespis.update("gilchrist", {"flags": {"last_evening": true}})
 	await refresh()
 	var r := _say(await Thespis.decide("gilchrist", "evening",
 			{"bindings": {"teller": await _teller()}}))
 	if r.ok:
+		var act := str(r.value.action)
 		var flag: String = {"ask_night": "asked_night", "ask_lantern": "asked_lantern", "doubt_alibi": "doubted",
-				"warn": "warned", "caught_lie": "said_caught", "search": "searched"}.get(str(r.value.action), "")
+				"warn": "warned", "caught_lie": "said_caught", "search": "searched"}.get(act, "")
+		if act.begins_with("remark_") or act == "last_evening":  # each said once
+			flag = "said_" + act
 		if not flag.is_empty():
 			var flags := {flag: true}
 			if flag == "searched":
@@ -478,6 +488,7 @@ func steamer() -> void:
 		ended.emit("The Ice Goes Out", null)
 		return
 	var act := str(r.value.action)
+	ending_action = act
 	var title := "The Ice Goes Out"
 	if act == "breakup":
 		title = "Breakup"
@@ -493,9 +504,117 @@ func steamer() -> void:
 	ended.emit(title, r.value)
 
 
-## The Inspector's Notebook: the week as he'd write it up.
-func notebook() -> ThespisResult:
-	return await Thespis.narrate({"since": 0})
+## The Inspector's Notebook: what Gilchrist went south believing about the night, each thing with when he first had it
+## and from whom, and whom he took. His case as he'd write it up, not what happened: a lie he believed is in it.
+func notebook() -> String:
+	var g := await Thespis.inspect("gilchrist")
+	var held: Array = []
+	if g.ok:
+		for b in g.value.beliefs:
+			var c: Dictionary = b.claim
+			if b.status != "active" or str(c.pred) not in NOTED or (c.pred == "fired" and c.a == "someone"):
+				continue
+			if b.evidence.is_empty():
+				continue
+			var first: Dictionary = b.evidence[0]
+			for e in b.evidence:
+				if int(e.phase) < int(first.phase):
+					first = e
+			held.append({"phase": int(first.phase), "from": _from(str(first.source)), "what": _wrote(c),
+					"sure": float(b.opinion.b)})
+	held.sort_custom(func(x, y): return x.phase < y.phase)
+	var lines: Array = []
+	for h in held.slice(0, 8):  # what fits the sheet: the first eight things he had, in order
+		lines.append("%s · %s: %s. (%s)" % [_written(h.phase), h.from, h.what, "sure" if h.sure >= 0.8 else (
+				"likely" if h.sure >= 0.5 else "not sure")])
+	if held.size() > 8:
+		lines.append("And %d more besides." % (held.size() - 8))
+	if lines.is_empty():
+		lines.append("Nothing I could use.")
+	lines.append("")
+	lines.append(_took())
+	return "\n".join(lines)
+
+
+func _written(at_phase: int) -> String:
+	if at_phase >= PHASES:
+		return "At the steamer"
+	return "Day %d, %s" % [at_phase / 3 + 1, ["morning", "afternoon", "evening"][at_phase % 3]]
+
+
+## Whom he had it from, as he'd write it.
+func _from(source: String) -> String:
+	match source:
+		"witnessed", "self":
+			return "Seen myself"
+		"player":
+			return "Mr Holub"
+		"someone", "":
+			return "Talk in town"
+	return NAMES.get(source, source)
+
+
+func _who(id: String) -> String:
+	if id == "player":
+		return "Mr Holub"
+	if id == "gilchrist":
+		return "I"
+	if id == "someone":
+		return "someone"
+	return NAMES.get(id, id)
+
+
+## A belief about the night, in his words.
+func _wrote(c: Dictionary) -> String:
+	var a := _who(str(c.a))
+	var neg: bool = c.get("neg", false)
+	var t := ""
+	match str(c.pred):
+		"fired":
+			t = "%s set the fire" % a
+		"lantern":
+			t = "a lantern went down the back lane at one" if c.a == "someone" else "the lantern in the lane was %s's" % a
+		"with_vera":
+			t = "%s was %sat his sister's till late" % [a, "not " if neg else ""]
+		"left_vera":
+			t = "%s left his sister's at half past eleven" % a
+		"saw_lane":
+			t = "%s saw someone in the lane" % a
+		"drunk":
+			t = "%s was drunk on watch" % a
+		"sold_bottle":
+			t = "%s sold %s the bottle" % [a, _who(str(c.get("b", "")))]
+		"in_bed":
+			t = "%s was in his bed by midnight" % a
+		"back_room":
+			t = "%s was in Maggie's back room at one" % a
+		"asleep":
+			t = "%s was asleep at one" % a
+		"woodpile":
+			t = "%s was at Brand's back door with the cordwood" % a
+		"wanted":
+			t = "%s is wanted in Seattle under another name" % a
+		_:
+			t = claim_text(c)
+	if neg and str(c.pred) != "with_vera":
+		t = "not so: " + t
+	return t.left(1).to_upper() + t.substr(1)
+
+
+## The last line: whom he took south.
+func _took() -> String:
+	match ending_action:
+		"nobody":
+			return "I went south with no one."
+		"arrest":
+			return "I took Mr Holub south."
+		"mercy":
+			return "I took Mr Holub south, and I'll tell the judge why he did it."
+		"breakup":
+			return "I wrote it down as the watchman's lamp."
+	if ending_action.begins_with("take:"):
+		return "I took %s south." % NAMES.get(ending_action.trim_prefix("take:"), "")
+	return ""
 
 
 # ------------------------------------------------------------------------------------------------ plumbing
