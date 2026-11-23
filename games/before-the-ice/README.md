@@ -52,6 +52,9 @@ Thespis runs as a sidecar the addon starts: the packaged runtime as `thespis/` b
 THESPIS_SIDECAR='["<python>", "-m", "thespis"]' PYTHONPATH=<repo> godot --path games/before-the-ice
 ```
 
+On Windows, `play.cmd` (double-click) or `play.ps1 -Seed 19` does this for a playtest: it finds the Python and
+Godot, asks for the seed, and shows where the week's record was saved (`-Editor` opens the editor set up the same way).
+
 With no model the town speaks the game file's own lines and plays the same; `thespis/sidecar/model` in Project
 Settings gives it a local one. Without Thespis at all the town still draws and Anton still walks.
 
