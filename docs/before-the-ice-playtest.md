@@ -16,7 +16,8 @@ Each session takes about an hour: 40 minutes playing, 15 talking, a few minutes 
   - **In a browser**, for a friend anywhere: <https://thespis-production.up.railway.app/ice/?seed=19>, with the seed
     in the link. Nothing to install. Watch them on a video call with their screen shared. Tell them to keep the
     game's tab in front: a browser pauses a tab it isn't showing.
-  - **From this repo**: `godot --path games/before-the-ice -- --seed=<N>`. Thespis starts as a sidecar, as for
+  - **From this repo**: on Windows, double-click `games/before-the-ice/play.cmd` and type the seed. Otherwise
+    `godot --path games/before-the-ice -- --seed=<N>`. Thespis starts as a sidecar, as for
     `tools/week.tscn` (`$THESPIS_SIDECAR`; see the game's README).
 - **No model, for now.** Offline, the town speaks its written lines and the minds are deterministic, so two players
   on one seed meet the same town. With a model the lines vary, which tests something else.
